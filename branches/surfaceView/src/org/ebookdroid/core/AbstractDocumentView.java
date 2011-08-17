@@ -195,6 +195,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             case MotionEvent.ACTION_MOVE:
                 scrollBy((int) (lastX - ev.getX()), (int) (lastY - ev.getY()));
                 setLastPosition(ev);
+                redrawView();
                 break;
             case MotionEvent.ACTION_UP:
                 velocityTracker.computeCurrentVelocity(1000);
@@ -270,9 +271,9 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     public RectF getViewRect() {
-        if (viewRect == null) {
+//        if (viewRect == null) {
             viewRect = new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight());
-        }
+//        }
         return viewRect;
     }
 
@@ -361,10 +362,16 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
      * @see org.ebookdroid.core.IDocumentViewController#shouldKeptInMemory(org.ebookdroid.core.PageTreeNode)
      */
     public final boolean shouldKeptInMemory(final PageTreeNode pageTreeNode) {
+        /*
         return (pageTreeNode.getPageIndex() >= getBase().getDocumentModel().getFirstVisiblePage()
                 - getBase().getAppSettings().getPagesInMemory())
                 && (pageTreeNode.getPageIndex() <= getBase().getDocumentModel().getLastVisiblePage()
                         + getBase().getAppSettings().getPagesInMemory());
+        */
+        return (pageTreeNode.getPageIndex() >= getBase().getDocumentModel().getCurrentPageObject().getIndex()
+                - Math.ceil(getBase().getAppSettings().getPagesInMemory()/2.0))
+                && (pageTreeNode.getPageIndex() <= getBase().getDocumentModel().getCurrentPageObject().getIndex()
+                        + Math.ceil(getBase().getAppSettings().getPagesInMemory()/2.0));
     }
 
     @Override
