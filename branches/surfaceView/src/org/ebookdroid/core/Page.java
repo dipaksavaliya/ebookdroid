@@ -96,7 +96,6 @@ public class Page {
 
     public void setBounds(final RectF pageBounds) {
         bounds = pageBounds;
-        node.invalidateNodeBounds();
     }
 
     public void updateVisibility() {

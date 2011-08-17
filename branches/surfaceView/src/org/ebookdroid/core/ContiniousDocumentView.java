@@ -1,18 +1,12 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.utils.AndroidVersion;
-
 import android.graphics.Canvas;
 import android.graphics.RectF;
-import android.view.View;
 
 public class ContiniousDocumentView extends AbstractDocumentView {
 
     public ContiniousDocumentView(final IViewerActivity base) {
         super(base);
-//        if (!AndroidVersion.lessThan3x) {
-//            this.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-//        }
     }
 
     @Override

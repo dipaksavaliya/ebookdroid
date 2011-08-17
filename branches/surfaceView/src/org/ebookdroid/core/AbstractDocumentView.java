@@ -362,12 +362,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
      * @see org.ebookdroid.core.IDocumentViewController#shouldKeptInMemory(org.ebookdroid.core.PageTreeNode)
      */
     public final boolean shouldKeptInMemory(final PageTreeNode pageTreeNode) {
-        /*
-        return (pageTreeNode.getPageIndex() >= getBase().getDocumentModel().getFirstVisiblePage()
-                - getBase().getAppSettings().getPagesInMemory())
-                && (pageTreeNode.getPageIndex() <= getBase().getDocumentModel().getLastVisiblePage()
-                        + getBase().getAppSettings().getPagesInMemory());
-        */
         return (pageTreeNode.getPageIndex() >= getBase().getDocumentModel().getCurrentPageObject().getIndex()
                 - Math.ceil(getBase().getAppSettings().getPagesInMemory()/2.0))
                 && (pageTreeNode.getPageIndex() <= getBase().getDocumentModel().getCurrentPageObject().getIndex()
@@ -398,7 +392,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        boolean retry = true;
         drawThread.finish();
 
     }
