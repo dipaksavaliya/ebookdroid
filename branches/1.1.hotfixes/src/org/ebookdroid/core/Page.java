@@ -9,13 +9,14 @@ import android.graphics.RectF;
 
 public class Page {
 
-    private final int index;
-    private RectF bounds;
-    private final PageTreeNode node;
-    private final IViewerActivity base;
-    private float aspectRatio;
-    private final int documentPage;
-    private final PageType pageType;
+    final int index;
+    RectF bounds;
+    final PageTreeNode node;
+    final IViewerActivity base;
+    float aspectRatio;
+    final int documentPage;
+    final PageType pageType;
+    boolean recycled;
 
     public Page(final IViewerActivity base, final int index, final int documentPage, final PageType pt,
             final CodecPageInfo cpi) {
@@ -28,6 +29,11 @@ public class Page {
 
         final boolean sliceLimit = base.getAppSettings().getSliceLimit();
         node = new PageTreeNode(base, pageType.getInitialRect(), this, 1, null, sliceLimit);
+    }
+
+    public void recycle() {
+        recycled = true;
+        node.recycle();
     }
 
     public float getPageHeight(final int mainWidth, final float zoom) {
@@ -95,11 +101,15 @@ public class Page {
     }
 
     public void updateVisibility() {
-        node.updateVisibility();
+        if (!recycled) {
+            node.updateVisibility();
+        }
     }
 
     public void invalidate() {
-        node.invalidate();
+        if (!recycled) {
+            node.invalidate();
+        }
     }
 
     public RectF getBounds() {

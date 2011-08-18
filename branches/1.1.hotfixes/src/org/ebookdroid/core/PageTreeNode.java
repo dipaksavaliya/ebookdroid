@@ -12,11 +12,14 @@ import android.graphics.RectF;
 
 import java.lang.ref.SoftReference;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PageTreeNode implements DecodeService.DecodeCallback {
 
     // private static final int SLICE_SIZE = 65535;
     private static final int SLICE_SIZE = 131070;
+
+    private static final AtomicLong SEQ = new AtomicLong();
 
     private static RectF[] splitMasks = {
             // Left Top
@@ -28,6 +31,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             // Right Bottom
             new RectF(0.5f, 0.5f, 1.0f, 1.0f), };
 
+    private final long id;
     private Bitmap bitmap;
     private SoftReference<Bitmap> bitmapWeakReference;
     private final AtomicBoolean decodingNow = new AtomicBoolean();
@@ -45,6 +49,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
     PageTreeNode(final IViewerActivity base, final RectF localPageSliceBounds, final Page page,
             final float childrenZoomThreshold, final PageTreeNode parent, final boolean sliceLimit) {
+        this.id = SEQ.incrementAndGet();
         this.base = base;
         this.parent = parent;
         this.pageSliceBounds = evaluatePageSliceBounds(localPageSliceBounds, parent);
@@ -77,7 +82,10 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                 child.updateVisibility();
             }
         }
-        if (isKeptInMemory()) {
+        if (!isVisibleAndNotHiddenByChildren()) {
+            stopDecodingThisNode("node hidden");
+            setBitmap(null);
+        } else if (isKeptInMemory()) {
             if (!thresholdHit()) {
                 if (getBitmap() != null && !invalidateFlag) {
                     restoreBitmapReference();
@@ -85,10 +93,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                     decodePageTreeNode();
                 }
             }
-        }
-        if (!isVisibleAndNotHiddenByChildren()) {
-            stopDecodingThisNode("node hidden");
-            setBitmap(null);
         }
     }
 
@@ -308,7 +312,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return false;
     }
 
-    private void recycle() {
+    public void recycle() {
         stopDecodingThisNode("node recycling");
         setBitmap(null);
         if (children != null) {
@@ -328,11 +332,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((page == null) ? 0 : page.getIndex());
-        result = prime * result + ((pageSliceBounds == null) ? 0 : pageSliceBounds.hashCode());
-        return result;
+        return ((page == null) ? 0 : page.getIndex());
     }
 
     @Override
@@ -357,6 +357,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         final StringBuilder buf = new StringBuilder("PageTreeNode");
         buf.append("[");
 
+        buf.append("id").append("=").append(id);
+        buf.append(", ");
         buf.append("page").append("=").append(page.getIndex());
         buf.append(", ");
         buf.append("rect").append("=").append(this.pageSliceBounds);

@@ -115,6 +115,9 @@ public class DocumentModel extends CurrentPageModel {
     }
 
     public void initPages(final IViewerActivity base) {
+        for(Page page: pages.values()) {
+            page.recycle();
+        }
         pages.clear();
 
         final boolean splitPages = base.getBookSettings().getSplitPages();
