@@ -29,8 +29,9 @@ public abstract class AbstractDocumentView extends View implements ZoomListener,
         super(baseActivity.getContext());
         this.base = baseActivity;
         this.align = base.getBookSettings().getPageAlign();
-        setKeepScreenOn(true);
-        scroller = new Scroller(getContext());
+        this.scroller = new Scroller(getContext());
+
+        setKeepScreenOn(base.getAppSettings().isKeepScreenOn());
         setFocusable(true);
         setFocusableInTouchMode(true);
     }
@@ -172,7 +173,7 @@ public abstract class AbstractDocumentView extends View implements ZoomListener,
             if ((ev.getY() / getHeight() < ts) || (ev.getY() / getHeight() > (1 - ts))) {
                 inTap = true;
             }
-        }        
+        }
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 stopScroller();
@@ -183,7 +184,7 @@ public abstract class AbstractDocumentView extends View implements ZoomListener,
                     lastDownEventTime = ev.getEventTime();
                 }
                 touchInTapZone = inTap;
-                
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 scrollBy((int) (lastX - ev.getX()), (int) (lastY - ev.getY()));
@@ -196,7 +197,7 @@ public abstract class AbstractDocumentView extends View implements ZoomListener,
                         getBottomLimit());
                 velocityTracker.recycle();
                 velocityTracker = null;
-                
+
                 if (inTap && touchInTapZone) {
                     if (ev.getY() / getHeight() < ts) {
                         verticalConfigScroll(-1);
@@ -348,15 +349,16 @@ public abstract class AbstractDocumentView extends View implements ZoomListener,
     /**
      * Returns if given page tree node should be kept in memory.
      *
-     * @param pageTreeNode the page tree node
+     * @param pageTreeNode
+     *            the page tree node
      * @return true, if successful
      * @see org.ebookdroid.core.IDocumentViewController#shouldKeptInMemory(org.ebookdroid.core.PageTreeNode)
      */
     public final boolean shouldKeptInMemory(final PageTreeNode pageTreeNode) {
         return (pageTreeNode.getPageIndex() >= getBase().getDocumentModel().getCurrentPageObject().getIndex()
-                - Math.ceil(getBase().getAppSettings().getPagesInMemory()/2.0))
+                - Math.ceil(getBase().getAppSettings().getPagesInMemory() / 2.0))
                 && (pageTreeNode.getPageIndex() <= getBase().getDocumentModel().getCurrentPageObject().getIndex()
-                        + Math.ceil(getBase().getAppSettings().getPagesInMemory()/2.0));
+                        + Math.ceil(getBase().getAppSettings().getPagesInMemory() / 2.0));
     }
 
     @Override
