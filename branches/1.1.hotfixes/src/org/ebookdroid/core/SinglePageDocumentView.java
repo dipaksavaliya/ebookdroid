@@ -13,7 +13,7 @@ import android.view.View;
 
 /**
  * The Class SinglePageDocumentView.
- *
+ * 
  * Used in single page view mode
  */
 public class SinglePageDocumentView extends AbstractDocumentView {
@@ -23,7 +23,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
 
     /**
      * Instantiates a new single page document view.
-     *
+     * 
      * @param baseActivity
      *            the base activity
      */
@@ -50,25 +50,22 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    public int compare(PageTreeNode node1, PageTreeNode node2) {
-        RectF viewRect = getViewRect();
+    public int compare(final PageTreeNode node1, final PageTreeNode node2) {
+        final RectF rect1 = node1.getTargetRectF();
+        final RectF rect2 = node2.getTargetRectF();
 
-        long centerX = ((long) viewRect.left + (long) viewRect.right) / 2;
-        long centerY = ((long) viewRect.top + (long) viewRect.bottom) / 2;
+        final int cp = getCurrentPage();
 
-        RectF rect1 = node1.getTargetRectF();
-        RectF rect2 = node1.getTargetRectF();
+        if (node1.page.index == node2.page.index) {
+            int res = CompareUtils.compare(rect1.top, rect2.top);
+            if (res == 0) {
+                res = CompareUtils.compare(rect1.left, rect2.left);
+            }
+            return res;
+        }
 
-        long centerX1 = ((long) rect1.left + (long) rect1.right) / 2;
-        long centerY1 = ((long) rect1.top + (long) rect1.bottom) / 2 + (node1.page.getIndex() - getCurrentPage())
-                * (long) viewRect.height();
-
-        long centerX2 = ((long) rect2.left + (long) rect2.right) / 2;
-        long centerY2 = ((long) rect2.top + (long) rect2.bottom) / 2 + (node2.page.getIndex() - getCurrentPage())
-                * (long) viewRect.height();
-
-        long dist1 = (centerX1 - centerX) * (centerX1 - centerX) + (centerY1 - centerY) * (centerY1 - centerY);
-        long dist2 = (centerX2 - centerX) * (centerX2 - centerX) + (centerY2 - centerY) * (centerY2 - centerY);
+        final int dist1 = Math.abs(node1.page.index - cp);
+        final int dist2 = Math.abs(node2.page.index - cp);
 
         return CompareUtils.compare(dist1, dist2);
     }

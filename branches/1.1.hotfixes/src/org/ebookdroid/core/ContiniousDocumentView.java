@@ -63,12 +63,21 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     @Override
     public int compare(final PageTreeNode node1, final PageTreeNode node2) {
         final RectF viewRect = getViewRect();
+        final RectF rect1 = node1.getTargetRectF();
+        final RectF rect2 = node2.getTargetRectF();
+
+        final int cp = getCurrentPage();
+
+        if (node1.page.index == cp && node2.page.index == cp) {
+            int res = CompareUtils.compare(rect1.top, rect2.top);
+            if (res == 0) {
+                res = CompareUtils.compare(rect1.left, rect2.left);
+            }
+            return res;
+        }
 
         final long centerX = ((long) viewRect.left + (long) viewRect.right) / 2;
         final long centerY = ((long) viewRect.top + (long) viewRect.bottom) / 2;
-
-        final RectF rect1 = node1.getTargetRectF();
-        final RectF rect2 = node2.getTargetRectF();
 
         final long centerX1 = ((long) rect1.left + (long) rect1.right) / 2;
         final long centerY1 = ((long) rect1.top + (long) rect1.bottom) / 2;
