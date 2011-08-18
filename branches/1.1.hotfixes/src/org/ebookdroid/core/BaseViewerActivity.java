@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -172,13 +173,14 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         }
     }
 
+    @Override
     public void createDocumentView() {
         if (documentController != null) {
             frameLayout.removeView(documentController.getView());
             zoomModel.removeEventListener(documentController);
         }
 
-        BookSettings bs = getBookSettings();
+        final BookSettings bs = getBookSettings();
 
         if (bs.getSinglePage()) {
             documentController = new SinglePageDocumentView(this);
@@ -216,7 +218,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     @Override
     public void currentPageChanged(final int docPageIndex, final int viewPageIndex) {
-        int pageCount = documentModel.getPageCount();
+        final int pageCount = documentModel.getPageCount();
         String prefix = "";
 
         if (pageCount > 0) {
@@ -286,7 +288,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Called on creation options menu
-     *
+     * 
      * @param menu
      *            the main menu
      * @return true, if successful
@@ -294,10 +296,25 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
      */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-
         final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.mainmenu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onMenuOpened(final int featureId, final Menu menu) {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    @Override
+    public void onOptionsMenuClosed(final Menu menu) {
+        if (getAppSettings().getFullScreen()) {
+            getWindow()
+                    .setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
     }
 
     private void showOutline() {
@@ -382,7 +399,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the zoom model.
-     *
+     * 
      * @return the zoom model
      */
     @Override
@@ -392,7 +409,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the multi touch zoom.
-     *
+     * 
      * @return the multi touch zoom
      */
     @Override
@@ -407,7 +424,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the decoding progress model.
-     *
+     * 
      * @return the decoding progress model
      */
     @Override
