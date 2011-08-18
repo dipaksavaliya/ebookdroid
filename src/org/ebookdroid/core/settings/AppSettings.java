@@ -49,10 +49,6 @@ public class AppSettings {
     private Boolean pageInTitle;
 
     private Integer brightness;
-    
-    private Boolean brightnessnightmodeonly;
-    
-    private Boolean keepscreenon;
 
     private Set<String> autoScanDirs;
 
@@ -107,20 +103,6 @@ public class AppSettings {
             nightMode = prefs.getBoolean("nightmode", false);
         }
         return nightMode;
-    }
-    
-    public boolean isKeepScreenOn() {
-        if (keepscreenon == null) {
-            keepscreenon = prefs.getBoolean("keepscreenon", true);
-        }
-        return keepscreenon;
-    }
-    
-    public boolean isBrightnessInNightModeOnly() {
-        if (brightnessnightmodeonly == null) {
-            brightnessnightmodeonly = prefs.getBoolean("brightnessnightmodeonly", false);
-        }
-        return brightnessnightmodeonly;
     }
 
     public void switchNightMode() {
@@ -287,9 +269,6 @@ public class AppSettings {
         private static final short D_ScrollHeight = 0x0001 << 7;
         private static final short D_PagesInMemory = 0x0001 << 8;
         private static final short D_SliceLimit = 0x0001 << 9;
-        private static final short D_Brightness = 0x0001 << 10;
-        private static final short D_BrightnessInNightMode = 0x0001 << 11;
-        private static final short D_KeepScreenOn = 0x0001 << 12;
 
         private short mask;
         private final boolean firstTime;
@@ -326,15 +305,6 @@ public class AppSettings {
                 }
                 if (firstTime || olds.getSliceLimit() != news.getSliceLimit()) {
                     mask |= D_SliceLimit;
-                }
-                if (firstTime || olds.getBrightness() != news.getBrightness()) {
-                    mask |= D_Brightness;
-                }
-                if (firstTime || olds.isBrightnessInNightModeOnly() != news.isBrightnessInNightModeOnly()) {
-                    mask |= D_BrightnessInNightMode;
-                }
-                if (firstTime || olds.isKeepScreenOn() != news.isKeepScreenOn()) {
-                    mask |= D_KeepScreenOn;
                 }
             }
         }
@@ -381,18 +351,6 @@ public class AppSettings {
 
         public boolean isSliceLimitChanged() {
             return 0 != (mask & D_SliceLimit);
-        }
-        
-        public boolean isBrightnessChanged() {
-            return 0 != (mask & D_Brightness);
-        }
-        
-        public boolean isBrightnessInNightModeChanged() {
-            return 0 != (mask & D_BrightnessInNightMode);
-        }
-        
-        public boolean isKeepScreenOnChanged() {
-            return 0 != (mask & D_KeepScreenOn);
         }
     }
 

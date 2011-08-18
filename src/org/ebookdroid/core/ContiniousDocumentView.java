@@ -1,7 +1,5 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.models.DocumentModel;
-
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
@@ -20,14 +18,19 @@ public class ContiniousDocumentView extends AbstractDocumentView {
 
     @Override
     public int getCurrentPage() {
-        return getFirstVisiblePage();
+        return getBase().getDocumentModel().getFirstVisiblePage();
     }
 
     @Override
     protected void onScrollChanged() {
+        post(new Runnable() {
+
+            @Override
+            public void run() {
+                getBase().getDocumentModel().setCurrentPageByFirstVisible();
+            }
+        });
         super.onScrollChanged();
-        getBase().getDocumentModel().setCurrentPageByFirstVisible(getFirstVisiblePage());
-        redrawView();
     }
 
     @Override
@@ -36,14 +39,14 @@ public class ContiniousDocumentView extends AbstractDocumentView {
         getScroller().startScroll(getScrollX(), getScrollY(), 0,
                 (int) (direction * getHeight() * (scrollheight / 100.0)));
 
-        redrawView();
+        invalidate();
     }
 
     @Override
     protected void verticalDpadScroll(final int direction) {
         getScroller().startScroll(getScrollX(), getScrollY(), 0, direction * getHeight() / 2);
 
-        redrawView();
+        invalidate();
     }
 
     @Override
@@ -67,13 +70,10 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    public void drawView(final Canvas canvas, RectF viewRect) {
-        DocumentModel dm = getBase().getDocumentModel();
-        for (int i = firstVisiblePage; i <= lastVisiblePage; i++) {
-            final Page page = dm.getPageObject(i);
-            if (page != null) {
-                page.draw(canvas, viewRect);
-            }
+    protected void onDraw(final Canvas canvas) {
+        super.onDraw(canvas);
+        for (final Page page : getBase().getDocumentModel().getPages().values()) {
+            page.draw(canvas);
         }
     }
 
@@ -106,15 +106,18 @@ public class ContiniousDocumentView extends AbstractDocumentView {
         final int width = getWidth();
         final float zoom = getBase().getZoomModel().getZoom();
 
-        for (final Page page : getBase().getDocumentModel().getPages()) {
+        for (int i = 0; i < getBase().getDocumentModel().getPages().size(); i++) {
+            final Page page = getBase().getDocumentModel().getPages().get(i);
+
             final float pageHeight = page.getPageHeight(width, zoom);
             page.setBounds(new RectF(0, heightAccum, width * zoom, heightAccum + pageHeight));
             heightAccum += pageHeight;
         }
     }
 
+
     @Override
-    protected boolean isPageVisibleImpl(final Page page) {
+    public boolean isPageVisible(final Page page) {
         return RectF.intersects(getViewRect(), page.getBounds());
     }
 

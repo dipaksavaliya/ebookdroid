@@ -20,16 +20,6 @@
 			android:maxLength="3"
 			android:defaultValue="100"
 			android:numeric="integer" />
-		<CheckBoxPreference
-			android:key="brightnessnightmodeonly"
-			android:title="@string/pref_brightnessnightmodeonly_title"
-			android:summary="@string/pref_brightnessnightmodeonly_summary"
-			android:defaultValue="false" />
-		<CheckBoxPreference
-			android:key="keepscreenon"
-			android:title="@string/pref_keepscreenon_title"
-			android:summary="@string/pref_keepscreenon_summary"
-			android:defaultValue="true" />
 			
 		<ListPreference
 			android:key="rotation"

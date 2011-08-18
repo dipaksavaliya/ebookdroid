@@ -108,8 +108,10 @@ public class SettingsManager implements CurrentPageListener {
     public void currentPageChanged(final int docPageIndex, final int viewPageIndex) {
         lock.readLock().lock();
         try {
-            bookSettings.currentPageChanged(docPageIndex, viewPageIndex);
-            db.storeBookSettings(bookSettings);
+            if (bookSettings != null) {
+                bookSettings.currentPageChanged(docPageIndex, viewPageIndex);
+                db.storeBookSettings(bookSettings);
+            }
         } finally {
             lock.readLock().unlock();
         }
@@ -196,12 +198,6 @@ public class SettingsManager implements CurrentPageListener {
                 base.getActivity().setProgressBarIndeterminate(true);
             }
         }
-        final IDocumentViewController dc = base.getDocumentController();
-        if (dc != null) {
-            if (diff.isKeepScreenOnChanged()) {
-                dc.getView().setKeepScreenOn(newSettings.isKeepScreenOn());
-            }
-        }        
     }
 
     protected void applyBookSettingsChanges(final IViewerActivity base, final BookSettings oldSettings,
@@ -229,7 +225,6 @@ public class SettingsManager implements CurrentPageListener {
             if (diff.isAnimationTypeChanged()) {
                 dc.updateAnimationType();
             }
-            
         }
 
         final DocumentModel dm = base.getDocumentModel();

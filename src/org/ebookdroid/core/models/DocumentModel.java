@@ -5,30 +5,29 @@ import org.ebookdroid.core.IViewerActivity;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageType;
 import org.ebookdroid.core.codec.CodecPageInfo;
-import org.ebookdroid.utils.LengthUtils;
 
 import android.view.View;
 
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class DocumentModel extends CurrentPageModel {
 
-    private static final Page[] EMPTY_PAGES = {};
-
     private DecodeService decodeService;
 
-    private Page[] pages = EMPTY_PAGES;
+    private final Map<Integer, Page> pages = new TreeMap<Integer, Page>();
 
     public DocumentModel(final DecodeService decodeService) {
+        super();
         this.decodeService = decodeService;
     }
 
-    public Page[] getPages() {
+    public Map<Integer, Page> getPages() {
         return pages;
     }
 
     public int getPageCount() {
-        return LengthUtils.length(pages);
+        return getPages().size();
     }
 
     public DecodeService getDecodeService() {
@@ -38,16 +37,12 @@ public class DocumentModel extends CurrentPageModel {
     public void recycle() {
         decodeService.recycle();
         decodeService = null;
-        if (LengthUtils.isNotEmpty(pages)) {
-            for(Page page: pages) {
-                page.recycle();
-            }
-        }
-        pages = EMPTY_PAGES;
+
+        pages.clear();
     }
 
-    public Page getPageObject(final int viewIndex) {
-        return pages != null && 0 <= viewIndex && viewIndex < pages.length ? pages[viewIndex] : null;
+    public Page getPageObject(final int page) {
+        return pages.get(page);
     }
 
     /**
@@ -56,7 +51,7 @@ public class DocumentModel extends CurrentPageModel {
      * @return the current page object
      */
     public Page getCurrentPageObject() {
-        return getPageObject(this.currentViewPageIndex);
+        return pages.get(getCurrentViewPageIndex());
     }
 
     /**
@@ -65,7 +60,7 @@ public class DocumentModel extends CurrentPageModel {
      * @return the next page object
      */
     public Page getNextPageObject() {
-        return getPageObject(this.currentViewPageIndex + 1);
+        return pages.get(getCurrentViewPageIndex() + 1);
     }
 
     /**
@@ -74,7 +69,7 @@ public class DocumentModel extends CurrentPageModel {
      * @return the prev page object
      */
     public Page getPrevPageObject() {
-        return getPageObject(this.currentViewPageIndex - 1);
+        return pages.get(getCurrentViewPageIndex() - 1);
     }
 
     /**
@@ -83,23 +78,47 @@ public class DocumentModel extends CurrentPageModel {
      * @return the last page object
      */
     public Page getLastPageObject() {
-        return getPageObject(pages.length - 1);
+        return pages.get(pages.size() - 1);
     }
 
-    public void setCurrentPageByFirstVisible(int firstVisiblePage) {
-        Page page = getPageObject(firstVisiblePage);
-        if (page != null) {
-            setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
+    public int getFirstVisiblePage() {
+        int result = 0;
+        for (final Page page : pages.values()) {
+            if (page.isVisible()) {
+                result = page.getIndex();
+                break;
+            }
         }
+        return result;
+    }
+
+    public int getLastVisiblePage() {
+        int result = 0;
+        boolean foundVisible = false;
+        for (final Page page : pages.values()) {
+            if (page.isVisible()) {
+                foundVisible = true;
+                result = page.getIndex();
+            } else {
+                if (foundVisible) {
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public void setCurrentPageByFirstVisible() {
+        int index = getFirstVisiblePage();
+        Page page = pages.get(index);
+        setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
     }
 
     public void initPages(final IViewerActivity base) {
-        if (LengthUtils.isNotEmpty(pages)) {
-            for(Page page: pages) {
-                page.recycle();
-            }
+        for(Page page: pages.values()) {
+            page.recycle();
         }
-        pages = EMPTY_PAGES;
+        pages.clear();
 
         final boolean splitPages = base.getBookSettings().getSplitPages();
         final View view = base.getView();
@@ -110,20 +129,17 @@ public class DocumentModel extends CurrentPageModel {
 
         int index = 0;
 
-        ArrayList<Page> list = new ArrayList<Page>();
         for (int i = 0; i < getDecodeService().getPageCount(); i++) {
             final CodecPageInfo cpi = getDecodeService().getPageInfo(i);
             if (!splitPages || cpi == null || (cpi.getWidth() < cpi.getHeight())) {
-                final Page page = new Page(base, index++, i, PageType.FULL_PAGE, cpi != null ? cpi : defCpi);
-                list.add(page);
+                final Page page = new Page(base, index, i, PageType.FULL_PAGE, cpi != null ? cpi : defCpi);
+                pages.put(index++, page);
             } else {
-                final Page page1 = new Page(base, index++, i, PageType.LEFT_PAGE, cpi);
-                list.add(page1);
-                final Page page2 = new Page(base, index++, i, PageType.RIGHT_PAGE, cpi);
-                list.add(page2);
+                final Page page1 = new Page(base, index, i, PageType.LEFT_PAGE, cpi);
+                pages.put(index++, page1);
+                final Page page2 = new Page(base, index, i, PageType.RIGHT_PAGE, cpi);
+                pages.put(index++, page2);
             }
         }
-
-        pages = list.toArray(new Page[list.size()]);
     }
 }

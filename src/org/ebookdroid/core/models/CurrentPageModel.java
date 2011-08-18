@@ -7,9 +7,9 @@ import android.util.Log;
 
 public class CurrentPageModel extends EventDispatcher {
 
-    int currentDocPageIndex;
+    private int currentDocPageIndex;
 
-    int currentViewPageIndex;
+    private int currentViewPageIndex;
 
     public void setCurrentPageIndex(final int currentDocPageIndex, final int currentViewPageIndex) {
         if (this.currentViewPageIndex != currentViewPageIndex) {
