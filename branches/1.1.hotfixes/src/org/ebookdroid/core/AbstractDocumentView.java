@@ -9,7 +9,13 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.Scroller;
 
-public abstract class AbstractDocumentView extends View implements ZoomListener, IDocumentViewController {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+public abstract class AbstractDocumentView extends View implements ZoomListener, IDocumentViewController,
+        Comparator<PageTreeNode> {
 
     private final IViewerActivity base;
     private boolean isInitialized = false;
@@ -88,8 +94,12 @@ public abstract class AbstractDocumentView extends View implements ZoomListener,
 
     @Override
     public void updatePageVisibility() {
+        List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
         for (final Page page : getBase().getDocumentModel().getPages().values()) {
-            page.updateVisibility();
+            page.updateVisibility(nodesToDecode);
+        }
+        if (!nodesToDecode.isEmpty()) {
+            decodePageTreeNodes(nodesToDecode);
         }
     }
 
@@ -97,10 +107,24 @@ public abstract class AbstractDocumentView extends View implements ZoomListener,
     public void commitZoom() {
         base.getSettings().zoomChanged(base.getZoomModel().getZoom());
 
+        List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
         for (final Page page : getBase().getDocumentModel().getPages().values()) {
-            page.invalidate();
+            page.invalidate(nodesToDecode);
         }
+        if (!nodesToDecode.isEmpty()) {
+            decodePageTreeNodes(nodesToDecode);
+        }
+
         inZoom = false;
+    }
+
+    protected void decodePageTreeNodes(List<PageTreeNode> nodesToDecode) {
+        Collections.sort(nodesToDecode, this);
+        for (PageTreeNode pageTreeNode : nodesToDecode) {
+            final int width = base.getView().getWidth();
+            final float zoom = base.getZoomModel().getZoom() * pageTreeNode.page.getTargetRectScale();
+            base.getDecodeService().decodePage(pageTreeNode, width, zoom, pageTreeNode);
+        }
     }
 
     @Override

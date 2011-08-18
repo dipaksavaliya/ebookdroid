@@ -3,6 +3,7 @@ package org.ebookdroid.core;
 import org.ebookdroid.core.curl.PageAnimationType;
 import org.ebookdroid.core.curl.PageAnimator;
 import org.ebookdroid.core.utils.AndroidVersion;
+import org.ebookdroid.utils.CompareUtils;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
@@ -46,6 +47,30 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     @Override
     public int getCurrentPage() {
         return getBase().getDocumentModel().getCurrentViewPageIndex();
+    }
+
+    @Override
+    public int compare(PageTreeNode node1, PageTreeNode node2) {
+        RectF viewRect = getViewRect();
+
+        long centerX = ((long) viewRect.left + (long) viewRect.right) / 2;
+        long centerY = ((long) viewRect.top + (long) viewRect.bottom) / 2;
+
+        RectF rect1 = node1.getTargetRectF();
+        RectF rect2 = node1.getTargetRectF();
+
+        long centerX1 = ((long) rect1.left + (long) rect1.right) / 2;
+        long centerY1 = ((long) rect1.top + (long) rect1.bottom) / 2 + (node1.page.getIndex() - getCurrentPage())
+                * (long) viewRect.height();
+
+        long centerX2 = ((long) rect2.left + (long) rect2.right) / 2;
+        long centerY2 = ((long) rect2.top + (long) rect2.bottom) / 2 + (node2.page.getIndex() - getCurrentPage())
+                * (long) viewRect.height();
+
+        long dist1 = (centerX1 - centerX) * (centerX1 - centerX) + (centerY1 - centerY) * (centerY1 - centerY);
+        long dist2 = (centerX2 - centerX) * (centerX2 - centerX) + (centerY2 - centerY) * (centerY2 - centerY);
+
+        return CompareUtils.compare(dist1, dist2);
     }
 
     @Override

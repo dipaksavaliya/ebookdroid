@@ -81,39 +81,6 @@ public class DocumentModel extends CurrentPageModel {
         return pages.get(pages.size() - 1);
     }
 
-    public int getFirstVisiblePage() {
-        int result = 0;
-        for (final Page page : pages.values()) {
-            if (page.isVisible()) {
-                result = page.getIndex();
-                break;
-            }
-        }
-        return result;
-    }
-
-    public int getLastVisiblePage() {
-        int result = 0;
-        boolean foundVisible = false;
-        for (final Page page : pages.values()) {
-            if (page.isVisible()) {
-                foundVisible = true;
-                result = page.getIndex();
-            } else {
-                if (foundVisible) {
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    public void setCurrentPageByFirstVisible() {
-        int index = getFirstVisiblePage();
-        Page page = pages.get(index);
-        setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
-    }
-
     public void initPages(final IViewerActivity base) {
         for(Page page: pages.values()) {
             page.recycle();
