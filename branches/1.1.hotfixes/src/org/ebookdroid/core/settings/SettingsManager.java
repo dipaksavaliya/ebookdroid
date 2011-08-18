@@ -108,8 +108,10 @@ public class SettingsManager implements CurrentPageListener {
     public void currentPageChanged(final int docPageIndex, final int viewPageIndex) {
         lock.readLock().lock();
         try {
-            bookSettings.currentPageChanged(docPageIndex, viewPageIndex);
-            db.storeBookSettings(bookSettings);
+            if (bookSettings != null) {
+                bookSettings.currentPageChanged(docPageIndex, viewPageIndex);
+                db.storeBookSettings(bookSettings);
+            }
         } finally {
             lock.readLock().unlock();
         }
