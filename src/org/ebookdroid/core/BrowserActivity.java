@@ -56,7 +56,6 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.browser);
 
         adapter = new BrowserAdapter(this, filter);

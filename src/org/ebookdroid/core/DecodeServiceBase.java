@@ -12,7 +12,6 @@ import android.graphics.RectF;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +102,6 @@ public class DecodeServiceBase implements DecodeService {
         if (LCTX.isDebugEnabled()) {
             LCTX.d("Task " + task.id + ": Starting decoding");
         }
-
         final CodecPage vuPage = getPage(task.pageNumber);
 
         if (executor.isTaskDead(task)) {
@@ -195,7 +193,7 @@ public class DecodeServiceBase implements DecodeService {
 
     private class Executor implements RejectedExecutionHandler {
 
-        final Map<PageTreeNode, DecodeTask> decodingTasks = new IdentityHashMap<PageTreeNode, DecodeTask>();
+        final Map<PageTreeNode, DecodeTask> decodingTasks = new HashMap<PageTreeNode, DecodeTask>();
         final Map<Long, Future<?>> decodingFutures = new HashMap<Long, Future<?>>();
 
         final BlockingQueue<Runnable> queue;
@@ -217,24 +215,19 @@ public class DecodeServiceBase implements DecodeService {
                 }
 
                 final DecodeTask running = decodingTasks.get(task.node);
-
                 if (running != null && running.equals(task) && !isTaskDead(running)) {
                     if (LCTX.isDebugEnabled()) {
                         LCTX.d("The similar task is running: " + running.id);
                     }
                     return;
-                } else if (running != null) {
-                    if (LCTX.isDebugEnabled()) {
-                        LCTX.d("The another task is running: " + running.id);
-                    }
                 }
 
-                decodingTasks.put(task.node, task);
+                final Future<?> future = executorService.submit(task);
 
-                decodingFutures.put(task.id, executorService.submit(task));
-
-                if (running != null) {
-                    stopDecoding(running, null, "canceled by new one");
+                decodingFutures.put(task.id, future);
+                final DecodeTask old = decodingTasks.put(task.node, task);
+                if (old != null) {
+                    stopDecoding(old, null, "canceled by new one");
                 }
             } finally {
                 lock.writeLock().unlock();

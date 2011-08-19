@@ -2,17 +2,18 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.core.curl.PageAnimationType;
 import org.ebookdroid.core.curl.PageAnimator;
+import org.ebookdroid.core.utils.AndroidVersion;
 import org.ebookdroid.utils.CompareUtils;
 
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+import android.view.View;
 
 /**
  * The Class SinglePageDocumentView.
- *
+ * 
  * Used in single page view mode
  */
 public class SinglePageDocumentView extends AbstractDocumentView {
@@ -22,7 +23,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
 
     /**
      * Instantiates a new single page document view.
-     *
+     * 
      * @param baseActivity
      *            the base activity
      */
@@ -36,10 +37,10 @@ public class SinglePageDocumentView extends AbstractDocumentView {
         if (toPage >= 0 && toPage <= getBase().getDocumentModel().getPageCount()) {
             final Page page = getBase().getDocumentModel().getPageObject(toPage);
             getBase().getDocumentModel().setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
-            if (curler != null) {
-                curler.resetPageIndexes();
-            }
             updatePageVisibility();
+        }
+        if (curler != null) {
+            curler.resetPageIndexes();
         }
     }
 
@@ -49,10 +50,9 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    public int compare(PageTreeNode node1, PageTreeNode node2) {
-        RectF viewRect = getViewRect();
-        Rect rect1 = node1.getTargetRect(viewRect, node1.page.getBounds());
-        Rect rect2 = node1.getTargetRect(viewRect, node2.page.getBounds());
+    public int compare(final PageTreeNode node1, final PageTreeNode node2) {
+        final RectF rect1 = node1.getTargetRectF();
+        final RectF rect2 = node2.getTargetRectF();
 
         final int cp = getCurrentPage();
 
@@ -73,11 +73,14 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     @Override
     protected void verticalConfigScroll(final int direction) {
         goToPageImpl(getBase().getDocumentModel().getCurrentViewPageIndex() + direction);
+
+        invalidate();
     }
 
     @Override
     protected void verticalDpadScroll(final int direction) {
         goToPageImpl(getBase().getDocumentModel().getCurrentViewPageIndex() + direction);
+        invalidate();
     }
 
     @Override
@@ -130,7 +133,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
             }
             velocityTracker.addMovement(event);
 
-            return curler.handleTouchEvent(event);
+            return curler.onTouchEvent(event);
         }
     }
 
@@ -144,14 +147,14 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    public void drawView(final Canvas canvas, final RectF viewRect) {
+    protected void onDraw(final Canvas canvas) {
         if (isCurlerDisabled()) {
             final Page page = getBase().getDocumentModel().getCurrentPageObject();
             if (page != null) {
-                page.draw(canvas, viewRect);
+                page.draw(canvas);
             }
         } else {
-            curler.draw(canvas, viewRect);
+            curler.onDraw(canvas);
         }
     }
 
@@ -167,7 +170,9 @@ public class SinglePageDocumentView extends AbstractDocumentView {
         final int height = getHeight();
         final float zoom = getBase().getZoomModel().getZoom();
 
-        for (final Page page : getBase().getDocumentModel().getPages()) {
+        for (int i = 0; i < getBase().getDocumentModel().getPages().size(); i++) {
+            final Page page = getBase().getDocumentModel().getPages().get(i);
+
             PageAlign effectiveAlign = getAlign();
             if (getAlign() == PageAlign.AUTO) {
                 final float pageHeight = page.getPageHeight(width, zoom);
@@ -180,12 +185,11 @@ public class SinglePageDocumentView extends AbstractDocumentView {
 
             if (effectiveAlign == PageAlign.WIDTH) {
                 final float pageHeight = page.getPageHeight(width, zoom);
-                final float heightDelta = (height - pageHeight) / 2;
-                page.setBounds(new RectF(0, heightDelta, width * zoom, pageHeight + heightDelta));
+                page.setBounds(new RectF(0, ((height - pageHeight) / 2), width * zoom, pageHeight
+                        + ((height - pageHeight) / 2)));
             } else {
                 final float pageWidth = page.getPageWidth(height, zoom);
-                final float widthDelta = (width - pageWidth) / 2;
-                page.setBounds(new RectF(widthDelta, 0, pageWidth + widthDelta, height * zoom));
+                page.setBounds(new RectF((width - pageWidth) / 2, 0, pageWidth + (width - pageWidth) / 2, height * zoom));
             }
         }
         if (curler != null) {
@@ -195,18 +199,19 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    protected boolean isPageVisibleImpl(final Page page) {
-        final int pageIndex = page.getIndex();
-        if (curler != null) {
-            return pageIndex == curler.getForeIndex() || pageIndex == curler.getBackIndex();
-        }
-        return pageIndex == getCurrentPage();
+    public boolean isPageVisible(final Page page) {
+        return page.getIndex() == getCurrentPage();
     }
 
     @Override
     public void updateAnimationType() {
         final PageAnimationType type = getBase().getBookSettings().getAnimationType();
         curler = PageAnimationType.create(type, this);
+
+        if (!AndroidVersion.lessThan3x) {
+            final int layerType = type.isHardwareAccelSupported() ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_SOFTWARE;
+            this.setLayerType(layerType, null);
+        }
 
         if (curler != null) {
             curler.init();

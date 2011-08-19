@@ -3,8 +3,6 @@ package org.ebookdroid.xpsdroid.codec;
 import org.ebookdroid.core.OutlineLink;
 import org.ebookdroid.core.log.LogContext;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 

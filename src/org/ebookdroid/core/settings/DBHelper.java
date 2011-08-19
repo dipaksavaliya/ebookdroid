@@ -62,7 +62,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
     }
 
-    public Map<String, BookSettings> getBookSettings() {
+    public Map<String, BookSettings> getBookSettings(boolean all) {
         final Map<String, BookSettings> map = new LinkedHashMap<String, BookSettings>();
 
         try {
@@ -74,6 +74,9 @@ public class DBHelper extends SQLiteOpenHelper {
                         for (boolean next = c.moveToFirst(); next; next = c.moveToNext()) {
                             final BookSettings bs = createBookSettings(c);
                             map.put(bs.getFileName(), bs);
+                            if (!all) {
+                                break;
+                            }
                         }
                     } finally {
                         try {

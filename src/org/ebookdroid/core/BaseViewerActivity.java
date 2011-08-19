@@ -25,7 +25,6 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -67,7 +66,9 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
      * Instantiates a new base viewer activity.
      */
     public BaseViewerActivity() {
-        super();
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity created: " + System.identityHashCode(this));
+        }
     }
 
     /**
@@ -76,6 +77,10 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity initialized: " + System.identityHashCode(this));
+        }
 
         frameLayout = createMainContainer();
 
@@ -275,6 +280,9 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     @Override
     public void onResume() {
         super.onResume();
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity resumed: " + System.identityHashCode(this));
+        }
         if (documentModel != null) {
             getSettings().onAppSettingsChanged(this);
         }
@@ -285,6 +293,9 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         if (documentModel != null) {
             documentModel.recycle();
             documentModel = null;
+        }
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity destroyed: " + System.identityHashCode(this));
         }
         super.onDestroy();
     }
@@ -299,7 +310,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
      */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-
         final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.mainmenu, menu);
         return true;
@@ -385,7 +395,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
                 return true;
             case R.id.mainmenu_nightmode:
                 getAppSettings().switchNightMode();
-                ((AbstractDocumentView) getView()).redrawView();
+                getView().invalidate();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -483,15 +493,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
         }
-    }
-
-    @Override
-    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            finish();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
 }
