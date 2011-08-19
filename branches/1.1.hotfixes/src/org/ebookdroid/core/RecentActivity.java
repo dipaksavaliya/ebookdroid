@@ -1,6 +1,7 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.R;
+import org.ebookdroid.core.log.EmergencyHandler;
 import org.ebookdroid.core.presentation.FileListAdapter;
 import org.ebookdroid.core.presentation.RecentAdapter;
 import org.ebookdroid.core.settings.SettingsActivity;
@@ -37,6 +38,8 @@ public class RecentActivity extends Activity implements IBrowserActivity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EmergencyHandler.init(this);
+
         setContentView(R.layout.recent);
 
         recentAdapter = new RecentAdapter(this);
@@ -47,6 +50,8 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         viewflipper = (ViewFlipper) findViewById(R.id.recentflip);
         viewflipper.addView(new RecentBooksView(this, recentAdapter), VIEW_RECENT);
         viewflipper.addView(new LibraryView(this, libraryAdapter), VIEW_LIBRARY);
+
+        throw new RuntimeException("Test exception");
     }
 
     @Override

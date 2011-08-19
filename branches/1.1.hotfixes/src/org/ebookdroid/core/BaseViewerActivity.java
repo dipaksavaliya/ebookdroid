@@ -3,6 +3,7 @@ package org.ebookdroid.core;
 import org.ebookdroid.R;
 import org.ebookdroid.core.events.CurrentPageListener;
 import org.ebookdroid.core.events.DecodingProgressListener;
+import org.ebookdroid.core.log.EmergencyHandler;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.models.ZoomModel;
@@ -64,7 +65,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
      * Instantiates a new base viewer activity.
      */
     public BaseViewerActivity() {
-        super();
     }
 
     /**
@@ -73,6 +73,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EmergencyHandler.init(this);
 
         frameLayout = createMainContainer();
 
@@ -288,7 +289,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Called on creation options menu
-     * 
+     *
      * @param menu
      *            the main menu
      * @return true, if successful
@@ -399,7 +400,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the zoom model.
-     * 
+     *
      * @return the zoom model
      */
     @Override
@@ -409,7 +410,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the multi touch zoom.
-     * 
+     *
      * @return the multi touch zoom
      */
     @Override
@@ -424,7 +425,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the decoding progress model.
-     * 
+     *
      * @return the decoding progress model
      */
     @Override
