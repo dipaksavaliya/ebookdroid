@@ -29,7 +29,9 @@ public class ContiniousDocumentView extends AbstractDocumentView {
         final DocumentModel dm = getBase().getDocumentModel();
         final int index = getCurrentPage();
         final Page page = dm.getPageObject(index);
-        dm.setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
+        if (page != null) {
+            dm.setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
+        }
     }
 
     @Override
