@@ -89,13 +89,15 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         super.onResume();
 
         getSettings().clearCurrentBookSettings();
+        
+        
+        viewflipper.setDisplayedChild(VIEW_RECENT);
+        library.setImageResource(R.drawable.actionbar_library);
 
         final DirectoryOrFileFilter filter = new DirectoryOrFileFilter(getSettings().getAppSettings()
                 .getAllowedFileTypes(Activities.getAllExtensions()));
 
         recentAdapter.setBooks(getSettings().getAllBooksSettings().values(), filter);
-
-        libraryAdapter.startScan(filter);
     }
 
     @Override
@@ -128,6 +130,9 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         if (viewflipper.getDisplayedChild() == VIEW_RECENT) {
             viewflipper.setDisplayedChild(VIEW_LIBRARY);
             library.setImageResource(R.drawable.actionbar_recent);
+            final DirectoryOrFileFilter filter = new DirectoryOrFileFilter(getSettings().getAppSettings()
+                    .getAllowedFileTypes(Activities.getAllExtensions()));
+            libraryAdapter.startScan(filter);
         } else {
             viewflipper.setDisplayedChild(VIEW_RECENT);
             library.setImageResource(R.drawable.actionbar_library);

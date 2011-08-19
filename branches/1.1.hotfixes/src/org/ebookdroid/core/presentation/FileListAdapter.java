@@ -190,6 +190,8 @@ public class FileListAdapter extends BaseExpandableListAdapter implements Compar
                 for (File f = currFiles.poll(); f != null && inScan.get(); f = currFiles.poll()) {
                     addFile(f);
                 }
+                //FileListAdapter.this.notifyDataSetInvalidated();
+                FileListAdapter.this.notifyDataSetChanged();
                 // Clear flag
                 inUI.set(false);
                 // Finish UI part
@@ -220,7 +222,7 @@ public class FileListAdapter extends BaseExpandableListAdapter implements Compar
             if (file.isFile()) {
                 // Add file to queue
                 currFiles.add(file);
-                if (currFiles.size() > 40 && inUI.compareAndSet(false, true)) {
+                if (currFiles.size() > 2 && inUI.compareAndSet(false, true)) {
                     // Start UI task if required
                     base.getActivity().runOnUiThread(this);
                 }
