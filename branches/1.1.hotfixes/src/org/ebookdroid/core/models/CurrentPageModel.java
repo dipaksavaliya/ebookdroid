@@ -2,10 +2,11 @@ package org.ebookdroid.core.models;
 
 import org.ebookdroid.core.events.CurrentPageListener;
 import org.ebookdroid.core.events.EventDispatcher;
-
-import android.util.Log;
+import org.ebookdroid.core.log.LogContext;
 
 public class CurrentPageModel extends EventDispatcher {
+
+    private static final LogContext LCTX = LogContext.ROOT.lctx("DocModel");
 
     private int currentDocPageIndex;
 
@@ -13,9 +14,11 @@ public class CurrentPageModel extends EventDispatcher {
 
     public void setCurrentPageIndex(final int currentDocPageIndex, final int currentViewPageIndex) {
         if (this.currentViewPageIndex != currentViewPageIndex) {
-            Log.d("DocModel", "Current page changed: " + "[" + this.currentDocPageIndex + ", "
-                    + this.currentViewPageIndex + "]" + " -> " + "[" + currentDocPageIndex + ", "
-                    + currentViewPageIndex + "]");
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Current page changed: " + "[" + this.currentDocPageIndex + ", "
+                        + this.currentViewPageIndex + "]" + " -> " + "[" + currentDocPageIndex + ", "
+                        + currentViewPageIndex + "]");
+            }
 
             this.currentDocPageIndex = currentDocPageIndex;
             this.currentViewPageIndex = currentViewPageIndex;
