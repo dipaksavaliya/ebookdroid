@@ -21,10 +21,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -149,7 +149,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
             @Override
             public void onClick(final View v) {
-                finish();
+                closeActivity();
             }
         });
     }
@@ -167,7 +167,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
             @Override
             public void onClick(final View v) {
-                finish();
+                closeActivity();
             }
         });
     }
@@ -302,7 +302,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Called on creation options menu
-     *
+     * 
      * @param menu
      *            the main menu
      * @return true, if successful
@@ -377,8 +377,8 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.mainmenu_exit:
-                System.exit(0);
+            case R.id.mainmenu_close:
+                closeActivity();
                 return true;
             case R.id.mainmenu_goto_page:
                 showDialog(DIALOG_GOTO);
@@ -412,7 +412,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the zoom model.
-     *
+     * 
      * @return the zoom model
      */
     @Override
@@ -422,7 +422,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the multi touch zoom.
-     *
+     * 
      * @return the multi touch zoom
      */
     @Override
@@ -437,7 +437,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     /**
      * Gets the decoding progress model.
-     *
+     * 
      * @return the decoding progress model
      */
     @Override
@@ -486,13 +486,16 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     }
 
     @Override
-    public void onConfigurationChanged(final Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // Checks the orientation of the screen
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            closeActivity();
+            return true;
         }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void closeActivity() {
+        finish();
     }
 
 }

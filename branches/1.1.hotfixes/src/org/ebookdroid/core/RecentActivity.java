@@ -6,7 +6,7 @@ import org.ebookdroid.core.presentation.FileListAdapter;
 import org.ebookdroid.core.presentation.RecentAdapter;
 import org.ebookdroid.core.settings.SettingsActivity;
 import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.utils.DirectoryOrFileFilter;
+import org.ebookdroid.core.utils.FileNameExtFilter;
 import org.ebookdroid.core.views.LibraryView;
 import org.ebookdroid.core.views.RecentBooksView;
 
@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -115,10 +116,8 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         viewflipper.setDisplayedChild(VIEW_RECENT);
         library.setImageResource(R.drawable.actionbar_library);
 
-        final DirectoryOrFileFilter filter = new DirectoryOrFileFilter(getSettings().getAppSettings()
+        recentAdapter.setBooks(getSettings().getAllBooksSettings().values(), getSettings().getAppSettings()
                 .getAllowedFileTypes(Activities.getAllExtensions()));
-
-        recentAdapter.setBooks(getSettings().getAllBooksSettings().values(), filter);
     }
 
     @Override
@@ -155,12 +154,21 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         startActivity(intent);
     }
 
+    @Override
+    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            System.exit(0);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     private void changeLibraryView() {
         if (viewflipper.getDisplayedChild() == VIEW_RECENT) {
             viewflipper.setDisplayedChild(VIEW_LIBRARY);
             library.setImageResource(R.drawable.actionbar_recent);
-            final DirectoryOrFileFilter filter = new DirectoryOrFileFilter(getSettings().getAppSettings()
-                    .getAllowedFileTypes(Activities.getAllExtensions()));
+            final FileNameExtFilter filter = new FileNameExtFilter(getSettings().getAppSettings().getAllowedFileTypes(
+                    Activities.getAllExtensions()));
             libraryAdapter.startScan(filter);
         } else {
             viewflipper.setDisplayedChild(VIEW_RECENT);
