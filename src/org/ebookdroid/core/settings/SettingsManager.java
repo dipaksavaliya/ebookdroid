@@ -1,6 +1,5 @@
 package org.ebookdroid.core.settings;
 
-import org.ebookdroid.core.IBrowserActivity;
 import org.ebookdroid.core.IDocumentViewController;
 import org.ebookdroid.core.IViewerActivity;
 import org.ebookdroid.core.events.CurrentPageListener;
@@ -114,8 +113,10 @@ public class SettingsManager implements CurrentPageListener {
     public void currentPageChanged(final int docPageIndex, final int viewPageIndex) {
         lock.readLock().lock();
         try {
-            bookSettings.currentPageChanged(docPageIndex, viewPageIndex);
-            db.storeBookSettings(bookSettings);
+            if (bookSettings != null) {
+                bookSettings.currentPageChanged(docPageIndex, viewPageIndex);
+                db.storeBookSettings(bookSettings);
+            }
         } finally {
             lock.readLock().unlock();
         }
@@ -152,34 +153,20 @@ public class SettingsManager implements CurrentPageListener {
         }
     }
 
-    public void onAppSettingsChanged(final IBrowserActivity base) {
-        lock.writeLock().lock();
-        try {
-            appSettings = new AppSettings(base.getContext());
-            clearCurrentBookSettings();
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
     public void onAppSettingsChanged(final IViewerActivity base) {
         lock.writeLock().lock();
         try {
             final AppSettings oldSettings = appSettings;
             appSettings = new AppSettings(base.getContext());
 
-            if (base != null) {
-                applyAppSettingsChanges(base, oldSettings, appSettings);
-            }
+            applyAppSettingsChanges(base, oldSettings, appSettings);
 
             final BookSettings oldBS = bookSettings;
             if (oldBS != null) {
                 bookSettings = new BookSettings(oldBS, appSettings);
                 db.storeBookSettings(bookSettings);
 
-                if (base != null) {
-                    applyBookSettingsChanges(base, oldBS, bookSettings);
-                }
+                applyBookSettingsChanges(base, oldBS, bookSettings);
             } else {
                 appSettings.clearPseudoBookSettings();
             }
@@ -241,15 +228,12 @@ public class SettingsManager implements CurrentPageListener {
 
         final IDocumentViewController dc = base.getDocumentController();
         if (dc != null) {
-
             if (diff.isPageAlignChanged()) {
                 dc.setAlign(newSettings.getPageAlign());
             }
-
             if (diff.isAnimationTypeChanged()) {
                 dc.updateAnimationType();
             }
-
         }
 
         final DocumentModel dm = base.getDocumentModel();

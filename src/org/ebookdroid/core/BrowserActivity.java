@@ -42,33 +42,12 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.browser);
 
         adapter = new BrowserAdapter(this, filter);
         header = (TextView) findViewById(R.id.browsertext);
         viewflipper = (ViewFlipper) findViewById(R.id.browserflip);
         viewflipper.addView(new FileBrowserView(this, adapter));
-        
-        View.OnClickListener handler = new View.OnClickListener() {
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.browserhome:
-                        goHome(v);
-                        break;
-                    case R.id.browserrecent:
-                        goRecent(v);
-                        break;
-                    case R.id.browserupfolder:
-                        goUp(v);
-                        break;
-                }
-            }
-        };
-        
-        findViewById(R.id.browserhome).setOnClickListener(handler);
-        findViewById(R.id.browserrecent).setOnClickListener(handler);
-        findViewById(R.id.browserupfolder).setOnClickListener(handler);
     }
 
     @Override
@@ -135,7 +114,7 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
 
     @Override
     public void setCurrentDir(final File newDir) {
-        final ImageView view = (ImageView) findViewById(R.id.browserupfolder);
+        final ImageView view = (ImageView) findViewById(R.id.goUpFolder);
         final boolean hasParent = newDir.getParentFile() != null;
         view.setImageResource(hasParent ? R.drawable.arrowup_enabled : R.drawable.arrowup_disabled);
 
@@ -152,16 +131,14 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getSettings().onAppSettingsChanged(this);
     }
 
     @Override
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            final File dir = adapter.getCurrentDirectory();
-            final File parent = dir != null ? dir.getParentFile() : null;
+            final File parent = adapter.getCurrentDirectory().getParentFile();
             if (parent != null) {
-                setCurrentDir(parent);
+                adapter.setCurrentDirectory(parent);
             } else {
                 finish();
             }

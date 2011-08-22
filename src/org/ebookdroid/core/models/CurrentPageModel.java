@@ -8,9 +8,9 @@ public class CurrentPageModel extends EventDispatcher {
 
     private static final LogContext LCTX = LogContext.ROOT.lctx("DocModel");
 
-    int currentDocPageIndex;
+    private int currentDocPageIndex;
 
-    int currentViewPageIndex;
+    private int currentViewPageIndex;
 
     public void setCurrentPageIndex(final int currentDocPageIndex, final int currentViewPageIndex) {
         if (this.currentViewPageIndex != currentViewPageIndex) {
@@ -19,6 +19,7 @@ public class CurrentPageModel extends EventDispatcher {
                         + this.currentViewPageIndex + "]" + " -> " + "[" + currentDocPageIndex + ", "
                         + currentViewPageIndex + "]");
             }
+
             this.currentDocPageIndex = currentDocPageIndex;
             this.currentViewPageIndex = currentViewPageIndex;
 

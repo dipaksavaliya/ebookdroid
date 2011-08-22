@@ -66,7 +66,9 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
      * Instantiates a new base viewer activity.
      */
     public BaseViewerActivity() {
-        super();
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity created: " + System.identityHashCode(this));
+        }
     }
 
     /**
@@ -75,6 +77,10 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity initialized: " + System.identityHashCode(this));
+        }
 
         frameLayout = createMainContainer();
 
@@ -244,22 +250,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     private void setWindowTitle() {
         currentFilename = getIntent().getData().getLastPathSegment();
-        
-        cleanupTitle();
-        
         getWindow().setTitle(currentFilename);
-    }
-
-    /**
-     * Cleanup title. Remove from title file extension and (...), [...]
-     */
-    private void cleanupTitle() {
-        try {
-            currentFilename = currentFilename.substring(0, currentFilename.lastIndexOf('.'));
-            currentFilename = currentFilename.replaceAll("\\(.*\\)|\\[.*\\]", "");
-        } catch (IndexOutOfBoundsException e) {
-            
-        }
     }
 
     @Override
@@ -289,6 +280,9 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     @Override
     public void onResume() {
         super.onResume();
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity resumed: " + System.identityHashCode(this));
+        }
         if (documentModel != null) {
             getSettings().onAppSettingsChanged(this);
         }
@@ -299,6 +293,9 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         if (documentModel != null) {
             documentModel.recycle();
             documentModel = null;
+        }
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity destroyed: " + System.identityHashCode(this));
         }
         super.onDestroy();
     }
@@ -313,7 +310,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
      */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-
         final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.mainmenu, menu);
         return true;
@@ -399,7 +395,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
                 return true;
             case R.id.mainmenu_nightmode:
                 getAppSettings().switchNightMode();
-                ((AbstractDocumentView) getView()).redrawView();
+                getView().invalidate();
                 return true;
         }
         return super.onOptionsItemSelected(item);

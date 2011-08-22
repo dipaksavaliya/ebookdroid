@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DjvuOutline {
-
+ 
     private long docHandle;
 
     public List<OutlineLink> getOutline(final long dochandle) {

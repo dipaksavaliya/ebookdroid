@@ -14,16 +14,21 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class BrowserAdapter extends BaseAdapter implements Comparator<File> {
+
+    private static final List<File> EMPTY_LIST = Collections.<File> emptyList();
 
     private final IBrowserActivity base;
     private final FileFilter filter;
 
     private File currentDirectory;
-    private File[] files = null;
+    private List<File> files = EMPTY_LIST;
 
     public BrowserAdapter(final IBrowserActivity base, final FileFilter filter) {
         this.base = base;
@@ -32,16 +37,12 @@ public class BrowserAdapter extends BaseAdapter implements Comparator<File> {
 
     @Override
     public int getCount() {
-        if(LengthUtils.isNotEmpty(files))
-            return files.length;
-        return 0;
+        return files.size();
     }
 
     @Override
     public File getItem(final int i) {
-        if(LengthUtils.isNotEmpty(files))
-            return files[i];
-        return null;
+        return files.get(i);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class BrowserAdapter extends BaseAdapter implements Comparator<File> {
             view = LayoutInflater.from(base.getContext()).inflate(R.layout.browseritem, viewGroup, false);
         }
 
-        final File file = getItem(i);
+        final File file = files.get(i);
 
         final TextView textView = (TextView) view.findViewById(R.id.browserItemText);
         textView.setText(file.getName());
@@ -67,8 +68,6 @@ public class BrowserAdapter extends BaseAdapter implements Comparator<File> {
             boolean watched = base.getSettings().getAppSettings().getAutoScanDirs().contains(file.getPath());
             imageView.setImageResource(watched ? R.drawable.folderwatched : R.drawable.folderopen);
 
-            //long len = file.list().length;
-            /*
             final File[] listOfFiles = file.listFiles(filter);
             int folders = 0;
             int books = 0;
@@ -81,10 +80,9 @@ public class BrowserAdapter extends BaseAdapter implements Comparator<File> {
                     }
                 }
             }
-            */
+
             final TextView info = (TextView) view.findViewById(R.id.browserItemInfo);
-            //info.setText("Folders: " + folders + " Books: " + books);
-            info.setText("");
+            info.setText("Folders: " + folders + " Books: " + books);
         } else {
             imageView.setImageResource(R.drawable.book);
             final TextView info = (TextView) view.findViewById(R.id.browserItemInfo);
@@ -99,15 +97,18 @@ public class BrowserAdapter extends BaseAdapter implements Comparator<File> {
     public void setCurrentDirectory(final File currentDirectory) {
         this.currentDirectory = currentDirectory;
 
-        final File[] files = currentDirectory.listFiles(filter);
+        final File[] fileArray = currentDirectory.listFiles(filter);
 
-        if (LengthUtils.isNotEmpty(files)) {
-            Arrays.sort(files, this);
+        List<File> files = EMPTY_LIST;
+        if (LengthUtils.isNotEmpty(fileArray)) {
+            files = new ArrayList<File>(Arrays.asList(fileArray));
+            this.currentDirectory = currentDirectory;
+            Collections.sort(files, this);
         }
         setFiles(files);
     }
 
-    private void setFiles(final File[] files) {
+    public void setFiles(final List<File> files) {
         this.files = files;
         notifyDataSetInvalidated();
     }

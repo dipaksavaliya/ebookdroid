@@ -21,12 +21,14 @@
 		<ImageView
 			style="@style/action_bar_action"
 			android:id="@+id/recentlibrary"
-			android:src="@drawable/actionbar_library" />
+			android:src="@drawable/actionbar_library"
+			android:onClick="goLibrary" />
 
 		<ImageView
 
 			style="@style/action_bar_action"
-			android:src="@drawable/actionbar_open" />
+			android:src="@drawable/actionbar_open"
+			android:onClick="goFileBrowser" />
 
 		<View style="@style/action_bar_separator" />
 

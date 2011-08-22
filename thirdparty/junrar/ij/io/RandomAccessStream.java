@@ -3,10 +3,7 @@
  */
 package ij.io;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.Vector;
 
 

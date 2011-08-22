@@ -5,7 +5,6 @@ import org.ebookdroid.core.log.LogContext;
 
 import android.app.Application;
 
-
 public class EBookDroidApp extends Application {
 
     @Override

@@ -18,8 +18,6 @@ public class Page {
     float aspectRatio;
     final int documentPage;
     final PageType pageType;
-    boolean keptInMempory;
-    boolean visible;
     boolean recycled;
 
     public Page(final IViewerActivity base, final int index, final int documentPage, final PageType pt,
@@ -32,7 +30,7 @@ public class Page {
         setAspectRatio(cpi.getWidth(), cpi.getHeight());
 
         final boolean sliceLimit = base.getAppSettings().getSliceLimit();
-        node = new PageTreeNode(base, pageType.getInitialRect(), this, 2, null, sliceLimit);
+        node = new PageTreeNode(base, pageType.getInitialRect(), this, 1, null, sliceLimit);
     }
 
     public void recycle() {
@@ -52,30 +50,24 @@ public class Page {
         return Math.round(getBounds().top);
     }
 
-    public boolean draw(final Canvas canvas, RectF viewRect) {
-        return draw(canvas, viewRect, false);
+    public void draw(final Canvas canvas) {
+        draw(canvas, false);
     }
 
-    public boolean draw(final Canvas canvas, RectF viewRect, final boolean drawInvisible) {
+    public void draw(final Canvas canvas, final boolean drawInvisible) {
         if (drawInvisible || isVisible()) {
             final PagePaint paint = base.getAppSettings().getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
 
-            RectF bounds = new RectF(getBounds());
-            RectF nodesBounds = new RectF(bounds);
-            bounds.offset(-viewRect.left, -viewRect.top);
+            canvas.drawRect(getBounds(), paint.getFillPaint());
 
-            canvas.drawRect(bounds, paint.getFillPaint());
-
-            canvas.drawText(base.getContext().getString(R.string.text_page) + " " + (getIndex() + 1), bounds.centerX(),
-                    bounds.centerY(), paint.getTextPaint());
-
-            node.draw(canvas, viewRect, nodesBounds, paint);
-
-            canvas.drawLine(bounds.left, bounds.top, bounds.right, bounds.top, paint.getStrokePaint());
-            canvas.drawLine(bounds.left, bounds.bottom, bounds.right, bounds.bottom, paint.getStrokePaint());
-            return true;
+            canvas.drawText(base.getContext().getString(R.string.text_page) + " " + (getIndex() + 1), getBounds()
+                    .centerX(), getBounds().centerY(), paint.getTextPaint());
+            node.draw(canvas, paint);
+            canvas.drawLine(getBounds().left, getBounds().top, getBounds().right, getBounds().top,
+                    paint.getStrokePaint());
+            canvas.drawLine(getBounds().left, getBounds().bottom, getBounds().right, getBounds().bottom,
+                    paint.getStrokePaint());
         }
-        return false;
     }
 
     public float getAspectRatio() {
@@ -96,7 +88,9 @@ public class Page {
     }
 
     public boolean isVisible() {
-        return visible;
+        final boolean pageVisible = base.getDocumentController().isPageVisible(this);
+        // Log.d("DocModel", "Page visibility: " + this + " -> " + pageVisible);
+        return pageVisible;
     }
 
     public void setAspectRatio(final int width, final int height) {
@@ -105,30 +99,17 @@ public class Page {
 
     public void setBounds(final RectF pageBounds) {
         bounds = pageBounds;
-    }
-
-    public boolean isKeptInMemory() {
-        return keptInMempory || visible;
-    }
-
-    private boolean calculateKeptInMemory() {
-        int current = base.getDocumentModel().getCurrentViewPageIndex();
-        int inMemory = (int) Math.ceil(base.getAppSettings().getPagesInMemory() / 2.0);
-        return (current - inMemory <= this.index) && (this.index <= current + inMemory);
+        node.invalidateNodeBounds();
     }
 
     public void updateVisibility(List<PageTreeNode> nodesToDecode) {
         if (!recycled) {
-            keptInMempory = calculateKeptInMemory();
-            visible = base.getDocumentController().isPageVisible(this);
             node.updateVisibility(nodesToDecode);
         }
     }
 
     public void invalidate(List<PageTreeNode> nodesToDecode) {
         if (!recycled) {
-            keptInMempory = calculateKeptInMemory();
-            visible = base.getDocumentController().isPageVisible(this);
             node.invalidate(nodesToDecode);
         }
     }
