@@ -2,6 +2,7 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.core.curl.PageAnimationType;
 import org.ebookdroid.core.curl.PageAnimator;
+import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.utils.AndroidVersion;
 import org.ebookdroid.utils.CompareUtils;
 
@@ -13,7 +14,7 @@ import android.view.View;
 
 /**
  * The Class SinglePageDocumentView.
- * 
+ *
  * Used in single page view mode
  */
 public class SinglePageDocumentView extends AbstractDocumentView {
@@ -23,7 +24,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
 
     /**
      * Instantiates a new single page document view.
-     * 
+     *
      * @param baseActivity
      *            the base activity
      */
@@ -34,10 +35,13 @@ public class SinglePageDocumentView extends AbstractDocumentView {
 
     @Override
     public void goToPageImpl(final int toPage) {
-        if (toPage >= 0 && toPage <= getBase().getDocumentModel().getPageCount()) {
-            final Page page = getBase().getDocumentModel().getPageObject(toPage);
-            getBase().getDocumentModel().setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
-            updatePageVisibility();
+        DocumentModel dm = getBase().getDocumentModel();
+        if (toPage >= 0 && toPage < dm.getPageCount()) {
+            final Page page = dm.getPageObject(toPage);
+            if (page != null) {
+                dm.setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
+                updatePageVisibility();
+            }
         }
         if (curler != null) {
             curler.resetPageIndexes();
@@ -170,8 +174,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
         final int height = getHeight();
         final float zoom = getBase().getZoomModel().getZoom();
 
-        for (int i = 0; i < getBase().getDocumentModel().getPages().size(); i++) {
-            final Page page = getBase().getDocumentModel().getPages().get(i);
+        for (Page page : getBase().getDocumentModel().getPages().values()) {
 
             PageAlign effectiveAlign = getAlign();
             if (getAlign() == PageAlign.AUTO) {

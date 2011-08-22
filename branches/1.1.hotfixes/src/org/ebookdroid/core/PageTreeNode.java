@@ -240,11 +240,14 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     private Rect getTargetRect() {
         if (targetRect == null) {
             matrix.reset();
-            matrix.postScale(page.getBounds().width() * page.getTargetRectScale(), page.getBounds().height());
-            matrix.postTranslate(page.getBounds().left - page.getBounds().width() * page.getTargetTranslate(),
-                    page.getBounds().top);
+            RectF bounds = page.getBounds();
+
+            matrix.postScale(bounds.width() * page.getTargetRectScale(), bounds.height());
+            matrix.postTranslate(bounds.left - bounds.width() * page.getTargetTranslate(), bounds.top);
+
             final RectF targetRectF = new RectF();
             matrix.mapRect(targetRectF, pageSliceBounds);
+
             targetRect = new Rect((int) targetRectF.left, (int) targetRectF.top, (int) targetRectF.right,
                     (int) targetRectF.bottom);
         }

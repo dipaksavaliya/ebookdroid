@@ -15,7 +15,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     @Override
     protected void goToPageImpl(final int toPage) {
         final DocumentModel dm = getBase().getDocumentModel();
-        if (toPage >= 0 && toPage <= dm.getPageCount()) {
+        if (toPage >= 0 && toPage < dm.getPageCount()) {
             final Page pageObject = dm.getPageObject(toPage);
             if (pageObject != null) {
                 final RectF viewRect = this.getViewRect();
@@ -78,6 +78,14 @@ public class ContiniousDocumentView extends AbstractDocumentView {
             return res;
         }
 
+        if (node1.page.index == cp && node2.page.index != cp) {
+            return -1;
+        }
+
+        if (node1.page.index != cp && node2.page.index == cp) {
+            return 1;
+        }
+
         final long centerX = ((long) viewRect.left + (long) viewRect.right) / 2;
         final long centerY = ((long) viewRect.top + (long) viewRect.bottom) / 2;
 
@@ -90,7 +98,11 @@ public class ContiniousDocumentView extends AbstractDocumentView {
         final long dist1 = (centerX1 - centerX) * (centerX1 - centerX) + (centerY1 - centerY) * (centerY1 - centerY);
         final long dist2 = (centerX2 - centerX) * (centerX2 - centerX) + (centerY2 - centerY) * (centerY2 - centerY);
 
-        return CompareUtils.compare(dist1, dist2);
+        int res = CompareUtils.compare(dist1, dist2);
+        if (res == 0) {
+            res = CompareUtils.compare(rect1.left, rect2.left);
+        }
+        return res;
     }
 
     @Override
@@ -178,9 +190,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
         final int width = getWidth();
         final float zoom = getBase().getZoomModel().getZoom();
 
-        for (int i = 0; i < getBase().getDocumentModel().getPages().size(); i++) {
-            final Page page = getBase().getDocumentModel().getPages().get(i);
-
+        for (final Page page : getBase().getDocumentModel().getPages().values()) {
             final float pageHeight = page.getPageHeight(width, zoom);
             page.setBounds(new RectF(0, heightAccum, width * zoom, heightAccum + pageHeight));
             heightAccum += pageHeight;
