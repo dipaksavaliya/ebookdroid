@@ -1,14 +1,10 @@
 package org.ebookdroid.core.curl;
 
 import org.ebookdroid.core.SinglePageDocumentView;
-import org.ebookdroid.core.models.DocumentModel;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.view.MotionEvent;
-
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class AbstractPageAnimator implements PageAnimator {
 
@@ -44,8 +40,6 @@ public abstract class AbstractPageAnimator implements PageAnimator {
     protected Vector2D mOldMovement;
     /** TRUE if the user moves the pages */
     protected boolean bUserMoves;
-
-    protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public AbstractPageAnimator(final PageAnimationType type, final SinglePageDocumentView singlePageDocumentView) {
         this.type = type;
@@ -89,16 +83,13 @@ public abstract class AbstractPageAnimator implements PageAnimator {
      */
     @Override
     public void resetPageIndexes() {
-        foreIndex = view.getCurrentPage();
-        backIndex = view.getCurrentPage();
+        foreIndex = backIndex = -1;
     }
 
-    @Override
     public int getForeIndex() {
         return foreIndex;
     }
 
-    @Override
     public int getBackIndex() {
         return backIndex;
     }
@@ -107,40 +98,32 @@ public abstract class AbstractPageAnimator implements PageAnimator {
      * Swap to next view
      */
     protected void nextView() {
-        DocumentModel dm = view.getBase().getDocumentModel();
-
         foreIndex = view.getCurrentPage();
-        if (foreIndex >= dm.getPageCount()) {
+        if (foreIndex >= view.getBase().getDocumentModel().getPageCount()) {
             foreIndex = 0;
         }
         backIndex = foreIndex + 1;
-        if (backIndex >= dm.getPageCount()) {
+        if (backIndex >= view.getBase().getDocumentModel().getPageCount()) {
             backIndex = 0;
         }
-
-        view.invalidatePages(dm.getPageObject(foreIndex), dm.getPageObject(backIndex));
     }
 
     /**
      * Swap to previous view
      */
     protected void previousView() {
-        DocumentModel dm = view.getBase().getDocumentModel();
-
         backIndex = view.getCurrentPage();
         foreIndex = backIndex - 1;
         if (foreIndex < 0) {
-            foreIndex = dm.getPageCount() - 1;
+            foreIndex = view.getBase().getDocumentModel().getPages().size() - 1;
         }
-
-        view.invalidatePages(dm.getPageObject(foreIndex), dm.getPageObject(backIndex));
     }
 
     /**
      * Execute a step of the flip animation
      */
     @Override
-    public synchronized void FlipAnimationStep() {
+    public void FlipAnimationStep() {
         if (!bFlipping) {
             return;
         }
@@ -161,39 +144,21 @@ public abstract class AbstractPageAnimator implements PageAnimator {
         mMovement = fixMovement(mMovement, false);
 
         // Create values
+        updateValues();
 
-        lock.writeLock().lock();
-        try {
-            updateValues();
-
-            if (mA.x < 1) {
-                mA.x = 0;
-            }
-
-            if (mA.x > width - 1) {
-                mA.x = width;
-            }
-        } finally {
-            lock.writeLock().unlock();
-        }
         // Check for endings :D
-        if (mA.x <= 1 || mA.x >= width - 1) {
+        if (mA.x < 1 || mA.x > width - 1) {
             bFlipping = false;
             if (bFlipRight) {
                 view.goToPageImpl(backIndex);
-                foreIndex = backIndex;
             } else {
                 view.goToPageImpl(foreIndex);
             }
 
+            resetClipEdge();
+
             // Create values
-            lock.writeLock().lock();
-            try {
-                resetClipEdge();
-                updateValues();
-            } finally {
-                lock.writeLock().unlock();
-            }
+            updateValues();
 
             // Enable touch input after the next draw event
             bEnableInputAfterDraw = true;
@@ -202,48 +167,43 @@ public abstract class AbstractPageAnimator implements PageAnimator {
         }
 
         // Force a new draw call
-        view.redrawView();
+        view.invalidate();
     }
 
     protected abstract void resetClipEdge();
 
     protected abstract Vector2D fixMovement(Vector2D point, final boolean bMaintainMoveDir);
 
-    protected abstract void drawBackground(final Canvas canvas, RectF viewRect);
+    protected abstract void drawBackground(final Canvas canvas);
 
-    protected abstract void drawForeground(final Canvas canvas, RectF viewRect);
+    protected abstract void drawForeground(final Canvas canvas);
 
-    protected abstract void drawExtraObjects(final Canvas canvas, RectF viewRect);
+    protected abstract void drawExtraObjects(final Canvas canvas);
 
     /**
      * Update points values values.
      */
     protected abstract void updateValues();
 
-    /**
+    /*
+     * (non-Javadoc)
+     *
      * @see org.ebookdroid.core.curl.PageAnimator#onDraw(android.graphics.Canvas)
      */
     @Override
-    public synchronized void draw(final Canvas canvas, RectF viewRect) {
+    public void onDraw(final Canvas canvas) {
         // We need to initialize all size data when we first draw the view
         if (!isViewDrawn()) {
             setViewDrawn(true);
-            onFirstDrawEvent(canvas, viewRect);
+            onFirstDrawEvent(canvas);
         }
 
         canvas.drawColor(Color.BLACK);
 
         // Draw our elements
-        lock.readLock().lock();
-        try {
-            drawForeground(canvas, viewRect);
-            if (foreIndex != backIndex) {
-                drawBackground(canvas, viewRect);
-            }
-            drawExtraObjects(canvas, viewRect);
-        } finally {
-            lock.readLock().unlock();
-        }
+        drawForeground(canvas);
+        drawBackground(canvas);
+        drawExtraObjects(canvas);
 
         // Check if we can re-enable input
         if (bEnableInputAfterDraw) {
@@ -252,10 +212,10 @@ public abstract class AbstractPageAnimator implements PageAnimator {
         }
     }
 
-    protected abstract void onFirstDrawEvent(Canvas canvas, RectF viewRect);
+    protected abstract void onFirstDrawEvent(Canvas canvas);
 
     @Override
-    public boolean handleTouchEvent(final MotionEvent event) {
+    public boolean onTouchEvent(final MotionEvent event) {
         if (!bBlockTouchInput) {
 
             // Get our finger position
@@ -328,13 +288,8 @@ public abstract class AbstractPageAnimator implements PageAnimator {
                     mOldMovement.y = mFinger.y;
 
                     // Force a new draw call
-                    lock.writeLock().lock();
-                    try {
-                        updateValues();
-                    } finally {
-                        lock.writeLock().unlock();
-                    }
-                    view.redrawView();
+                    updateValues();
+                    view.invalidate();
                     break;
             }
 

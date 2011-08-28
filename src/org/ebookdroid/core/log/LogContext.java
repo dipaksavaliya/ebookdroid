@@ -83,6 +83,6 @@ public class LogContext {
         } catch (final NameNotFoundException ex) {
             ex.printStackTrace();
         }
-            Log.i(ROOT.tag, "Debug logging " + (ROOT.debugEnabled ? "enabled" : "disabled") + " by default");
+        Log.i(ROOT.tag, "Debug logging " + (ROOT.debugEnabled ? "enabled" : "disabled") + " by default");
     }
 }

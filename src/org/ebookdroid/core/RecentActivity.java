@@ -4,7 +4,6 @@ import org.ebookdroid.R;
 import org.ebookdroid.core.log.LogContext;
 import org.ebookdroid.core.presentation.FileListAdapter;
 import org.ebookdroid.core.presentation.RecentAdapter;
-import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.settings.SettingsActivity;
 import org.ebookdroid.core.settings.SettingsManager;
 import org.ebookdroid.core.utils.FileExtensionFilter;
@@ -22,14 +21,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.ViewFlipper;
 
 import java.io.File;
 
 public class RecentActivity extends Activity implements IBrowserActivity {
 
-    public static final LogContext LCTX = LogContext.ROOT.lctx("Core");
+    private static final LogContext LCTX = LogContext.ROOT.lctx("Core");
 
     private static final int VIEW_RECENT = 0;
     private static final int VIEW_LIBRARY = 1;
@@ -40,10 +38,18 @@ public class RecentActivity extends Activity implements IBrowserActivity {
     private ViewFlipper viewflipper;
     private ImageView library;
 
+    public RecentActivity() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity created: " + System.identityHashCode(this));
+        }
+    }
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity initialized: " + System.identityHashCode(this));
+        }
         setContentView(R.layout.recent);
 
         recentAdapter = new RecentAdapter(this);
@@ -55,51 +61,14 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         viewflipper.addView(new RecentBooksView(this, recentAdapter), VIEW_RECENT);
         viewflipper.addView(new LibraryView(this, libraryAdapter), VIEW_LIBRARY);
 
-        final View.OnClickListener handler = new View.OnClickListener() {
-
-            @Override
-            public void onClick(final View v) {
-                switch (v.getId()) {
-                    case R.id.recentlibrary:
-                        goLibrary(v);
-                        break;
-                    case R.id.recentbrowser:
-                        goFileBrowser(v);
-                        break;
-                }
-            }
-        };
-
-        findViewById(R.id.recentlibrary).setOnClickListener(handler);
-        final View recentBrowser = findViewById(R.id.recentbrowser);
-        if (recentBrowser != null) {
-            recentBrowser.setOnClickListener(handler);
-        }
-
-        final boolean shouldLoad = SettingsManager.getAppSettings().isLoadRecentBook();
-        final BookSettings recent = SettingsManager.getRecentBook();
-        final File file = recent != null ? new File(recent.getFileName()) : null;
-        final boolean found = file != null ? file.exists() : false;
-
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("Last book: " + (file != null ? file.getAbsolutePath() : "") + ", found: " + found
-                    + ", should load: " + shouldLoad);
-        }
-
-        if (shouldLoad && found) {
-            showDocument(Uri.fromFile(file));
-        }
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        SettingsManager.clearCurrentBookSettings();
-        SettingsManager.onSettingsChanged();
-
-        changeLibraryView(SettingsManager.getRecentBook() != null ? VIEW_RECENT : VIEW_LIBRARY);
+        // TODO open last seen book
+        // BookSettings recent = getSettings().getRecentBook();
+        // if (recent != null) {
+        // File file = new File(recent.getFileName());
+        // if (file.exists()) {
+        // showDocument(Uri.fromFile(file));
+        // }
+        // }
     }
 
     @Override
@@ -124,7 +93,7 @@ public class RecentActivity extends Activity implements IBrowserActivity {
     }
 
     public void clearRecent(final View view) {
-        SettingsManager.deleteAllBookSettings();
+        getSettings().deleteAllBookSettings();
         recentAdapter.clearBooks();
     }
 
@@ -135,6 +104,31 @@ public class RecentActivity extends Activity implements IBrowserActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity resumed: " + System.identityHashCode(this));
+        }
+
+        getSettings().clearCurrentBookSettings();
+
+        viewflipper.setDisplayedChild(VIEW_RECENT);
+        library.setImageResource(R.drawable.actionbar_library);
+
+        recentAdapter.setBooks(getSettings().getAllBooksSettings().values(), getSettings().getAppSettings()
+                .getAllowedFileTypes(Activities.getAllExtensions()));
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d(this.getClass().getSimpleName() + " activity destroyed: " + System.identityHashCode(this));
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public Context getContext() {
         return this;
     }
@@ -142,6 +136,11 @@ public class RecentActivity extends Activity implements IBrowserActivity {
     @Override
     public Activity getActivity() {
         return this;
+    }
+
+    @Override
+    public SettingsManager getSettings() {
+        return SettingsManager.getInstance(this);
     }
 
     @Override
@@ -164,41 +163,25 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private void changeLibraryView(int view) {
-        final FileExtensionFilter filter = SettingsManager.getAppSettings().getAllowedFileTypes(
-                Activities.getAllExtensions());
-
-        if (view == VIEW_LIBRARY) {
+    private void changeLibraryView() {
+        if (viewflipper.getDisplayedChild() == VIEW_RECENT) {
             viewflipper.setDisplayedChild(VIEW_LIBRARY);
             library.setImageResource(R.drawable.actionbar_recent);
-
+            final FileExtensionFilter filter = getSettings().getAppSettings().getAllowedFileTypes(
+                    Activities.getAllExtensions());
             libraryAdapter.startScan(filter);
-
         } else {
             viewflipper.setDisplayedChild(VIEW_RECENT);
             library.setImageResource(R.drawable.actionbar_library);
-
-            recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), filter);
         }
     }
 
     public void goLibrary(final View view) {
-        changeLibraryView(viewflipper.getDisplayedChild() == VIEW_RECENT ? VIEW_LIBRARY: VIEW_RECENT);
+        changeLibraryView();
     }
 
     public void goFileBrowser(final View view) {
         final Intent myIntent = new Intent(RecentActivity.this, BrowserActivity.class);
         startActivity(myIntent);
-    }
-
-    @Override
-    public void showProgress(final boolean show) {
-        final ProgressBar progress = (ProgressBar) findViewById(R.id.recentprogress);
-        if (show) {
-            progress.setVisibility(View.VISIBLE);
-        } else {
-            progress.setVisibility(View.GONE);
-        }
-
     }
 }

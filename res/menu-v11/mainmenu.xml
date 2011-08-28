@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-	xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<item
 		android:id="@+id/mainmenu_goto_page"
@@ -8,12 +7,7 @@
 		android:title="@string/menu_goto_page"
 		android:icon="@drawable/gotopage"
 		android:showAsAction="ifRoom" />
-	<item
-		android:id="@+id/mainmenu_bookmark"
-		android:alphabeticShortcut="b"
-		android:title="@string/menu_add_bookmark"
-		android:icon="@drawable/bookmark"
-		android:showAsAction="ifRoom" />
+
 	<item
 		android:id="@+id/mainmenu_nightmode"
 		android:alphabeticShortcut="n"
@@ -21,26 +15,24 @@
 		android:icon="@drawable/daynight"
 		android:showAsAction="ifRoom" />
 	<item
-		android:id="@+id/mainmenu_booksettings"
-		android:alphabeticShortcut="t"
-		android:title="@string/menu_booksettings"
-		android:icon="@drawable/settings"
-		android:showAsAction="ifRoom" />
-	<item
 		android:id="@+id/mainmenu_settings"
 		android:alphabeticShortcut="s"
 		android:title="@string/menu_settings"
-		android:icon="@drawable/settings" />
+		android:icon="@drawable/settings"
+		android:showAsAction="ifRoom" />
+
 	<item
 		android:id="@+id/mainmenu_zoom"
 		android:alphabeticShortcut="z"
 		android:title="@string/menu_zoom"
 		android:icon="@drawable/zoomfit" />
+
 	<item
 		android:id="@+id/mainmenu_outline"
 		android:alphabeticShortcut="o"
 		android:title="@string/menu_outline"
 		android:icon="@drawable/outline" />
+
 	<item
 		android:id="@+id/mainmenu_close"
 		android:alphabeticShortcut="e"

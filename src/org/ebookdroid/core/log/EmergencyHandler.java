@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Environment;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -79,13 +78,8 @@ public class EmergencyHandler implements UncaughtExceptionHandler {
                 APP_VERSION = pi.versionName;
                 APP_PACKAGE = pi.packageName;
 
-                File dir = Environment.getExternalStorageDirectory();
-                if (dir != null) {
-                    File appDir = new File(dir, "." + APP_PACKAGE);
-                    if (appDir.isDirectory() || appDir.mkdir()) {
-                        dir = appDir;
-                    }
-                } else {
+                File dir = context.getExternalFilesDir(null);
+                if (dir == null) {
                     dir = context.getFilesDir();
                 }
                 FILES_PATH = dir.getAbsolutePath();

@@ -1,119 +1,79 @@
 package org.ebookdroid.core.settings;
 
-import org.ebookdroid.core.PageIndex;
+import org.ebookdroid.core.IDocumentViewController;
+import org.ebookdroid.core.IViewerActivity;
+import org.ebookdroid.core.events.CurrentPageListener;
+import org.ebookdroid.core.models.DocumentModel;
 
 import android.content.Context;
+import android.view.Window;
+import android.view.WindowManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class SettingsManager {
+public class SettingsManager implements CurrentPageListener {
 
-    private static Context ctx;
+    private static SettingsManager instance;
 
-    private static DBHelper db;
+    private final DBHelper db;
 
-    private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    private static AppSettings appSettings;
+    private AppSettings appSettings;
 
-    private static final Map<String, BookSettings> bookSettings = new HashMap<String, BookSettings>();
+    private BookSettings bookSettings;
 
-    private static BookSettings current;
-
-    private static List<ISettingsChangeListener> listeners = new ArrayList<ISettingsChangeListener>();
-
-    public static void init(final Context context) {
-        if (ctx == null) {
-            ctx = context;
-            db = new DBHelper(context);
-            appSettings = new AppSettings(context);
-        }
+    private SettingsManager(final Context context) {
+        db = new DBHelper(context);
+        appSettings = new AppSettings(context);
     }
 
-    public static BookSettings init(final String fileName) {
-        lock.writeLock().lock();
-        try {
-            current = getBookSettingsImpl(fileName, true);
-            getAppSettings().updatePseudoBookSettings(current);
-
-            return current;
-        } finally {
-            lock.writeLock().unlock();
+    public static SettingsManager getInstance(final Context context) {
+        if (instance == null) {
+            instance = new SettingsManager(context);
         }
+        return instance;
     }
 
-    public static BookSettings getBookSettings(final String fileName) {
+    public BookSettings init(final String fileName) {
         lock.writeLock().lock();
         try {
-            BookSettings bs = bookSettings.get(fileName);
+            BookSettings bs = db.getBookSettings(fileName);
             if (bs == null) {
-                bs = db.getBookSettings(fileName);
+                bs = new BookSettings(fileName, getAppSettings());
+                db.storeBookSettings(bs);
             }
-            if (current == null) {
-                current = bs;
-            }
+            bookSettings = bs;
+            getAppSettings().updatePseudoBookSettings(bs);
+
             return bs;
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    private static BookSettings getBookSettingsImpl(final String fileName, final boolean createOnDemand) {
-        BookSettings bs = bookSettings.get(fileName);
-        if (bs == null) {
-            bs = db.getBookSettings(fileName);
-            if (bs == null) {
-                bs = new BookSettings(fileName, getAppSettings());
-                db.storeBookSettings(bs);
-            }
-            bookSettings.put(fileName, bs);
-        }
-        return bs;
-    }
-
-    private static void replaceCurrentBookSettings(final BookSettings newBS) {
-        if (current != null) {
-            bookSettings.remove(current.fileName);
-        }
-        current = newBS;
-        if (current != null) {
-            bookSettings.put(current.fileName, current);
-        }
-    }
-
-    public static BookSettingsEditor edit(final BookSettings bs) {
-        return new BookSettingsEditor(bs);
-    }
-
-    public static void clearCurrentBookSettings() {
+    public void clearCurrentBookSettings() {
         lock.writeLock().lock();
         try {
             getAppSettings().clearPseudoBookSettings();
-            replaceCurrentBookSettings(null);
+            bookSettings = null;
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    public static void deleteAllBookSettings() {
+    public void deleteAllBookSettings() {
         lock.writeLock().lock();
         try {
             db.deleteAll();
-            bookSettings.clear();
-
             final BookSettings oldBS = getBookSettings();
             final AppSettings apps = getAppSettings();
             if (oldBS != null) {
                 apps.clearPseudoBookSettings();
                 final BookSettings newBS = new BookSettings(oldBS, apps);
                 apps.updatePseudoBookSettings(newBS);
-
-                replaceCurrentBookSettings(newBS);
-
+                bookSettings = newBS;
             } else {
                 apps.clearPseudoBookSettings();
             }
@@ -122,7 +82,7 @@ public class SettingsManager {
         }
     }
 
-    public static AppSettings getAppSettings() {
+    public AppSettings getAppSettings() {
         lock.readLock().lock();
         try {
             return appSettings;
@@ -131,83 +91,82 @@ public class SettingsManager {
         }
     }
 
-    public static BookSettings getBookSettings() {
+    public BookSettings getBookSettings() {
         lock.readLock().lock();
         try {
-            return current;
+            return bookSettings;
         } finally {
             lock.readLock().unlock();
         }
     }
 
-    public static BookSettings getRecentBook() {
+    public BookSettings getRecentBook() {
+        final Map<String, BookSettings> bs = db.getBookSettings(false);
+        return bs.isEmpty() ? null : bs.values().iterator().next();
+    }
+
+    public Map<String, BookSettings> getAllBooksSettings() {
+        return db.getBookSettings(true);
+    }
+
+    @Override
+    public void currentPageChanged(final int docPageIndex, final int viewPageIndex) {
         lock.readLock().lock();
         try {
-            if (current != null) {
-                return current;
+            if (bookSettings != null) {
+                bookSettings.currentPageChanged(docPageIndex, viewPageIndex);
+                db.storeBookSettings(bookSettings);
             }
-            final Map<String, BookSettings> books = db.getBookSettings(false);
-            final BookSettings bs = books.isEmpty() ? null : books.values().iterator().next();
-            if (bs != null) {
-                bookSettings.put(bs.fileName, bs);
-            }
-            return bs;
         } finally {
             lock.readLock().unlock();
         }
     }
 
-    public static Map<String, BookSettings> getAllBooksSettings() {
+    public void zoomChanged(final float zoom) {
+        lock.readLock().lock();
+        try {
+            if (bookSettings != null) {
+                bookSettings.setZoom(zoom);
+                db.storeBookSettings(bookSettings);
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public void applyAppSettings(final IViewerActivity base) {
         lock.writeLock().lock();
         try {
-            final String fileName = current != null ? current.fileName : null;
-            final Map<String, BookSettings> books = db.getBookSettings(true);
-            bookSettings.clear();
-            books.putAll(books);
-            replaceCurrentBookSettings(books.get(fileName));
-            return books;
+            appSettings = new AppSettings(base.getContext());
+            applyAppSettingsChanges(base, null, appSettings);
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    public static void currentPageChanged(final PageIndex oldIndex, final PageIndex newIndex) {
+    public void applyBookSettings(final IViewerActivity base) {
         lock.readLock().lock();
         try {
-            if (current != null) {
-                current.currentPageChanged(oldIndex, newIndex);
-                db.storeBookSettings(current);
-            }
+            applyBookSettingsChanges(base, null, bookSettings);
         } finally {
             lock.readLock().unlock();
         }
     }
 
-    public static void zoomChanged(final float zoom) {
-        lock.readLock().lock();
-        try {
-            if (current != null) {
-                current.setZoom(zoom);
-                db.storeBookSettings(current);
-            }
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
-    public static void onSettingsChanged() {
+    public void onAppSettingsChanged(final IViewerActivity base) {
         lock.writeLock().lock();
         try {
             final AppSettings oldSettings = appSettings;
-            appSettings = new AppSettings(ctx);
+            appSettings = new AppSettings(base.getContext());
 
-            applyAppSettingsChanges(oldSettings, appSettings);
+            applyAppSettingsChanges(base, oldSettings, appSettings);
 
-            final BookSettings oldBS = current;
+            final BookSettings oldBS = bookSettings;
             if (oldBS != null) {
-                replaceCurrentBookSettings(new BookSettings(oldBS, appSettings));
-                db.storeBookSettings(current);
-                applyBookSettingsChanges(oldBS, current);
+                bookSettings = new BookSettings(oldBS, appSettings);
+                db.storeBookSettings(bookSettings);
+
+                applyBookSettingsChanges(base, oldBS, bookSettings);
             } else {
                 appSettings.clearPseudoBookSettings();
             }
@@ -216,51 +175,68 @@ public class SettingsManager {
         }
     }
 
-    public static void applyAppSettingsChanges(final AppSettings oldSettings, final AppSettings newSettings) {
+    protected void applyAppSettingsChanges(final IViewerActivity base, final AppSettings oldSettings,
+            final AppSettings newSettings) {
         final AppSettings.Diff diff = new AppSettings.Diff(oldSettings, newSettings);
-        for (final ISettingsChangeListener l : listeners) {
-            l.onAppSettingsChanged(oldSettings, newSettings, diff);
+
+        if (diff.isRotationChanged()) {
+            base.getActivity().setRequestedOrientation(newSettings.getRotation().getOrientation());
+        }
+
+        if (diff.isFullScreenChanged()) {
+            final Window window = base.getActivity().getWindow();
+            if (newSettings.getFullScreen()) {
+                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+        }
+
+        if (diff.isShowTitleChanged() && diff.isFirstTime()) {
+            final Window window = base.getActivity().getWindow();
+            if (!getAppSettings().getShowTitle()) {
+                window.requestFeature(Window.FEATURE_NO_TITLE);
+            } else {
+                // Android 3.0+ you need both progress!!!
+                window.requestFeature(Window.FEATURE_PROGRESS);
+                window.requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+                base.getActivity().setProgressBarIndeterminate(true);
+            }
+        }
+        final IDocumentViewController dc = base.getDocumentController();
+        if (dc != null) {
+            if (diff.isKeepScreenOnChanged()) {
+                dc.getView().setKeepScreenOn(newSettings.isKeepScreenOn());
+            }
         }
     }
 
-    public static void applyBookSettingsChanges(final BookSettings oldSettings, final BookSettings newSettings) {
+    protected void applyBookSettingsChanges(final IViewerActivity base, final BookSettings oldSettings,
+            final BookSettings newSettings) {
         if (newSettings == null) {
             return;
         }
         final BookSettings.Diff diff = new BookSettings.Diff(oldSettings, newSettings);
-        for (final ISettingsChangeListener l : listeners) {
-            l.onBookSettingsChanged(oldSettings, newSettings, diff);
+
+        if (diff.isSinglePageChanged()) {
+            base.createDocumentView();
         }
 
-    }
+        if (diff.isZoomChanged() && diff.isFirstTime()) {
+            base.getZoomModel().setZoom(newSettings.getZoom());
+        }
 
-    public static void addListener(final ISettingsChangeListener l) {
-        listeners.add(l);
-    }
-
-    public static void removeListener(final ISettingsChangeListener l) {
-        listeners.remove(l);
-    }
-
-    public static class BookSettingsEditor {
-
-        final BookSettings bookSettings;
-
-        BookSettingsEditor(final BookSettings bs) {
-            this.bookSettings = bs;
-            if (bookSettings != null) {
-                getAppSettings().updatePseudoBookSettings(bookSettings);
+        final IDocumentViewController dc = base.getDocumentController();
+        if (dc != null) {
+            if (diff.isPageAlignChanged()) {
+                dc.setAlign(newSettings.getPageAlign());
+            }
+            if (diff.isAnimationTypeChanged()) {
+                dc.updateAnimationType();
             }
         }
 
-        public void commit() {
-            if (bookSettings != null) {
-                onSettingsChanged();
-            }
-        }
-
-        public void rollback() {
-            getAppSettings().clearPseudoBookSettings();
-        }
+        final DocumentModel dm = base.getDocumentModel();
+        currentPageChanged(dm.getCurrentDocPageIndex(), dm.getCurrentViewPageIndex());
     }
 }

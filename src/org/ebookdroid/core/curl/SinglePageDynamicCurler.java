@@ -4,11 +4,11 @@ import org.ebookdroid.core.SinglePageDocumentView;
 
 /**
  * The Class SinglePageCurler.
- * 
+ *
  * Used for drawing page curl animation
- * 
+ *
  * @author Moritz 'Moss' Wundke (b.thax.dcg@gmail.com)
- * 
+ *
  */
 public class SinglePageDynamicCurler extends AbstractSinglePageCurler {
 
@@ -44,13 +44,16 @@ public class SinglePageDynamicCurler extends AbstractSinglePageCurler {
         final float deltaX = width - mF.x;
         final float deltaY = height - mF.y;
 
-        final float delta_sq = deltaX * deltaX + deltaY * deltaY;
-        final float tangA = deltaY / deltaX;
+        final float BH = (float) (Math.sqrt(deltaX * deltaX + deltaY * deltaY) / 2);
+        final double tangAlpha = deltaY / deltaX;
+        final double alpha = Math.atan(deltaY / deltaX);
+        final double _cos = Math.cos(alpha);
+        final double _sin = Math.sin(alpha);
 
-        mA.x = width - (delta_sq / (2 * deltaX));
+        mA.x = (float) (width - (BH / _cos));
         mA.y = height;
 
-        mD.y = height - (delta_sq / (2 * deltaY));
+        mD.y = (float) (height - (BH / _sin));
         mD.x = width;
 
         mA.x = Math.max(0, mA.x);
@@ -65,9 +68,9 @@ public class SinglePageDynamicCurler extends AbstractSinglePageCurler {
 
         // Correct
         if (mD.y < 0) {
-            mD.x = width + tangA * mD.y;
+            mD.x = width + (float) (tangAlpha * mD.y);
             mE.y = 0;
-            mE.x = width + 2 * mD.y * tangA / (1 - tangA * tangA);
+            mE.x = width + (float) (Math.tan(2 * alpha) * mD.y);
         }
     }
 

@@ -1,7 +1,6 @@
 package org.ebookdroid.core.utils;
 
-
 @Deprecated
-public class FileNameExtFilter{
+public class FileNameExtFilter {
 
 }

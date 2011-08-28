@@ -34,43 +34,20 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
     private TextView header;
 
     public BrowserActivity() {
-        this.filter = new DirectoryOrFileFilter(SettingsManager.getAppSettings().getAllowedFileTypes(
-                Activities.getAllExtensions()));
+        this.filter = new DirectoryOrFileFilter(getSettings().getAppSettings()
+                .getAllowedFileTypes(Activities.getAllExtensions()));
     }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.browser);
 
         adapter = new BrowserAdapter(this, filter);
         header = (TextView) findViewById(R.id.browsertext);
         viewflipper = (ViewFlipper) findViewById(R.id.browserflip);
         viewflipper.addView(new FileBrowserView(this, adapter));
-
-        View.OnClickListener handler = new View.OnClickListener() {
-
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.browserhome:
-                        goHome(v);
-                        break;
-                    case R.id.browserrecent:
-                        goRecent(v);
-                        break;
-                    case R.id.browserupfolder:
-                        goUp(v);
-                        break;
-                }
-            }
-        };
-
-        findViewById(R.id.browserhome).setOnClickListener(handler);
-        findViewById(R.id.browserrecent).setOnClickListener(handler);
-        findViewById(R.id.browserupfolder).setOnClickListener(handler);
     }
-
 
     @Override
     protected void onPostCreate(final Bundle savedInstanceState) {
@@ -84,12 +61,6 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
                 setCurrentDir(new File(absolutePath));
             }
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SettingsManager.onSettingsChanged();
     }
 
     @Override
@@ -142,7 +113,7 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
 
     @Override
     public void setCurrentDir(final File newDir) {
-        final ImageView view = (ImageView) findViewById(R.id.browserupfolder);
+        final ImageView view = (ImageView) findViewById(R.id.goUpFolder);
         final boolean hasParent = newDir.getParentFile() != null;
         view.setImageResource(hasParent ? R.drawable.arrowup_enabled : R.drawable.arrowup_disabled);
 
@@ -157,12 +128,16 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            final File dir = adapter.getCurrentDirectory();
-            final File parent = dir != null ? dir.getParentFile() : null;
+            final File parent = adapter.getCurrentDirectory().getParentFile();
             if (parent != null) {
-                setCurrentDir(parent);
+                adapter.setCurrentDirectory(parent);
             } else {
                 finish();
             }
@@ -186,10 +161,9 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
     public Activity getActivity() {
         return this;
     }
-    
+
     @Override
-    public void showProgress(final boolean show)
-    {
-    
+    public SettingsManager getSettings() {
+        return SettingsManager.getInstance(this);
     }
 }

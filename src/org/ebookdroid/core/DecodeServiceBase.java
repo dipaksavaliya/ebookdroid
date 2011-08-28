@@ -11,15 +11,13 @@ import android.graphics.RectF;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -96,45 +94,44 @@ public class DecodeServiceBase implements DecodeService {
     private void performDecode(final DecodeTask task) throws IOException {
         if (executor.isTaskDead(task)) {
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("Task " + task.id + ": Skipping dead decode task for " + task.node);
+                LCTX.d("Task " + task.id + ": Skipping dead decode task");
             }
             return;
         }
 
         if (LCTX.isDebugEnabled()) {
-            LCTX.d("Task " + task.id + ": Starting decoding for " + task.node);
+            LCTX.d("Task " + task.id + ": Starting decoding");
         }
-
         final CodecPage vuPage = getPage(task.pageNumber);
 
         if (executor.isTaskDead(task)) {
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("Task " + task.id + ": Abort dead decode task for " + task.node);
+                LCTX.d("Task " + task.id + ": Abort dead decode task");
             }
             return;
         }
 
-//        if (LCTX.isDebugEnabled()) {
-//            LCTX.d("Task " + task.id + ": Start converting map to bitmap for " + task.node);
-//        }
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Task " + task.id + ": Start converting map to bitmap");
+        }
         final float scale = calculateScale(vuPage, task.targetWidth) * task.zoom;
         final Bitmap bitmap = vuPage.renderBitmap(getScaledWidth(task, vuPage, scale),
                 getScaledHeight(task, vuPage, scale), task.pageSliceBounds);
-//        if (LCTX.isDebugEnabled()) {
-//            LCTX.d("Task " + task.id + ": Converting map to bitmap finished for " + task.node);
-//        }
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Task " + task.id + ": Converting map to bitmap finished");
+        }
 
         if (executor.isTaskDead(task)) {
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("Task " + task.id + ": Abort dead decode task for " + task.node);
+                LCTX.d("Task " + task.id + ": Abort dead decode task");
             }
             bitmap.recycle();
             return;
         }
 
-//        if (LCTX.isDebugEnabled()) {
-//            LCTX.d("Task " + task.id + ": Finish decoding task for " + task.node);
-//        }
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Task " + task.id + ": Finish decoding task");
+        }
         finishDecoding(task, vuPage, bitmap);
     }
 
@@ -146,12 +143,12 @@ public class DecodeServiceBase implements DecodeService {
         return Math.round(getScaledWidth(vuPage, scale) * currentDecodeTask.pageSliceBounds.width());
     }
 
-    private float getScaledHeight(final CodecPage vuPage, final float scale) {
-        return (scale * vuPage.getHeight());
+    private int getScaledHeight(final CodecPage vuPage, final float scale) {
+        return (int) (scale * vuPage.getHeight());
     }
 
-    private float getScaledWidth(final CodecPage vuPage, final float scale) {
-        return (scale * vuPage.getWidth());
+    private int getScaledWidth(final CodecPage vuPage, final float scale) {
+        return (int) (scale * vuPage.getWidth());
     }
 
     private float calculateScale(final CodecPage codecPage, final int targetWidth) {
@@ -167,9 +164,6 @@ public class DecodeServiceBase implements DecodeService {
         final SoftReference<CodecPage> ref = pages.get(pageIndex);
         CodecPage page = ref != null ? ref.get() : null;
         if (page == null) {
-            // Cause native recycling last used page if page cache is full now
-            // before opening new native page
-            pages.put(pageIndex, null);
             page = document.getPage(pageIndex);
             pages.put(pageIndex, new SoftReference<CodecPage>(page));
         }
@@ -197,9 +191,9 @@ public class DecodeServiceBase implements DecodeService {
         }
     }
 
-    private class Executor implements RejectedExecutionHandler, Comparator<Runnable> {
+    private class Executor implements RejectedExecutionHandler {
 
-        final Map<PageTreeNode, DecodeTask> decodingTasks = new IdentityHashMap<PageTreeNode, DecodeTask>();
+        final Map<PageTreeNode, DecodeTask> decodingTasks = new HashMap<PageTreeNode, DecodeTask>();
         final Map<Long, Future<?>> decodingFutures = new HashMap<Long, Future<?>>();
 
         final BlockingQueue<Runnable> queue;
@@ -208,7 +202,7 @@ public class DecodeServiceBase implements DecodeService {
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
         public Executor() {
-            queue = /*new LinkedBlockingQueue<Runnable>()*/ new PriorityBlockingQueue<Runnable>(16, this);
+            queue = new LinkedBlockingQueue<Runnable>();
             executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, queue);
             executorService.setRejectedExecutionHandler(this);
         }
@@ -217,52 +211,27 @@ public class DecodeServiceBase implements DecodeService {
             lock.writeLock().lock();
             try {
                 if (LCTX.isDebugEnabled()) {
-                    LCTX.d("Adding decoding task: " + task + " for " + task.node);
+                    LCTX.d("Adding decoding task: " + task);
                 }
 
                 final DecodeTask running = decodingTasks.get(task.node);
-
                 if (running != null && running.equals(task) && !isTaskDead(running)) {
                     if (LCTX.isDebugEnabled()) {
-                        LCTX.d("The similar task is running: " + running.id + " for " + task.node);
+                        LCTX.d("The similar task is running: " + running.id);
                     }
                     return;
-                } else if (running != null) {
-                    if (LCTX.isDebugEnabled()) {
-                        LCTX.d("The another task is running: " + running.id+ " for " + task.node);
-                    }
                 }
 
-                decodingTasks.put(task.node, task);
+                final Future<?> future = executorService.submit(task);
 
-                decodingFutures.put(task.id, executorService.submit(task));
-
-                if (running != null) {
-                    stopDecoding(running, null, "canceled by new one");
+                decodingFutures.put(task.id, future);
+                final DecodeTask old = decodingTasks.put(task.node, task);
+                if (old != null) {
+                    stopDecoding(old, null, "canceled by new one");
                 }
             } finally {
                 lock.writeLock().unlock();
             }
-        }
-
-        @Override
-        public int compare(Runnable r1, Runnable r2)
-        {
-            boolean isTask1 = r1 instanceof DecodeTask;
-            boolean isTask2 = r2 instanceof DecodeTask;
-
-            if (isTask1 != isTask2) {
-                return isTask1 ? -1 : 1;
-            }
-
-            if (!isTask1) {
-                return 0;
-            }
-
-            DecodeTask t1 = (DecodeTask) r1;
-            DecodeTask t2 = (DecodeTask) r2;
-
-            return t1.node.getBase().getDocumentController().compare(t1.node, t2.node);
         }
 
         public void stopDecoding(final DecodeTask task, final PageTreeNode node, final String reason) {
@@ -273,7 +242,7 @@ public class DecodeServiceBase implements DecodeService {
 
                 if (removed != null) {
                     if (LCTX.isDebugEnabled()) {
-                        LCTX.d("Task " + removed.id + ": Stop decoding task with reason: " + reason + " for " + removed.node);
+                        LCTX.d("Stop decoding task: " + removed.id + " with reason: " + reason);
                     }
                 }
                 if (future != null) {

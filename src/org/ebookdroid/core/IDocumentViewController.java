@@ -1,30 +1,21 @@
 package org.ebookdroid.core;
 
-import android.graphics.RectF;
 import android.view.View;
 
-import java.util.Comparator;
-
-public interface IDocumentViewController extends Comparator<PageTreeNode>{
+public interface IDocumentViewController {
 
     /* Page related methods */
     void goToPage(int page);
 
-    void invalidatePageSizes(InvalidateSizeReason reason, Page changedPage);
+    void invalidatePageSizes();
 
-    void updatePageVisibility(int newPage, int direction);
+    void updatePageVisibility();
 
     boolean isPageVisible(Page page);
 
-    RectF getViewRect();
-
-    int getFirstVisiblePage();
-
-    int getLastVisiblePage();
+    boolean shouldKeptInMemory(PageTreeNode pageTreeNode);
 
     void showDocument();
-
-    void redrawView();
 
     void setAlign(PageAlign byResValue);
 
@@ -35,8 +26,4 @@ public interface IDocumentViewController extends Comparator<PageTreeNode>{
     View getView();
 
     void updateAnimationType();
-
-    public static enum InvalidateSizeReason {
-        INIT, LAYOUT, PAGE_ALIGN, ZOOM, PAGE_LOADED;
-    }
 }

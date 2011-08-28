@@ -2,7 +2,6 @@ package org.ebookdroid.core.presentation;
 
 import org.ebookdroid.R;
 import org.ebookdroid.core.IBrowserActivity;
-import org.ebookdroid.core.settings.SettingsManager;
 import org.ebookdroid.core.utils.FileExtensionFilter;
 import org.ebookdroid.utils.FileUtils;
 
@@ -31,21 +30,15 @@ public class FileListAdapter extends BaseExpandableListAdapter {
     private class Node {
 
         private String name;
-        private String path;
         private String[] list;
 
-        Node(String name, String path, String[] list) {
+        Node(String name, String[] list) {
             this.name = name;
-            this.path = path;
             this.list = list;
         }
 
         String getName() {
             return this.name;
-        }
-
-        String getPath() {
-            return this.path;
         }
 
         String[] getList() {
@@ -70,7 +63,7 @@ public class FileListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public File getChild(final int groupPosition, final int childPosition) {
-        return new File(data.get(groupPosition).getPath(), data.get(groupPosition).getList()[childPosition]);
+        return new File(data.get(groupPosition).getName(), data.get(groupPosition).getList()[childPosition]);
     }
 
     @Override
@@ -97,8 +90,7 @@ public class FileListAdapter extends BaseExpandableListAdapter {
         textView.setText(file.getName());
 
         final ImageView imageView = (ImageView) convertView.findViewById(R.id.browserItemIcon);
-        final boolean wasRead = SettingsManager.getBookSettings(file.getAbsolutePath()) != null;
-        imageView.setImageResource(wasRead ? R.drawable.bookwatched : R.drawable.book);
+        imageView.setImageResource(R.drawable.book);
 
         final TextView info = (TextView) convertView.findViewById(R.id.browserItemInfo);
         info.setText(FileUtils.getFileDate(file.lastModified()));
@@ -165,7 +157,6 @@ public class FileListAdapter extends BaseExpandableListAdapter {
 
     public void startScan(FileExtensionFilter filter) {
         if (inScan.compareAndSet(false, true)) {
-            base.showProgress(true);
             clearData();
             new Thread(new ScanTask(filter)).start();
         }
@@ -189,7 +180,8 @@ public class FileListAdapter extends BaseExpandableListAdapter {
 
         public void run() {
             // Checks if we started to update adapter data
-            if (!currNodes.isEmpty()) {
+
+            if (!currNodes.isEmpty() && inScan.get()) {
                 // Add files from queue to adapter
                 for (Node n = currNodes.poll(); n != null && inScan.get(); n = currNodes.poll()) {
                     addNode(n);
@@ -201,7 +193,7 @@ public class FileListAdapter extends BaseExpandableListAdapter {
                 return;
             }
 
-            for (String path : SettingsManager.getAppSettings().getAutoScanDirs()) {
+            for (String path : base.getSettings().getAppSettings().getAutoScanDirs()) {
                 // Scan each valid folder
                 File dir = new File(path);
                 if (dir.isDirectory()) {
@@ -214,14 +206,6 @@ public class FileListAdapter extends BaseExpandableListAdapter {
                 // Start final UI task
                 base.getActivity().runOnUiThread(this);
             }
-            base.getActivity().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    base.showProgress(false);
-                }
-            });
-
         }
 
         public class DirectoryFilter implements FileFilter {
@@ -243,7 +227,7 @@ public class FileListAdapter extends BaseExpandableListAdapter {
                 final String[] list = dir.list(filter);
                 if (list != null && list.length > 0) {
                     Arrays.sort(list);
-                    currNodes.add(new Node(dir.getName(), dir.getAbsolutePath(), list));
+                    currNodes.add(new Node(dir.getAbsolutePath(), list));
                     if (inUI.compareAndSet(false, true)) {
                         // Start UI task if required
                         base.getActivity().runOnUiThread(this);

@@ -3,14 +3,14 @@ package org.ebookdroid.core;
 import org.ebookdroid.core.curl.PageAnimationType;
 import org.ebookdroid.core.curl.PageAnimator;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.core.settings.SettingsManager;
+import org.ebookdroid.core.utils.AndroidVersion;
 import org.ebookdroid.utils.CompareUtils;
 
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+import android.view.View;
 
 /**
  * The Class SinglePageDocumentView.
@@ -35,16 +35,16 @@ public class SinglePageDocumentView extends AbstractDocumentView {
 
     @Override
     public void goToPageImpl(final int toPage) {
-        final DocumentModel dm = getBase().getDocumentModel();
+        DocumentModel dm = getBase().getDocumentModel();
         if (toPage >= 0 && toPage < dm.getPageCount()) {
             final Page page = dm.getPageObject(toPage);
             if (page != null) {
-                dm.setCurrentPageIndex(page.index);
-                updatePageVisibility(page.index.viewIndex, 0);
+                dm.setCurrentPageIndex(page.getDocumentPageIndex(), page.getIndex());
+                updatePageVisibility();
             }
-            if (curler != null) {
-                curler.resetPageIndexes();
-            }
+        }
+        if (curler != null) {
+            curler.resetPageIndexes();
         }
     }
 
@@ -55,13 +55,12 @@ public class SinglePageDocumentView extends AbstractDocumentView {
 
     @Override
     public int compare(final PageTreeNode node1, final PageTreeNode node2) {
-        final RectF viewRect = getViewRect();
-        final RectF rect1 = node1.getTargetRect(viewRect, node1.page.getBounds());
-        final RectF rect2 = node1.getTargetRect(viewRect, node2.page.getBounds());
+        final RectF rect1 = node1.getTargetRectF();
+        final RectF rect2 = node2.getTargetRectF();
 
         final int cp = getCurrentPage();
 
-        if (node1.page.index.viewIndex == cp && node2.page.index.viewIndex == cp) {
+        if (node1.page.index == node2.page.index) {
             int res = CompareUtils.compare(rect1.top, rect2.top);
             if (res == 0) {
                 res = CompareUtils.compare(rect1.left, rect2.left);
@@ -69,8 +68,8 @@ public class SinglePageDocumentView extends AbstractDocumentView {
             return res;
         }
 
-        final int dist1 = Math.abs(node1.page.index.viewIndex - cp);
-        final int dist2 = Math.abs(node2.page.index.viewIndex - cp);
+        final int dist1 = Math.abs(node1.page.index - cp);
+        final int dist2 = Math.abs(node2.page.index - cp);
 
         return CompareUtils.compare(dist1, dist2);
     }
@@ -78,25 +77,44 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     @Override
     protected void verticalConfigScroll(final int direction) {
         goToPageImpl(getBase().getDocumentModel().getCurrentViewPageIndex() + direction);
+
+        invalidate();
     }
 
     @Override
     protected void verticalDpadScroll(final int direction) {
         goToPageImpl(getBase().getDocumentModel().getCurrentViewPageIndex() + direction);
+        invalidate();
     }
 
     @Override
-    protected Rect getScrollLimits() {
-        final int width = getWidth();
-        final int height = getHeight();
-
+    protected int getTopLimit() {
         final RectF bounds = getBase().getDocumentModel().getCurrentPageObject().getBounds();
-        final int top = ((int) bounds.top > 0) ? 0 : (int) bounds.top;
-        final int left = ((int) bounds.left > 0) ? 0 : (int) bounds.left;
-        final int bottom = ((int) bounds.bottom < height) ? 0 : (int) bounds.bottom - height;
-        final int right = ((int) bounds.right < width) ? 0 : (int) bounds.right - width;
+        return ((int) bounds.top > 0) ? 0 : (int) bounds.top;
+    }
 
-        return new Rect(left, top, right, bottom);
+    @Override
+    protected int getLeftLimit() {
+        final RectF bounds = getBase().getDocumentModel().getCurrentPageObject().getBounds();
+        return ((int) bounds.left > 0) ? 0 : (int) bounds.left;
+    }
+
+    @Override
+    protected int getBottomLimit() {
+        final RectF bounds = getBase().getDocumentModel().getCurrentPageObject().getBounds();
+        return ((int) bounds.bottom < getHeight()) ? 0 : (int) bounds.bottom - getHeight();
+    }
+
+    @Override
+    protected int getRightLimit() {
+        final RectF bounds = getBase().getDocumentModel().getCurrentPageObject().getBounds();
+        return ((int) bounds.right < getWidth()) ? 0 : (int) bounds.right - getWidth();
+    }
+
+    @Override
+    public void scrollTo(final int x, final int y) {
+        super.scrollTo(Math.min(Math.max(x, getLeftLimit()), getRightLimit()),
+                Math.min(Math.max(y, getTopLimit()), getBottomLimit()));
     }
 
     @Override
@@ -119,7 +137,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
             }
             velocityTracker.addMovement(event);
 
-            return curler.handleTouchEvent(event);
+            return curler.onTouchEvent(event);
         }
     }
 
@@ -133,14 +151,14 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    public void drawView(final Canvas canvas, final RectF viewRect) {
+    protected void onDraw(final Canvas canvas) {
         if (isCurlerDisabled()) {
             final Page page = getBase().getDocumentModel().getCurrentPageObject();
             if (page != null) {
-                page.draw(canvas, viewRect);
+                page.draw(canvas);
             }
         } else {
-            curler.draw(canvas, viewRect);
+            curler.onDraw(canvas);
         }
     }
 
@@ -148,66 +166,55 @@ public class SinglePageDocumentView extends AbstractDocumentView {
      * Invalidate page sizes.
      */
     @Override
-    public void invalidatePageSizes(final InvalidateSizeReason reason, final Page changedPage) {
+    public void invalidatePageSizes() {
         if (!isInitialized()) {
             return;
         }
-        if (reason == InvalidateSizeReason.ZOOM) {
-            return;
-        }
-
         final int width = getWidth();
         final int height = getHeight();
+        final float zoom = getBase().getZoomModel().getZoom();
 
-        if (changedPage == null) {
-            for (final Page page : getBase().getDocumentModel().getPages()) {
-                invalidatePageSize(page, width, height);
+        for (Page page : getBase().getDocumentModel().getPages().values()) {
+
+            PageAlign effectiveAlign = getAlign();
+            if (getAlign() == PageAlign.AUTO) {
+                final float pageHeight = page.getPageHeight(width, zoom);
+                if (pageHeight > height) {
+                    effectiveAlign = PageAlign.HEIGHT;
+                } else {
+                    effectiveAlign = PageAlign.WIDTH;
+                }
             }
-        } else {
-            invalidatePageSize(changedPage, width, height);
-        }
 
+            if (effectiveAlign == PageAlign.WIDTH) {
+                final float pageHeight = page.getPageHeight(width, zoom);
+                page.setBounds(new RectF(0, ((height - pageHeight) / 2), width * zoom, pageHeight
+                        + ((height - pageHeight) / 2)));
+            } else {
+                final float pageWidth = page.getPageWidth(height, zoom);
+                page.setBounds(new RectF((width - pageWidth) / 2, 0, pageWidth + (width - pageWidth) / 2, height * zoom));
+            }
+        }
         if (curler != null) {
             curler.setViewDrawn(false);
         }
 
     }
 
-    private void invalidatePageSize(final Page page, final int width, final int height) {
-        PageAlign effectiveAlign = getAlign();
-        if (getAlign() == PageAlign.AUTO) {
-            final float pageHeight = width / page.getAspectRatio();
-            if (pageHeight > height) {
-                effectiveAlign = PageAlign.HEIGHT;
-            } else {
-                effectiveAlign = PageAlign.WIDTH;
-            }
-        }
-
-        if (effectiveAlign == PageAlign.WIDTH) {
-            final float pageHeight = width / page.getAspectRatio();
-            final float heightDelta = (height - pageHeight) / 2;
-            page.setBounds(new RectF(0, heightDelta, width, pageHeight + heightDelta));
-        } else {
-            final float pageWidth = height * page.getAspectRatio();
-            final float widthDelta = (width - pageWidth) / 2;
-            page.setBounds(new RectF(widthDelta, 0, pageWidth + widthDelta, height));
-        }
-    }
-
     @Override
-    protected boolean isPageVisibleImpl(final Page page) {
-        final int pageIndex = page.index.viewIndex;
-        if (curler != null) {
-            return pageIndex == curler.getForeIndex() || pageIndex == curler.getBackIndex();
-        }
-        return pageIndex == getCurrentPage();
+    public boolean isPageVisible(final Page page) {
+        return page.getIndex() == getCurrentPage();
     }
 
     @Override
     public void updateAnimationType() {
-        final PageAnimationType type = SettingsManager.getBookSettings().getAnimationType();
+        final PageAnimationType type = getBase().getBookSettings().getAnimationType();
         curler = PageAnimationType.create(type, this);
+
+        if (!AndroidVersion.lessThan3x) {
+            final int layerType = type.isHardwareAccelSupported() ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_SOFTWARE;
+            this.setLayerType(layerType, null);
+        }
 
         if (curler != null) {
             curler.init();
