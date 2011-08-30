@@ -3,7 +3,7 @@
 = Supported Mime Types =
 
 
-|| Extensions || Mime types |
+|| Extensions || Mime types ||
 || .pdf || application/pdf ||
 || .djv, .djvu || image/djvu, image/vnd.djvu, image/x-djvu ||
 || .xps, .oxps || application/vnd.ms-xpsdocument, application/oxps||
