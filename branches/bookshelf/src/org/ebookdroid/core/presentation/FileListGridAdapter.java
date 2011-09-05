@@ -6,6 +6,7 @@ import org.ebookdroid.core.settings.SettingsManager;
 import org.ebookdroid.core.utils.FileExtensionFilter;
 import org.ebookdroid.utils.StringUtils;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -88,12 +89,16 @@ public class FileListGridAdapter extends BaseAdapter implements ListAdapter {
 
         imageView = (ImageView) convertView.findViewById(R.id.thumbnailImage);
         textView = (TextView) convertView.findViewById(R.id.thumbnailText);
+        textView.setTextColor(Color.BLACK);
         if (thumbnailFile.exists()) {
             imageView.setImageURI(Uri.fromFile(thumbnailFile));
         } else {
             imageView.setImageResource(R.drawable.book);
         }
-        textView.setText(data.get(position).getName());
+        textView.setText(StringUtils.cleanupTitle(data.get(position).getName()));
+        
+        imageView.setBackgroundResource(R.drawable.bookshelf_back_up);
+        textView.setBackgroundResource(R.drawable.bookshelf_back_down);
         return convertView;
     }
 

@@ -11,6 +11,20 @@ public class StringUtils {
     private StringUtils() {
     }
 
+    /**
+     * Cleanup title. Remove from title file extension and (...), [...]
+     */
+    public static String cleanupTitle(final String in) {
+        String out = in;
+        try {
+            out = in.substring(0, in.lastIndexOf('.'));
+            out = out.replaceAll("\\(.*\\)|\\[.*\\]", "");
+        } catch (final IndexOutOfBoundsException e) {
+        }
+        return out;
+    }
+
+
     public static String md5(final String in) {
         MessageDigest digest;
         try {
