@@ -1,5 +1,6 @@
 package org.ebookdroid.core.views;
 
+import org.ebookdroid.R;
 import org.ebookdroid.core.IBrowserActivity;
 import org.ebookdroid.core.presentation.FileListGridAdapter;
 import org.ebookdroid.core.presentation.FileListGridAdapter.Node;
@@ -26,10 +27,11 @@ public class LibraryGridView extends GridView implements OnItemClickListener {
         setStretchMode(STRETCH_SPACING);
         setGravity(0x11);
         setColumnWidth(205);
-        setVerticalSpacing(10);
+        setVerticalSpacing(0);
         setHorizontalSpacing(10);
         setAdapter(adapter);
 
+        setBackgroundResource(R.drawable.bookshelf_back_repeat);
         setOnItemClickListener(this);
     }
 
