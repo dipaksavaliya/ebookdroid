@@ -8,8 +8,8 @@ import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.settings.SettingsActivity;
 import org.ebookdroid.core.settings.SettingsManager;
 import org.ebookdroid.core.utils.FileExtensionFilter;
+import org.ebookdroid.core.views.BookcaseView;
 import org.ebookdroid.core.views.BooksAdapter;
-import org.ebookdroid.core.views.BookshelfView;
 import org.ebookdroid.core.views.LibraryView;
 import org.ebookdroid.core.views.RecentBooksView;
 
@@ -61,7 +61,7 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         viewflipper = (ViewFlipper) findViewById(R.id.recentflip);
         viewflipper.addView(new RecentBooksView(this, recentAdapter), VIEW_RECENT);
         viewflipper.addView(new LibraryView(this, libraryAdapter), VIEW_LIBRARY);
-        viewflipper.addView(new BookshelfView(this, bookshelfAdapter), VIEW_LIBRARY_GRID);
+        viewflipper.addView(new BookcaseView(this, bookshelfAdapter), VIEW_LIBRARY_GRID);
 
         final View.OnClickListener handler = new View.OnClickListener() {
 

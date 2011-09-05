@@ -4,10 +4,12 @@ import org.ebookdroid.R;
 import org.ebookdroid.core.IBrowserActivity;
 import org.ebookdroid.core.settings.SettingsManager;
 import org.ebookdroid.core.utils.FileExtensionFilter;
+import org.ebookdroid.utils.LengthUtils;
 import org.ebookdroid.utils.StringUtils;
 
 import android.graphics.Color;
 import android.net.Uri;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +22,11 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BooksAdapter extends BaseAdapter {
 
@@ -52,20 +56,51 @@ public class BooksAdapter extends BaseAdapter {
         }
     }
 
-    final ArrayList<Node> data = new ArrayList<Node>();
+    final HashMap<Integer, ArrayList<Node>> data = new HashMap<Integer, ArrayList<Node>>();
+    final HashMap<Integer, String> names = new HashMap<Integer, String>();
+
+    private final static AtomicInteger SEQ = new AtomicInteger(0);
+
+    private int currentList = 0;
 
     public BooksAdapter(final IBrowserActivity base) {
         this.base = base;
     }
 
+    public int getListCount() {
+        return SEQ.get();
+    }
+    
+    public synchronized void nextList() {
+        if (currentList < SEQ.get() - 1) {
+            currentList++;
+        } else {
+            currentList = 0;
+        }
+        notifyDataSetChanged();
+    }
+
+    public synchronized void prevList() {
+        if (currentList > 0) {
+            currentList--;
+        } else {
+            currentList = SEQ.get() - 1;
+        }
+        notifyDataSetChanged();
+    }
+    
+    public String getListName() {
+        return LengthUtils.safeString(names.get(currentList));
+    }
+    
     @Override
     public int getCount() {
-        return data.size();
+        return getList(currentList).size();
     }
 
     @Override
     public Object getItem(int position) {
-        return data.get(position);
+        return getList(currentList).get(position);
     }
 
     @Override
@@ -83,7 +118,7 @@ public class BooksAdapter extends BaseAdapter {
 
         final File cacheDir = base.getContext().getFilesDir();
 
-        final String md5 = StringUtils.md5(data.get(position).getPath());
+        final String md5 = StringUtils.md5(getList(currentList).get(position).getPath());
         final File thumbnailFile = new File(cacheDir, md5 + ".thumbnail");
 
         imageView = (ImageView) convertView.findViewById(R.id.thumbnailImage);
@@ -94,12 +129,11 @@ public class BooksAdapter extends BaseAdapter {
         } else {
             imageView.setImageResource(R.drawable.book);
         }
-        textView.setText(StringUtils.cleanupTitle(data.get(position).getName()));
-        
-//        imageView.setBackgroundResource(R.drawable.bookshelf_back_up);
-//        textView.setBackgroundResource(R.drawable.bookshelf_back_down);
+        textView.setText(StringUtils.cleanupTitle(getList(currentList).get(position).getName()));
+
         return convertView;
     }
+
     public void clearData() {
         data.clear();
         notifyDataSetInvalidated();
@@ -117,16 +151,27 @@ public class BooksAdapter extends BaseAdapter {
         inScan.set(false);
     }
 
-    public void addNode(Node node) {
-        if (node != null)
-            data.add(node);
+    synchronized void addNode(Pair<Integer, Node> pair) {
+        if (pair != null) {
+            ArrayList<Node> list = getList(pair.first);
+            list.add(pair.second);
+        }
+    }
+
+    private ArrayList<Node> getList(final int number) {
+        ArrayList<Node> list = data.get(number);
+        if (list == null) {
+            list = new ArrayList<Node>();
+            data.put(number, list);
+        }
+        return list;
     }
 
     private class ScanTask implements Runnable {
 
         final FileExtensionFilter filter;
 
-        final Queue<Node> currNodes = new ConcurrentLinkedQueue<Node>();
+        final Queue<Pair<Integer, Node>> currNodes = new ConcurrentLinkedQueue<Pair<Integer, Node>>();
 
         final AtomicBoolean inUI = new AtomicBoolean();
 
@@ -138,8 +183,8 @@ public class BooksAdapter extends BaseAdapter {
             // Checks if we started to update adapter data
             if (!currNodes.isEmpty() && inUI.get()) {
                 // Add files from queue to adapter
-                for (Node n = currNodes.poll(); n != null && inScan.get(); n = currNodes.poll()) {
-                    addNode(n);
+                for (Pair<Integer, Node> p = currNodes.poll(); p != null && inScan.get(); p = currNodes.poll()) {
+                    addNode(p);
                 }
                 notifyDataSetChanged();
                 // Clear flag
@@ -187,8 +232,10 @@ public class BooksAdapter extends BaseAdapter {
             final File[] list = dir.listFiles((FilenameFilter) filter);
             if (list != null && list.length > 0) {
                 Arrays.sort(list);
+                int listNum = SEQ.getAndIncrement();
+                names.put(listNum, dir.getName());
                 for (File f : list) {
-                    currNodes.add(new Node(f.getName(), f.getAbsolutePath()));
+                    currNodes.add(new Pair<Integer, Node>(listNum, new Node(f.getName(), f.getAbsolutePath())));
                     if (inUI.compareAndSet(false, true)) {
                         // Start UI task if required
                         base.getActivity().runOnUiThread(this);

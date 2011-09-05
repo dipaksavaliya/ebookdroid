@@ -54,6 +54,7 @@ public class BookshelfView extends GridView implements OnItemClickListener {
         setStretchMode(STRETCH_COLUMN_WIDTH);
         setAdapter(adapter);
         setOnItemClickListener(this);
+        setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
     }
 
     private void init(Context context) {
