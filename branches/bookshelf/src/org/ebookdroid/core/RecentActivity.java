@@ -3,13 +3,13 @@ package org.ebookdroid.core;
 import org.ebookdroid.R;
 import org.ebookdroid.core.log.LogContext;
 import org.ebookdroid.core.presentation.FileListAdapter;
-import org.ebookdroid.core.presentation.FileListGridAdapter;
 import org.ebookdroid.core.presentation.RecentAdapter;
 import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.settings.SettingsActivity;
 import org.ebookdroid.core.settings.SettingsManager;
 import org.ebookdroid.core.utils.FileExtensionFilter;
-import org.ebookdroid.core.views.LibraryGridView;
+import org.ebookdroid.core.views.BooksAdapter;
+import org.ebookdroid.core.views.BookshelfView;
 import org.ebookdroid.core.views.LibraryView;
 import org.ebookdroid.core.views.RecentBooksView;
 
@@ -41,10 +41,10 @@ public class RecentActivity extends Activity implements IBrowserActivity {
 
     private RecentAdapter recentAdapter;
     private FileListAdapter libraryAdapter;
-    private FileListGridAdapter libraryGridAdapter;
+    private BooksAdapter bookshelfAdapter;
 
     private ViewFlipper viewflipper;
-    private ImageView library;
+    private ImageView libraryButton;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -54,14 +54,14 @@ public class RecentActivity extends Activity implements IBrowserActivity {
 
         recentAdapter = new RecentAdapter();
         libraryAdapter = new FileListAdapter(this);
-        libraryGridAdapter = new FileListGridAdapter(this);
+        bookshelfAdapter = new BooksAdapter(this);
 
-        library = (ImageView) findViewById(R.id.recentlibrary);
+        libraryButton = (ImageView) findViewById(R.id.recentlibrary);
 
         viewflipper = (ViewFlipper) findViewById(R.id.recentflip);
         viewflipper.addView(new RecentBooksView(this, recentAdapter), VIEW_RECENT);
         viewflipper.addView(new LibraryView(this, libraryAdapter), VIEW_LIBRARY);
-        viewflipper.addView(new LibraryGridView(this, libraryGridAdapter), VIEW_LIBRARY_GRID);
+        viewflipper.addView(new BookshelfView(this, bookshelfAdapter), VIEW_LIBRARY_GRID);
 
         final View.OnClickListener handler = new View.OnClickListener() {
 
@@ -132,7 +132,7 @@ public class RecentActivity extends Activity implements IBrowserActivity {
             }
             
         }
-            
+        bookshelfAdapter.notifyDataSetChanged();    
     }
 
     @Override
@@ -183,7 +183,7 @@ public class RecentActivity extends Activity implements IBrowserActivity {
 
     public void showSettings(final View view) {
         libraryAdapter.stopScan();
-        libraryGridAdapter.stopScan();
+        bookshelfAdapter.stopScan();
         final Intent i = new Intent(RecentActivity.this, SettingsActivity.class);
         startActivity(i);
     }
@@ -205,7 +205,7 @@ public class RecentActivity extends Activity implements IBrowserActivity {
     @Override
     public void showDocument(final Uri uri) {
         libraryAdapter.stopScan();
-        libraryGridAdapter.stopScan();
+        bookshelfAdapter.stopScan();
         final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         intent.setClass(this, Activities.getByUri(uri));
 
@@ -229,19 +229,19 @@ public class RecentActivity extends Activity implements IBrowserActivity {
 
         if (view == VIEW_LIBRARY) {
             viewflipper.setDisplayedChild(VIEW_LIBRARY);
-            library.setImageResource(R.drawable.actionbar_shelf);
+            libraryButton.setImageResource(R.drawable.actionbar_shelf);
 
             libraryAdapter.startScan(filter);
 
         } else if (view == VIEW_LIBRARY_GRID) {
             viewflipper.setDisplayedChild(VIEW_LIBRARY_GRID);
-            library.setImageResource(R.drawable.actionbar_recent);
+            libraryButton.setImageResource(R.drawable.actionbar_recent);
 
-            libraryGridAdapter.startScan(filter);
+            bookshelfAdapter.startScan(filter);
 
         } else {
             viewflipper.setDisplayedChild(VIEW_RECENT);
-            library.setImageResource(R.drawable.actionbar_library);
+            libraryButton.setImageResource(R.drawable.actionbar_library);
 
             recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), filter);
         }

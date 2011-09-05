@@ -1,4 +1,4 @@
-package org.ebookdroid.core.presentation;
+package org.ebookdroid.core.views;
 
 import org.ebookdroid.R;
 import org.ebookdroid.core.IBrowserActivity;
@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.File;
@@ -25,7 +24,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class FileListGridAdapter extends BaseAdapter implements ListAdapter {
+public class BooksAdapter extends BaseAdapter {
 
     final IBrowserActivity base;
     final AtomicBoolean inScan = new AtomicBoolean();
@@ -55,7 +54,7 @@ public class FileListGridAdapter extends BaseAdapter implements ListAdapter {
 
     final ArrayList<Node> data = new ArrayList<Node>();
 
-    public FileListGridAdapter(final IBrowserActivity base) {
+    public BooksAdapter(final IBrowserActivity base) {
         this.base = base;
     }
 
@@ -97,11 +96,10 @@ public class FileListGridAdapter extends BaseAdapter implements ListAdapter {
         }
         textView.setText(StringUtils.cleanupTitle(data.get(position).getName()));
         
-        imageView.setBackgroundResource(R.drawable.bookshelf_back_up);
-        textView.setBackgroundResource(R.drawable.bookshelf_back_down);
+//        imageView.setBackgroundResource(R.drawable.bookshelf_back_up);
+//        textView.setBackgroundResource(R.drawable.bookshelf_back_down);
         return convertView;
     }
-
     public void clearData() {
         data.clear();
         notifyDataSetInvalidated();
