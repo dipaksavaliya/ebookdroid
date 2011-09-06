@@ -136,6 +136,8 @@ public class BooksAdapter extends BaseAdapter {
 
     public void clearData() {
         data.clear();
+        names.clear();
+        SEQ.set(0);
         notifyDataSetInvalidated();
     }
 
