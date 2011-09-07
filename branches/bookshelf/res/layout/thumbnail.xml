@@ -10,6 +10,7 @@
     android:layout_width="132px"
     android:layout_height="132px"
     android:gravity="center"
+    android:layout_gravity="center"
     android:paddingLeft="14px"
     android:paddingRight="14px">
   </ImageView>
@@ -20,7 +21,7 @@
     android:layout_height="50px"
     android:gravity="center"
     android:background="@drawable/border"
-    android:paddingBottom="12px"
+    android:paddingBottom="8px"
     android:paddingTop="8px"
     android:paddingLeft="10px"
     android:paddingRight="10px" />

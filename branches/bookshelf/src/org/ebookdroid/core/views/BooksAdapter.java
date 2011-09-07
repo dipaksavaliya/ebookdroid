@@ -22,8 +22,8 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,8 +56,8 @@ public class BooksAdapter extends BaseAdapter {
         }
     }
 
-    final HashMap<Integer, ArrayList<Node>> data = new HashMap<Integer, ArrayList<Node>>();
-    final HashMap<Integer, String> names = new HashMap<Integer, String>();
+    final TreeMap<Integer, ArrayList<Node>> data = new TreeMap<Integer, ArrayList<Node>>();
+    final TreeMap<Integer, String> names = new TreeMap<Integer, String>();
 
     private final static AtomicInteger SEQ = new AtomicInteger(0);
 
@@ -253,6 +253,20 @@ public class BooksAdapter extends BaseAdapter {
                 }
             }
         }
+    }
+
+    public String[] getListNames() {
+        if (names.isEmpty()) {
+            return null;
+        }
+        return names.values().toArray(new String[names.values().size()]);
+    }
+
+    public void setCurrentList(int index) {
+        if (index >=0 && index < SEQ.get()) {
+            currentList = index;
+        }
+        notifyDataSetChanged();
     }
 
 }

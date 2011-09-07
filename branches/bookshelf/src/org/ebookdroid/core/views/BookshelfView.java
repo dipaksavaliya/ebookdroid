@@ -76,7 +76,7 @@ public class BookshelfView extends GridView implements OnItemClickListener {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         final int count = getChildCount();
-        final int top = count > 0 ? getChildAt(0).getTop() : 0;
+        int top = count > 0 ? getChildAt(0).getTop() : 0;
         final int shelfWidth = mShelfWidth;
         final int shelfHeight = mShelfHeight;
         final int width = getWidth();
@@ -89,10 +89,9 @@ public class BookshelfView extends GridView implements OnItemClickListener {
             }
         }
 
-        if (count == 0) {
-            canvas.drawBitmap(mWebLeft, 0.0f, top + 1, null);
-            canvas.drawBitmap(mWebRight, width - mWebRightWidth, top + shelfHeight + 1, null);
-        }
+        top = (count > 0) ? getChildAt(count - 1).getTop() + shelfHeight : 0;
+        canvas.drawBitmap(mWebLeft, 0.0f, top + 1, null);
+        canvas.drawBitmap(mWebRight, width - mWebRightWidth, top + shelfHeight + 1, null);
 
         super.dispatchDraw(canvas);
     }
