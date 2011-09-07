@@ -7,7 +7,7 @@
  * The decoding queue is resorted depending on current view position before top element is taken
  * The position & zoom event handlers optimization to restrict number of affected pages/page nodes.
  * New memory usage mode: "Render page in document resolution" for new devices with Android 3+
- * Native bitmap memory is directly used if possible (Android v8+)
+ * Native bitmap memory is directly used if possible (Android 2.2+)
  * Full recycling of book resources on "Back" key pressed.
 
 ===Bookmarks support added===
