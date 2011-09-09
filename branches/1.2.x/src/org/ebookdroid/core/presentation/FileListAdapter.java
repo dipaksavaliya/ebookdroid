@@ -3,10 +3,11 @@ package org.ebookdroid.core.presentation;
 import org.ebookdroid.R;
 import org.ebookdroid.core.IBrowserActivity;
 import org.ebookdroid.core.settings.SettingsManager;
+import org.ebookdroid.core.utils.DirectoryFilter;
 import org.ebookdroid.core.utils.FileExtensionFilter;
 import org.ebookdroid.utils.FileUtils;
+import org.ebookdroid.utils.StringUtils;
 
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -14,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Queue;
@@ -24,40 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class FileListAdapter extends BaseExpandableListAdapter {
 
     final IBrowserActivity base;
+
     final AtomicBoolean inScan = new AtomicBoolean();
-
-    private class Node {
-
-        private final String name;
-        private final String path;
-        private final String[] list;
-
-        Node(String name, String path, String[] list) {
-            this.name = name;
-            this.path = path;
-            this.list = list;
-        }
-
-        String getName() {
-            return this.name;
-        }
-
-        String getPath() {
-            return this.path;
-        }
-
-        String[] getList() {
-            return this.list;
-        }
-
-        int getCount() {
-            return this.list.length;
-        }
-
-        public String toString() {
-            return this.name;
-        }
-    }
 
     final ArrayList<Node> data = new ArrayList<Node>();
 
@@ -82,47 +50,37 @@ public class FileListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(final int groupPosition, final int childPosition, final boolean isLastChild,
-            View convertView, final ViewGroup parent) {
+            final View convertView, final ViewGroup parent) {
 
-        if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.browseritem, parent, false);
-        }
+        final ViewHolder holder = BaseViewHolder.getOrCreateViewHolder(ViewHolder.class, R.layout.browseritem,
+                convertView, parent);
 
         final File file = getChild(groupPosition, childPosition);
-
-        final TextView textView = (TextView) convertView.findViewById(R.id.browserItemText);
-        textView.setText(file.getName());
-
-        final ImageView imageView = (ImageView) convertView.findViewById(R.id.browserItemIcon);
         final boolean wasRead = SettingsManager.getBookSettings(file.getAbsolutePath()) != null;
-        imageView.setImageResource(wasRead ? R.drawable.bookwatched : R.drawable.book);
 
-        final TextView info = (TextView) convertView.findViewById(R.id.browserItemInfo);
-        info.setText(FileUtils.getFileDate(file.lastModified()));
+        holder.name.setText(file.getName());
+        holder.image.setImageResource(wasRead ? R.drawable.bookwatched : R.drawable.book);
+        holder.info.setText(FileUtils.getFileDate(file.lastModified()));
+        holder.fileSize.setText(FileUtils.getFileSize(file.length()));
 
-        final TextView fileSize = (TextView) convertView.findViewById(R.id.browserItemfileSize);
-        fileSize.setText(FileUtils.getFileSize(file.length()));
-        return convertView;
+        return holder.getView();
     }
 
     @Override
-    public View getGroupView(final int groupPosition, final boolean isExpanded, View convertView, final ViewGroup parent) {
+    public View getGroupView(final int groupPosition, final boolean isExpanded, final View convertView,
+            final ViewGroup parent) {
 
-        if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.browseritem, parent, false);
-        }
+        final ViewHolder holder = BaseViewHolder.getOrCreateViewHolder(ViewHolder.class, R.layout.browseritem,
+                convertView, parent);
+
         final Node curr = getGroup(groupPosition);
 
-        final TextView textView = (TextView) convertView.findViewById(R.id.browserItemText);
-        textView.setText(curr.getName());
+        holder.name.setText(curr.getName());
+        holder.image.setImageResource(R.drawable.folderopen);
+        holder.info.setText("Books: " + curr.getCount());
+        holder.fileSize.setText("");
 
-        final ImageView imageView = (ImageView) convertView.findViewById(R.id.browserItemIcon);
-        imageView.setImageResource(R.drawable.folderopen);
-
-        final TextView info = (TextView) convertView.findViewById(R.id.browserItemInfo);
-        info.setText("Books: " + curr.getCount());
-
-        return convertView;
+        return holder.getView();
     }
 
     @Override
@@ -150,9 +108,10 @@ public class FileListAdapter extends BaseExpandableListAdapter {
         return false;
     }
 
-    public void addNode(Node node) {
-        if (node != null)
+    public void addNode(final Node node) {
+        if (node != null) {
             data.add(node);
+        }
     }
 
     public void clearData() {
@@ -160,7 +119,7 @@ public class FileListAdapter extends BaseExpandableListAdapter {
         notifyDataSetInvalidated();
     }
 
-    public void startScan(FileExtensionFilter filter) {
+    public void startScan(final FileExtensionFilter filter) {
         if (inScan.compareAndSet(false, true)) {
             base.showProgress(true);
             clearData();
@@ -172,7 +131,58 @@ public class FileListAdapter extends BaseExpandableListAdapter {
         inScan.set(false);
     }
 
-    private class ScanTask implements Runnable {
+    static class ViewHolder extends BaseViewHolder {
+
+        TextView name;
+        ImageView image;
+        TextView info;
+        TextView fileSize;
+
+        @Override
+        public void init(final View convertView) {
+            super.init(convertView);
+            this.name = (TextView) convertView.findViewById(R.id.browserItemText);
+            this.image = (ImageView) convertView.findViewById(R.id.browserItemIcon);
+            this.info = (TextView) convertView.findViewById(R.id.browserItemInfo);
+            this.fileSize = (TextView) convertView.findViewById(R.id.browserItemfileSize);
+        }
+    }
+
+    static class Node {
+
+        private final String name;
+        private final String path;
+        private final String[] list;
+
+        Node(final String name, final String path, final String[] list) {
+            this.name = name;
+            this.path = path;
+            this.list = list;
+        }
+
+        String getName() {
+            return this.name;
+        }
+
+        String getPath() {
+            return this.path;
+        }
+
+        String[] getList() {
+            return this.list;
+        }
+
+        int getCount() {
+            return this.list.length;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+    }
+
+    class ScanTask implements Runnable {
 
         final FileExtensionFilter filter;
 
@@ -180,10 +190,11 @@ public class FileListAdapter extends BaseExpandableListAdapter {
 
         final AtomicBoolean inUI = new AtomicBoolean();
 
-        public ScanTask(FileExtensionFilter filter) {
+        public ScanTask(final FileExtensionFilter filter) {
             this.filter = filter;
         }
 
+        @Override
         public void run() {
             // Checks if we started to update adapter data
             if (!currNodes.isEmpty() && inUI.get()) {
@@ -198,9 +209,9 @@ public class FileListAdapter extends BaseExpandableListAdapter {
                 return;
             }
 
-            for (String path : SettingsManager.getAppSettings().getAutoScanDirs()) {
+            for (final String path : SettingsManager.getAppSettings().getAutoScanDirs()) {
                 // Scan each valid folder
-                File dir = new File(path);
+                final File dir = new File(path);
                 if (dir.isDirectory()) {
                     scanDir(dir);
                 }
@@ -221,14 +232,6 @@ public class FileListAdapter extends BaseExpandableListAdapter {
 
         }
 
-        private class DirectoryFilter implements FileFilter {
-
-            @Override
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        }
-
         private void scanDir(final File dir) {
             // Checks if scan should be continued
             if (!inScan.get() || !dir.isDirectory()) {
@@ -236,7 +239,7 @@ public class FileListAdapter extends BaseExpandableListAdapter {
             }
             final String[] list = dir.list(filter);
             if (list != null && list.length > 0) {
-                Arrays.sort(list);
+                Arrays.sort(list, StringUtils.getNaturalComparator());
                 currNodes.add(new Node(dir.getName(), dir.getAbsolutePath(), list));
                 if (inUI.compareAndSet(false, true)) {
                     // Start UI task if required
@@ -244,7 +247,7 @@ public class FileListAdapter extends BaseExpandableListAdapter {
                 }
             }
             // Retrieves files from current directory
-            final File[] listOfDirs = dir.listFiles(new DirectoryFilter());
+            final File[] listOfDirs = dir.listFiles(DirectoryFilter.ALL);
             if (listOfDirs != null && inScan.get()) {
                 for (int i = 0; i < listOfDirs.length; i++) {
                     // Recursively processing found file

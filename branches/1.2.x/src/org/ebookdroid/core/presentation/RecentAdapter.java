@@ -5,7 +5,6 @@ import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.utils.FileExtensionFilter;
 import org.ebookdroid.utils.FileUtils;
 
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -38,26 +37,21 @@ public class RecentAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int i, View view, final ViewGroup parent) {
-        if (view == null) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recentitem, parent, false);
-        }
+    public View getView(final int i, final View view, final ViewGroup parent) {
+        final ViewHolder holder = BaseViewHolder.getOrCreateViewHolder(ViewHolder.class, R.layout.recentitem, view,
+                parent);
 
         final BookSettings bs = books.get(i);
         final File file = new File(bs.getFileName());
 
-        final TextView name = (TextView) view.findViewById(R.id.recentItemName);
-        name.setText(file.getName());
+        holder.name.setText(file.getName());
 
-        final ImageView imageView = (ImageView) view.findViewById(R.id.recentItemIcon);
-        imageView.setImageResource(R.drawable.book);
+        holder.imageView.setImageResource(R.drawable.book);
 
-        final TextView info = (TextView) view.findViewById(R.id.recentItemInfo);
-        info.setText(FileUtils.getFileDate(file.lastModified()));
+        holder.info.setText(FileUtils.getFileDate(file.lastModified()));
+        holder.fileSize.setText(FileUtils.getFileSize(file.length()));
 
-        final TextView fileSize = (TextView) view.findViewById(R.id.recentItemfileSize);
-        fileSize.setText(FileUtils.getFileSize(file.length()));
-        return view;
+        return holder.getView();
     }
 
     public void clearBooks() {
@@ -78,4 +72,22 @@ public class RecentAdapter extends BaseAdapter {
         }
         notifyDataSetInvalidated();
     }
+
+    static class ViewHolder extends BaseViewHolder {
+
+        TextView name;
+        ImageView imageView;
+        TextView info;
+        TextView fileSize;
+
+        @Override
+        public void init(final View convertView) {
+            super.init(convertView);
+            name = (TextView) convertView.findViewById(R.id.recentItemName);
+            imageView = (ImageView) convertView.findViewById(R.id.recentItemIcon);
+            info = (TextView) convertView.findViewById(R.id.recentItemInfo);
+            fileSize = (TextView) convertView.findViewById(R.id.recentItemfileSize);
+        }
+    }
+
 }
