@@ -8,11 +8,12 @@ import org.ebookdroid.utils.MathUtils;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.Scroller;
 
@@ -30,14 +31,9 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     protected final IViewerActivity base;
     protected boolean isInitialized = false;
-    protected float lastX;
-    protected float lastY;
-    protected VelocityTracker velocityTracker;
     protected final Scroller scroller;
     protected final AtomicBoolean inZoom = new AtomicBoolean();
-    protected long lastDownEventTime;
     protected PageAlign align;
-    protected Boolean touchInTapZone = null;
 
     protected DrawThread drawThread;
 
@@ -50,6 +46,8 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     protected boolean layoutLocked;
 
+    protected GestureDetector gestureDetector;
+
     public AbstractDocumentView(final IViewerActivity baseActivity) {
         super(baseActivity.getContext());
         this.base = baseActivity;
@@ -57,6 +55,8 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         this.firstVisiblePage = -1;
         this.lastVisiblePage = -1;
         this.scroller = new Scroller(getContext());
+
+        this.gestureDetector = new GestureDetector(getContext(), new GestureListener());
         this.pageToGo = SettingsManager.getBookSettings().getCurrentPage();
 
         setKeepScreenOn(SettingsManager.getAppSettings().isKeepScreenOn());
@@ -136,7 +136,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     protected final void decodePageTreeNodes(final ViewState viewState, final List<PageTreeNode> nodesToDecode) {
-        PageTreeNode best = Collections.min(nodesToDecode, new PageTreeNodeComparator(viewState));
+        final PageTreeNode best = Collections.min(nodesToDecode, new PageTreeNodeComparator(viewState));
         base.getDecodeService().decodePage(viewState, best);
 
         for (final PageTreeNode node : nodesToDecode) {
@@ -268,7 +268,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         LCTX.d("updateMemorySettings: " + viewState + " => " + nodesToDecode.size());
     }
 
-    public final ViewState invalidatePages(ViewState oldState, final Page... pages) {
+    public final ViewState invalidatePages(final ViewState oldState, final Page... pages) {
         final ViewState viewState = calculatePageVisibility(pages[0].index.viewIndex, 0, oldState.zoom);
 
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
@@ -314,9 +314,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         if (!isInitialized) {
             return;
         }
-        // if (LCTX.isDebugEnabled()) {
-        // LCTX.d("Zoom changed: " + oldZoom + " -> " + newZoom);
-        // }
         if (inZoom.compareAndSet(false, true)) {
             initialZoom = oldZoom;
         }
@@ -335,97 +332,20 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     public boolean onTouchEvent(final MotionEvent ev) {
         super.onTouchEvent(ev);
 
+        try {
+            Thread.sleep(16);
+        } catch (final InterruptedException e) {
+            Thread.interrupted();
+        }
+
         if (getBase().getMultiTouchZoom() != null) {
             if (getBase().getMultiTouchZoom().onTouchEvent(ev)) {
                 return true;
             }
-
-            if (getBase().getMultiTouchZoom().isResetLastPointAfterZoom()) {
-                setLastPosition(ev);
-                getBase().getMultiTouchZoom().setResetLastPointAfterZoom(false);
-            }
         }
 
-        if (velocityTracker == null) {
-            velocityTracker = VelocityTracker.obtain();
-        }
-        velocityTracker.addMovement(ev);
+        return gestureDetector.onTouchEvent(ev);
 
-        boolean inTap = false;
-        float ts = 0;
-        if (SettingsManager.getAppSettings().getTapScroll()) {
-            final int tapsize = SettingsManager.getAppSettings().getTapSize();
-
-            ts = (float) tapsize / 100;
-            if (ts > 0.5) {
-                ts = 0.5f;
-            }
-            if ((ev.getY() / getHeight() < ts) || (ev.getY() / getHeight() > (1 - ts))) {
-                inTap = true;
-            }
-        }
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                stopScroller();
-                setLastPosition(ev);
-                if (ev.getEventTime() - lastDownEventTime < DOUBLE_TAP_TIME) {
-                    if (SettingsManager.getAppSettings().getZoomByDoubleTap()) {
-                        getBase().getZoomModel().toggleZoomControls();
-                    }
-                } else {
-                    lastDownEventTime = ev.getEventTime();
-                }
-                touchInTapZone = inTap;
-
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (getSquareDistanceToLast(ev) >= 100) {
-                    lastDownEventTime = 0;
-                }
-                scrollBy((int) (lastX - ev.getX()), (int) (lastY - ev.getY()));
-                setLastPosition(ev);
-                redrawView();
-                break;
-            case MotionEvent.ACTION_UP:
-                velocityTracker.computeCurrentVelocity(1000);
-                final Rect l = getScrollLimits();
-                getScroller().fling(getScrollX(), getScrollY(), (int) -velocityTracker.getXVelocity(),
-                        (int) -velocityTracker.getYVelocity(), l.left, l.right, l.top, l.bottom);
-                velocityTracker.recycle();
-                velocityTracker = null;
-                if (getSquareDistanceToLast(ev) >= 100) {
-                    lastDownEventTime = 0;
-                }
-
-                if (inTap && (touchInTapZone == null || touchInTapZone.booleanValue())) {
-                    if (ev.getY() / getHeight() < ts) {
-                        verticalConfigScroll(-1);
-                    } else if (ev.getY() / getHeight() > (1 - ts)) {
-                        verticalConfigScroll(1);
-                    }
-                }
-
-                touchInTapZone = null;
-                break;
-        }
-        return true;
-    }
-
-    public final long getLastDownEventTime() {
-        return lastDownEventTime;
-    }
-
-    public final void setLastDownEventTime(long lastDownEventTime) {
-        this.lastDownEventTime = lastDownEventTime;
-    }
-
-    public final void setLastPosition(final MotionEvent ev) {
-        lastX = ev.getX();
-        lastY = ev.getY();
-    }
-
-    public final float getSquareDistanceToLast(final MotionEvent ev) {
-        return (ev.getX() - lastX) * (ev.getX() - lastX) + (ev.getY() - lastY) * (ev.getY() - lastY);
     }
 
     @Override
@@ -489,22 +409,24 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     @Override
-    protected final void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
+    protected final void onLayout(final boolean changed, final int left, final int top, final int right,
+            final int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         onLayoutChanged(changed, left, top, right, bottom);
     }
 
-    protected boolean onLayoutChanged(final boolean changed, final int left, final int top, final int right, final int bottom) {
+    protected boolean onLayoutChanged(final boolean changed, final int left, final int top, final int right,
+            final int bottom) {
         if (changed && !layoutLocked) {
             if (isInitialized) {
-                for (Page page : base.getDocumentModel().getPages()) {
+                for (final Page page : base.getDocumentModel().getPages()) {
                     page.nodes.root.recycle();
                 }
                 invalidatePageSizes(InvalidateSizeReason.LAYOUT, null);
                 invalidateScroll();
-                float oldZoom = base.getZoomModel().getZoom();
+                final float oldZoom = base.getZoomModel().getZoom();
                 initialZoom = 0;
-                ViewState state = onZoomChanged(oldZoom);
+                final ViewState state = onZoomChanged(oldZoom);
                 redrawView(state);
                 return true;
             }
@@ -611,5 +533,57 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     @Override
     public final void surfaceDestroyed(final SurfaceHolder holder) {
         drawThread.finish();
+    }
+
+    protected class GestureListener extends SimpleOnGestureListener {
+
+        @Override
+        public boolean onDoubleTap(final MotionEvent e) {
+            if (SettingsManager.getAppSettings().getZoomByDoubleTap()) {
+                getBase().getZoomModel().toggleZoomControls();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onDown(final MotionEvent e) {
+            if (!scroller.isFinished()) { // is flinging
+                scroller.forceFinished(true); // to stop flinging on touch
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onFling(final MotionEvent e1, final MotionEvent e2, final float vX, final float vY) {
+            final Rect l = getScrollLimits();
+            scroller.fling(getScrollX(), getScrollY(), -(int) vX, -(int) vY, l.left, l.right, l.top, l.bottom);
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(final MotionEvent e1, final MotionEvent e2, final float distanceX, final float distanceY) {
+            scrollBy((int) distanceX, (int) distanceY);
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapUp(final MotionEvent e) {
+            float ts;
+            if (SettingsManager.getAppSettings().getTapScroll()) {
+                final int tapsize = SettingsManager.getAppSettings().getTapSize();
+
+                ts = (float) tapsize / 100;
+                if (ts > 0.5) {
+                    ts = 0.5f;
+                }
+                if (e.getY() / getHeight() < ts) {
+                    verticalConfigScroll(-1);
+                } else if (e.getY() / getHeight() > (1 - ts)) {
+                    verticalConfigScroll(1);
+                }
+                return true;
+            }
+            return false;
+        }
     }
 }
