@@ -9,6 +9,7 @@ import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.settings.SettingsManager;
 import org.ebookdroid.utils.LengthUtils;
+import org.ebookdroid.utils.StringUtils;
 
 import android.view.View;
 
@@ -20,8 +21,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -74,7 +73,7 @@ public class DocumentModel extends CurrentPageModel {
 
     /**
      * Gets the current page object.
-     * 
+     *
      * @return the current page object
      */
     public Page getCurrentPageObject() {
@@ -83,7 +82,7 @@ public class DocumentModel extends CurrentPageModel {
 
     /**
      * Gets the next page object.
-     * 
+     *
      * @return the next page object
      */
     public Page getNextPageObject() {
@@ -92,7 +91,7 @@ public class DocumentModel extends CurrentPageModel {
 
     /**
      * Gets the prev page object.
-     * 
+     *
      * @return the prev page object
      */
     public Page getPrevPageObject() {
@@ -101,7 +100,7 @@ public class DocumentModel extends CurrentPageModel {
 
     /**
      * Gets the last page object.
-     * 
+     *
      * @return the last page object
      */
     public Page getLastPageObject() {
@@ -164,7 +163,7 @@ public class DocumentModel extends CurrentPageModel {
         final String fileName = bs.getFileName();
         final File cacheDir = base.getContext().getFilesDir();
 
-        final String md5 = md5(fileName);
+        final String md5 = StringUtils.md5(fileName);
         final File pagesFile = new File(cacheDir, md5 + ".cache");
         if (md5 != null) {
             if (pagesFile.exists()) {
@@ -242,26 +241,6 @@ public class DocumentModel extends CurrentPageModel {
         } catch (final IOException ex) {
             LCTX.e("Saving pages cache failed: " + ex.getMessage());
         }
-    }
-
-    private String md5(final String in) {
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("MD5");
-            digest.reset();
-            digest.update(in.getBytes());
-            final byte[] a = digest.digest();
-            final int len = a.length;
-            final StringBuilder sb = new StringBuilder(len << 1);
-            for (int i = 0; i < len; i++) {
-                sb.append(Character.forDigit((a[i] & 0xf0) >> 4, 16));
-                sb.append(Character.forDigit(a[i] & 0x0f, 16));
-            }
-            return sb.toString();
-        } catch (final NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private final class PageIterator implements Iterable<Page>, Iterator<Page> {
