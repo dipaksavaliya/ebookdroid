@@ -18,7 +18,7 @@ public class SinglePageSqueezer extends AbstractPageSlider {
 
     /**
      * Draw the foreground
-     * 
+     *
      * @param canvas
      * @param rect
      * @param paint
@@ -30,7 +30,7 @@ public class SinglePageSqueezer extends AbstractPageSlider {
             page = view.getBase().getDocumentModel().getCurrentPageObject();
         }
         if (page != null) {
-            final Bitmap fore = getBitmap(canvas);
+            final Bitmap fore = getBitmap(canvas, viewState);
             final Canvas tmp = new Canvas(fore);
             page.draw(tmp, viewState, true);
 
@@ -46,7 +46,7 @@ public class SinglePageSqueezer extends AbstractPageSlider {
 
     /**
      * Draw the background image.
-     * 
+     *
      * @param canvas
      * @param rect
      * @param paint
@@ -55,7 +55,7 @@ public class SinglePageSqueezer extends AbstractPageSlider {
     protected void drawBackground(final Canvas canvas, final ViewState viewState) {
         final Page page = view.getBase().getDocumentModel().getPageObject(backIndex);
         if (page != null) {
-            final Bitmap back = getBitmap(canvas);
+            final Bitmap back = getBitmap(canvas, viewState);
             final Canvas tmp = new Canvas(back);
             page.draw(tmp, viewState, true);
 

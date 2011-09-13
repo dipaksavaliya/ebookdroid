@@ -18,7 +18,7 @@ public class SinglePageFader extends AbstractPageSlider {
 
     /**
      * Draw the foreground
-     * 
+     *
      * @param canvas
      * @param rect
      * @param paint
@@ -36,7 +36,7 @@ public class SinglePageFader extends AbstractPageSlider {
 
     /**
      * Draw the background image.
-     * 
+     *
      * @param canvas
      * @param rect
      * @param paint
@@ -45,7 +45,7 @@ public class SinglePageFader extends AbstractPageSlider {
     protected void drawBackground(final Canvas canvas, final ViewState viewState) {
         final Page page = view.getBase().getDocumentModel().getPageObject(backIndex);
         if (page != null) {
-            final Bitmap back = getBitmap(canvas);
+            final Bitmap back = getBitmap(canvas, viewState);
             final Canvas tmp = new Canvas(back);
             page.draw(tmp, viewState, true);
 

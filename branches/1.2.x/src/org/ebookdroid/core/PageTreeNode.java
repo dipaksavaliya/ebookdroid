@@ -222,13 +222,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         if (!viewState.isNodeVisible(this, pageBounds)) {
             return;
         }
-        Bitmap bitmap = null;
 
-        if (SettingsManager.getAppSettings().getNightMode()) {
-            bitmap = holder.getNightBitmap(tr, paint.nightBitmapPaint);
-        } else {
-            bitmap = getBitmap();
-        }
+        final Bitmap bitmap = viewState.nightMode ? holder.getNightBitmap(tr, paint.nightBitmapPaint) : holder.getBitmap();
 
         if (bitmap != null) {
             canvas.drawBitmap(bitmap, null, tr, paint.bitmapPaint);
@@ -384,6 +379,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             }
             final Bitmap night = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.RGB_565);
             final Canvas c = new Canvas(night);
+            c.drawRect(0, 0, bmp.getWidth(), bmp.getHeight(), PagePaint.NIGHT.fillPaint);
             c.drawBitmap(bmp, 0, 0, paint);
             nightWeakReference = new SoftReference<Bitmap>(night);
             return night;

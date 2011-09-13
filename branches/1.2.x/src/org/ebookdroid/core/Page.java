@@ -3,7 +3,6 @@ package org.ebookdroid.core;
 import org.ebookdroid.R;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
-import org.ebookdroid.core.settings.SettingsManager;
 import org.ebookdroid.utils.MathUtils;
 
 import android.graphics.Canvas;
@@ -48,7 +47,7 @@ public class Page {
 
     public boolean draw(final Canvas canvas, final ViewState viewState, final boolean drawInvisible) {
         if (drawInvisible || viewState.isPageVisible(this)) {
-            final PagePaint paint = SettingsManager.getAppSettings().getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
+            final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
 
             final RectF bounds = new RectF(viewState.getBounds(this));
             final RectF nodesBounds = new RectF(bounds);

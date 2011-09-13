@@ -1,5 +1,6 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.settings.SettingsManager;
 
 import android.graphics.RectF;
@@ -22,7 +23,8 @@ public class ViewState {
 
     public final float zoom;
 
-    public DecodeMode decodeMode;
+    public final DecodeMode decodeMode;
+    public final boolean nightMode;
 
     public final SparseArray<RectF> pages = new SparseArray<RectF>();
 
@@ -44,17 +46,23 @@ public class ViewState {
         this.viewRect = new RectF(dc.getViewRect());
         this.zoom = zoom;
 
-        for (final Page page : dc.getBase().getDocumentModel().getPages(firstVisible, lastVisible + 1)) {
-            pages.append(page.index.viewIndex, page.getBounds(zoom));
+        DocumentModel dm = dc.getBase().getDocumentModel();
+        if (dm != null) {
+            for (final Page page : dm.getPages(firstVisible, lastVisible + 1)) {
+                pages.append(page.index.viewIndex, page.getBounds(zoom));
+            }
+            this.currentIndex = dc.calculateCurrentPage(this);
+            final int inMemory = (int) Math.ceil(SettingsManager.getAppSettings().getPagesInMemory() / 2.0);
+            this.firstCached = Math.max(0, this.currentIndex - inMemory);
+            this.lastCached = Math.min(this.currentIndex + inMemory, dm.getPageCount());
+        } else {
+            this.currentIndex = 0;
+            this.firstCached = 0;
+            this.lastCached = 0;
         }
 
-        this.currentIndex = dc.calculateCurrentPage(this);
-
-        final int inMemory = (int) Math.ceil(SettingsManager.getAppSettings().getPagesInMemory() / 2.0);
-        this.firstCached = Math.max(0, this.currentIndex - inMemory);
-        this.lastCached = Math.min(this.currentIndex + inMemory, dc.getBase().getDocumentModel().getPageCount());
-
         this.decodeMode = SettingsManager.getAppSettings().getDecodeMode();
+        this.nightMode  = SettingsManager.getAppSettings().getNightMode();
     }
 
     public ViewState(final ViewState oldState, final IDocumentViewController dc) {
@@ -78,6 +86,7 @@ public class ViewState {
         this.lastCached = Math.min(this.currentIndex + inMemory, dc.getBase().getDocumentModel().getPageCount());
 
         this.decodeMode = oldState.decodeMode;
+        this.nightMode  = oldState.nightMode;
     }
 
     public ViewState(final ViewState state) {
@@ -93,6 +102,7 @@ public class ViewState {
         this.lastCached = state.lastCached;
 
         this.decodeMode = state.decodeMode;
+        this.nightMode  = state.nightMode;
     }
 
     public RectF getBounds(final Page page) {
@@ -144,6 +154,5 @@ public class ViewState {
 
         return buf.toString();
     }
-
 
 }
