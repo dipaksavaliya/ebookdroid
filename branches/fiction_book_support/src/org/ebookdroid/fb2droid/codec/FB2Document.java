@@ -57,13 +57,31 @@ public class FB2Document implements CodecDocument {
 
         SAXParserFactory spf = SAXParserFactory.newInstance();
 
+        parseImages(spf, fileName, encoding);
+        parseContent(spf, fileName, encoding);
+    }
+
+    private void parseImages(SAXParserFactory spf, String fileName, String encoding) {
         try {
             SAXParser parser = spf.newSAXParser();
             
             Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
             InputSource is = new InputSource();
             is.setCharacterStream(isr);
-            parser.parse(is, new FB2SAXHandler(this));            
+            parser.parse(is, new FB2BinaryHandler(this));            
+            
+        } catch (Exception e) {
+            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage());
+        }
+    }
+    private void parseContent(SAXParserFactory spf, String fileName, String encoding) {
+        try {
+            SAXParser parser = spf.newSAXParser();
+            
+            Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
+            InputSource is = new InputSource();
+            is.setCharacterStream(isr);
+            parser.parse(is, new FB2ContentHandler(this));            
             
         } catch (Exception e) {
             throw new RuntimeException("FB2 document can not be opened: " + e.getMessage());

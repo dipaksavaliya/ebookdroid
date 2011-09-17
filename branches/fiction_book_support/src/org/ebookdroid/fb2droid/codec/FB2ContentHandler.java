@@ -11,7 +11,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class FB2SAXHandler extends DefaultHandler {
+public class FB2ContentHandler extends DefaultHandler {
 
     private final FB2Document document;
 
@@ -31,7 +31,7 @@ public class FB2SAXHandler extends DefaultHandler {
 
     private JustificationMode jm = JustificationMode.Justify;
     
-    public FB2SAXHandler(FB2Document fb2Document) {
+    public FB2ContentHandler(FB2Document fb2Document) {
         this.document = fb2Document;
     }
 
