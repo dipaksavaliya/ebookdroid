@@ -8,6 +8,7 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.log.LogContext;
 
+import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.TextPaint;
@@ -18,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +38,7 @@ public class FB2Document implements CodecDocument {
     public static final Paint MAINTITLETEXTPAINT = new TextPaint();
     public static final Paint SECTIONTITLETEXTPAINT = new TextPaint();
     private final ArrayList<FB2Page> pages = new ArrayList<FB2Page>();
+    private final static TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
     public static final Typeface NORMAL_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
     "fonts/OldStandard-Regular.ttf"); 
     public static final Typeface ITALIC_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
@@ -164,6 +167,21 @@ public class FB2Document implements CodecDocument {
             appendLine(line);
         }
         
+    }
+
+    public void addImage(String tmpBinaryName, byte[] data) {
+        if (tmpBinaryName != null && data != null) {
+            FB2Image img = new FB2Image(data);
+            images.put(tmpBinaryName, img);
+        }
+    }
+
+    public FB2Image getImage(String name) {
+        FB2Image img = images.get(name);
+        if (img == null && name.startsWith("#")) {
+            img = images.get(name.substring(1));
+        }
+        return img;
     }
 
 }

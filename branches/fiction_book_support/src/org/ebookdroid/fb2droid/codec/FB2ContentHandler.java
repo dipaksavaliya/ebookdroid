@@ -88,6 +88,29 @@ public class FB2ContentHandler extends DefaultHandler {
             jm = JustificationMode.Right;
             return;
         }
+        if ("image".equals(qName)) {
+            insertImage(attributes.getValue("href"));
+            return;
+        }
+    }
+
+    private void insertImage(String name) {
+        FB2Image image = document.getImage(name);
+        if (image == null) {
+            return;
+        }
+        if (!paragraphParsing) {
+            FB2Line line = new FB2Line();
+            line.append(image);
+            line.applyJustification(JustificationMode.Center);
+            document.appendLine(line);
+        } else {
+            if (paragraphLines != null) {
+                int space = (int)currentTextPaint.measureText(" ");
+                appendLineElement(space, image);
+            }
+        }
+        
     }
 
     @Override
@@ -154,21 +177,25 @@ public class FB2ContentHandler extends DefaultHandler {
         String text = new String(ch, start, length);
         int space = (int)currentTextPaint.measureText(" ");
         StringTokenizer st = new StringTokenizer(text);
-        FB2Line line = FB2Line.getLastLine(paragraphLines);
         while (st.hasMoreTokens()) {
             String word = st.nextToken();
             FB2TextElement te = new FB2TextElement(word, (int) currentTextPaint.getTextSize(), (int)currentTextPaint.measureText(word), bold, italic);
-            if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
-                if (line.hasNonWhiteSpaces()) {
-                    line.append(new FB2LineWhiteSpace(space, (int) currentTextPaint.getTextSize(), true));
-                }
-            } else {
-                line = new FB2Line();
-                paragraphLines.add(line);
-            }
-            line.append(te);
+            appendLineElement(space, te);
         }
         
+    }
+
+    private void appendLineElement(int space, FB2LineElement te) {
+        FB2Line line = FB2Line.getLastLine(paragraphLines);
+        if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
+            if (line.hasNonWhiteSpaces()) {
+                line.append(new FB2LineWhiteSpace(space, (int) currentTextPaint.getTextSize(), true));
+            }
+        } else {
+            line = new FB2Line();
+            paragraphLines.add(line);
+        }
+        line.append(te);
     }
 
 }
