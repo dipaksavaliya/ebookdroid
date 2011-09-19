@@ -68,5 +68,9 @@ public class FB2Image implements FB2LineElement {
         c.drawBitmap(bmp, null, new Rect(x, y - height, x+width, y), null);
         bmp.recycle();
     }
+    
+    public byte[] getData() {
+        return data;
+    }
 
 }

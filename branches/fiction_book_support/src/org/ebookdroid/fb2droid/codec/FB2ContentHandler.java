@@ -24,6 +24,8 @@ public class FB2ContentHandler extends DefaultHandler {
     private boolean bold = false;
     
     private boolean italic = false;
+    
+    private boolean cover = false;
 
     private Paint currentTextPaint = FB2Document.NORMALTEXTPAINT;
 
@@ -95,7 +97,14 @@ public class FB2ContentHandler extends DefaultHandler {
             return;
         }
         if ("image".equals(qName)) {
+            if (cover) {
+                document.setCover(attributes.getValue("href"));
+            }
             insertImage(attributes.getValue("href"));
+            return;
+        }
+        if ("coverpage".equals(qName)) {
+            cover = true;
             return;
         }
     }
@@ -156,6 +165,10 @@ public class FB2ContentHandler extends DefaultHandler {
         }
         if ("epigraph".equals(qName)) {
             jm = JustificationMode.Justify;
+            return;
+        }
+        if ("coverpage".equals(qName)) {
+            cover = false;
             return;
         }
     }

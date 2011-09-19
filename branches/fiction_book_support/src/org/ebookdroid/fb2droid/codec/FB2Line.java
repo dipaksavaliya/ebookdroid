@@ -27,7 +27,7 @@ public class FB2Line {
         }
     }
 
-    public int getHeight() {
+    public int getTotalHeight() {
         int h = height;
         if (footnotes != null) {
             List<FB2Line> note = FB2Document.getNote(footnotes.get(0));
@@ -109,5 +109,9 @@ public class FB2Line {
             footnotes = new ArrayList<String>();
         }
         footnotes.add(value);
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

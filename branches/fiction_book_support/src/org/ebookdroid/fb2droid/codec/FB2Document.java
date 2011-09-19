@@ -7,6 +7,8 @@ import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.TextPaint;
@@ -37,6 +39,7 @@ public class FB2Document implements CodecDocument {
     public static final Paint MAINTITLETEXTPAINT = new TextPaint();
     public static final Paint SECTIONTITLETEXTPAINT = new TextPaint();
     private final ArrayList<FB2Page> pages = new ArrayList<FB2Page>();
+    private String cover;
     private final static TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
     private final static TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
     public static final Typeface NORMAL_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
@@ -119,7 +122,7 @@ public class FB2Document implements CodecDocument {
     void appendLine(FB2Line line) {
         FB2Page lastPage = FB2Page.getLastPage(pages);
 
-        if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + line.getHeight() > FB2Page.PAGE_HEIGHT) {
+        if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + line.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
             lastPage = new FB2Page();
             pages.add(lastPage);
         }
@@ -131,7 +134,7 @@ public class FB2Document implements CodecDocument {
                 if (note != null) {
                     for (FB2Line l : note) {
                         lastPage = FB2Page.getLastPage(pages);
-                        if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + l.getHeight() > FB2Page.PAGE_HEIGHT) {
+                        if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + l.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
                             lastPage = new FB2Page();
                             pages.add(lastPage);
                         }
@@ -224,5 +227,18 @@ public class FB2Document implements CodecDocument {
         return note;
     }
 
+    public void setCover(String value) {
+        this.cover = value;
+    }
+
+    @Override
+    public Bitmap getEmbeddedThumbnail() {
+        FB2Image image = getImage(cover);
+        if (image != null) {
+            byte[] data = image.getData();
+            return BitmapFactory.decodeByteArray(data, 0, data.length);
+        }
+        return null;
+    }
 
 }
