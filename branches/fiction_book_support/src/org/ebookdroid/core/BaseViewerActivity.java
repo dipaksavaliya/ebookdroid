@@ -22,10 +22,12 @@ import org.ebookdroid.utils.StringUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.DisplayMetrics;
@@ -70,6 +72,8 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     private DocumentModel documentModel;
     private String currentFilename;
+    
+    public static BaseViewerActivity instance = null;
 
     /**
      * Instantiates a new base viewer activity.
@@ -84,6 +88,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance = this;
 
         getWindowManager().getDefaultDisplay().getMetrics(DM);
 
@@ -110,6 +115,8 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         SettingsManager.applyAppSettingsChanges(null, SettingsManager.getAppSettings());
     }
 
+    ProgressDialog progressDialog;
+    
     private void initView(final String password) {
         final DecodeService decodeService = createDecodeService();
 
@@ -119,7 +126,46 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
             SettingsManager.init(fileName);
 
-            decodeService.open(fileName, password);
+            new AsyncTask<String, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(String... params) {
+                    BaseViewerActivity.instance.runOnUiThread(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            progressDialog = ProgressDialog.show(BaseViewerActivity.instance, "", "Loading... Please wait", true);
+                        }
+                    });
+                    
+                    decodeService.open(params[0], params[1]);
+                    progressDialog.dismiss();
+                    
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void result) {
+                    documentModel = new DocumentModel(decodeService);
+
+                    documentModel.addEventListener(BaseViewerActivity.this);
+
+
+                    progressModel = new DecodingProgressModel();
+                    progressModel.addEventListener(BaseViewerActivity.this);
+
+                    SettingsManager.applyBookSettingsChanges(null, SettingsManager.getBookSettings(), null);
+
+                    if (documentModel != null) {
+                        final BookSettings bs = SettingsManager.getBookSettings();
+                        if (bs != null) {
+                            currentPageChanged(PageIndex.NULL, bs.getCurrentPage());
+                        }
+                    }
+                }
+                
+                
+            }.execute(fileName, password);
 
         } catch (final Exception e) {
             LCTX.e(e.getMessage(), e);
@@ -133,18 +179,10 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
             return;
         }
 
-        documentModel = new DocumentModel(decodeService);
-
-        documentModel.addEventListener(this);
-
         zoomModel = new ZoomModel();
 
         initMultiTouchZoomIfAvailable();
 
-        progressModel = new DecodingProgressModel();
-        progressModel.addEventListener(this);
-
-        SettingsManager.applyBookSettingsChanges(null, SettingsManager.getBookSettings(), null);
 
         setContentView(frameLayout);
         setProgressBarIndeterminateVisibility(false);
@@ -276,12 +314,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     protected void onPostCreate(final Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         setWindowTitle();
-        if (documentModel != null) {
-            final BookSettings bs = SettingsManager.getBookSettings();
-            if (bs != null) {
-                currentPageChanged(PageIndex.NULL, bs.getCurrentPage());
-            }
-        }
     }
 
     private PageViewZoomControls getZoomControls() {
