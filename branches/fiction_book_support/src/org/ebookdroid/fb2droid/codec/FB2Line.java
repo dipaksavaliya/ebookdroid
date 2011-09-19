@@ -5,12 +5,14 @@ import org.ebookdroid.fb2droid.codec.FB2Document.JustificationMode;
 import android.graphics.Canvas;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FB2Line {
 
     private final ArrayList<FB2LineElement> elements = new ArrayList<FB2LineElement>();
     private int height;
     private boolean hasNonWhiteSpaces = false;
+    private List<String> footnotes;
 
     public FB2Line() {
     }
@@ -26,7 +28,14 @@ public class FB2Line {
     }
 
     public int getHeight() {
-        return height;
+        int h = height;
+        if (footnotes != null) {
+            List<FB2Line> note = FB2Document.getNote(footnotes.get(0));
+            if (note != null) {
+                h += note.get(0).getHeight();
+            }
+        }
+        return h;
     }
 
     public int getWidth() {
@@ -86,5 +95,19 @@ public class FB2Line {
 
     public boolean hasNonWhiteSpaces() {
         return hasNonWhiteSpaces ;
+    }
+
+    public List<String> getFootNotes() {
+        return footnotes;
+    }
+
+    public void addNote(String value) {
+        if (value == null) {
+            return;
+        }
+        if (footnotes == null) {
+            footnotes = new ArrayList<String>();
+        }
+        footnotes.add(value);
     }
 }

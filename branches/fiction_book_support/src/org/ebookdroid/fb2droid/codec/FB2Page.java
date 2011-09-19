@@ -23,6 +23,7 @@ public class FB2Page implements CodecPage {
 
     private static final Bitmap bitmap = Bitmap.createBitmap(PAGE_WIDTH, PAGE_HEIGHT, Bitmap.Config.RGB_565);
     private ArrayList<FB2Line> lines = new ArrayList<FB2Line>();
+    private ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>();
 
     @Override
     public int getHeight() {
@@ -68,9 +69,19 @@ public class FB2Page implements CodecPage {
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
         c.drawRect(PAGE_RECT, paint);
+        paint.setColor(Color.BLACK);
 
         int y = MARGIN_Y;
         for (FB2Line line : lines) {
+            y += line.getHeight();
+            line.render(c, y);
+        }
+        y += FB2Document.FOOTNOTE_SIZE;
+        if (!noteLines.isEmpty()) {
+            c.drawLine(MARGIN_X, y - FB2Document.FOOTNOTE_SIZE / 2, MARGIN_X + PAGE_WIDTH / 4, y
+                    - FB2Document.FOOTNOTE_SIZE / 2, paint);
+        }
+        for (FB2Line line : noteLines) {
             y += line.getHeight();
             line.render(c, y);
         }
@@ -80,6 +91,12 @@ public class FB2Page implements CodecPage {
         int y = 0;
         for (FB2Line line : lines) {
             y += line.getHeight();
+        }
+        for (FB2Line line : noteLines) {
+            y += line.getHeight();
+        }
+        if (!noteLines.isEmpty()) {
+            y += FB2Document.FOOTNOTE_SIZE;
         }
         return y;
     }
@@ -92,7 +109,12 @@ public class FB2Page implements CodecPage {
         if (pages.size() == 0) {
             pages.add(new FB2Page());
         }
-        return pages.get(pages.size() -1);
+        return pages.get(pages.size() - 1);
+    }
+
+    public void appendNoteLine(FB2Line l) {
+        noteLines.add(l);
+
     }
 
 }

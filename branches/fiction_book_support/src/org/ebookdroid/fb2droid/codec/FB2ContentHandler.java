@@ -67,6 +67,12 @@ public class FB2ContentHandler extends DefaultHandler {
             }
             return;
         }
+        if ("a".equals(qName) && paragraphParsing) {
+            if ("note".equalsIgnoreCase(attributes.getValue("type"))) {
+                FB2Line line = FB2Line.getLastLine(paragraphLines);
+                line.addNote(attributes.getValue("href"));
+            }
+        }
         if ("empty-line".equals(qName)) {
             FB2Line line = new FB2Line();
             line.append(new FB2LineWhiteSpace(0, (int) currentTextPaint.getTextSize(), true));
@@ -117,7 +123,7 @@ public class FB2ContentHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if ("body".equals(qName) && documentStarted && !documentEnded) {
             documentEnded = true;
-            return;
+            throw new StopParsingException();
         }
         if ("section".equals(qName)) {
             document.commitPage();
