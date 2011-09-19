@@ -28,6 +28,8 @@ public class FB2BinaryHandler extends DefaultHandler {
     private boolean parsingBinary = false;
     private boolean inTitle = false;
     private String noteName = null;
+    private int noteId = -1;
+    private boolean noteFirstWord = true;
     private Pattern notesPattern = Pattern.compile("n([0-9]+)");
     private ArrayList<FB2Line> noteLines = null;
 
@@ -70,12 +72,14 @@ public class FB2BinaryHandler extends DefaultHandler {
                 Matcher matcher = notesPattern.matcher(noteName);
                 String n = noteName;
                 if (matcher.matches()) {
-                    n = "" + Integer.parseInt(matcher.group(1)) + ")";
+                    noteId = Integer.parseInt(matcher.group(1));
+                    n = "" + noteId + ")";
                 }
                 noteLines = new ArrayList<FB2Line>();
                 FB2Line lastLine = FB2Line.getLastLine(noteLines);
                 lastLine.append(new FB2TextElement(n, FB2Document.FOOTNOTE_SIZE,
                         (int) FB2Document.FOOTNOTETEXTPAINT.measureText(n), false, false));
+                lastLine.append(new FB2LineWhiteSpace((int) FB2Document.FOOTNOTETEXTPAINT.measureText(" "), FB2Document.FOOTNOTE_SIZE, false));
             }
         }
     }
@@ -98,6 +102,8 @@ public class FB2BinaryHandler extends DefaultHandler {
         if ("section".equalsIgnoreCase(qName) && parsingNotes) {
             document.addNote(noteName, noteLines);
             noteLines = null;
+            noteId = -1;
+            noteFirstWord = true;
         }
         if ("p".equalsIgnoreCase(qName) && parsingNotesP) {
             parsingNotesP = false;
@@ -131,6 +137,18 @@ public class FB2BinaryHandler extends DefaultHandler {
             StringTokenizer st = new StringTokenizer(text);
             while (st.hasMoreTokens()) {
                 String word = st.nextToken();
+                if (noteFirstWord) {
+                    noteFirstWord = false;
+                    int id = -2;
+                    try {
+                        id = Integer.parseInt(word);
+                    } catch (Exception e) {
+                        id = -2;
+                    }
+                    if (id == noteId) {
+                        continue;
+                    }
+                }
                 FB2TextElement te = new FB2TextElement(word, (int) FB2Document.FOOTNOTETEXTPAINT.getTextSize(),
                         (int) FB2Document.FOOTNOTETEXTPAINT.measureText(word), bold, italic);
                 FB2Line line = FB2Line.getLastLine(noteLines);

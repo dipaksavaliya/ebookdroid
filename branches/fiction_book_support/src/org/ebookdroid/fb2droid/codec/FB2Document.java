@@ -123,6 +123,7 @@ public class FB2Document implements CodecDocument {
         FB2Page lastPage = FB2Page.getLastPage(pages);
 
         if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + line.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
+            commitPage();
             lastPage = new FB2Page();
             pages.add(lastPage);
         }
@@ -135,6 +136,7 @@ public class FB2Document implements CodecDocument {
                     for (FB2Line l : note) {
                         lastPage = FB2Page.getLastPage(pages);
                         if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + l.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
+                            commitPage();
                             lastPage = new FB2Page();
                             pages.add(lastPage);
                         }

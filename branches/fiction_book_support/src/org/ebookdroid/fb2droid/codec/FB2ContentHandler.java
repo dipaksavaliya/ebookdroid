@@ -94,6 +94,8 @@ public class FB2ContentHandler extends DefaultHandler {
         }
         if ("epigraph".equals(qName)) {
             jm = JustificationMode.Right;
+            currentTextPaint.setTypeface(FB2Document.ITALIC_TF);
+            italic = true;
             return;
         }
         if ("image".equals(qName)) {
@@ -165,6 +167,8 @@ public class FB2ContentHandler extends DefaultHandler {
         }
         if ("epigraph".equals(qName)) {
             jm = JustificationMode.Justify;
+            currentTextPaint.setTypeface(FB2Document.NORMAL_TF);
+            italic = false;
             return;
         }
         if ("coverpage".equals(qName)) {
