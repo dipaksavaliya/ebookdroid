@@ -72,8 +72,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
     private DocumentModel documentModel;
     private String currentFilename;
-    
-    public static BaseViewerActivity instance = null;
 
     /**
      * Instantiates a new base viewer activity.
@@ -88,7 +86,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        instance = this;
 
         getWindowManager().getDefaultDisplay().getMetrics(DM);
 
@@ -116,7 +113,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     }
 
     ProgressDialog progressDialog;
-    
+
     private void initView(final String password) {
         final DecodeService decodeService = createDecodeService();
 
@@ -129,31 +126,22 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
             new AsyncTask<String, Void, Void>() {
 
                 @Override
+                protected void onPreExecute() {
+                    progressDialog = ProgressDialog.show(BaseViewerActivity.this, "", "Loading... Please wait", true);
+                }
+
+                @Override
                 protected Void doInBackground(String... params) {
-                    BaseViewerActivity.instance.runOnUiThread(new Runnable() {
-                        
-                        @Override
-                        public void run() {
-                            progressDialog = ProgressDialog.show(BaseViewerActivity.instance, "", "Loading... Please wait", true);
-                        }
-                    });
-                    
                     decodeService.open(params[0], params[1]);
-                    progressDialog.dismiss();
-                    
                     return null;
                 }
 
                 @Override
                 protected void onPostExecute(Void result) {
                     documentModel = new DocumentModel(decodeService);
-
                     documentModel.addEventListener(BaseViewerActivity.this);
-
-
                     progressModel = new DecodingProgressModel();
                     progressModel.addEventListener(BaseViewerActivity.this);
-
                     SettingsManager.applyBookSettingsChanges(null, SettingsManager.getBookSettings(), null);
 
                     if (documentModel != null) {
@@ -162,9 +150,9 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
                             currentPageChanged(PageIndex.NULL, bs.getCurrentPage());
                         }
                     }
+                    progressDialog.dismiss();
                 }
-                
-                
+
             }.execute(fileName, password);
 
         } catch (final Exception e) {
@@ -182,7 +170,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         zoomModel = new ZoomModel();
 
         initMultiTouchZoomIfAvailable();
-
 
         setContentView(frameLayout);
         setProgressBarIndeterminateVisibility(false);
@@ -363,6 +350,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
         getView().post(new Runnable() {
+
             @Override
             public void run() {
                 getDocumentController().changeLayoutLock(false);
