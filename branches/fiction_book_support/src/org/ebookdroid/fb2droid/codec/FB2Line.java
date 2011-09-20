@@ -11,6 +11,7 @@ public class FB2Line {
 
     private final ArrayList<FB2LineElement> elements = new ArrayList<FB2LineElement>();
     private int height;
+    private int width = 0;
     private boolean hasNonWhiteSpaces = false;
     private List<String> footnotes;
 
@@ -25,6 +26,7 @@ public class FB2Line {
         if (!(element instanceof FB2LineWhiteSpace)) {
             hasNonWhiteSpaces = true;
         }
+        width += element.getWidth();
     }
 
     public int getTotalHeight() {
@@ -39,11 +41,14 @@ public class FB2Line {
     }
 
     public int getWidth() {
-        int x = 0;
+        return width;
+    }
+    public int recalculateWidth() {
+        width = 0;
         for (FB2LineElement e : elements) {
-            x += e.getWidth();
+            width += e.getWidth();
         }
-        return x;
+        return width;
     }
 
     public void render(Canvas c, int y) {
@@ -64,7 +69,7 @@ public class FB2Line {
     public void applyJustification(JustificationMode jm) {
         switch (jm) {
             case Center:
-                int x = (FB2Page.PAGE_WIDTH - (getWidth() + 2 * FB2Page.MARGIN_X)) / 2;
+                int x = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / 2;
                 elements.add(0, new FB2LineWhiteSpace(x, height, true));
                 elements.add(new FB2LineWhiteSpace(x, height, true));
                 break;
@@ -78,7 +83,7 @@ public class FB2Line {
                     }
                 }
                 if (ws > 0) {
-                    int wsx = (FB2Page.PAGE_WIDTH - (getWidth() + 2 * FB2Page.MARGIN_X)) / ws;
+                    int wsx = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / ws;
                     for (FB2LineElement e : elements) {
                         if (e instanceof FB2LineWhiteSpace && e.isSizeable()) {
                             e.adjustWidth(wsx);
@@ -87,10 +92,11 @@ public class FB2Line {
                 }
                 break;
             case Right:
-                int x1 = (FB2Page.PAGE_WIDTH - (getWidth() + 2 * FB2Page.MARGIN_X));
+                int x1 = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X));
                 elements.add(0, new FB2LineWhiteSpace(x1, height, true));
                 break;
         }
+        recalculateWidth();
     }
 
     public boolean hasNonWhiteSpaces() {

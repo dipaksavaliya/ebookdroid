@@ -1,6 +1,7 @@
 package org.ebookdroid.fb2droid.codec;
 
 import org.ebookdroid.fb2droid.codec.FB2Document.JustificationMode;
+import org.ebookdroid.utils.StringUtils;
 
 import android.util.Base64;
 
@@ -132,11 +133,8 @@ public class FB2BinaryHandler extends DefaultHandler {
             tmpBinaryContents.append(ch, start, length);
         }
         if (parsingNotesP && noteLines != null) {
-            String text = new String(ch, start, length);
             int space = (int) FB2Document.FOOTNOTETEXTPAINT.measureText(" ");
-            StringTokenizer st = new StringTokenizer(text);
-            while (st.hasMoreTokens()) {
-                String word = st.nextToken();
+            for (String word : StringUtils.split(ch, start, length)) {
                 if (noteFirstWord) {
                     noteFirstWord = false;
                     int id = -2;

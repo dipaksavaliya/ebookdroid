@@ -22,8 +22,8 @@ public class FB2Page implements CodecPage {
     private static final RectF PAGE_RECT = new RectF(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
 
     private static final Bitmap bitmap = Bitmap.createBitmap(PAGE_WIDTH, PAGE_HEIGHT, Bitmap.Config.RGB_565);
-    private ArrayList<FB2Line> lines = new ArrayList<FB2Line>();
-    private ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>();
+    private ArrayList<FB2Line> lines = new ArrayList<FB2Line>(PAGE_HEIGHT / FB2Document.TEXT_SIZE);
+    private ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>(PAGE_HEIGHT / FB2Document.FOOTNOTE_SIZE);
 
     @Override
     public int getHeight() {

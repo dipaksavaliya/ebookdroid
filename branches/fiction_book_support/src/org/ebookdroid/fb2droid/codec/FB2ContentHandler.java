@@ -1,6 +1,7 @@
 package org.ebookdroid.fb2droid.codec;
 
 import org.ebookdroid.fb2droid.codec.FB2Document.JustificationMode;
+import org.ebookdroid.utils.StringUtils;
 
 import android.graphics.Paint;
 
@@ -197,11 +198,8 @@ public class FB2ContentHandler extends DefaultHandler {
         if (!documentStarted || documentEnded || !paragraphParsing) {
             return;
         }
-        String text = new String(ch, start, length);
         int space = (int)currentTextPaint.measureText(" ");
-        StringTokenizer st = new StringTokenizer(text);
-        while (st.hasMoreTokens()) {
-            String word = st.nextToken();
+        for (String word : StringUtils.split(ch, start, length)) {
             FB2TextElement te = new FB2TextElement(word, (int) currentTextPaint.getTextSize(), (int)currentTextPaint.measureText(word), bold, italic);
             appendLineElement(space, te);
         }

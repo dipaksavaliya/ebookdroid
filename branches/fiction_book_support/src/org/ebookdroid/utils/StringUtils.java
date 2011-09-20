@@ -4,9 +4,11 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 public class StringUtils {
@@ -111,7 +113,8 @@ public class StringUtils {
                 return 1;
             }
 
-            if (Character.isDigit(firstString.charAt(firstIndex)) && Character.isDigit(secondString.charAt(secondIndex))) {
+            if (Character.isDigit(firstString.charAt(firstIndex))
+                    && Character.isDigit(secondString.charAt(secondIndex))) {
                 int firstZeroCount = 0;
                 while (firstString.charAt(firstIndex) == '0') {
                     firstZeroCount++;
@@ -129,11 +132,13 @@ public class StringUtils {
                     }
                 }
                 if ((firstIndex == firstString.length() || !Character.isDigit(firstString.charAt(firstIndex)))
-                        && (secondIndex == secondString.length() || !Character.isDigit(secondString.charAt(secondIndex)))) {
+                        && (secondIndex == secondString.length() || !Character
+                                .isDigit(secondString.charAt(secondIndex)))) {
                     continue;
                 }
                 if ((firstIndex == firstString.length() || !Character.isDigit(firstString.charAt(firstIndex)))
-                        && !(secondIndex == secondString.length() || !Character.isDigit(secondString.charAt(secondIndex)))) {
+                        && !(secondIndex == secondString.length() || !Character.isDigit(secondString
+                                .charAt(secondIndex)))) {
                     return -1;
                 }
                 if ((secondIndex == secondString.length() || !Character.isDigit(secondString.charAt(secondIndex)))) {
@@ -162,7 +167,8 @@ public class StringUtils {
                         }
                         return Character.isDigit(firstString.charAt(firstIndex)) ? 1 : diff;
                     }
-                    if (!Character.isDigit(firstString.charAt(firstIndex)) && !Character.isDigit(secondString.charAt(secondIndex))) {
+                    if (!Character.isDigit(firstString.charAt(firstIndex))
+                            && !Character.isDigit(secondString.charAt(secondIndex))) {
                         if (diff != 0) {
                             return diff;
                         }
@@ -208,6 +214,40 @@ public class StringUtils {
                 return compareNatural(o1.getAbsolutePath(), o2.getAbsolutePath());
             }
         };
+    }
+
+    private final static String[] EMPTY_STRING_ARRAY = {};
+
+    public static String[] split(char[] str, int begin, int len) {
+        if (str == null) {
+            return null;
+        }
+        if (len == 0) {
+            return EMPTY_STRING_ARRAY;
+        }
+        List<String> list = new ArrayList<String>();
+        int sizePlus1 = 1;
+        int i = begin, start = begin;
+        boolean match = false;
+        while (i < begin + len) {
+            if (Character.isWhitespace(str[i])) {
+                if (match) {
+                    if (sizePlus1++ == -1) {
+                        i = begin + len;
+                    }
+                    list.add(new String(str, start, i - start));
+                    match = false;
+                }
+                start = ++i;
+                continue;
+            }
+            match = true;
+            i++;
+        }
+        if (match) {
+            list.add(new String(str, start, i - start));
+        }
+        return (String[]) list.toArray(new String[list.size()]);
     }
 
 }
