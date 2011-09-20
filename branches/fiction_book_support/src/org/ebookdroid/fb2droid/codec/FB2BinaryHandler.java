@@ -4,8 +4,11 @@ import org.ebookdroid.fb2droid.codec.FB2Document.JustificationMode;
 import org.ebookdroid.utils.StringUtils;
 
 import android.util.Base64;
+import android.util.SparseIntArray;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +26,7 @@ public class FB2BinaryHandler extends DefaultHandler {
     }
 
     private String tmpBinaryName = null;
-    private StringBuffer tmpBinaryContents = null;
+    private final StringBuilder tmpBinaryContents = new StringBuilder();
     private boolean parsingNotes = false;
     private boolean parsingNotesP = false;
     private boolean parsingBinary = false;
@@ -31,7 +34,7 @@ public class FB2BinaryHandler extends DefaultHandler {
     private String noteName = null;
     private int noteId = -1;
     private boolean noteFirstWord = true;
-    private Pattern notesPattern = Pattern.compile("n([0-9]+)");
+    private static final Pattern notesPattern = Pattern.compile("n([0-9]+)");
     private ArrayList<FB2Line> noteLines = null;
 
     private boolean bold = false;
@@ -41,7 +44,7 @@ public class FB2BinaryHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if ("binary".equalsIgnoreCase(qName)) {
             tmpBinaryName = attributes.getValue("id");
-            tmpBinaryContents = new StringBuffer();
+            tmpBinaryContents.setLength(0);
             parsingBinary = true;
             return;
         }
@@ -78,9 +81,10 @@ public class FB2BinaryHandler extends DefaultHandler {
                 }
                 noteLines = new ArrayList<FB2Line>();
                 FB2Line lastLine = FB2Line.getLastLine(noteLines);
-                lastLine.append(new FB2TextElement(n, FB2Document.FOOTNOTE_SIZE,
-                        (int) FB2Document.FOOTNOTETEXTPAINT.measureText(n), false, false));
-                lastLine.append(new FB2LineWhiteSpace((int) FB2Document.FOOTNOTETEXTPAINT.measureText(" "), FB2Document.FOOTNOTE_SIZE, false));
+                lastLine.append(new FB2TextElement(n.toCharArray(), 0, n.length(), FB2Document.FOOTNOTE_SIZE, (int) FB2Document.FOOTNOTETEXTPAINT
+                        .measureText(n), false, false));
+                lastLine.append(new FB2LineWhiteSpace((int) FB2Document.FOOTNOTETEXTPAINT.measureText(" "),
+                        FB2Document.FOOTNOTE_SIZE, false));
             }
         }
     }
@@ -91,7 +95,7 @@ public class FB2BinaryHandler extends DefaultHandler {
             byte[] data = Base64.decode(tmpBinaryContents.toString(), Base64.DEFAULT);
             document.addImage(tmpBinaryName, data);
             tmpBinaryName = null;
-            tmpBinaryContents = null;
+            tmpBinaryContents.setLength(0);
             parsingBinary = false;
         }
         if ("body".equalsIgnoreCase(qName)) {
@@ -126,40 +130,51 @@ public class FB2BinaryHandler extends DefaultHandler {
             return;
         }
     }
+    private static int[] starts = new int[10000];
+    private static int[] lengths = new int[10000];
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if (parsingBinary && tmpBinaryContents != null) {
+        if (parsingBinary) {
             tmpBinaryContents.append(ch, start, length);
         }
         if (parsingNotesP && noteLines != null) {
             int space = (int) FB2Document.FOOTNOTETEXTPAINT.measureText(" ");
-            for (String word : StringUtils.split(ch, start, length)) {
-                if (noteFirstWord) {
-                    noteFirstWord = false;
-                    int id = -2;
-                    try {
-                        id = Integer.parseInt(word);
-                    } catch (Exception e) {
-                        id = -2;
+            int count = StringUtils.split(ch, start, length, starts, lengths);
+
+            if (count > 0) {
+                char[] dst = new char[length];
+                System.arraycopy(ch, start, dst, 0, length);
+                
+                for (int i = 0; i < count; i++) {
+                    int st = starts[i];
+                    int len = lengths[i];
+                    if (noteFirstWord) {
+                        noteFirstWord = false;
+                        int id = -2;
+                        try {
+                            id = Integer.parseInt(new String(ch, st, len));
+                        } catch (Exception e) {
+                            id = -2;
+                        }
+                        if (id == noteId) {
+                            continue;
+                        }
                     }
-                    if (id == noteId) {
-                        continue;
+                    FB2TextElement te = new FB2TextElement(dst, st - start, len, (int) FB2Document.FOOTNOTETEXTPAINT.getTextSize(),
+                            (int) FB2Document.FOOTNOTETEXTPAINT.measureText(ch, st, len), bold, italic);
+                    FB2Line line = FB2Line.getLastLine(noteLines);
+                    if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
+                        if (line.hasNonWhiteSpaces()) {
+                            line.append(new FB2LineWhiteSpace(space, (int) FB2Document.FOOTNOTETEXTPAINT.getTextSize(),
+                                    true));
+                        }
+                    } else {
+                        line = new FB2Line();
+                        noteLines.add(line);
                     }
+                    line.append(te);
                 }
-                FB2TextElement te = new FB2TextElement(word, (int) FB2Document.FOOTNOTETEXTPAINT.getTextSize(),
-                        (int) FB2Document.FOOTNOTETEXTPAINT.measureText(word), bold, italic);
-                FB2Line line = FB2Line.getLastLine(noteLines);
-                if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
-                    if (line.hasNonWhiteSpaces()) {
-                        line.append(new FB2LineWhiteSpace(space, (int) FB2Document.FOOTNOTETEXTPAINT.getTextSize(),
-                                true));
-                    }
-                } else {
-                    line = new FB2Line();
-                    noteLines.add(line);
-                }
-                line.append(te);
             }
         }
     }

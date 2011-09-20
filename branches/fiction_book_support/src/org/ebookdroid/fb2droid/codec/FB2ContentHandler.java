@@ -4,6 +4,7 @@ import org.ebookdroid.fb2droid.codec.FB2Document.JustificationMode;
 import org.ebookdroid.utils.StringUtils;
 
 import android.graphics.Paint;
+import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -193,17 +194,28 @@ public class FB2ContentHandler extends DefaultHandler {
         paragraphLines.clear();
     }
 
+    private static int[] starts = new int[10000];
+    private static int[] lengths = new int[10000];
+    
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         if (!documentStarted || documentEnded || !paragraphParsing) {
             return;
         }
         int space = (int)currentTextPaint.measureText(" ");
-        for (String word : StringUtils.split(ch, start, length)) {
-            FB2TextElement te = new FB2TextElement(word, (int) currentTextPaint.getTextSize(), (int)currentTextPaint.measureText(word), bold, italic);
-            appendLineElement(space, te);
+        int count = StringUtils.split(ch, start, length, starts, lengths);
+
+        if (count > 0) {
+            char[] dst = new char[length];
+            System.arraycopy(ch, start, dst, 0, length);
+            
+            for (int i = 0; i < count; i++) {
+                int st = starts[i];
+                int len = lengths[i];
+                FB2TextElement te = new FB2TextElement(dst, st - start, len, (int) currentTextPaint.getTextSize(), (int)currentTextPaint.measureText(ch, st, len), bold, italic);
+                appendLineElement(space, te);
+            }
         }
-        
     }
 
     private void appendLineElement(int space, FB2LineElement te) {

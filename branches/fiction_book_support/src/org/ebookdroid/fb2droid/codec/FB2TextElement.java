@@ -6,7 +6,9 @@ import android.graphics.Paint;
 
 public class FB2TextElement implements FB2LineElement {
 
-    private final String text;
+    private final char[] chars;
+    private final int start;
+    private final int length;
     private final int height;
     private final int width;
     private final boolean bold;
@@ -14,8 +16,10 @@ public class FB2TextElement implements FB2LineElement {
 
     private final static Paint textPaint = new Paint();
     
-    public FB2TextElement(String text, int height, int width, boolean bold, boolean italic) {
-        this.text = text;
+    public FB2TextElement(char[] ch, int st, int len, int height, int width, boolean bold, boolean italic) {
+        this.chars = ch;
+        this.start = st;
+        this.length = len;
         this.height = height;
         this.width = width;
         this.bold = bold;
@@ -38,7 +42,7 @@ public class FB2TextElement implements FB2LineElement {
         textPaint.setTypeface(italic ? FB2Document.ITALIC_TF : FB2Document.NORMAL_TF);
         textPaint.setFakeBoldText(bold);
         textPaint.setAntiAlias(true);
-        c.drawText(text, x, y, textPaint);
+        c.drawText(chars, start, length, x, y, textPaint);
     }
 
     @Override

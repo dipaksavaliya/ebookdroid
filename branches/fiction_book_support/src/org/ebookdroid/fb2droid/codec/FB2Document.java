@@ -84,7 +84,7 @@ public class FB2Document implements CodecDocument {
             parser.parse(is, new FB2BinaryHandler(this));            
             
         } catch (Exception e) {
-            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage());
+            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
         }
     }
     private void parseContent(SAXParserFactory spf, String fileName, String encoding) {
@@ -100,7 +100,7 @@ public class FB2Document implements CodecDocument {
             // do nothing
         }
         catch (Exception e) {
-            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage());
+            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
         }
     }
 

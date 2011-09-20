@@ -1,5 +1,7 @@
 package org.ebookdroid.utils;
 
+import android.util.SparseIntArray;
+
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -216,26 +218,22 @@ public class StringUtils {
         };
     }
 
-    private final static String[] EMPTY_STRING_ARRAY = {};
-
-    public static String[] split(char[] str, int begin, int len) {
+    public static int split(char[] str, int begin, int len, int[] outStart, int[] outLength) {
         if (str == null) {
-            return null;
+            return 0;
         }
         if (len == 0) {
-            return EMPTY_STRING_ARRAY;
+            return 0;
         }
-        List<String> list = new ArrayList<String>();
-        int sizePlus1 = 1;
         int i = begin, start = begin;
+        int index = 0;
         boolean match = false;
         while (i < begin + len) {
-            if (Character.isWhitespace(str[i])) {
+            if (str[i] == 0x20 || str[i] == 0x0D || str[i] == 0x0A || str[i] == 0x09) {
                 if (match) {
-                    if (sizePlus1++ == -1) {
-                        i = begin + len;
-                    }
-                    list.add(new String(str, start, i - start));
+                    outStart[index] = start;
+                    outLength[index] = i-start;
+                    index++;
                     match = false;
                 }
                 start = ++i;
@@ -245,9 +243,11 @@ public class StringUtils {
             i++;
         }
         if (match) {
-            list.add(new String(str, start, i - start));
+            outStart[index] = start;
+            outLength[index] = i-start;
+            index++;
         }
-        return (String[]) list.toArray(new String[list.size()]);
+        return index;
     }
 
 }
