@@ -29,7 +29,7 @@ public class FB2ContentHandler extends DefaultHandler {
 
     private Paint currentTextPaint = FB2Document.NORMALTEXTPAINT;
 
-    private ArrayList<FB2Line> paragraphLines = null;
+    private final ArrayList<FB2Line> paragraphLines = new ArrayList<FB2Line>();
 
     private JustificationMode jm = JustificationMode.Justify;
     
@@ -62,7 +62,7 @@ public class FB2ContentHandler extends DefaultHandler {
         }
         if ("p".equals(qName)) {
             paragraphParsing = true;
-            paragraphLines = new ArrayList<FB2Line>();
+            paragraphLines.clear();
             if (jm != JustificationMode.Center) {
                 FB2Line.getLastLine(paragraphLines).append(
                         new FB2LineWhiteSpace((int) currentTextPaint.getTextSize() * 3, (int) currentTextPaint.getTextSize(), false));
@@ -122,7 +122,7 @@ public class FB2ContentHandler extends DefaultHandler {
             line.applyJustification(JustificationMode.Center);
             document.appendLine(line);
         } else {
-            if (paragraphLines != null) {
+            if (!paragraphLines.isEmpty()) {
                 int space = (int)currentTextPaint.measureText(" ");
                 appendLineElement(space, image);
             }
@@ -178,7 +178,7 @@ public class FB2ContentHandler extends DefaultHandler {
     }
 
     private void flushParagraphLines() {
-        if (paragraphLines == null) {
+        if (paragraphLines.isEmpty()) {
             return;
         }
         if (jm == JustificationMode.Justify) {
@@ -189,12 +189,12 @@ public class FB2ContentHandler extends DefaultHandler {
             l.applyJustification(jm);
             document.appendLine(l);
         }
-        paragraphLines = null;
+        paragraphLines.clear();
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if (!documentStarted || documentEnded || paragraphLines == null || !paragraphParsing) {
+        if (!documentStarted || documentEnded || !paragraphParsing) {
             return;
         }
         String text = new String(ch, start, length);
