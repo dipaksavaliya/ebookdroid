@@ -2,9 +2,8 @@ package org.ebookdroid.fb2droid.codec;
 
 import org.ebookdroid.utils.StringUtils;
 
-import android.graphics.Paint;
-
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -26,15 +25,11 @@ public class FB2ContentHandler extends DefaultHandler {
 
     private boolean paragraphParsing = false;
 
-    private boolean bold = false;
-
-    private boolean italic = false;
-
     private boolean cover = false;
 
-    private Paint currentTextPaint = FB2Document.NORMALTEXTPAINT;
+    private RenderingStyle crs = new RenderingStyle(RenderingStyle.TEXT_SIZE);
 
-    private JustificationMode jm = JustificationMode.Justify;
+    private final LinkedList<RenderingStyle> renderingStates = new LinkedList<RenderingStyle>();
 
     public FB2ContentHandler(final FB2Document fb2Document) {
         this.document = fb2Document;
@@ -50,22 +45,23 @@ public class FB2ContentHandler extends DefaultHandler {
         } else if ("section".equals(qName)) {
             inSection = true;
         } else if ("title".equals(qName)) {
+            renderingStates.addFirst(crs);
+            crs = new RenderingStyle(crs);
             if (!inSection) {
-                currentTextPaint = FB2Document.MAINTITLETEXTPAINT;
+                crs.textSize = RenderingStyle.MAIN_TITLE_SIZE;
             } else {
-                currentTextPaint = FB2Document.SECTIONTITLETEXTPAINT;
+                crs.textSize = RenderingStyle.SECTION_TITLE_SIZE;
             }
-            jm = JustificationMode.Center;
+            crs.jm = JustificationMode.Center;
             final FB2Line line = new FB2Line();
-            line.append(new FB2LineWhiteSpace(0, (int) currentTextPaint.getTextSize(), true));
+            line.append(new FB2LineWhiteSpace(0, crs.textSize, true));
             document.appendLine(line);
         } else if ("p".equals(qName)) {
             paragraphParsing = true;
             paragraphLines.clear();
-            if (jm != JustificationMode.Center) {
+            if (crs.jm != JustificationMode.Center) {
                 FB2Line.getLastLine(paragraphLines).append(
-                        new FB2LineWhiteSpace((int) currentTextPaint.getTextSize() * 3, (int) currentTextPaint
-                                .getTextSize(), false));
+                        new FB2LineWhiteSpace((int) crs.textSize * 3, crs.textSize, false));
             }
         } else if ("a".equals(qName)) {
             if (paragraphParsing) {
@@ -77,18 +73,21 @@ public class FB2ContentHandler extends DefaultHandler {
             }
         } else if ("empty-line".equals(qName)) {
             final FB2Line line = new FB2Line();
-            line.append(new FB2LineWhiteSpace(0, (int) currentTextPaint.getTextSize(), true));
+            line.append(new FB2LineWhiteSpace(0, crs.textSize, true));
             document.appendLine(line);
         } else if ("strong".equals(qName)) {
-            currentTextPaint.setFakeBoldText(true);
-            bold = true;
+            renderingStates.addFirst(crs);
+            crs = new RenderingStyle(crs);
+            crs.bold = true;
         } else if ("emphasis".equals(qName)) {
-            currentTextPaint.setTypeface(FB2Document.ITALIC_TF);
-            italic = true;
+            renderingStates.addFirst(crs);
+            crs = new RenderingStyle(crs);
+            crs.face = RenderingStyle.ITALIC_TF;
         } else if ("epigraph".equals(qName)) {
-            jm = JustificationMode.Right;
-            currentTextPaint.setTypeface(FB2Document.ITALIC_TF);
-            italic = true;
+            renderingStates.addFirst(crs);
+            crs = new RenderingStyle(crs);
+            crs.jm = JustificationMode.Right;
+            crs.face = RenderingStyle.ITALIC_TF;
         } else if ("image".equals(qName)) {
             final String ref = attributes.getValue("href");
             if (cover) {
@@ -112,7 +111,7 @@ public class FB2ContentHandler extends DefaultHandler {
             document.appendLine(line);
         } else {
             if (!paragraphLines.isEmpty()) {
-                final int space = (int) currentTextPaint.measureText(" ");
+                final int space = (int) crs.getTextPaint().measureText(" ");
                 appendLineElement(space, image);
             }
         }
@@ -131,23 +130,18 @@ public class FB2ContentHandler extends DefaultHandler {
             inSection = false;
         } else if ("title".equals(qName)) {
             final FB2Line line = new FB2Line();
-            line.append(new FB2LineWhiteSpace(0, (int) currentTextPaint.getTextSize(), true));
+            line.append(new FB2LineWhiteSpace(0, crs.textSize, true));
             document.appendLine(line);
-            currentTextPaint = FB2Document.NORMALTEXTPAINT;
-            jm = JustificationMode.Justify;
+            crs = renderingStates.removeFirst();
         } else if ("p".equals(qName)) {
             flushParagraphLines();
             paragraphParsing = false;
         } else if ("strong".equals(qName)) {
-            currentTextPaint.setFakeBoldText(false);
-            bold = false;
+            crs = renderingStates.removeFirst();
         } else if ("emphasis".equals(qName)) {
-            currentTextPaint.setTypeface(FB2Document.NORMAL_TF);
-            italic = false;
+            crs = renderingStates.removeFirst();
         } else if ("epigraph".equals(qName)) {
-            jm = JustificationMode.Justify;
-            currentTextPaint.setTypeface(FB2Document.NORMAL_TF);
-            italic = false;
+            crs = renderingStates.removeFirst();
         } else if ("coverpage".equals(qName)) {
             cover = false;
         }
@@ -157,13 +151,13 @@ public class FB2ContentHandler extends DefaultHandler {
         if (paragraphLines.isEmpty()) {
             return;
         }
-        if (jm == JustificationMode.Justify) {
+        if (crs.jm == JustificationMode.Justify) {
             final FB2Line l = FB2Line.getLastLine(paragraphLines);
-            l.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - l.getWidth() - 2 * FB2Page.MARGIN_X,
-                    (int) currentTextPaint.getTextSize(), false));
+            l.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - l.getWidth() - 2 * FB2Page.MARGIN_X, crs.textSize,
+                    false));
         }
         for (final FB2Line l : paragraphLines) {
-            l.applyJustification(jm);
+            l.applyJustification(crs.jm);
             document.appendLine(l);
         }
         paragraphLines.clear();
@@ -174,7 +168,7 @@ public class FB2ContentHandler extends DefaultHandler {
         if (!documentStarted || documentEnded || !paragraphParsing) {
             return;
         }
-        final int space = (int) currentTextPaint.measureText(" ");
+        final int space = (int) crs.getTextPaint().measureText(" ");
         final int count = StringUtils.split(ch, start, length, starts, lengths);
 
         if (count > 0) {
@@ -184,9 +178,7 @@ public class FB2ContentHandler extends DefaultHandler {
             for (int i = 0; i < count; i++) {
                 final int st = starts[i];
                 final int len = lengths[i];
-                final FB2TextElement te = new FB2TextElement(dst, st - start, len,
-                        (int) currentTextPaint.getTextSize(), (int) currentTextPaint.measureText(ch, st, len), bold,
-                        italic);
+                final FB2TextElement te = new FB2TextElement(dst, st - start, len, crs);
                 appendLineElement(space, te);
             }
         }
@@ -196,7 +188,7 @@ public class FB2ContentHandler extends DefaultHandler {
         FB2Line line = FB2Line.getLastLine(paragraphLines);
         if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
             if (line.hasNonWhiteSpaces()) {
-                line.append(new FB2LineWhiteSpace(space, (int) currentTextPaint.getTextSize(), true));
+                line.append(new FB2LineWhiteSpace(space, crs.textSize, true));
             }
         } else {
             line = new FB2Line();

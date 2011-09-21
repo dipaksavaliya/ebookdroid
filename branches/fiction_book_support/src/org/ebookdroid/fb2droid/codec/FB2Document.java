@@ -1,6 +1,5 @@
 package org.ebookdroid.fb2droid.codec;
 
-import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.core.OutlineLink;
 import org.ebookdroid.core.PageLink;
 import org.ebookdroid.core.codec.CodecDocument;
@@ -9,9 +8,6 @@ import org.ebookdroid.core.codec.CodecPageInfo;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.text.TextPaint;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,20 +26,6 @@ import org.xml.sax.InputSource;
 
 public class FB2Document implements CodecDocument {
 
-    public static final Typeface NORMAL_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
-            "fonts/OldStandard-Regular.ttf");
-    public static final Typeface ITALIC_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
-            "fonts/OldStandard-Italic.ttf");
-
-    public static final int MAIN_TITLE_SIZE = 48;
-    public static final int SECTION_TITLE_SIZE = 36;
-    public static final int TEXT_SIZE = 24;
-    public static final int FOOTNOTE_SIZE = 20;
-    public static final Paint NORMALTEXTPAINT = new TextPaint();
-    public static final Paint FOOTNOTETEXTPAINT = new TextPaint();
-    public static final Paint MAINTITLETEXTPAINT = new TextPaint();
-    public static final Paint SECTIONTITLETEXTPAINT = new TextPaint();
-
     private final TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
     private final TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
 
@@ -51,20 +33,6 @@ public class FB2Document implements CodecDocument {
     private String cover;
 
     public FB2Document(final String fileName) {
-        NORMALTEXTPAINT.setTextSize(TEXT_SIZE);
-        FOOTNOTETEXTPAINT.setTextSize(FOOTNOTE_SIZE);
-        MAINTITLETEXTPAINT.setTextSize(MAIN_TITLE_SIZE);
-        SECTIONTITLETEXTPAINT.setTextSize(SECTION_TITLE_SIZE);
-
-        NORMALTEXTPAINT.setAntiAlias(true);
-        FOOTNOTETEXTPAINT.setAntiAlias(true);
-        MAINTITLETEXTPAINT.setAntiAlias(true);
-        SECTIONTITLETEXTPAINT.setAntiAlias(true);
-        NORMALTEXTPAINT.setTypeface(NORMAL_TF);
-        MAINTITLETEXTPAINT.setTypeface(NORMAL_TF);
-        SECTIONTITLETEXTPAINT.setTypeface(NORMAL_TF);
-        FOOTNOTETEXTPAINT.setTypeface(NORMAL_TF);
-
         final String encoding = getEncoding(fileName);
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();

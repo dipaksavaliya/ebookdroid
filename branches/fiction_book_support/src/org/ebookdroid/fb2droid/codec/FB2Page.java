@@ -27,8 +27,8 @@ public class FB2Page implements CodecPage {
 
     private static final RectF PAGE_RECT = new RectF(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
 
-    private final ArrayList<FB2Line> lines = new ArrayList<FB2Line>(PAGE_HEIGHT / FB2Document.TEXT_SIZE);
-    private final ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>(PAGE_HEIGHT / FB2Document.FOOTNOTE_SIZE);
+    private final ArrayList<FB2Line> lines = new ArrayList<FB2Line>(PAGE_HEIGHT / RenderingStyle.TEXT_SIZE);
+    private final ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>(PAGE_HEIGHT / RenderingStyle.FOOTNOTE_SIZE);
 
     @Override
     public int getHeight() {
@@ -81,10 +81,10 @@ public class FB2Page implements CodecPage {
             y += line.getHeight();
             line.render(c, y);
         }
-        y += FB2Document.FOOTNOTE_SIZE;
+        y += RenderingStyle.FOOTNOTE_SIZE;
         if (!noteLines.isEmpty()) {
-            c.drawLine(MARGIN_X, y - FB2Document.FOOTNOTE_SIZE / 2, MARGIN_X + PAGE_WIDTH / 4, y
-                    - FB2Document.FOOTNOTE_SIZE / 2, paint);
+            c.drawLine(MARGIN_X, y - RenderingStyle.FOOTNOTE_SIZE / 2, MARGIN_X + PAGE_WIDTH / 4, y
+                    - RenderingStyle.FOOTNOTE_SIZE / 2, paint);
         }
         for (final FB2Line line : noteLines) {
             y += line.getHeight();
@@ -101,7 +101,7 @@ public class FB2Page implements CodecPage {
             y += line.getHeight();
         }
         if (!noteLines.isEmpty()) {
-            y += FB2Document.FOOTNOTE_SIZE;
+            y += RenderingStyle.FOOTNOTE_SIZE;
         }
         return y;
     }

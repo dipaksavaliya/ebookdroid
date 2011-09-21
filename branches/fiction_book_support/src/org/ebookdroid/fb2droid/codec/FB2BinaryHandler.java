@@ -3,6 +3,7 @@ package org.ebookdroid.fb2droid.codec;
 import org.ebookdroid.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,13 +28,14 @@ public class FB2BinaryHandler extends DefaultHandler {
     private boolean noteFirstWord = true;
     private ArrayList<FB2Line> noteLines = null;
 
-    private boolean bold = false;
-    private boolean italic = false;
-
+    private final LinkedList<RenderingStyle> renderingStates = new LinkedList<RenderingStyle>();
+    
     public FB2BinaryHandler(final FB2Document fb2Document) {
         this.document = fb2Document;
     }
 
+    private RenderingStyle crs = new RenderingStyle(RenderingStyle.FOOTNOTE_SIZE);
+    
     @Override
     public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
             throws SAXException {
@@ -52,11 +54,13 @@ public class FB2BinaryHandler extends DefaultHandler {
                 parsingNotesP = true;
             }
         } else if ("strong".equals(qName)) {
-            FB2Document.FOOTNOTETEXTPAINT.setFakeBoldText(true);
-            bold = true;
+            renderingStates.addFirst(crs);
+            crs = new RenderingStyle(crs);
+            crs.bold = true;
         } else if ("emphasis".equals(qName)) {
-            FB2Document.FOOTNOTETEXTPAINT.setTypeface(FB2Document.ITALIC_TF);
-            italic = true;
+            renderingStates.addFirst(crs);
+            crs = new RenderingStyle(crs);
+            crs.face = RenderingStyle.ITALIC_TF;
         } else if ("section".equalsIgnoreCase(qName)) {
             if (parsingNotes) {
                 noteName = attributes.getValue("id");
@@ -64,10 +68,9 @@ public class FB2BinaryHandler extends DefaultHandler {
                     String n = getNoteId();
                     noteLines = new ArrayList<FB2Line>();
                     final FB2Line lastLine = FB2Line.getLastLine(noteLines);
-                    lastLine.append(new FB2TextElement(n.toCharArray(), 0, n.length(), FB2Document.FOOTNOTE_SIZE,
-                            (int) FB2Document.FOOTNOTETEXTPAINT.measureText(n), false, false));
-                    lastLine.append(new FB2LineWhiteSpace((int) FB2Document.FOOTNOTETEXTPAINT.measureText(" "),
-                            FB2Document.FOOTNOTE_SIZE, false));
+                    lastLine.append(new FB2TextElement(n.toCharArray(), 0, n.length(), crs));
+                    lastLine.append(new FB2LineWhiteSpace((int) crs.getTextPaint().measureText(" "),
+                            crs.textSize, false));
                 }
             }
         }
@@ -96,17 +99,15 @@ public class FB2BinaryHandler extends DefaultHandler {
                 parsingNotesP = false;
                 final FB2Line line = FB2Line.getLastLine(noteLines);
                 line.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - line.getWidth() - 2 * FB2Page.MARGIN_X,
-                        (int) FB2Document.FOOTNOTETEXTPAINT.getTextSize(), false));
+                        (int) crs.textSize, false));
                 for (final FB2Line l : noteLines) {
                     l.applyJustification(JustificationMode.Justify);
                 }
             }
         } else if ("strong".equals(qName)) {
-            FB2Document.FOOTNOTETEXTPAINT.setFakeBoldText(false);
-            bold = false;
+            crs = renderingStates.removeFirst();
         } else if ("emphasis".equals(qName)) {
-            FB2Document.FOOTNOTETEXTPAINT.setTypeface(FB2Document.NORMAL_TF);
-            italic = false;
+            crs = renderingStates.removeFirst();
         }
     }
 
@@ -119,7 +120,7 @@ public class FB2BinaryHandler extends DefaultHandler {
             tmpBinaryContents.append(ch, start, length);
         }
         if (parsingNotesP && noteLines != null) {
-            final int space = (int) FB2Document.FOOTNOTETEXTPAINT.measureText(" ");
+            final int space = (int) crs.getTextPaint().measureText(" ");
             final int count = StringUtils.split(ch, start, length, starts, lengths);
 
             if (count > 0) {
@@ -141,13 +142,11 @@ public class FB2BinaryHandler extends DefaultHandler {
                             continue;
                         }
                     }
-                    final FB2TextElement te = new FB2TextElement(dst, st - start, len,
-                            (int) FB2Document.FOOTNOTETEXTPAINT.getTextSize(),
-                            (int) FB2Document.FOOTNOTETEXTPAINT.measureText(ch, st, len), bold, italic);
+                    final FB2TextElement te = new FB2TextElement(dst, st - start, len, crs);
                     FB2Line line = FB2Line.getLastLine(noteLines);
                     if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
                         if (line.hasNonWhiteSpaces()) {
-                            line.append(new FB2LineWhiteSpace(space, (int) FB2Document.FOOTNOTETEXTPAINT.getTextSize(),
+                            line.append(new FB2LineWhiteSpace(space, crs.textSize,
                                     true));
                         }
                     } else {
