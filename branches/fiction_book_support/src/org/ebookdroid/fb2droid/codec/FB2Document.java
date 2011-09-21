@@ -43,9 +43,9 @@ public class FB2Document implements CodecDocument {
     private final static TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
     private final static TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
     public static final Typeface NORMAL_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
-    "fonts/OldStandard-Regular.ttf"); 
+    "fonts/OldStandard-Regular.ttf");
     public static final Typeface ITALIC_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
-    "fonts/OldStandard-Italic.ttf"); 
+    "fonts/OldStandard-Italic.ttf");
 
     public enum JustificationMode {
         Center, Left, Right, Justify;
@@ -65,24 +65,28 @@ public class FB2Document implements CodecDocument {
         MAINTITLETEXTPAINT.setTypeface(NORMAL_TF);
         SECTIONTITLETEXTPAINT.setTypeface(NORMAL_TF);
         FOOTNOTETEXTPAINT.setTypeface(NORMAL_TF);
-        
+
         String encoding = getEncoding(fileName);
 
         SAXParserFactory spf = SAXParserFactory.newInstance();
 
+        long t1 = System.currentTimeMillis();
         parseImages(spf, fileName, encoding);
+        long t2 = System.currentTimeMillis();
         parseContent(spf, fileName, encoding);
+        long t3 = System.currentTimeMillis();
+        System.out.println("SAX parser: " + (t2 - t1) + " ms, " + (t3 - t2) + " ms");
     }
 
     private void parseImages(SAXParserFactory spf, String fileName, String encoding) {
         try {
             SAXParser parser = spf.newSAXParser();
-            
+
             Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
             InputSource is = new InputSource();
             is.setCharacterStream(isr);
-            parser.parse(is, new FB2BinaryHandler(this));            
-            
+            parser.parse(is, new FB2BinaryHandler(this));
+
         } catch (Exception e) {
             throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
         }
@@ -90,12 +94,12 @@ public class FB2Document implements CodecDocument {
     private void parseContent(SAXParserFactory spf, String fileName, String encoding) {
         try {
             SAXParser parser = spf.newSAXParser();
-            
+
             Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
             InputSource is = new InputSource();
             is.setCharacterStream(isr);
-            parser.parse(is, new FB2ContentHandler(this));            
-            
+            parser.parse(is, new FB2ContentHandler(this));
+
         } catch (StopParsingException e) {
             // do nothing
         }
@@ -195,14 +199,14 @@ public class FB2Document implements CodecDocument {
             FB2Line line = new FB2Line();
             line.append(new FB2LineWhiteSpace(0, h, false));
             appendLine(line);
-            
+
         }
-        
+
     }
 
-    public void addImage(String tmpBinaryName, byte[] data) {
-        if (tmpBinaryName != null && data != null) {
-            FB2Image img = new FB2Image(data);
+    public void addImage(String tmpBinaryName, String encoded) {
+        if (tmpBinaryName != null && encoded != null) {
+            FB2Image img = new FB2Image(encoded);
             images.put(tmpBinaryName, img);
         }
     }
@@ -220,7 +224,7 @@ public class FB2Document implements CodecDocument {
             notes.put(noteName, noteLines);
         }
     }
-    
+
     public static List<FB2Line> getNote(String noteName) {
         List<FB2Line> note = notes.get(noteName);
         if (note == null && noteName.startsWith("#")) {

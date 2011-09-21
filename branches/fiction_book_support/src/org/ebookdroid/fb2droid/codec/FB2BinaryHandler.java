@@ -3,13 +3,7 @@ package org.ebookdroid.fb2droid.codec;
 import org.ebookdroid.fb2droid.codec.FB2Document.JustificationMode;
 import org.ebookdroid.utils.StringUtils;
 
-import android.util.Base64;
-import android.util.SparseIntArray;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +20,7 @@ public class FB2BinaryHandler extends DefaultHandler {
     }
 
     private String tmpBinaryName = null;
-    private final StringBuilder tmpBinaryContents = new StringBuilder();
+    private final StringBuilder tmpBinaryContents = new StringBuilder(64*1024);
     private boolean parsingNotes = false;
     private boolean parsingNotesP = false;
     private boolean parsingBinary = false;
@@ -92,8 +86,7 @@ public class FB2BinaryHandler extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if ("binary".equalsIgnoreCase(qName)) {
-            byte[] data = Base64.decode(tmpBinaryContents.toString(), Base64.DEFAULT);
-            document.addImage(tmpBinaryName, data);
+            document.addImage(tmpBinaryName, tmpBinaryContents.toString());
             tmpBinaryName = null;
             tmpBinaryContents.setLength(0);
             parsingBinary = false;
@@ -145,7 +138,7 @@ public class FB2BinaryHandler extends DefaultHandler {
             if (count > 0) {
                 char[] dst = new char[length];
                 System.arraycopy(ch, start, dst, 0, length);
-                
+
                 for (int i = 0; i < count; i++) {
                     int st = starts[i];
                     int len = lengths[i];
