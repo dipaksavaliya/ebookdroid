@@ -1,7 +1,5 @@
 package org.ebookdroid.fb2droid.codec;
 
-import org.ebookdroid.fb2droid.codec.FB2Document.JustificationMode;
-
 import android.graphics.Canvas;
 
 import java.util.ArrayList;
@@ -13,12 +11,12 @@ public class FB2Line {
     private int height;
     private int width = 0;
     private boolean hasNonWhiteSpaces = false;
-    private List<String> footnotes;
+    private List<FB2Line> footnotes;
 
     public FB2Line() {
     }
 
-    public void append(FB2LineElement element) {
+    public void append(final FB2LineElement element) {
         elements.add(element);
         if (element.getHeight() > height) {
             height = element.getHeight();
@@ -32,10 +30,7 @@ public class FB2Line {
     public int getTotalHeight() {
         int h = height;
         if (footnotes != null) {
-            List<FB2Line> note = FB2Document.getNote(footnotes.get(0));
-            if (note != null) {
-                h += note.get(0).getHeight();
-            }
+            h += footnotes.get(0).getHeight();
         }
         return h;
     }
@@ -43,33 +38,34 @@ public class FB2Line {
     public int getWidth() {
         return width;
     }
+
     public int recalculateWidth() {
         width = 0;
-        for (FB2LineElement e : elements) {
+        for (final FB2LineElement e : elements) {
             width += e.getWidth();
         }
         return width;
     }
 
-    public void render(Canvas c, int y) {
+    public void render(final Canvas c, final int y) {
         int x = FB2Page.MARGIN_X;
-        for (FB2LineElement e : elements) {
+        for (final FB2LineElement e : elements) {
             e.render(c, y, x);
             x += e.getWidth();
         }
     }
 
-    public static FB2Line getLastLine(ArrayList<FB2Line> lines) {
+    public static FB2Line getLastLine(final ArrayList<FB2Line> lines) {
         if (lines.size() == 0) {
             lines.add(new FB2Line());
         }
         return lines.get(lines.size() - 1);
     }
 
-    public void applyJustification(JustificationMode jm) {
+    public void applyJustification(final JustificationMode jm) {
         switch (jm) {
             case Center:
-                int x = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / 2;
+                final int x = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / 2;
                 elements.add(0, new FB2LineWhiteSpace(x, height, true));
                 elements.add(new FB2LineWhiteSpace(x, height, true));
                 break;
@@ -77,14 +73,14 @@ public class FB2Line {
                 break;
             case Justify:
                 int ws = 0;
-                for (FB2LineElement e : elements) {
+                for (final FB2LineElement e : elements) {
                     if (e instanceof FB2LineWhiteSpace && e.isSizeable()) {
                         ws++;
                     }
                 }
                 if (ws > 0) {
-                    int wsx = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / ws;
-                    for (FB2LineElement e : elements) {
+                    final int wsx = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / ws;
+                    for (final FB2LineElement e : elements) {
                         if (e instanceof FB2LineWhiteSpace && e.isSizeable()) {
                             e.adjustWidth(wsx);
                         }
@@ -92,7 +88,7 @@ public class FB2Line {
                 }
                 break;
             case Right:
-                int x1 = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X));
+                final int x1 = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X));
                 elements.add(0, new FB2LineWhiteSpace(x1, height, true));
                 break;
         }
@@ -100,21 +96,21 @@ public class FB2Line {
     }
 
     public boolean hasNonWhiteSpaces() {
-        return hasNonWhiteSpaces ;
+        return hasNonWhiteSpaces;
     }
 
-    public List<String> getFootNotes() {
+    public List<FB2Line> getFootNotes() {
         return footnotes;
     }
 
-    public void addNote(String value) {
-        if (value == null) {
+    public void addNote(final List<FB2Line> noteLines) {
+        if (noteLines == null) {
             return;
         }
         if (footnotes == null) {
-            footnotes = new ArrayList<String>();
+            footnotes = new ArrayList<FB2Line>();
         }
-        footnotes.add(value);
+        footnotes.addAll(noteLines);
     }
 
     public int getHeight() {

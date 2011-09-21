@@ -85,7 +85,8 @@ public class FB2Image implements FB2LineElement {
     private static Options getImageSize(final String encoded) {
         final Options opts = new Options();
         opts.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(new Base64InputStream(new AsciiCharInputStream(encoded), Base64.DEFAULT), null, opts);
+        BitmapFactory
+                .decodeStream(new Base64InputStream(new AsciiCharInputStream(encoded), Base64.DEFAULT), null, opts);
         return opts;
     }
 
@@ -94,7 +95,7 @@ public class FB2Image implements FB2LineElement {
         private final String str;
         private int index;
 
-        public AsciiCharInputStream(String str) {
+        public AsciiCharInputStream(final String str) {
             this.str = str;
         }
 

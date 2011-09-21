@@ -15,15 +15,20 @@ import java.util.ArrayList;
 
 public class FB2Page implements CodecPage {
 
-    final static int PAGE_WIDTH = 800;
-    final static int PAGE_HEIGHT = 1176;
+    public static final int PAGE_WIDTH = 800;
+
+    public static final int PAGE_HEIGHT = 1176;
+
     public static final int MARGIN_X = 20;
+
     public static final int MARGIN_Y = 20;
-    private static final RectF PAGE_RECT = new RectF(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
 
     private static final Bitmap bitmap = Bitmap.createBitmap(PAGE_WIDTH, PAGE_HEIGHT, Bitmap.Config.RGB_565);
-    private ArrayList<FB2Line> lines = new ArrayList<FB2Line>(PAGE_HEIGHT / FB2Document.TEXT_SIZE);
-    private ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>(PAGE_HEIGHT / FB2Document.FOOTNOTE_SIZE);
+
+    private static final RectF PAGE_RECT = new RectF(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
+
+    private final ArrayList<FB2Line> lines = new ArrayList<FB2Line>(PAGE_HEIGHT / FB2Document.TEXT_SIZE);
+    private final ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>(PAGE_HEIGHT / FB2Document.FOOTNOTE_SIZE);
 
     @Override
     public int getHeight() {
@@ -40,10 +45,10 @@ public class FB2Page implements CodecPage {
     }
 
     @Override
-    public BitmapRef renderBitmap(int width, int height, RectF pageSliceBounds) {
-
+    public BitmapRef renderBitmap(final int width, final int height, final RectF pageSliceBounds) {
         try {
             renderPage();
+
             final Matrix matrix = new Matrix();
             matrix.postScale((float) width / bitmap.getWidth(), (float) height / bitmap.getHeight());
             matrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height);
@@ -64,15 +69,15 @@ public class FB2Page implements CodecPage {
     }
 
     private void renderPage() {
-        Canvas c = new Canvas(bitmap);
+        final Canvas c = new Canvas(bitmap);
 
-        Paint paint = new Paint();
+        final Paint paint = new Paint();
         paint.setColor(Color.WHITE);
         c.drawRect(PAGE_RECT, paint);
         paint.setColor(Color.BLACK);
 
         int y = MARGIN_Y;
-        for (FB2Line line : lines) {
+        for (final FB2Line line : lines) {
             y += line.getHeight();
             line.render(c, y);
         }
@@ -81,7 +86,7 @@ public class FB2Page implements CodecPage {
             c.drawLine(MARGIN_X, y - FB2Document.FOOTNOTE_SIZE / 2, MARGIN_X + PAGE_WIDTH / 4, y
                     - FB2Document.FOOTNOTE_SIZE / 2, paint);
         }
-        for (FB2Line line : noteLines) {
+        for (final FB2Line line : noteLines) {
             y += line.getHeight();
             line.render(c, y);
         }
@@ -89,10 +94,10 @@ public class FB2Page implements CodecPage {
 
     public int getContentHeight() {
         int y = 0;
-        for (FB2Line line : lines) {
+        for (final FB2Line line : lines) {
             y += line.getHeight();
         }
-        for (FB2Line line : noteLines) {
+        for (final FB2Line line : noteLines) {
             y += line.getHeight();
         }
         if (!noteLines.isEmpty()) {
@@ -101,20 +106,19 @@ public class FB2Page implements CodecPage {
         return y;
     }
 
-    public void appendLine(FB2Line line) {
+    public void appendLine(final FB2Line line) {
         lines.add(line);
     }
 
-    public static FB2Page getLastPage(ArrayList<FB2Page> pages) {
+    public static FB2Page getLastPage(final ArrayList<FB2Page> pages) {
         if (pages.size() == 0) {
             pages.add(new FB2Page());
         }
         return pages.get(pages.size() - 1);
     }
 
-    public void appendNoteLine(FB2Line l) {
+    public void appendNoteLine(final FB2Line l) {
         noteLines.add(l);
 
     }
-
 }

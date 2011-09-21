@@ -3,8 +3,9 @@ package org.ebookdroid.fb2droid.codec;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-
 public class FB2TextElement implements FB2LineElement {
+
+    private static final Paint textPaint = new Paint();
 
     private final char[] chars;
     private final int start;
@@ -14,9 +15,8 @@ public class FB2TextElement implements FB2LineElement {
     private final boolean bold;
     private final boolean italic;
 
-    private final static Paint textPaint = new Paint();
-    
-    public FB2TextElement(char[] ch, int st, int len, int height, int width, boolean bold, boolean italic) {
+    public FB2TextElement(final char[] ch, final int st, final int len, final int height, final int width,
+            final boolean bold, final boolean italic) {
         this.chars = ch;
         this.start = st;
         this.length = len;
@@ -37,7 +37,7 @@ public class FB2TextElement implements FB2LineElement {
     }
 
     @Override
-    public void render(Canvas c, int y, int x) {
+    public void render(final Canvas c, final int y, final int x) {
         textPaint.setTextSize(height);
         textPaint.setTypeface(italic ? FB2Document.ITALIC_TF : FB2Document.NORMAL_TF);
         textPaint.setFakeBoldText(bold);
@@ -46,12 +46,11 @@ public class FB2TextElement implements FB2LineElement {
     }
 
     @Override
-    public void adjustWidth(int w) {
+    public void adjustWidth(final int w) {
     }
 
     @Override
     public boolean isSizeable() {
         return false;
     }
-
 }

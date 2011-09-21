@@ -2,14 +2,13 @@ package org.ebookdroid.fb2droid.codec;
 
 import android.graphics.Canvas;
 
-
 public class FB2LineWhiteSpace implements FB2LineElement {
 
     private final int height;
     private int width;
     private final boolean sizeable;
 
-    public FB2LineWhiteSpace(int width, int height, boolean sizeable) {
+    public FB2LineWhiteSpace(final int width, final int height, final boolean sizeable) {
         this.width = width;
         this.height = height;
         this.sizeable = sizeable;
@@ -26,13 +25,13 @@ public class FB2LineWhiteSpace implements FB2LineElement {
     }
 
     @Override
-    public void render(Canvas c, int y, int x) {
+    public void render(final Canvas c, final int y, final int x) {
     }
 
     @Override
-    public void adjustWidth(int w) {
+    public void adjustWidth(final int w) {
         if (sizeable) {
-            width += w; 
+            width += w;
         }
     }
 
@@ -41,6 +40,4 @@ public class FB2LineWhiteSpace implements FB2LineElement {
         return sizeable;
     }
 
-    
-    
 }

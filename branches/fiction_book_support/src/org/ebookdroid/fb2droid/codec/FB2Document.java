@@ -30,6 +30,11 @@ import org.xml.sax.InputSource;
 
 public class FB2Document implements CodecDocument {
 
+    public static final Typeface NORMAL_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
+            "fonts/OldStandard-Regular.ttf");
+    public static final Typeface ITALIC_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
+            "fonts/OldStandard-Italic.ttf");
+
     public static final int MAIN_TITLE_SIZE = 48;
     public static final int SECTION_TITLE_SIZE = 36;
     public static final int TEXT_SIZE = 24;
@@ -38,20 +43,14 @@ public class FB2Document implements CodecDocument {
     public static final Paint FOOTNOTETEXTPAINT = new TextPaint();
     public static final Paint MAINTITLETEXTPAINT = new TextPaint();
     public static final Paint SECTIONTITLETEXTPAINT = new TextPaint();
+
+    private final TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
+    private final TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
+
     private final ArrayList<FB2Page> pages = new ArrayList<FB2Page>();
     private String cover;
-    private final static TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
-    private final static TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
-    public static final Typeface NORMAL_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
-    "fonts/OldStandard-Regular.ttf");
-    public static final Typeface ITALIC_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
-    "fonts/OldStandard-Italic.ttf");
 
-    public enum JustificationMode {
-        Center, Left, Right, Justify;
-    }
-
-    public FB2Document(String fileName) {
+    public FB2Document(final String fileName) {
         NORMALTEXTPAINT.setTextSize(TEXT_SIZE);
         FOOTNOTETEXTPAINT.setTextSize(FOOTNOTE_SIZE);
         MAINTITLETEXTPAINT.setTextSize(MAIN_TITLE_SIZE);
@@ -66,64 +65,64 @@ public class FB2Document implements CodecDocument {
         SECTIONTITLETEXTPAINT.setTypeface(NORMAL_TF);
         FOOTNOTETEXTPAINT.setTypeface(NORMAL_TF);
 
-        String encoding = getEncoding(fileName);
+        final String encoding = getEncoding(fileName);
 
-        SAXParserFactory spf = SAXParserFactory.newInstance();
+        final SAXParserFactory spf = SAXParserFactory.newInstance();
 
-        long t1 = System.currentTimeMillis();
+        final long t1 = System.currentTimeMillis();
         parseImages(spf, fileName, encoding);
-        long t2 = System.currentTimeMillis();
+        final long t2 = System.currentTimeMillis();
         parseContent(spf, fileName, encoding);
-        long t3 = System.currentTimeMillis();
+        final long t3 = System.currentTimeMillis();
         System.out.println("SAX parser: " + (t2 - t1) + " ms, " + (t3 - t2) + " ms");
     }
 
-    private void parseImages(SAXParserFactory spf, String fileName, String encoding) {
+    private void parseImages(final SAXParserFactory spf, final String fileName, final String encoding) {
         try {
-            SAXParser parser = spf.newSAXParser();
+            final SAXParser parser = spf.newSAXParser();
 
-            Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
-            InputSource is = new InputSource();
+            final Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
+            final InputSource is = new InputSource();
             is.setCharacterStream(isr);
             parser.parse(is, new FB2BinaryHandler(this));
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
         }
     }
-    private void parseContent(SAXParserFactory spf, String fileName, String encoding) {
-        try {
-            SAXParser parser = spf.newSAXParser();
 
-            Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
-            InputSource is = new InputSource();
+    private void parseContent(final SAXParserFactory spf, final String fileName, final String encoding) {
+        try {
+            final SAXParser parser = spf.newSAXParser();
+
+            final Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
+            final InputSource is = new InputSource();
             is.setCharacterStream(isr);
             parser.parse(is, new FB2ContentHandler(this));
 
-        } catch (StopParsingException e) {
+        } catch (final StopParsingException e) {
             // do nothing
-        }
-        catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
         }
     }
 
-    private String getEncoding(String fileName) {
+    private String getEncoding(final String fileName) {
         try {
-            FileInputStream fis = new FileInputStream(fileName);
-            byte[] buffer = new byte[100];
+            final FileInputStream fis = new FileInputStream(fileName);
+            final byte[] buffer = new byte[100];
             fis.read(buffer);
-            Pattern p = Pattern.compile("encoding=\"(.*?)\"");
-            Matcher matcher = p.matcher(new String(buffer));
+            final Pattern p = Pattern.compile("encoding=\"(.*?)\"");
+            final Matcher matcher = p.matcher(new String(buffer));
             if (matcher.find()) {
                 return matcher.group(1);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
         }
         return "UTF-8";
     }
 
-    void appendLine(FB2Line line) {
+    void appendLine(final FB2Line line) {
         FB2Page lastPage = FB2Page.getLastPage(pages);
 
         if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + line.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
@@ -132,21 +131,16 @@ public class FB2Document implements CodecDocument {
             pages.add(lastPage);
         }
         lastPage.appendLine(line);
-        List<String> footnotes = line.getFootNotes();
+        final List<FB2Line> footnotes = line.getFootNotes();
         if (footnotes != null) {
-            for (String noteName : footnotes) {
-                List<FB2Line> note = getNote(noteName);
-                if (note != null) {
-                    for (FB2Line l : note) {
-                        lastPage = FB2Page.getLastPage(pages);
-                        if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + l.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
-                            commitPage();
-                            lastPage = new FB2Page();
-                            pages.add(lastPage);
-                        }
-                        lastPage.appendNoteLine(l);
-                    }
+            for (final FB2Line l : footnotes) {
+                lastPage = FB2Page.getLastPage(pages);
+                if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + l.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
+                    commitPage();
+                    lastPage = new FB2Page();
+                    pages.add(lastPage);
                 }
+                lastPage.appendNoteLine(l);
             }
         }
     }
@@ -157,7 +151,7 @@ public class FB2Document implements CodecDocument {
     }
 
     @Override
-    public CodecPage getPage(int pageNuber) {
+    public CodecPage getPage(final int pageNuber) {
         if (0 <= pageNuber && pageNuber < pages.size()) {
             return pages.get(pageNuber);
         } else {
@@ -171,15 +165,15 @@ public class FB2Document implements CodecDocument {
     }
 
     @Override
-    public CodecPageInfo getPageInfo(int pageNuber) {
-        CodecPageInfo codecPageInfo = new CodecPageInfo();
+    public CodecPageInfo getPageInfo(final int pageNuber) {
+        final CodecPageInfo codecPageInfo = new CodecPageInfo();
         codecPageInfo.setWidth(FB2Page.PAGE_WIDTH);
         codecPageInfo.setHeight(FB2Page.PAGE_HEIGHT);
         return codecPageInfo;
     }
 
     @Override
-    public List<PageLink> getPageLinks(int pageNuber) {
+    public List<PageLink> getPageLinks(final int pageNuber) {
         return null;
     }
 
@@ -193,10 +187,10 @@ public class FB2Document implements CodecDocument {
     }
 
     public void commitPage() {
-        FB2Page lastPage = FB2Page.getLastPage(pages);
-        int h = FB2Page.PAGE_HEIGHT - lastPage.getContentHeight() - 2 * FB2Page.MARGIN_Y;
+        final FB2Page lastPage = FB2Page.getLastPage(pages);
+        final int h = FB2Page.PAGE_HEIGHT - lastPage.getContentHeight() - 2 * FB2Page.MARGIN_Y;
         if (h > 0) {
-            FB2Line line = new FB2Line();
+            final FB2Line line = new FB2Line();
             line.append(new FB2LineWhiteSpace(0, h, false));
             appendLine(line);
 
@@ -204,14 +198,14 @@ public class FB2Document implements CodecDocument {
 
     }
 
-    public void addImage(String tmpBinaryName, String encoded) {
+    public void addImage(final String tmpBinaryName, final String encoded) {
         if (tmpBinaryName != null && encoded != null) {
-            FB2Image img = new FB2Image(encoded);
+            final FB2Image img = new FB2Image(encoded);
             images.put(tmpBinaryName, img);
         }
     }
 
-    public static FB2Image getImage(String name) {
+    public FB2Image getImage(final String name) {
         FB2Image img = images.get(name);
         if (img == null && name.startsWith("#")) {
             img = images.get(name.substring(1));
@@ -219,13 +213,13 @@ public class FB2Document implements CodecDocument {
         return img;
     }
 
-    public void addNote(String noteName, ArrayList<FB2Line> noteLines) {
+    public void addNote(final String noteName, final ArrayList<FB2Line> noteLines) {
         if (noteName != null && noteLines != null) {
             notes.put(noteName, noteLines);
         }
     }
 
-    public static List<FB2Line> getNote(String noteName) {
+    public List<FB2Line> getNote(final String noteName) {
         List<FB2Line> note = notes.get(noteName);
         if (note == null && noteName.startsWith("#")) {
             note = notes.get(noteName.substring(1));
@@ -233,15 +227,15 @@ public class FB2Document implements CodecDocument {
         return note;
     }
 
-    public void setCover(String value) {
+    public void setCover(final String value) {
         this.cover = value;
     }
 
     @Override
     public Bitmap getEmbeddedThumbnail() {
-        FB2Image image = getImage(cover);
+        final FB2Image image = getImage(cover);
         if (image != null) {
-            byte[] data = image.getData();
+            final byte[] data = image.getData();
             return BitmapFactory.decodeByteArray(data, 0, data.length);
         }
         return null;
