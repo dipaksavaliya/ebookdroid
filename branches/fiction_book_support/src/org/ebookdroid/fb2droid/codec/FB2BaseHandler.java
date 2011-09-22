@@ -100,4 +100,10 @@ public class FB2BaseHandler extends DefaultHandler {
                 tags.contains(FB2Tag.CITE) ? RenderingStyle.ITALIC_TF : RenderingStyle.NORMAL_TF);
         return crs;
     }
+
+    protected final RenderingStyle setPoemStyle() {
+        renderingStates.addFirst(crs);
+        crs = new RenderingStyle(crs, RenderingStyle.TEXT_SIZE, JustificationMode.Left, false, RenderingStyle.ITALIC_TF);
+        return crs;
+    }
 }

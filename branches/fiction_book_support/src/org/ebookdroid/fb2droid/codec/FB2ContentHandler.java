@@ -50,6 +50,14 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 paragraphParsing = true;
                 markup.add(new FB2MarkupNewParagraph(crs.textSize));
             }
+        } else if ("v".equals(qName)) {
+            if (parsingNotes && !inTitle) {
+                parsingNotesP = true;
+            } else {
+                paragraphParsing = true;
+                markup.add(new FB2MarkupNewParagraph(crs.textSize));
+                markup.add(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH / 8, crs.textSize, false));
+            }
         } else if ("binary".equalsIgnoreCase(qName)) {
             tmpBinaryName = attributes.getValue("id");
             tmpBinaryContents.setLength(0);
@@ -109,6 +117,11 @@ public class FB2ContentHandler extends FB2BaseHandler {
             }
         } else if ("empty-line".equals(qName)) {
             markup.add(emptyLine(crs.textSize));
+        } else if ("poem".equals(qName)) {
+            if (!parsingNotes) {
+                markup.add(setPoemStyle().jm);
+                markup.add(emptyLine(crs.textSize));
+            }
         } else if ("strong".equals(qName)) {
             setBoldStyle();
         } else if ("emphasis".equals(qName)) {
@@ -134,7 +147,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
     @Override
     public void endElement(final String uri, final String localName, final String qName) throws SAXException {
         super.endElement(uri, localName, qName);
-        if ("p".equals(qName)) {
+        if ("p".equals(qName) || "v".equals(qName)) {
             if (parsingNotesP) {
                 parsingNotesP = false;
                 final FB2Line line = FB2Line.getLastLine(noteLines);
@@ -189,6 +202,15 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 markup.add(FB2MarkupParagraphEnd.E);
                 markup.add(setPrevStyle().jm);
                 paragraphParsing = false;
+            }
+        } else if ("stanza".equals(qName)) {
+            if (!parsingNotes) {
+                markup.add(emptyLine(crs.textSize));
+            }
+        } else if ("poem".equals(qName)) {
+            if (!parsingNotes) {
+                markup.add(emptyLine(crs.textSize));
+                markup.add(setPrevStyle().jm);
             }
         } else if ("strong".equals(qName)) {
             setPrevStyle();
