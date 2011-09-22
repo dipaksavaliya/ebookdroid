@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -29,7 +30,12 @@ public class FB2Document implements CodecDocument {
     private final TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
     private final TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
 
+    private final LinkedList<FB2MarkupElement> markup = new LinkedList<FB2MarkupElement>();
+    JustificationMode jm = JustificationMode.Justify;
+
     private final ArrayList<FB2Page> pages = new ArrayList<FB2Page>();
+    private final ArrayList<FB2Line> paragraphLines = new ArrayList<FB2Line>();
+
     private String cover;
 
     public FB2Document(final String fileName) {
@@ -37,26 +43,24 @@ public class FB2Document implements CodecDocument {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
 
-        final long t1 = System.currentTimeMillis();
-        parseImages(spf, fileName, encoding);
         final long t2 = System.currentTimeMillis();
         parseContent(spf, fileName, encoding);
         final long t3 = System.currentTimeMillis();
-        System.out.println("SAX parser: " + (t2 - t1) + " ms, " + (t3 - t2) + " ms");
+        System.out.println("SAX parser: "+ (t3 - t2) + " ms");
+
+        createDocumentMarkup();
+        final long t4 = System.currentTimeMillis();
+        System.out.println("Markup: " + (t4 - t3) + " ms");
     }
 
-    private void parseImages(final SAXParserFactory spf, final String fileName, final String encoding) {
-        try {
-            final SAXParser parser = spf.newSAXParser();
-
-            final Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
-            final InputSource is = new InputSource();
-            is.setCharacterStream(isr);
-            parser.parse(is, new FB2BinaryHandler(this));
-
-        } catch (final Exception e) {
-            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
+    private void createDocumentMarkup() {
+        pages.clear();
+        jm = JustificationMode.Justify;
+        for (FB2MarkupElement me : markup) {
+            me.publishToDocument(this);
         }
+        commitPage();
+        markup.clear();
     }
 
     private void parseContent(final SAXParserFactory spf, final String fileName, final String encoding) {
@@ -90,7 +94,7 @@ public class FB2Document implements CodecDocument {
         return "UTF-8";
     }
 
-    void appendLine(final FB2Line line) {
+    private void appendLine(final FB2Line line) {
         FB2Page lastPage = FB2Page.getLastPage(pages);
 
         if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + line.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
@@ -154,7 +158,7 @@ public class FB2Document implements CodecDocument {
     public void recycle() {
     }
 
-    public void commitPage() {
+    void commitPage() {
         final FB2Page lastPage = FB2Page.getLastPage(pages);
         final int h = FB2Page.PAGE_HEIGHT - lastPage.getContentHeight() - 2 * FB2Page.MARGIN_Y;
         if (h > 0) {
@@ -207,6 +211,64 @@ public class FB2Document implements CodecDocument {
             return BitmapFactory.decodeByteArray(data, 0, data.length);
         }
         return null;
+    }
+
+    public void appendMarkupElement(final FB2MarkupElement me) {
+        if (me != null) {
+            markup.add(me);
+        }
+    }
+
+    public void publishElement(FB2LineElement le) {
+        FB2Line line = FB2Line.getLastLine(paragraphLines);
+        int space = (int) RenderingStyle.getTextPaint(line.getHeight()).measureText(" ");
+        if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + le.getWidth() < FB2Page.PAGE_WIDTH) {
+            if (line.hasNonWhiteSpaces()) {
+                line.append(new FB2LineWhiteSpace(space, line.getHeight(), true));
+            }
+        } else {
+            line = new FB2Line();
+            paragraphLines.add(line);
+        }
+        line.append(le);
+    }
+
+    public void commitParagraph() {
+        if (paragraphLines.isEmpty()) {
+            return;
+        }
+        if (jm == JustificationMode.Justify) {
+            final FB2Line l = FB2Line.getLastLine(paragraphLines);
+            l.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - l.getWidth() - 2 * FB2Page.MARGIN_X, l.getHeight(),
+                    false));
+        }
+        for (final FB2Line l : paragraphLines) {
+            l.applyJustification(jm);
+            appendLine(l);
+        }
+        paragraphLines.clear();
+    }
+
+    public void publishImage(String ref, boolean inline) {
+        FB2Image image = getImage(ref);
+        if (image != null) {
+            if (!inline) {
+                final FB2Line line = new FB2Line();
+                line.append(image);
+                line.applyJustification(JustificationMode.Center);
+                appendLine(line);
+            } else {
+                publishElement(image);
+            }
+        }
+    }
+
+    public void publishNote(String ref) {
+        List<FB2Line> note = getNote(ref);
+        if (note != null && !paragraphLines.isEmpty()) {
+            FB2Line line = FB2Line.getLastLine(paragraphLines);
+            line.addNote(note);
+        }
     }
 
 }

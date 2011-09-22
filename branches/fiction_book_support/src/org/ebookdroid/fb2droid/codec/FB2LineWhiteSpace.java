@@ -2,7 +2,7 @@ package org.ebookdroid.fb2droid.codec;
 
 import android.graphics.Canvas;
 
-public class FB2LineWhiteSpace implements FB2LineElement {
+public class FB2LineWhiteSpace extends AbstractFB2LineElement {
 
     private final int height;
     private int width;

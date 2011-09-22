@@ -2,7 +2,7 @@ package org.ebookdroid.fb2droid.codec;
 
 import android.graphics.Canvas;
 
-public class FB2TextElement implements FB2LineElement {
+public class FB2TextElement extends AbstractFB2LineElement {
 
     private final char[] chars;
     private final int start;

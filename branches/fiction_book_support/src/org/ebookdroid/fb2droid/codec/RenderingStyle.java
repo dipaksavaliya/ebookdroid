@@ -43,4 +43,12 @@ class RenderingStyle {
         return textPaint;
     }
 
+    public static Paint getTextPaint(int textSize) {
+        textPaint.setTextSize(textSize);
+        textPaint.setTypeface(NORMAL_TF);
+        textPaint.setFakeBoldText(false);
+        textPaint.setAntiAlias(true);
+        return textPaint;
+    }
+
 }

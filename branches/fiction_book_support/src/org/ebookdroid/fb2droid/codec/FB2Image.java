@@ -11,7 +11,7 @@ import android.util.Base64InputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FB2Image implements FB2LineElement {
+public class FB2Image extends AbstractFB2LineElement {
 
     private final int width;
     private final int height;
