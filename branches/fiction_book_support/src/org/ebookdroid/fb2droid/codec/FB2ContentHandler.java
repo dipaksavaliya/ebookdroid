@@ -42,7 +42,15 @@ public class FB2ContentHandler extends FB2BaseHandler {
     @Override
     public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
             throws SAXException {
-        if ("binary".equalsIgnoreCase(qName)) {
+        super.startElement(uri, localName, qName, attributes);
+        if ("p".equals(qName)) {
+            if (parsingNotes && !inTitle) {
+                parsingNotesP = true;
+            } else {
+                paragraphParsing = true;
+                markup.add(new FB2MarkupNewParagraph(crs.textSize));
+            }
+        } else if ("binary".equalsIgnoreCase(qName)) {
             tmpBinaryName = attributes.getValue("id");
             tmpBinaryContents.setLength(0);
             parsingBinary = true;
@@ -76,11 +84,21 @@ public class FB2ContentHandler extends FB2BaseHandler {
             } else {
                 inTitle = true;
             }
-        } else if ("p".equals(qName)) {
-            if (parsingNotes && !inTitle) {
-                parsingNotesP = true;
-            } else {
+        } else if ("cite".equals(qName)) {
+            if (!parsingNotes) {
+                setEmphasisStyle();
+                markup.add(emptyLine(crs.textSize));
+            }
+        } else if ("subtitle".equals(qName)) {
+            if (!parsingNotes) {
                 paragraphParsing = true;
+                markup.add(setSubtitleStyle().jm);
+                markup.add(new FB2MarkupNewParagraph(crs.textSize));
+            }
+        } else if ("text-author".equals(qName)) {
+            if (!parsingNotes) {
+                paragraphParsing = true;
+                markup.add(setTextAuthorStyle().jm);
                 markup.add(new FB2MarkupNewParagraph(crs.textSize));
             }
         } else if ("a".equals(qName)) {
@@ -115,7 +133,21 @@ public class FB2ContentHandler extends FB2BaseHandler {
 
     @Override
     public void endElement(final String uri, final String localName, final String qName) throws SAXException {
-        if ("binary".equalsIgnoreCase(qName)) {
+        super.endElement(uri, localName, qName);
+        if ("p".equals(qName)) {
+            if (parsingNotesP) {
+                parsingNotesP = false;
+                final FB2Line line = FB2Line.getLastLine(noteLines);
+                line.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - line.getWidth() - 2 * FB2Page.MARGIN_X,
+                        (int) crs.textSize, false));
+                for (final FB2Line l : noteLines) {
+                    l.applyJustification(JustificationMode.Justify);
+                }
+            } else {
+                markup.add(FB2MarkupParagraphEnd.E);
+                paragraphParsing = false;
+            }
+        } else if ("binary".equalsIgnoreCase(qName)) {
             document.addImage(tmpBinaryName, tmpBinaryContents.toString());
             tmpBinaryName = null;
             tmpBinaryContents.setLength(0);
@@ -141,17 +173,21 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 markup.add(emptyLine(crs.textSize));
                 markup.add(setPrevStyle().jm);
             }
-        } else if ("p".equals(qName)) {
-            if (parsingNotesP) {
-                parsingNotesP = false;
-                final FB2Line line = FB2Line.getLastLine(noteLines);
-                line.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - line.getWidth() - 2 * FB2Page.MARGIN_X,
-                        (int) crs.textSize, false));
-                for (final FB2Line l : noteLines) {
-                    l.applyJustification(JustificationMode.Justify);
-                }
-            } else {
+        } else if ("cite".equals(qName)) {
+            if (!parsingNotes) {
+                markup.add(emptyLine(crs.textSize));
+                markup.add(setPrevStyle().jm);
+            }
+        } else if ("subtitle".equals(qName)) {
+            if (!parsingNotes) {
                 markup.add(FB2MarkupParagraphEnd.E);
+                markup.add(setPrevStyle().jm);
+                paragraphParsing = false;
+            }
+        } else if ("text-author".equals(qName)) {
+            if (!parsingNotes) {
+                markup.add(FB2MarkupParagraphEnd.E);
+                markup.add(setPrevStyle().jm);
                 paragraphParsing = false;
             }
         } else if ("strong".equals(qName)) {

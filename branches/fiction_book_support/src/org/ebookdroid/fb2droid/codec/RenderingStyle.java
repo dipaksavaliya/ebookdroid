@@ -18,6 +18,7 @@ class RenderingStyle {
 
     public static final int MAIN_TITLE_SIZE = 48;
     public static final int SECTION_TITLE_SIZE = 36;
+    public static final int SUBTITLE_SIZE = 30;
     public static final int TEXT_SIZE = 24;
     public static final int FOOTNOTE_SIZE = 20;
 
@@ -56,6 +57,14 @@ class RenderingStyle {
         this.jm = jm;
         this.bold = old.bold;
         this.face = old.face;
+        this.paint = getTextPaint(face, textSize, bold);
+    }
+
+    public RenderingStyle(final RenderingStyle old, int textSize, JustificationMode jm, boolean bold, Typeface face) {
+        this.textSize = textSize;
+        this.jm = jm;
+        this.bold = bold;
+        this.face = face;
         this.paint = getTextPaint(face, textSize, bold);
     }
 

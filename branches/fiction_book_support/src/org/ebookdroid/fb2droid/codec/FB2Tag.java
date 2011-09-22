@@ -52,7 +52,11 @@ public enum FB2Tag {
     /**
      *
      */
-    EMPHASIS("emphasis");
+    EMPHASIS("emphasis"),
+    /**
+    *
+    */
+   CITE("cite");
 
     private static final Map<String, FB2Tag> tags;
 

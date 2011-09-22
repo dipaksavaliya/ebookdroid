@@ -27,8 +27,8 @@ public class FB2BaseHandler extends DefaultHandler {
     }
 
     @Override
-    public void startElement(final String uri, final String localName, final String qName,
-            final Attributes attributes) throws SAXException {
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
+            throws SAXException {
 
         final FB2Tag tag = FB2Tag.getTag(qName);
         if (tag == null) {
@@ -39,7 +39,7 @@ public class FB2BaseHandler extends DefaultHandler {
         }
     }
 
-    protected boolean onStartTag(final FB2Tag tag, final Attributes attributes)  throws SAXException {
+    protected boolean onStartTag(final FB2Tag tag, final Attributes attributes) throws SAXException {
         return true;
     }
 
@@ -84,6 +84,20 @@ public class FB2BaseHandler extends DefaultHandler {
     protected final RenderingStyle setEmphasisStyle() {
         renderingStates.addFirst(crs);
         crs = new RenderingStyle(crs, RenderingStyle.ITALIC_TF);
+        return crs;
+    }
+
+    protected final RenderingStyle setSubtitleStyle() {
+        renderingStates.addFirst(crs);
+        crs = new RenderingStyle(crs, RenderingStyle.SUBTITLE_SIZE, JustificationMode.Center, true,
+                RenderingStyle.NORMAL_TF);
+        return crs;
+    }
+
+    protected final RenderingStyle setTextAuthorStyle() {
+        renderingStates.addFirst(crs);
+        crs = new RenderingStyle(crs, RenderingStyle.TEXT_SIZE, JustificationMode.Right, false,
+                tags.contains(FB2Tag.CITE) ? RenderingStyle.ITALIC_TF : RenderingStyle.NORMAL_TF);
         return crs;
     }
 }
