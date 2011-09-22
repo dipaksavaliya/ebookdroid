@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -30,7 +29,6 @@ public class FB2Document implements CodecDocument {
     private final TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
     private final TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
 
-    private final LinkedList<FB2MarkupElement> markup = new LinkedList<FB2MarkupElement>();
     JustificationMode jm = JustificationMode.Justify;
 
     private final ArrayList<FB2Page> pages = new ArrayList<FB2Page>();
@@ -44,16 +42,15 @@ public class FB2Document implements CodecDocument {
         final SAXParserFactory spf = SAXParserFactory.newInstance();
 
         final long t2 = System.currentTimeMillis();
-        parseContent(spf, fileName, encoding);
+        List<FB2MarkupElement> markup = parseContent(spf, fileName, encoding);
         final long t3 = System.currentTimeMillis();
         System.out.println("SAX parser: "+ (t3 - t2) + " ms");
-
-        createDocumentMarkup();
+        createDocumentMarkup(markup);
         final long t4 = System.currentTimeMillis();
         System.out.println("Markup: " + (t4 - t3) + " ms");
     }
 
-    private void createDocumentMarkup() {
+    private void createDocumentMarkup(List<FB2MarkupElement> markup) {
         pages.clear();
         jm = JustificationMode.Justify;
         for (FB2MarkupElement me : markup) {
@@ -63,20 +60,20 @@ public class FB2Document implements CodecDocument {
         markup.clear();
     }
 
-    private void parseContent(final SAXParserFactory spf, final String fileName, final String encoding) {
+    private List<FB2MarkupElement> parseContent(final SAXParserFactory spf, final String fileName, final String encoding) {
+        FB2ContentHandler h = new FB2ContentHandler(this);
         try {
             final SAXParser parser = spf.newSAXParser();
-
             final Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
             final InputSource is = new InputSource();
             is.setCharacterStream(isr);
-            parser.parse(is, new FB2ContentHandler(this));
-
+            parser.parse(is, h);
         } catch (final StopParsingException e) {
             // do nothing
         } catch (final Exception e) {
             throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
         }
+        return h.markup;
     }
 
     private String getEncoding(final String fileName) {
@@ -94,7 +91,7 @@ public class FB2Document implements CodecDocument {
         return "UTF-8";
     }
 
-    private void appendLine(final FB2Line line) {
+    void appendLine(final FB2Line line) {
         FB2Page lastPage = FB2Page.getLastPage(pages);
 
         if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + line.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
@@ -211,12 +208,6 @@ public class FB2Document implements CodecDocument {
             return BitmapFactory.decodeByteArray(data, 0, data.length);
         }
         return null;
-    }
-
-    public void appendMarkupElement(final FB2MarkupElement me) {
-        if (me != null) {
-            markup.add(me);
-        }
     }
 
     public void publishElement(FB2LineElement le) {
