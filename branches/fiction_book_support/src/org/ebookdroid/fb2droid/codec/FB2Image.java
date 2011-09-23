@@ -8,6 +8,8 @@ import android.graphics.Rect;
 import android.util.Base64;
 import android.util.Base64InputStream;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -103,5 +105,20 @@ public class FB2Image extends AbstractFB2LineElement {
         public int read() throws IOException {
             return index >= str.length() ? -1 : (0xFF & str.charAt(index++));
         }
+    }
+
+    @Override
+    public void serialize(DataOutputStream out) throws IOException {
+        out.writeInt(IMAGE_ELEMENT_TAG);
+        byte[] bytes = encoded.getBytes("US-ASCII");
+        out.writeInt(bytes.length);
+        out.write(bytes);
+    }
+
+    public static FB2LineElement deserializeImpl(DataInputStream in) throws IOException {
+        int length = in.readInt();
+        byte[] bytes = new byte[length];
+        in.readFully(bytes);
+        return new FB2Image(new String(bytes,"US-ASCII"));
     }
 }

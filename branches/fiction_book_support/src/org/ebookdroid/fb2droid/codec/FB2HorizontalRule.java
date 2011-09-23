@@ -1,23 +1,28 @@
 package org.ebookdroid.fb2droid.codec;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class FB2LineWhiteSpace extends AbstractFB2LineElement {
 
+public class FB2HorizontalRule extends AbstractFB2LineElement {
+
+    private final int width;
     private final int height;
-    private int width;
-    private final boolean sizeable;
+    private static Paint rulePaint;
 
-    public FB2LineWhiteSpace(final int width, final int height, final boolean sizeable) {
+    public FB2HorizontalRule(final int width, final int height) {
         this.width = width;
         this.height = height;
-        this.sizeable = sizeable;
+        if (rulePaint == null) {
+            rulePaint = new Paint();
+            rulePaint.setColor(Color.BLACK);
+        }
     }
-
     @Override
     public int getHeight() {
         return height;
@@ -29,34 +34,28 @@ public class FB2LineWhiteSpace extends AbstractFB2LineElement {
     }
 
     @Override
-    public void render(final Canvas c, final int y, final int x) {
+    public void render(Canvas c, int y, int x) {
+        c.drawLine(x, y - height/2, x + width, y - height/2, rulePaint);
     }
 
     @Override
-    public void adjustWidth(final int w) {
-        if (sizeable) {
-            width += w;
-        }
+    public void adjustWidth(int w) {
     }
 
     @Override
     public boolean isSizeable() {
-        return sizeable;
+        return false;
     }
-
     @Override
     public void serialize(DataOutputStream out) throws IOException {
-        out.writeInt(WHITESPACE_ELEMENT_TAG);
+        out.writeInt(RULE_ELEMENT_TAG);
         out.writeInt(height);
         out.writeInt(width);
-        out.writeBoolean(sizeable);
     }
-
     public static FB2LineElement deserializeImpl(DataInputStream in) throws IOException {
         int height = in.readInt();
         int width = in.readInt();
-        boolean sizeable = in.readBoolean();
-        return new FB2LineWhiteSpace(width, height, sizeable);
+        return new FB2HorizontalRule(width, height);
     }
 
 }

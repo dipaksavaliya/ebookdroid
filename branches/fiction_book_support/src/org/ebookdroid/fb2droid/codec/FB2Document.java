@@ -9,7 +9,13 @@ import org.ebookdroid.core.codec.CodecPageInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -18,6 +24,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -26,6 +34,9 @@ import org.xml.sax.InputSource;
 
 public class FB2Document implements CodecDocument {
 
+    private static final int MARKUP_VERSION = 1;
+    
+    private final static boolean USE_SERIALIZE = false;
     private final TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
     private final TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
 
@@ -39,15 +50,67 @@ public class FB2Document implements CodecDocument {
     public FB2Document(final String fileName) {
         final String encoding = getEncoding(fileName);
 
-        final SAXParserFactory spf = SAXParserFactory.newInstance();
+        File f = new File(fileName + ".pages");
 
-        final long t2 = System.currentTimeMillis();
-        List<FB2MarkupElement> markup = parseContent(spf, fileName, encoding);
-        final long t3 = System.currentTimeMillis();
-        System.out.println("SAX parser: "+ (t3 - t2) + " ms");
-        createDocumentMarkup(markup);
-        final long t4 = System.currentTimeMillis();
-        System.out.println("Markup: " + (t4 - t3) + " ms");
+        if (!f.exists() || !deserialize(f)) {
+            final SAXParserFactory spf = SAXParserFactory.newInstance();
+
+            final long t2 = System.currentTimeMillis();
+            List<FB2MarkupElement> markup = parseContent(spf, fileName, encoding);
+            final long t3 = System.currentTimeMillis();
+            System.out.println("SAX parser: " + (t3 - t2) + " ms");
+            createDocumentMarkup(markup);
+            final long t4 = System.currentTimeMillis();
+            System.out.println("Markup: " + (t4 - t3) + " ms");
+            serializePages(fileName);
+            final long t5 = System.currentTimeMillis();
+            System.out.println("Serialize: " + (t5 - t4) + " ms");
+        }
+    }
+
+    private boolean deserialize(File f) {
+        if (!USE_SERIALIZE) {
+            return false;
+        }
+        pages.clear();
+        final long t1 = System.currentTimeMillis();
+        try {
+            DataInputStream in = new DataInputStream(new BufferedInputStream((new FileInputStream(f)), 1024 * 1024));
+            int version = in.readInt();
+            if (version != MARKUP_VERSION) {
+                return false;
+            }
+            int pagesCount = in.readInt();
+            for (int i = 0; i < pagesCount; i++) {
+                pages.add(FB2Page.deserialize(in));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            System.out.println("Deserialize: "+ (System.currentTimeMillis() - t1) + " ms");
+        }
+        return true;
+    }
+
+    private void serializePages(String fileName) {
+        if (!USE_SERIALIZE) {
+            return;
+        }
+        String fname = fileName + ".pages";
+        try {
+
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(((new FileOutputStream(fname))), 1024 * 1024));
+            out.writeInt(MARKUP_VERSION);
+            out.writeInt(pages.size());
+            for (FB2Page page : pages) {
+                page.serialize(out);
+            }
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            new File(fname).delete();
+        }
     }
 
     private void createDocumentMarkup(List<FB2MarkupElement> markup) {
@@ -157,14 +220,7 @@ public class FB2Document implements CodecDocument {
 
     void commitPage() {
         final FB2Page lastPage = FB2Page.getLastPage(pages);
-        final int h = FB2Page.PAGE_HEIGHT - lastPage.getContentHeight() - 2 * FB2Page.MARGIN_Y;
-        if (h > 0) {
-            final FB2Line line = new FB2Line();
-            line.append(new FB2LineWhiteSpace(0, h, false));
-            appendLine(line);
-
-        }
-
+        lastPage.commit();
     }
 
     public void addImage(final String tmpBinaryName, final String encoded) {

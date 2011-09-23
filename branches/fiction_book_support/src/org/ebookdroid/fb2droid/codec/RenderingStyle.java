@@ -15,6 +15,7 @@ class RenderingStyle {
             "fonts/OldStandard-Italic.ttf");
 
     private static final SparseArray<TextPaint> paints = new SparseArray<TextPaint>();
+    private static final SparseArray<RenderingStyle> styles = new SparseArray<RenderingStyle>();
 
     public static final int MAIN_TITLE_SIZE = 48;
     public static final int SECTION_TITLE_SIZE = 36;
@@ -100,6 +101,14 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
     }
 
+    public RenderingStyle(int textSize, boolean bold, boolean italic) {
+        this.textSize = textSize;
+        this.jm = JustificationMode.Justify;
+        this.bold = bold;
+        this.face = italic ? ITALIC_TF : NORMAL_TF;
+        this.paint = getTextPaint(face, textSize, bold);
+    }
+
     public Paint getTextPaint() {
         return paint;
     }
@@ -121,5 +130,16 @@ class RenderingStyle {
             paints.append(key, paint);
         }
         return paint;
+    }
+
+    public static RenderingStyle getStyle(int textSize, boolean bold, boolean italic) {
+        final int key = (textSize & 0x0FFF) + (italic ? 1 << 14 : 0) + (bold ? 1 << 15 : 0);
+        RenderingStyle style = styles.get(key);
+        if (style == null) {
+            style = new RenderingStyle(textSize, bold, italic);
+            
+            styles.append(key, style);
+        }
+        return style;
     }
 }

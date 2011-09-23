@@ -11,6 +11,9 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class FB2Page implements CodecPage {
@@ -30,6 +33,7 @@ public class FB2Page implements CodecPage {
     private final ArrayList<FB2Line> lines = new ArrayList<FB2Line>(PAGE_HEIGHT / RenderingStyle.TEXT_SIZE);
     private final ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>(PAGE_HEIGHT / RenderingStyle.FOOTNOTE_SIZE);
 
+    private boolean committed = false;
     @Override
     public int getHeight() {
         return PAGE_HEIGHT;
@@ -81,11 +85,6 @@ public class FB2Page implements CodecPage {
             y += line.getHeight();
             line.render(c, y);
         }
-        y += RenderingStyle.FOOTNOTE_SIZE;
-        if (!noteLines.isEmpty()) {
-            c.drawLine(MARGIN_X, y - RenderingStyle.FOOTNOTE_SIZE / 2, MARGIN_X + PAGE_WIDTH / 4, y
-                    - RenderingStyle.FOOTNOTE_SIZE / 2, paint);
-        }
         for (final FB2Line line : noteLines) {
             y += line.getHeight();
             line.render(c, y);
@@ -100,13 +99,13 @@ public class FB2Page implements CodecPage {
         for (final FB2Line line : noteLines) {
             y += line.getHeight();
         }
-        if (!noteLines.isEmpty()) {
-            y += RenderingStyle.FOOTNOTE_SIZE;
-        }
         return y;
     }
 
     public void appendLine(final FB2Line line) {
+        if (committed) {
+            return;
+        }
         lines.add(line);
     }
 
@@ -120,5 +119,40 @@ public class FB2Page implements CodecPage {
     public void appendNoteLine(final FB2Line l) {
         noteLines.add(l);
 
+    }
+
+    public void commit() {
+        if (committed) {
+            return;
+        }
+        final int h = FB2Page.PAGE_HEIGHT - getContentHeight() - 2 * FB2Page.MARGIN_Y;
+        if (h > 0) {
+            lines.add(new FB2Line().append(new FB2LineWhiteSpace(0, h, false)));
+        }
+        for (FB2Line line : noteLines) {
+            lines.add(line);
+        }
+        noteLines.clear();
+        committed = true;
+    }
+    
+    public void serialize(DataOutputStream out) throws IOException {
+        if (!committed) {
+            commit();
+        }
+        out.writeInt(lines.size());
+        for (FB2Line line : lines) {
+            line.serialize(out);
+        }
+    }
+
+    public static FB2Page deserialize(DataInputStream in) throws IOException {
+        FB2Page page = new FB2Page();
+        int lineCount = in.readInt();
+        for (int i = 0; i < lineCount; i++) {
+            page.appendLine(FB2Line.deserialize(in));
+        }
+        page.commit();
+        return page;
     }
 }

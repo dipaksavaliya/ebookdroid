@@ -76,10 +76,14 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 if (noteName != null) {
                     String n = getNoteId();
                     noteLines = new ArrayList<FB2Line>();
-                    final FB2Line lastLine = FB2Line.getLastLine(noteLines);
-                    lastLine.append(new FB2TextElement(n.toCharArray(), 0, n.length(), crs));
-                    lastLine.append(new FB2LineWhiteSpace((int) crs.getTextPaint().measureText(" "), crs.textSize,
-                            false));
+                    FB2Line lastLine = new FB2Line();
+                    noteLines.add(lastLine);
+                    lastLine.append(new FB2HorizontalRule(FB2Page.PAGE_WIDTH / 4, RenderingStyle.FOOTNOTE_SIZE));
+                    lastLine.applyJustification(JustificationMode.Left);
+                    lastLine = new FB2Line();
+                    noteLines.add(lastLine);
+                    lastLine.append(new FB2TextElement(n.toCharArray(), 0, n.length(), crs)).append(
+                            new FB2LineWhiteSpace((int) crs.getTextPaint().measureText(" "), crs.textSize, false));
                 }
             } else {
                 inSection = true;

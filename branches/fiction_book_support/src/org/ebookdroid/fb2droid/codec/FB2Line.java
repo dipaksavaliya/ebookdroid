@@ -2,6 +2,9 @@ package org.ebookdroid.fb2droid.codec;
 
 import android.graphics.Canvas;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +19,7 @@ public class FB2Line {
     public FB2Line() {
     }
 
-    public void append(final FB2LineElement element) {
+    public FB2Line append(final FB2LineElement element) {
         elements.add(element);
         if (element.getHeight() > height) {
             height = element.getHeight();
@@ -25,6 +28,7 @@ public class FB2Line {
             hasNonWhiteSpaces = true;
         }
         width += element.getWidth();
+        return this;
     }
 
     public int getTotalHeight() {
@@ -70,6 +74,8 @@ public class FB2Line {
                 elements.add(new FB2LineWhiteSpace(x, height, true));
                 break;
             case Left:
+                final int x2 = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X));
+                elements.add(new FB2LineWhiteSpace(x2, height, true));
                 break;
             case Justify:
                 int ws = 0;
@@ -115,5 +121,27 @@ public class FB2Line {
 
     public int getHeight() {
         return height;
+    }
+
+    public void serialize(DataOutputStream out) throws IOException {
+        out.writeInt(height);
+        out.writeInt(width);
+        out.writeBoolean(hasNonWhiteSpaces);
+        out.writeInt(elements.size());
+        for (FB2LineElement element : elements) {
+            element.serialize(out);
+        }
+    }
+
+    public static FB2Line deserialize(DataInputStream in) throws IOException {
+        FB2Line line = new FB2Line();
+        line.height = in.readInt();
+        line.width = in.readInt();
+        line.hasNonWhiteSpaces = in.readBoolean();
+        int elCount = in.readInt();
+        for (int i = 0; i < elCount; i++) {
+            line.append(AbstractFB2LineElement.deserialize(in));
+        }
+        return line;
     }
 }
