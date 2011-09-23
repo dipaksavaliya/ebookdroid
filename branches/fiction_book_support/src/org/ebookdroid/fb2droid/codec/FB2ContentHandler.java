@@ -58,7 +58,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 markup.add(new FB2MarkupNewParagraph(crs.textSize));
                 markup.add(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH / 8, crs.textSize, false));
             }
-        } else if ("binary".equalsIgnoreCase(qName)) {
+        } else if ("binary".equals(qName)) {
             tmpBinaryName = attributes.getValue("id");
             tmpBinaryContents.setLength(0);
             parsingBinary = true;
@@ -160,7 +160,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 markup.add(FB2MarkupParagraphEnd.E);
                 paragraphParsing = false;
             }
-        } else if ("binary".equalsIgnoreCase(qName)) {
+        } else if ("binary".equals(qName)) {
             document.addImage(tmpBinaryName, tmpBinaryContents.toString());
             tmpBinaryName = null;
             tmpBinaryContents.setLength(0);
