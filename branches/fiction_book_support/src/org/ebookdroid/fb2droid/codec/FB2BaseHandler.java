@@ -94,10 +94,10 @@ public class FB2BaseHandler extends DefaultHandler {
         return crs;
     }
 
-    protected final RenderingStyle setTextAuthorStyle() {
+    protected final RenderingStyle setTextAuthorStyle(boolean italic) {
         renderingStates.addFirst(crs);
         crs = new RenderingStyle(crs, RenderingStyle.TEXT_SIZE, JustificationMode.Right, false,
-                tags.contains(FB2Tag.CITE) ? RenderingStyle.ITALIC_TF : RenderingStyle.NORMAL_TF);
+                italic ? RenderingStyle.ITALIC_TF : RenderingStyle.NORMAL_TF);
         return crs;
     }
 

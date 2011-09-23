@@ -25,6 +25,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
     private boolean parsingNotesP = false;
     private boolean parsingBinary = false;
     private boolean inTitle = false;
+    private boolean inCite = false;
     private String noteName = null;
     private int noteId = -1;
     private boolean noteFirstWord = true;
@@ -42,7 +43,6 @@ public class FB2ContentHandler extends FB2BaseHandler {
     @Override
     public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
             throws SAXException {
-        super.startElement(uri, localName, qName, attributes);
         if ("p".equals(qName)) {
             if (parsingNotes && !inTitle) {
                 parsingNotesP = true;
@@ -93,6 +93,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 inTitle = true;
             }
         } else if ("cite".equals(qName)) {
+            inCite = true;
             if (!parsingNotes) {
                 setEmphasisStyle();
                 markup.add(emptyLine(crs.textSize));
@@ -106,7 +107,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
         } else if ("text-author".equals(qName)) {
             if (!parsingNotes) {
                 paragraphParsing = true;
-                markup.add(setTextAuthorStyle().jm);
+                markup.add(setTextAuthorStyle(inCite).jm);
                 markup.add(new FB2MarkupNewParagraph(crs.textSize));
             }
         } else if ("a".equals(qName)) {
@@ -146,7 +147,6 @@ public class FB2ContentHandler extends FB2BaseHandler {
 
     @Override
     public void endElement(final String uri, final String localName, final String qName) throws SAXException {
-        super.endElement(uri, localName, qName);
         if ("p".equals(qName) || "v".equals(qName)) {
             if (parsingNotesP) {
                 parsingNotesP = false;
@@ -187,6 +187,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 markup.add(setPrevStyle().jm);
             }
         } else if ("cite".equals(qName)) {
+            inCite = false;
             if (!parsingNotes) {
                 markup.add(emptyLine(crs.textSize));
                 markup.add(setPrevStyle().jm);
