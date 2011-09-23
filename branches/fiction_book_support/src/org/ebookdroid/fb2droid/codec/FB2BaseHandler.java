@@ -20,42 +20,8 @@ public class FB2BaseHandler extends DefaultHandler {
 
     private final LinkedList<RenderingStyle> renderingStates = new LinkedList<RenderingStyle>();
 
-    protected final Set<FB2Tag> tags = EnumSet.noneOf(FB2Tag.class);
-
     public FB2BaseHandler(final FB2Document fb2Document) {
         this.document = fb2Document;
-    }
-
-    @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
-            throws SAXException {
-
-        final FB2Tag tag = FB2Tag.getTag(qName);
-        if (tag == null) {
-            return;
-        }
-        if (onStartTag(tag, attributes)) {
-            tags.add(tag);
-        }
-    }
-
-    protected boolean onStartTag(final FB2Tag tag, final Attributes attributes) throws SAXException {
-        return true;
-    }
-
-    @Override
-    public void endElement(final String uri, final String localName, final String qName) throws SAXException {
-
-        final FB2Tag tag = FB2Tag.getTag(qName);
-        if (tag == null) {
-            return;
-        }
-        if (tags.remove(tag)) {
-            onEndTag(tag);
-        }
-    }
-
-    protected void onEndTag(final FB2Tag tag) throws SAXException {
     }
 
     protected final RenderingStyle setPrevStyle() {
