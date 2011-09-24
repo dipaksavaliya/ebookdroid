@@ -1,5 +1,6 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
 import org.ebookdroid.core.log.LogContext;
 import org.ebookdroid.core.presentation.BooksAdapter;
@@ -22,6 +23,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -289,7 +293,26 @@ public class RecentActivity extends Activity implements IBrowserActivity {
             final File cacheDir = getContext().getFilesDir();
             final File thumbnailFile = new File(cacheDir, md5 + ".thumbnail");
             if (thumbnailFile.exists()) {
-                bmp = BitmapFactory.decodeFile(thumbnailFile.getPath());
+                
+                Bitmap tmpbmp = BitmapFactory.decodeFile(thumbnailFile.getPath());
+                int width = tmpbmp.getWidth() + 33;
+                int height = tmpbmp.getHeight() + 23;
+                bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                
+                bmp.eraseColor(Color.TRANSPARENT);
+                
+                Bitmap corner = BitmapFactory.decodeResource(EBookDroidApp.getAppContext().getResources(), R.drawable.bt_corner);
+                Bitmap left = BitmapFactory.decodeResource(EBookDroidApp.getAppContext().getResources(), R.drawable.bt_left);
+                Bitmap top = BitmapFactory.decodeResource(EBookDroidApp.getAppContext().getResources(), R.drawable.bt_top);
+                
+                
+                Canvas c = new Canvas(bmp);
+                c.drawBitmap(corner, null, new Rect(0,0,33,23), null);
+                c.drawBitmap(top, null, new Rect(33, 0, width, 23), null);
+                c.drawBitmap(left, null, new Rect(0, 23, 33, height), null);
+                c.drawBitmap(tmpbmp, null, new Rect(33, 23, width, height), null);
+                
+                
                 thumbnails.put(md5, new SoftReference<Bitmap>(bmp));
             }
         }
