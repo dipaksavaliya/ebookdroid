@@ -12,7 +12,7 @@ public class FB2Line {
 
     private final ArrayList<FB2LineElement> elements = new ArrayList<FB2LineElement>();
     private int height;
-    private int width = 0;
+    int width = 0;
     private boolean hasNonWhiteSpaces = false;
     private List<FB2Line> footnotes;
 
@@ -39,11 +39,7 @@ public class FB2Line {
         return h;
     }
 
-    public int getWidth() {
-        return width;
-    }
-
-    public int recalculateWidth() {
+    private int recalculateWidth() {
         width = 0;
         for (final FB2LineElement e : elements) {
             width += e.getWidth();

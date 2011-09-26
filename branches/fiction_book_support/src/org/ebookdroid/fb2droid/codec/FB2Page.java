@@ -34,6 +34,8 @@ public class FB2Page implements CodecPage {
     private final ArrayList<FB2Line> noteLines = new ArrayList<FB2Line>(PAGE_HEIGHT / RenderingStyle.FOOTNOTE_SIZE);
 
     private boolean committed = false;
+    int contentHeight = 0;
+    
     @Override
     public int getHeight() {
         return PAGE_HEIGHT;
@@ -91,43 +93,39 @@ public class FB2Page implements CodecPage {
         }
     }
 
-    public int getContentHeight() {
-        int y = 0;
-        for (final FB2Line line : lines) {
-            y += line.getHeight();
-        }
-        for (final FB2Line line : noteLines) {
-            y += line.getHeight();
-        }
-        return y;
-    }
-
     public void appendLine(final FB2Line line) {
         if (committed) {
             return;
         }
         lines.add(line);
+        contentHeight += line.getHeight();
     }
 
     public static FB2Page getLastPage(final ArrayList<FB2Page> pages) {
         if (pages.size() == 0) {
             pages.add(new FB2Page());
         }
-        return pages.get(pages.size() - 1);
+        FB2Page fb2Page = pages.get(pages.size() - 1);
+        if (fb2Page.committed) {
+            fb2Page = new FB2Page();
+            pages.add(fb2Page);
+        }
+        return fb2Page;
     }
 
-    public void appendNoteLine(final FB2Line l) {
-        noteLines.add(l);
-
+    public void appendNoteLine(final FB2Line line) {
+        noteLines.add(line);
+        contentHeight += line.getHeight();
     }
 
     public void commit() {
         if (committed) {
             return;
         }
-        final int h = FB2Page.PAGE_HEIGHT - getContentHeight() - 2 * FB2Page.MARGIN_Y;
+        final int h = FB2Page.PAGE_HEIGHT - contentHeight - 2 * FB2Page.MARGIN_Y;
         if (h > 0) {
             lines.add(new FB2Line().append(new FB2LineWhiteSpace(0, h, false)));
+            contentHeight += h;
         }
         for (FB2Line line : noteLines) {
             lines.add(line);

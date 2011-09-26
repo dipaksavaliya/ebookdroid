@@ -155,7 +155,7 @@ public class FB2Document implements CodecDocument {
     void appendLine(final FB2Line line) {
         FB2Page lastPage = FB2Page.getLastPage(pages);
 
-        if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + line.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
+        if (lastPage.contentHeight + 2 * FB2Page.MARGIN_Y + line.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
             commitPage();
             lastPage = new FB2Page();
             pages.add(lastPage);
@@ -165,7 +165,7 @@ public class FB2Document implements CodecDocument {
         if (footnotes != null) {
             for (final FB2Line l : footnotes) {
                 lastPage = FB2Page.getLastPage(pages);
-                if (lastPage.getContentHeight() + 2 * FB2Page.MARGIN_Y + l.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
+                if (lastPage.contentHeight + 2 * FB2Page.MARGIN_Y + l.getTotalHeight() > FB2Page.PAGE_HEIGHT) {
                     commitPage();
                     lastPage = new FB2Page();
                     pages.add(lastPage);
@@ -267,7 +267,7 @@ public class FB2Document implements CodecDocument {
     public void publishElement(FB2LineElement le) {
         FB2Line line = FB2Line.getLastLine(paragraphLines);
         int space = (int) RenderingStyle.getTextPaint(line.getHeight()).measureText(" ");
-        if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + le.getWidth() < FB2Page.PAGE_WIDTH) {
+        if (line.width + 2 * FB2Page.MARGIN_X + space + le.getWidth() < FB2Page.PAGE_WIDTH) {
             if (line.hasNonWhiteSpaces()) {
                 line.append(new FB2LineWhiteSpace(space, line.getHeight(), true));
             }
@@ -284,7 +284,7 @@ public class FB2Document implements CodecDocument {
         }
         if (jm == JustificationMode.Justify) {
             final FB2Line l = FB2Line.getLastLine(paragraphLines);
-            l.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - l.getWidth() - 2 * FB2Page.MARGIN_X, l.getHeight(),
+            l.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - l.width - 2 * FB2Page.MARGIN_X, l.getHeight(),
                     false));
         }
         for (final FB2Line l : paragraphLines) {

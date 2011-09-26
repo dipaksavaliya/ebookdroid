@@ -155,7 +155,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
             if (parsingNotesP) {
                 parsingNotesP = false;
                 final FB2Line line = FB2Line.getLastLine(noteLines);
-                line.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - line.getWidth() - 2 * FB2Page.MARGIN_X,
+                line.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - line.width - 2 * FB2Page.MARGIN_X,
                         (int) crs.textSize, false));
                 for (final FB2Line l : noteLines) {
                     l.applyJustification(JustificationMode.Justify);
@@ -260,7 +260,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
                     }
                     final FB2TextElement te = new FB2TextElement(dst, st - start, len, crs);
                     FB2Line line = FB2Line.getLastLine(noteLines);
-                    if (line.getWidth() + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
+                    if (line.width + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
                         if (line.hasNonWhiteSpaces()) {
                             line.append(new FB2LineWhiteSpace(space, crs.textSize, true));
                         }
