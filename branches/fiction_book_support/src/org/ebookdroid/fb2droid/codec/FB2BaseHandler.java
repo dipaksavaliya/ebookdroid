@@ -1,11 +1,7 @@
 package org.ebookdroid.fb2droid.codec;
 
-import java.util.EnumSet;
 import java.util.LinkedList;
-import java.util.Set;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class FB2BaseHandler extends DefaultHandler {
