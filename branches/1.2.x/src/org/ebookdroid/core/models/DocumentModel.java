@@ -123,6 +123,11 @@ public class DocumentModel extends CurrentPageModel {
         pages = EMPTY_PAGES;
 
         final BookSettings bs = SettingsManager.getBookSettings();
+
+        if (base == null || base.getView() == null || bs == null) {
+            return;
+        }
+
         final boolean splitPages = bs.getSplitPages();
         final View view = base.getView();
 
