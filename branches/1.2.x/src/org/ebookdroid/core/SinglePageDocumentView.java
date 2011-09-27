@@ -95,7 +95,11 @@ public class SinglePageDocumentView extends AbstractDocumentView {
                 }
             }
 
-            return curler.handleTouchEvent(event);
+            if (!curler.handleTouchEvent(event)) {
+                return super.onTouchEvent(event);
+            } else {
+                return true;
+            }
         }
     }
 
