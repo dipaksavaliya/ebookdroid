@@ -45,6 +45,8 @@ public class FB2Document implements CodecDocument {
 
     private String cover;
 
+    private List<OutlineLink> outline = new ArrayList<OutlineLink>();
+
     public FB2Document(final String fileName) {
         final String encoding = getEncoding(fileName);
 
@@ -177,7 +179,7 @@ public class FB2Document implements CodecDocument {
 
     @Override
     public List<OutlineLink> getOutline() {
-        return null;
+        return outline;
     }
 
     @Override
@@ -314,6 +316,10 @@ public class FB2Document implements CodecDocument {
             FB2Line line = FB2Line.getLastLine(paragraphLines);
             line.addNote(note);
         }
+    }
+
+    public void addTitle(String title) {
+        outline.add(new OutlineLink(title, "#"+pages.size()));
     }
 
 }

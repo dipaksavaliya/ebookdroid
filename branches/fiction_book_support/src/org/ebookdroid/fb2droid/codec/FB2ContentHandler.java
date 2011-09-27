@@ -33,6 +33,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
 
     private static final Pattern notesPattern = Pattern.compile("n([0-9]+)");
     private final StringBuilder tmpBinaryContents = new StringBuilder(64 * 1024);
+    private final StringBuilder title = new StringBuilder();
 
     final List<FB2MarkupElement> markup = new ArrayList<FB2MarkupElement>();
 
@@ -93,9 +94,9 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 setTitleStyle(!inSection ? RenderingStyle.MAIN_TITLE_SIZE : RenderingStyle.SECTION_TITLE_SIZE);
                 markup.add(crs.jm);
                 markup.add(emptyLine(crs.textSize));
-            } else {
-                inTitle = true;
+                title.setLength(0);
             }
+                inTitle = true;
         } else if ("cite".equals(qName)) {
             inCite = true;
             if (!parsingNotes) {
@@ -187,6 +188,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
         } else if ("title".equals(qName)) {
             inTitle = false;
             if (!parsingNotes) {
+                markup.add(new FB2MarkupTitle(title.toString()));
                 markup.add(emptyLine(crs.textSize));
                 markup.add(setPrevStyle().jm);
             }
@@ -272,6 +274,9 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 }
             }
         } else if (documentStarted && !documentEnded) {
+            if (inTitle) {
+                title.append(ch, start, length);
+            }
             final int count = StringUtils.split(ch, start, length, starts, lengths);
 
             if (count > 0) {
