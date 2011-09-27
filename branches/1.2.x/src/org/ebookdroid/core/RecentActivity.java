@@ -82,7 +82,7 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         final boolean shouldLoad = SettingsManager.getAppSettings().isLoadRecentBook();
         final BookSettings recent = SettingsManager.getRecentBook();
         final File file = recent != null ? new File(recent.getFileName()) : null;
-        final boolean found = file != null ? file.exists() : false;
+        final boolean found = file != null && file.exists() && SettingsManager.getAppSettings().getAllowedFileTypes(Activities.getAllExtensions()).accept(file);
 
         if (LCTX.isDebugEnabled()) {
             LCTX.d("Last book: " + (file != null ? file.getAbsolutePath() : "") + ", found: " + found
@@ -114,9 +114,9 @@ public class RecentActivity extends Activity implements IBrowserActivity {
         //    changeLibraryView(VIEW_LIBRARY);
         //}
         //else {
-        //    changeLibraryView(VIEW_RECENT); 
+        //    changeLibraryView(VIEW_RECENT);
         //}
-        
+
         if(viewflipper.getDisplayedChild() == VIEW_RECENT) {
             if (SettingsManager.getRecentBook() == null) {
                 changeLibraryView(VIEW_LIBRARY);
@@ -125,9 +125,9 @@ public class RecentActivity extends Activity implements IBrowserActivity {
                 recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), SettingsManager.getAppSettings().getAllowedFileTypes(
                         Activities.getAllExtensions()));
             }
-            
+
         }
-            
+
     }
 
     @Override
