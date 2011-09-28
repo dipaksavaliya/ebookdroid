@@ -6,10 +6,9 @@ import org.ebookdroid.core.log.LogContext;
 import org.ebookdroid.core.presentation.BooksAdapter;
 import org.ebookdroid.core.presentation.FileListAdapter;
 import org.ebookdroid.core.presentation.RecentAdapter;
-import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.settings.SettingsActivity;
 import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.utils.AndroidVersion;
+import org.ebookdroid.core.settings.books.BookSettings;
 import org.ebookdroid.core.utils.FileExtensionFilter;
 import org.ebookdroid.core.views.BookcaseView;
 import org.ebookdroid.core.views.LibraryView;
@@ -28,7 +27,6 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -100,7 +98,7 @@ public class RecentActivity extends Activity implements IBrowserActivity {
 
         final boolean shouldLoad = SettingsManager.getAppSettings().isLoadRecentBook();
         final BookSettings recent = SettingsManager.getRecentBook();
-        final File file = recent != null ? new File(recent.getFileName()) : null;
+        final File file = recent != null ? new File(recent.fileName) : null;
         final boolean found = file != null && file.exists() && SettingsManager.getAppSettings().getAllowedFileTypes().accept(file);
 
         if (LCTX.isDebugEnabled()) {
