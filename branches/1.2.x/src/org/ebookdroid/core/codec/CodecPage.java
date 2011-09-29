@@ -12,4 +12,6 @@ public interface CodecPage {
     Bitmap renderBitmap(int width, int height, RectF pageSliceBounds);
 
     void recycle();
+
+    boolean isRecycled();
 }

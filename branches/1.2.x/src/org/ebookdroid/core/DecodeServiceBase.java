@@ -6,6 +6,7 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.log.EmergencyHandler;
 import org.ebookdroid.core.log.LogContext;
+import org.ebookdroid.core.settings.SettingsManager;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -47,7 +48,7 @@ public class DecodeServiceBase implements DecodeService {
 
         @Override
         protected boolean removeEldestEntry(final Map.Entry<Integer, SoftReference<CodecPage>> eldest) {
-            if (this.size() > PAGE_POOL_SIZE) {
+            if (this.size() > SettingsManager.getAppSettings().getPagesInMemory() + 1) {
                 final SoftReference<CodecPage> value = eldest != null ? eldest.getValue() : null;
                 final CodecPage codecPage = value != null ? value.get() : null;
                 if (codecPage != null) {
@@ -138,9 +139,10 @@ public class DecodeServiceBase implements DecodeService {
             finishDecoding(task, vuPage, bitmap);
         } catch (final OutOfMemoryError ex) {
             LCTX.e("Task " + task.id + ": No memory to decode " + task.node);
-            for (int i = 0; i < PAGE_POOL_SIZE; i++) {
+            for (int i = 0; i <= SettingsManager.getAppSettings().getPagesInMemory(); i++) {
                 pages.put(Integer.MAX_VALUE - i, null);
             }
+            pages.clear();
             vuPage.recycle();
             abortDecoding(task, null, null);
         } catch (final Throwable th) {
@@ -193,7 +195,7 @@ public class DecodeServiceBase implements DecodeService {
     CodecPage getPage(final int pageIndex) {
         final SoftReference<CodecPage> ref = pages.get(pageIndex);
         CodecPage page = ref != null ? ref.get() : null;
-        if (page == null) {
+        if (page == null || page.isRecycled()) {
             // Cause native recycling last used page if page cache is full now
             // before opening new native page
             pages.put(pageIndex, null);
@@ -379,6 +381,7 @@ public class DecodeServiceBase implements DecodeService {
                                 page.recycle();
                             }
                         }
+                        pages.clear();
                         if (document != null) {
                             document.recycle();
                         }
@@ -486,5 +489,4 @@ public class DecodeServiceBase implements DecodeService {
             return buf.toString();
         }
     }
-
 }

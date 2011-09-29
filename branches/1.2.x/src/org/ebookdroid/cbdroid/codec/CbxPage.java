@@ -61,7 +61,8 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> implements CodecPage
                 } catch (final IOException ex) {
                 }
                 if (CbxDocument.LCTX.isDebugEnabled()) {
-                    CbxDocument.LCTX.d("Finishing" + (onlyBounds ? " partial" : "full") + " decompressing: " + entry.getName());
+                    CbxDocument.LCTX.d("Finishing" + (onlyBounds ? " partial" : "full") + " decompressing: "
+                            + entry.getName());
                 }
             }
         } catch (final Throwable e) {
@@ -84,6 +85,11 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> implements CodecPage
 
     @Override
     public void recycle() {
+    }
+
+    @Override
+    public boolean isRecycled() {
+        return false;
     }
 
     @Override
