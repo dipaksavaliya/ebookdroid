@@ -9,6 +9,11 @@
 		android:summary="@string/pref_ui_category_summary">
 
 		<CheckBoxPreference
+			android:key="usebookcase"
+			android:title="@string/pref_usebookcase_title"
+			android:summary="@string/pref_usebookcase_summary"
+			android:defaultValue="false" />
+		<CheckBoxPreference
 			android:key="loadrecent"
 			android:title="@string/pref_loadrecent_title"
 			android:summary="@string/pref_loadrecent_summary"

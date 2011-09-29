@@ -118,4 +118,7 @@
 	<string name="pref_maximagesize_summary">"Max slice size (in KB)"</string>
   
     <string name="bookcase_shelves">"Bookshelves"</string>
+    <string name="recent_title">"Recent books"</string>
+    <string name="pref_usebookcase_title">"Use bookcase view"</string>
+    <string name="pref_usebookcase_summary">"Use bookcase view instead of lists"</string>
 </resources>

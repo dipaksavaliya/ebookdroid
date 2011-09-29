@@ -120,4 +120,7 @@
 	<string name="pref_maximagesize_summary">"Макс. размер области при декодировании (в КБ)"</string>
 
     <string name="bookcase_shelves">"Книжные полки"</string>
+    <string name="recent_title">"Недавние книги"</string>
+    <string name="pref_usebookcase_title">"Использовать шкаф"</string>
+    <string name="pref_usebookcase_summary">"Использовать шкаф с обложками вместо списков"</string>
 </resources>
