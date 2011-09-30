@@ -2,13 +2,8 @@
 
 #include <android/log.h>
 
-/*JNI BITMAP API */
-
 #include <nativebitmap.h>
 
-//#ifdef USE_JNI_BITMAP_API
-//#include <android/bitmap.h>
-//#endif
 
 #include <errno.h>
 
@@ -39,8 +34,10 @@ typedef struct renderpage_s renderpage_t;
 struct renderpage_s
 {
 	pdf_page *page;
-	fz_display_list *pageList;
+	int pageno;
 };
+
+static int current_page = 0;
 
 #define RUNTIME_EXCEPTION "java/lang/RuntimeException"
 
@@ -407,13 +404,7 @@ JNIEXPORT jlong JNICALL
 		throw_exception(env, "error loading page");
 		goto cleanup;
 	}
-
-//New draw page
-	page->pageList = fz_new_display_list();
-	fz_device *dev = fz_new_list_device(page->pageList);
-	pdf_run_page(doc->xref, page->page , dev, fz_identity);
-	fz_free_device(dev);
-//
+	page->pageno = pageno - 1;
 
 cleanup:
 	/* nothing yet */
@@ -437,10 +428,6 @@ JNIEXPORT void JNICALL
 	if(page) {
 		if (page->page)
 			pdf_free_page(page->page);
-//New draw page
-		if (page->pageList)
-		    fz_free_display_list(page->pageList);
-//
 		fz_free(page);
 	}
 }
@@ -489,6 +476,12 @@ Java_org_ebookdroid_pdfdroid_codec_PdfPage_renderPage
 	int length, val;
 	fz_device *dev = NULL;
 
+	if(current_page != page->pageno)
+	{
+		pdf_age_store(doc->xref->store, 1);
+		current_page = page->pageno;
+	}
+
 	/* initialize parameter arrays for MuPDF */
 
 	ctm = fz_identity;
@@ -523,8 +516,8 @@ Java_org_ebookdroid_pdfdroid_codec_PdfPage_renderPage
 	fz_clear_pixmap_with_color(pixmap, 0xff);
 
 	dev = fz_new_draw_device(doc->drawcache, pixmap);
-        fz_execute_display_list(page->pageList, dev, ctm, viewbox);
-        fz_free_device(dev);
+	pdf_run_page(doc->xref, page->page, dev, ctm);
+	fz_free_device(dev);
 
 	(*env)->ReleasePrimitiveArrayCritical(env, bufferarray, buffer, 0);
 
@@ -540,11 +533,6 @@ Java_org_ebookdroid_pdfdroid_codec_PdfPage_isNativeGraphicsAvailable
 	(JNIEnv *env, jobject this)
 {
     return NativePresent();
-//#ifdef USE_JNI_BITMAP_API
-//	return 1;
-//#else
-//	return 0;
-//#endif
 }
 
 JNIEXPORT jboolean JNICALL
@@ -553,7 +541,6 @@ Java_org_ebookdroid_pdfdroid_codec_PdfPage_renderPageBitmap
 	jintArray viewboxarray, jfloatArray matrixarray,
 	jobject bitmap)
 {
-//#ifdef USE_JNI_BITMAP_API
     renderdocument_t *doc = (renderdocument_t*) (long)dochandle;
     renderpage_t *page = (renderpage_t*) (long)pagehandle;
     DEBUG("PdfView(%p).renderPageBitmap(%p, %p)", this, doc, page);
@@ -571,6 +558,14 @@ Java_org_ebookdroid_pdfdroid_codec_PdfPage_renderPageBitmap
     void *pixels;
 
     int ret;
+    
+    if(current_page != page->pageno)
+    {
+	pdf_age_store(doc->xref->store, 1);
+	current_page = page->pageno;
+    }
+
+    
 
     if ((ret = NativeBitmap_getInfo(env, bitmap, &info)) < 0) {
             ERROR("AndroidBitmap_getInfo() failed ! error=%d", ret);
@@ -616,8 +611,9 @@ Java_org_ebookdroid_pdfdroid_codec_PdfPage_renderPageBitmap
     fz_clear_pixmap_with_color(pixmap, 0xff);
 
     dev = fz_new_draw_device(doc->drawcache, pixmap);
-    fz_execute_display_list(page->pageList, dev, ctm, viewbox);
+    pdf_run_page(doc->xref, page->page, dev, ctm);
     fz_free_device(dev);
+
     fz_drop_pixmap(pixmap);
 
     DEBUG("PdfView.renderPage() done");
@@ -625,10 +621,6 @@ Java_org_ebookdroid_pdfdroid_codec_PdfPage_renderPageBitmap
     NativeBitmap_unlockPixels(env, bitmap);
 
     return 1;
-//#else
-//	DEBUG("PdfView(%p).renderPageBitmap(): not implemented", this);
-//	return 0;
-//#endif
 }
 
 //Outline

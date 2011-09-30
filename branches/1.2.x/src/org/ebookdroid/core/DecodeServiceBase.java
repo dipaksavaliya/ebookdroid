@@ -28,8 +28,6 @@ public class DecodeServiceBase implements DecodeService {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding");
 
-    static final int PAGE_POOL_SIZE = 16;
-
     static final AtomicLong TASK_ID_SEQ = new AtomicLong();
 
     final CodecContext codecContext;
@@ -139,7 +137,7 @@ public class DecodeServiceBase implements DecodeService {
             finishDecoding(task, vuPage, bitmap);
         } catch (final OutOfMemoryError ex) {
             LCTX.e("Task " + task.id + ": No memory to decode " + task.node);
-            for (int i = 0; i <= SettingsManager.getAppSettings().getPagesInMemory(); i++) {
+            for (int i = 0; i <= SettingsManager.getAppSettings().getPagesInMemory() + 2; i++) {
                 pages.put(Integer.MAX_VALUE - i, null);
             }
             pages.clear();
