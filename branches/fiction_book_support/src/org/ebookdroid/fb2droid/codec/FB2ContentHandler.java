@@ -31,7 +31,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
     private boolean noteFirstWord = true;
     private ArrayList<FB2Line> noteLines = null;
 
-    private static final Pattern notesPattern = Pattern.compile("n([0-9]+)");
+    private static final Pattern notesPattern = Pattern.compile("n([0-9]+)|n_([0-9]+)");
     private final StringBuilder tmpBinaryContents = new StringBuilder(64 * 1024);
     private final StringBuilder title = new StringBuilder();
 
@@ -296,8 +296,14 @@ public class FB2ContentHandler extends FB2BaseHandler {
         final Matcher matcher = notesPattern.matcher(noteName);
         String n = noteName;
         if (matcher.matches()) {
-            noteId = Integer.parseInt(matcher.group(1));
-            n = "" + noteId + ")";
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                if (matcher.group(i) != null) {
+                    noteId = Integer.parseInt(matcher.group(i));
+                    n = "" + noteId + ")";
+                    break;
+                }
+                noteId = -1;
+            }
         }
         return n;
     }

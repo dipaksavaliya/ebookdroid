@@ -5,6 +5,8 @@ import org.ebookdroid.core.PageLink;
 import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
+import org.ebookdroid.core.utils.archives.zip.ZipArchive;
+import org.ebookdroid.core.utils.archives.zip.ZipArchiveEntry;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,9 +19,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -33,7 +37,7 @@ import org.xml.sax.InputSource;
 public class FB2Document implements CodecDocument {
 
     private static final int MARKUP_VERSION = 1;
-    
+
     private final static boolean USE_SERIALIZE = false;
     private final TreeMap<String, FB2Image> images = new TreeMap<String, FB2Image>();
     private final TreeMap<String, ArrayList<FB2Line>> notes = new TreeMap<String, ArrayList<FB2Line>>();
@@ -88,7 +92,7 @@ public class FB2Document implements CodecDocument {
             e.printStackTrace();
             return false;
         } finally {
-            System.out.println("Deserialize: "+ (System.currentTimeMillis() - t1) + " ms");
+            System.out.println("Deserialize: " + (System.currentTimeMillis() - t1) + " ms");
         }
         return true;
     }
@@ -100,7 +104,8 @@ public class FB2Document implements CodecDocument {
         String fname = fileName + ".pages";
         try {
 
-            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(((new FileOutputStream(fname))), 1024 * 1024));
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(((new FileOutputStream(fname))),
+                    1024 * 1024));
             out.writeInt(MARKUP_VERSION);
             out.writeInt(pages.size());
             for (FB2Page page : pages) {
@@ -127,10 +132,28 @@ public class FB2Document implements CodecDocument {
         FB2ContentHandler h = new FB2ContentHandler(this);
         try {
             final SAXParser parser = spf.newSAXParser();
-            final Reader isr = new InputStreamReader(new FileInputStream(fileName), encoding);
-            final InputSource is = new InputSource();
-            is.setCharacterStream(isr);
-            parser.parse(is, h);
+
+            InputStream inStream = null;
+
+            if (fileName.endsWith("zip")) {
+                ZipArchive zipArchive = new ZipArchive(new File(fileName));
+                Enumeration<ZipArchiveEntry> entries = zipArchive.entries();
+                while (entries.hasMoreElements()) {
+                    ZipArchiveEntry entry = entries.nextElement();
+                    if (!entry.isDirectory() && entry.getName().endsWith("fb2")) {
+                        inStream = entry.open();
+                        break;
+                    }
+                }
+            } else {
+                inStream = new FileInputStream(fileName);
+            }
+            if (inStream != null) {
+                final Reader isr = new InputStreamReader(inStream, encoding);
+                final InputSource is = new InputSource();
+                is.setCharacterStream(isr);
+                parser.parse(is, h);
+            }
         } catch (final StopParsingException e) {
             // do nothing
         } catch (final Exception e) {
@@ -141,13 +164,29 @@ public class FB2Document implements CodecDocument {
 
     private String getEncoding(final String fileName) {
         try {
-            final FileInputStream fis = new FileInputStream(fileName);
-            final byte[] buffer = new byte[100];
-            fis.read(buffer);
-            final Pattern p = Pattern.compile("encoding=\"(.*?)\"");
-            final Matcher matcher = p.matcher(new String(buffer));
-            if (matcher.find()) {
-                return matcher.group(1);
+            InputStream inStream = null;
+
+            if (fileName.endsWith("zip")) {
+                ZipArchive zipArchive = new ZipArchive(new File(fileName));
+                Enumeration<ZipArchiveEntry> entries = zipArchive.entries();
+                while (entries.hasMoreElements()) {
+                    ZipArchiveEntry entry = entries.nextElement();
+                    if (!entry.isDirectory() && entry.getName().endsWith("fb2")) {
+                        inStream = entry.open();
+                        break;
+                    }
+                }
+            } else {
+                inStream = new FileInputStream(fileName);
+            }
+            if (inStream != null) {
+                final byte[] buffer = new byte[100];
+                inStream.read(buffer);
+                final Pattern p = Pattern.compile("encoding=\"(.*?)\"");
+                final Matcher matcher = p.matcher(new String(buffer));
+                if (matcher.find()) {
+                    return matcher.group(1);
+                }
             }
         } catch (final IOException e) {
         }
@@ -286,8 +325,7 @@ public class FB2Document implements CodecDocument {
         }
         if (jm == JustificationMode.Justify) {
             final FB2Line l = FB2Line.getLastLine(paragraphLines);
-            l.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - l.width - 2 * FB2Page.MARGIN_X, l.getHeight(),
-                    false));
+            l.append(new FB2LineWhiteSpace(FB2Page.PAGE_WIDTH - l.width - 2 * FB2Page.MARGIN_X, l.getHeight(), false));
         }
         for (final FB2Line l : paragraphLines) {
             l.applyJustification(jm);
@@ -319,7 +357,7 @@ public class FB2Document implements CodecDocument {
     }
 
     public void addTitle(String title) {
-        outline.add(new OutlineLink(title, "#"+pages.size()));
+        outline.add(new OutlineLink(title, "#" + pages.size()));
     }
 
 }

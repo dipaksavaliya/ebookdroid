@@ -26,7 +26,7 @@ public enum Activities {
 
     CBR(CbrViewerActivity.class, "cbr"),
     
-    FB2(FB2ViewerActivity.class, "fb2");
+    FB2(FB2ViewerActivity.class, "fb2", "fb2.zip");
 
     private final static Map<String, Class<? extends Activity>> extensionToActivity;
 
@@ -63,8 +63,12 @@ public enum Activities {
 
     public static Class<? extends Activity> getByUri(final Uri uri) {
         final String uriString = uri.toString();
-        final String extension = uriString.substring(uriString.lastIndexOf('.') + 1);
-        return getByExtension(extension);
+        for (String ext :extensionToActivity.keySet()) {
+            if (uriString.endsWith("."+ext)) {
+                return extensionToActivity.get(ext);
+            }
+        }
+        return null;
     }
 
     public static Class<? extends Activity> getByExtension(final String ext) {
