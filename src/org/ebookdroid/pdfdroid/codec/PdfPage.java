@@ -1,7 +1,5 @@
 package org.ebookdroid.pdfdroid.codec;
 
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPage;
 
 import android.graphics.Bitmap;
@@ -38,7 +36,7 @@ public class PdfPage implements CodecPage {
     }
 
     @Override
-    public BitmapRef renderBitmap(final int width, final int height, final RectF pageSliceBounds) {
+    public Bitmap renderBitmap(final int width, final int height, final RectF pageSliceBounds) {
         final Matrix matrix = new Matrix();
         matrix.postTranslate(-mediaBox.left, -mediaBox.top);
         matrix.postScale(width / mediaBox.width(), -height / mediaBox.height());
@@ -77,7 +75,7 @@ public class PdfPage implements CodecPage {
         return new RectF(box[0], box[1], box[2], box[3]);
     }
 
-    public BitmapRef render(final Rect viewbox, final Matrix matrix) {
+    public Bitmap render(final Rect viewbox, final Matrix matrix) {
         final int[] mRect = new int[4];
         mRect[0] = viewbox.left;
         mRect[1] = viewbox.top;
@@ -97,21 +95,19 @@ public class PdfPage implements CodecPage {
         final int width = viewbox.width();
         final int height = viewbox.height();
 
-        if (useNativeGraphics) {
-            BitmapRef bmp = BitmapManager.getBitmap(width, height, Bitmap.Config.ARGB_8888);
-            if (renderPageBitmap(docHandle, pageHandle, mRect, matrixArray, bmp.getBitmap())) {
+        if (useNativeGraphics /* && AndroidVersion.VERSION >= 8 */) {
+            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            if (renderPageBitmap(docHandle, pageHandle, mRect, matrixArray, bmp)) {
                 return bmp;
             } else {
-                BitmapManager.release(bmp);
+                bmp.recycle();
                 return null;
             }
         }
 
         final int[] bufferarray = new int[width * height];
         renderPage(docHandle, pageHandle, mRect, matrixArray, bufferarray);
-        BitmapRef b = BitmapManager.getBitmap(width, height, Bitmap.Config.RGB_565);
-        b.getBitmap().setPixels(bufferarray, 0, width, 0, 0, width, height);
-        return b;
+        return Bitmap.createBitmap(bufferarray, width, height, Bitmap.Config.RGB_565);
     }
 
     private static native void getMediaBox(long handle, float[] mediabox);

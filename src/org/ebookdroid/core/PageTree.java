@@ -1,11 +1,8 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.bitmaps.BitmapRef;
-
 import android.graphics.RectF;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -35,10 +32,10 @@ public class PageTree {
         this.root = createRoot();
     }
 
-    public void recycle(List<BitmapRef> bitmapsToRecycle) {
+    public void recycle() {
         lock.writeLock().lock();
         try {
-            root.recycle(bitmapsToRecycle);
+            root.recycle();
             nodes.clear();
         } finally {
             lock.writeLock().unlock();
@@ -65,13 +62,13 @@ public class PageTree {
         }
     }
 
-    public boolean recycleChildren(final PageTreeNode parent, List<BitmapRef> bitmapsToRecycle) {
+    public boolean recycleChildren(final PageTreeNode parent) {
         lock.writeLock().lock();
         try {
             for (int i = 0; i < splitMasks.length; i++) {
                 final PageTreeNode child = nodes.remove(getChildId(parent.id, i));
                 if (child != null) {
-                    child.recycle(bitmapsToRecycle);
+                    child.recycle();
                 }
             }
         } finally {

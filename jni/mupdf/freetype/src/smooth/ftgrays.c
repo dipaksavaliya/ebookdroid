@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    A new `perfect' anti-aliasing renderer (body).                       */
 /*                                                                         */
-/*  Copyright 2000-2003, 2005-2011 by                                      */
+/*  Copyright 2000-2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 by */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -890,8 +890,14 @@ typedef ptrdiff_t  FT_PtrDist;
     if ( dx < dy )
       dx = dy;
 
+    if ( dx <= ONE_PIXEL / 4 )
+    {
+      gray_render_line( RAS_VAR_ arc[0].x, arc[0].y );
+      return;
+    }
+
     level = 0;
-    while ( dx > ONE_PIXEL / 6 )
+    while ( dx > ONE_PIXEL / 4 )
     {
       dx >>= 2;
       level++;
@@ -901,7 +907,7 @@ typedef ptrdiff_t  FT_PtrDist;
     levels[0] = level;
     top       = 0;
 
-    do
+    while ( top >= 0 )
     {
       level = levels[top];
       if ( level > 1 )
@@ -934,8 +940,9 @@ typedef ptrdiff_t  FT_PtrDist;
       gray_render_line( RAS_VAR_ arc[0].x, arc[0].y );
       top--;
       arc -= 2;
+    }
 
-    } while ( top >= 0 );
+    return;
   }
 
 

@@ -1,4 +1,4 @@
-package org.ebookdroid.core.settings.books;
+package org.ebookdroid.core.settings;
 
 import org.ebookdroid.core.PageAlign;
 import org.ebookdroid.core.PageIndex;
@@ -11,25 +11,25 @@ import java.util.List;
 
 public class BookSettings implements CurrentPageListener {
 
-    public final String fileName;
+    final String fileName;
 
-    public long lastUpdated;
+    long lastUpdated;
 
-    public PageIndex currentPage;
+    PageIndex currentPage;
 
-    public int zoom = 100;
+    int zoom = 100;
 
-    public boolean splitPages;
+    boolean splitPages;
 
-    public boolean singlePage;
+    boolean singlePage;
 
-    public PageAlign pageAlign = PageAlign.AUTO;
+    PageAlign pageAlign = PageAlign.AUTO;
 
-    public PageAnimationType animationType = PageAnimationType.NONE;
+    PageAnimationType animationType = PageAnimationType.NONE;
 
-    public final List<Bookmark> bookmarks = new ArrayList<Bookmark>();
+    final List<Bookmark> bookmarks = new ArrayList<Bookmark>();
 
-    public BookSettings(BookSettings current) {
+    BookSettings(BookSettings current) {
         this.fileName = current.fileName;
         this.currentPage = current.currentPage;
         this.lastUpdated = current.lastUpdated;
@@ -42,15 +42,22 @@ public class BookSettings implements CurrentPageListener {
 
     }
 
-    public BookSettings(final String fileName) {
+    BookSettings(final String fileName, AppSettings appSettings) {
         this.fileName = fileName;
         this.currentPage = PageIndex.FIRST;
         this.lastUpdated = System.currentTimeMillis();
+        if (appSettings != null) {
+            appSettings.fillBookSettings(this);
+        }
     }
 
     @Override
     public void currentPageChanged(PageIndex oldIndex, PageIndex newIndex) {
         this.currentPage = newIndex;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public PageIndex getCurrentPage() {
@@ -61,8 +68,28 @@ public class BookSettings implements CurrentPageListener {
         return zoom / 100.0f;
     }
 
-    public void setZoom(float zoom) {
+    void setZoom(float zoom) {
         this.zoom = Math.round(zoom * 100);
+    }
+
+    public boolean getSinglePage() {
+        return singlePage;
+    }
+
+    public PageAlign getPageAlign() {
+        return pageAlign;
+    }
+
+    public boolean getSplitPages() {
+        return splitPages;
+    }
+
+    public PageAnimationType getAnimationType() {
+        return animationType;
+    }
+
+    public List<Bookmark> getBookmarks() {
+        return bookmarks;
     }
 
     public static class Diff {

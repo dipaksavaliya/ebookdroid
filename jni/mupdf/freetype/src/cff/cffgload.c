@@ -4,7 +4,8 @@
 /*                                                                         */
 /*    OpenType Glyph Loader (body).                                        */
 /*                                                                         */
-/*  Copyright 1996-2011 by                                                 */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,   */
+/*            2010 by                                                      */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -1158,8 +1159,8 @@
               op = cff_op_flex1;
               break;
             default:
-              FT_TRACE4(( " unknown op (12, %d)\n", v ));
-              break;
+              /* decrement ip for syntax error message */
+              ip--;
             }
           }
           break;
@@ -1212,12 +1213,11 @@
           op = cff_op_hvcurveto;
           break;
         default:
-          FT_TRACE4(( " unknown op (%d)\n", v ));
           break;
         }
 
         if ( op == cff_op_unknown )
-          continue;
+          goto Syntax_Error;
 
         /* check arguments */
         req_args = cff_argument_counts[op];
@@ -1438,13 +1438,8 @@
             FT_TRACE4(( op == cff_op_hlineto ? " hlineto\n"
                                              : " vlineto\n" ));
 
-            if ( num_args < 0 )
+            if ( num_args < 1 )
               goto Stack_Underflow;
-
-            /* there exist subsetted fonts (found in PDFs) */
-            /* which call `hlineto' without arguments      */
-            if ( num_args == 0 )
-              break;
 
             if ( cff_builder_start_point ( builder, x, y ) ||
                  check_points( builder, num_args )         )
@@ -2706,7 +2701,7 @@
                                               glyph_index );
 
       if ( fd_index >= cff->num_subfonts ) 
-        fd_index = (FT_Byte)( cff->num_subfonts - 1 );
+        fd_index = cff->num_subfonts - 1;
 
       top_upm = cff->top_font.font_dict.units_per_em;
       sub_upm = cff->subfonts[fd_index]->font_dict.units_per_em;

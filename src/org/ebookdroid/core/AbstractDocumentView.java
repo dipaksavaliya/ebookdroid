@@ -1,7 +1,5 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
 import org.ebookdroid.core.events.ZoomListener;
 import org.ebookdroid.core.log.LogContext;
 import org.ebookdroid.core.settings.SettingsManager;
@@ -53,7 +51,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     public AbstractDocumentView(final IViewerActivity baseActivity) {
         super(baseActivity.getContext());
         this.base = baseActivity;
-        this.align = SettingsManager.getBookSettings().pageAlign;
+        this.align = SettingsManager.getBookSettings().getPageAlign();
         this.firstVisiblePage = -1;
         this.lastVisiblePage = -1;
         this.scroller = new Scroller(getContext());
@@ -109,19 +107,25 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         if (inZoom.get()) {
             return;
         }
-        redrawView();
+        // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
+        base.getActivity().runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                final ViewState viewState = updatePageVisibility(newPage, direction, getBase().getZoomModel().getZoom());
+                redrawView(viewState);
+            }
+        });
     }
 
     public final ViewState updatePageVisibility(final int newPage, final int direction, final float zoom) {
         final ViewState viewState = calculatePageVisibility(newPage, direction, zoom);
 
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-        final List<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
 
         for (final Page page : getBase().getDocumentModel().getPages()) {
-            page.onPositionChanged(viewState, nodesToDecode, bitmapsToRecycle);
+            page.onPositionChanged(viewState, nodesToDecode);
         }
-        BitmapManager.release(bitmapsToRecycle);
 
         if (!nodesToDecode.isEmpty()) {
             decodePageTreeNodes(viewState, nodesToDecode);
@@ -232,21 +236,14 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     protected ViewState onZoomChanged(final float newZoom) {
-        if (initialZoom != newZoom) {
-            BitmapManager.increateGeneration();
-        }
-
         final ViewState viewState = calculatePageVisibility(base.getDocumentModel().getCurrentViewPageIndex(), 0,
                 newZoom);
 
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-        final List<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
 
         for (final Page page : getBase().getDocumentModel().getPages()) {
-            page.onZoomChanged(initialZoom, viewState, nodesToDecode, bitmapsToRecycle);
+            page.onZoomChanged(initialZoom, viewState, nodesToDecode);
         }
-        BitmapManager.release(bitmapsToRecycle);
-
         if (!nodesToDecode.isEmpty()) {
             decodePageTreeNodes(viewState, nodesToDecode);
         }
@@ -261,13 +258,10 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         final ViewState viewState = new ViewState(this);
 
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-        final List<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
 
         for (final Page page : getBase().getDocumentModel().getPages()) {
-            page.onZoomChanged(0, viewState, nodesToDecode, bitmapsToRecycle);
+            page.onZoomChanged(0, viewState, nodesToDecode);
         }
-        BitmapManager.release(bitmapsToRecycle);
-
         if (!nodesToDecode.isEmpty()) {
             decodePageTreeNodes(viewState, nodesToDecode);
         }
@@ -279,13 +273,9 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         final ViewState viewState = calculatePageVisibility(pages[0].index.viewIndex, 0, oldState.zoom);
 
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-        final List<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
-
         for (final Page page : pages) {
-            page.onPositionChanged(viewState, nodesToDecode, bitmapsToRecycle);
+            page.onPositionChanged(viewState, nodesToDecode);
         }
-        BitmapManager.release(bitmapsToRecycle);
-
         if (!nodesToDecode.isEmpty()) {
             decodePageTreeNodes(viewState, nodesToDecode);
         }
@@ -341,6 +331,14 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     @Override
     public boolean onTouchEvent(final MotionEvent ev) {
+        super.onTouchEvent(ev);
+
+        try {
+            Thread.sleep(16);
+        } catch (final InterruptedException e) {
+            Thread.interrupted();
+        }
+
         if (getBase().getMultiTouchZoom() != null) {
             if (getBase().getMultiTouchZoom().onTouchEvent(ev)) {
                 return true;
@@ -422,12 +420,9 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             final int bottom) {
         if (changed && !layoutLocked) {
             if (isInitialized) {
-                ArrayList<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
                 for (final Page page : base.getDocumentModel().getPages()) {
-                    page.nodes.root.recycle(bitmapsToRecycle);
+                    page.nodes.root.recycle();
                 }
-                BitmapManager.release(bitmapsToRecycle);
-
                 invalidatePageSizes(InvalidateSizeReason.LAYOUT, null);
                 invalidateScroll();
                 final float oldZoom = base.getZoomModel().getZoom();
@@ -541,7 +536,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         drawThread.finish();
     }
 
-    private final class GestureListener extends SimpleOnGestureListener {
+    protected class GestureListener extends SimpleOnGestureListener {
 
         @Override
         public boolean onDoubleTap(final MotionEvent e) {
@@ -591,6 +586,5 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             }
             return false;
         }
-
     }
 }

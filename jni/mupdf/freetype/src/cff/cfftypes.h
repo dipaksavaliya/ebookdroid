@@ -5,7 +5,7 @@
 /*    Basic OpenType/CFF type definitions and interface (specification     */
 /*    only).                                                               */
 /*                                                                         */
-/*  Copyright 1996-2003, 2006-2008, 2010-2011 by                           */
+/*  Copyright 1996-2001, 2002, 2003, 2006, 2007, 2008, 2010 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -212,7 +212,8 @@ FT_BEGIN_HEADER
   } CFF_SubFontRec, *CFF_SubFont;
 
 
-#define CFF_MAX_CID_FONTS  256
+  /* maximum number of sub-fonts in a CID-keyed file */
+#define CFF_MAX_CID_FONTS  32
 
 
   typedef struct  CFF_FontRec_

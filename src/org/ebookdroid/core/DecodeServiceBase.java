@@ -1,7 +1,5 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecContext;
 import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
@@ -14,10 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -135,20 +129,20 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             final Rect r = getScaledSize(task, vuPage);
-            final BitmapRef bitmap = vuPage.renderBitmap(r.width(), r.height(), task.pageSliceBounds);
+            final Bitmap bitmap = vuPage.renderBitmap(r.width(), r.height(), task.pageSliceBounds);
 
             if (executor.isTaskDead(task)) {
                 if (LCTX.isDebugEnabled()) {
                     LCTX.d("Task " + task.id + ": Abort dead decode task for " + task.node);
                 }
-                BitmapManager.release(bitmap);
+                bitmap.recycle();
                 return;
             }
 
-            finishDecoding(task, vuPage, bitmap, r);
+            finishDecoding(task, vuPage, bitmap);
         } catch (final OutOfMemoryError ex) {
             LCTX.e("Task " + task.id + ": No memory to decode " + task.node);
-            for (int i = 0; i <= SettingsManager.getAppSettings().getPagesInMemory(); i++) {
+            for (int i = 0; i <= SettingsManager.getAppSettings().getPagesInMemory() + 2; i++) {
                 pages.put(Integer.MAX_VALUE - i, null);
             }
             pages.clear();
@@ -191,15 +185,14 @@ public class DecodeServiceBase implements DecodeService {
         return new Rect(0, 0, scaledWidth, scaledHeight);
     }
 
-    void finishDecoding(final DecodeTask currentDecodeTask, final CodecPage page, final BitmapRef bitmap,
-            final Rect bitmapBounds) {
+    void finishDecoding(final DecodeTask currentDecodeTask, final CodecPage page, final Bitmap bitmap) {
         stopDecoding(currentDecodeTask.node, "complete");
-        updateImage(currentDecodeTask, page, bitmap, bitmapBounds);
+        updateImage(currentDecodeTask, page, bitmap);
     }
 
-    void abortDecoding(final DecodeTask currentDecodeTask, final CodecPage page, final BitmapRef bitmap) {
+    void abortDecoding(final DecodeTask currentDecodeTask, final CodecPage page, final Bitmap bitmap) {
         stopDecoding(currentDecodeTask.node, "failed");
-        updateImage(currentDecodeTask, page, bitmap, null);
+        updateImage(currentDecodeTask, page, bitmap);
     }
 
     CodecPage getPage(final int pageIndex) {
@@ -231,9 +224,8 @@ public class DecodeServiceBase implements DecodeService {
         return page;
     }
 
-    void updateImage(final DecodeTask currentDecodeTask, final CodecPage page, final BitmapRef bitmap,
-            final Rect bitmapBounds) {
-        currentDecodeTask.node.decodeComplete(page, bitmap, bitmapBounds);
+    void updateImage(final DecodeTask currentDecodeTask, final CodecPage page, final Bitmap bitmap) {
+        currentDecodeTask.node.decodeComplete(page, bitmap);
     }
 
     @Override
@@ -515,42 +507,5 @@ public class DecodeServiceBase implements DecodeService {
             buf.append("]");
             return buf.toString();
         }
-    }
-
-    @Override
-    public void createThumbnail(File thumbnailFile, int width, int height) {
-        Bitmap thumbnail = document.getEmbeddedThumbnail();
-        BitmapRef bmp = null;
-        if (thumbnail != null) {
-            width = 200;
-            height = 200;
-            if (thumbnail.getHeight() > thumbnail.getWidth()) {
-                width = 200 * thumbnail.getWidth() / thumbnail.getHeight();
-            } else {
-                height = 200 * thumbnail.getHeight() / thumbnail.getWidth();
-            }
-
-            thumbnail = Bitmap.createScaledBitmap(thumbnail, width, height, true);
-        } else {
-            CodecPage page = getPage(0);
-            bmp = page.renderBitmap(width, height, new RectF(0, 0, 1, 1));
-            thumbnail = bmp.getBitmap();
-        }
-
-        FileOutputStream out;
-        try {
-            out = new FileOutputStream(thumbnailFile);
-            bmp.getBitmap().compress(Bitmap.CompressFormat.JPEG, 50, out);
-            out.close();
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        } finally {
-            BitmapManager.release(bmp);
-        }
-    }
-
-    @Override
-    public boolean isPageSizeCacheable() {
-        return codecContext.isPageSizeCacheable();
     }
 }

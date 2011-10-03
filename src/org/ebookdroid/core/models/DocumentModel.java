@@ -5,11 +5,9 @@ import org.ebookdroid.core.IViewerActivity;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.PageType;
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPageInfo;
+import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.settings.books.BookSettings;
 import org.ebookdroid.utils.LengthUtils;
 import org.ebookdroid.utils.StringUtils;
 
@@ -25,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class DocumentModel extends CurrentPageModel {
 
@@ -62,16 +59,10 @@ public class DocumentModel extends CurrentPageModel {
     public void recycle() {
         decodeService.recycle();
         decodeService = null;
-        recyclePages();
-    }
-
-    private void recyclePages() {
         if (LengthUtils.isNotEmpty(pages)) {
-            final List<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
             for (final Page page : pages) {
-                page.recycle(bitmapsToRecycle);
+                page.recycle();
             }
-            BitmapManager.release(bitmapsToRecycle);
         }
         pages = EMPTY_PAGES;
     }
@@ -124,7 +115,12 @@ public class DocumentModel extends CurrentPageModel {
     }
 
     public void initPages(final IViewerActivity base) {
-        recyclePages();
+        if (LengthUtils.isNotEmpty(pages)) {
+            for (final Page page : pages) {
+                page.recycle();
+            }
+        }
+        pages = EMPTY_PAGES;
 
         final BookSettings bs = SettingsManager.getBookSettings();
 
@@ -132,6 +128,7 @@ public class DocumentModel extends CurrentPageModel {
             return;
         }
 
+        final boolean splitPages = bs.getSplitPages();
         final View view = base.getView();
 
         final CodecPageInfo defCpi = new CodecPageInfo();
@@ -146,7 +143,7 @@ public class DocumentModel extends CurrentPageModel {
             final CodecPageInfo[] infos = retrievePagesInfo(base, bs);
 
             for (int docIndex = 0; docIndex < infos.length; docIndex++) {
-                if (!bs.splitPages || infos[docIndex] == null
+                if (!splitPages || infos[docIndex] == null
                         || (infos[docIndex].getWidth() < infos[docIndex].getHeight())) {
                     final Page page = new Page(base, new PageIndex(docIndex, viewIndex++), PageType.FULL_PAGE,
                             infos[docIndex] != null ? infos[docIndex] : defCpi);
@@ -161,52 +158,23 @@ public class DocumentModel extends CurrentPageModel {
                 }
             }
             pages = list.toArray(new Page[list.size()]);
-            if (infos.length > 0){
-                createBookThumbnail(base, bs, infos[0]);
-            }
         } finally {
             LCTX.d("Loading page info: " + (System.currentTimeMillis() - start) + " ms");
         }
     }
 
-    private void createBookThumbnail(final IViewerActivity base, final BookSettings bs, CodecPageInfo info) {
-        final File cacheDir = base.getContext().getFilesDir();
-
-        final String md5 = StringUtils.md5(bs.fileName);
-        final File thumbnailFile = new File(cacheDir, md5 + ".thumbnail");
-        if (thumbnailFile.exists()) {
-            return;
-        }
-        int width = 200, height = 200;
-        if (info.getHeight() > info.getWidth()) {
-            width = 200 * info.getWidth() / info.getHeight();
-        } else {
-            height = 200 * info.getHeight() / info.getWidth();
-        }
-
-        decodeService.createThumbnail(thumbnailFile, width, height);
-    }
-
     private CodecPageInfo[] retrievePagesInfo(final IViewerActivity base, final BookSettings bs) {
 
+        final String fileName = bs.getFileName();
         final File cacheDir = base.getContext().getFilesDir();
 
-        final String md5 = StringUtils.md5(bs.fileName);
+        final String md5 = StringUtils.md5(fileName);
         final File pagesFile = new File(cacheDir, md5 + ".cache");
         if (md5 != null) {
             if (pagesFile.exists()) {
                 final CodecPageInfo[] infos = loadPagesInfo(pagesFile);
                 if (infos != null) {
-                    boolean nullInfoFound = false;
-                    for (CodecPageInfo info : infos) {
-                        if (info == null) {
-                            nullInfoFound = true;
-                            break;
-                        }
-                    }
-                    if (!nullInfoFound) {
-                        return infos;
-                    }
+                    return infos;
                 }
             }
         }
@@ -254,9 +222,6 @@ public class DocumentModel extends CurrentPageModel {
     }
 
     private void storePagesInfo(final File pagesFile, final CodecPageInfo[] infos) {
-        if (!decodeService.isPageSizeCacheable()) {
-            return;
-        }
         try {
             final DataOutputStream out = new DataOutputStream(new FileOutputStream(pagesFile));
             try {
@@ -282,7 +247,6 @@ public class DocumentModel extends CurrentPageModel {
             LCTX.e("Saving pages cache failed: " + ex.getMessage());
         }
     }
-
 
     private final class PageIterator implements Iterable<Page>, Iterator<Page> {
 

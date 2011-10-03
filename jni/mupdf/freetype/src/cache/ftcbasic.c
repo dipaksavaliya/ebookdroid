@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType basic cache interface (body).                           */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by            */
+/*  Copyright 2003, 2004, 2005, 2006, 2007, 2009, 2010 by                  */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -17,7 +17,6 @@
 
 
 #include <ft2build.h>
-#include FT_INTERNAL_OBJECTS_H
 #include FT_INTERNAL_DEBUG_H
 #include FT_CACHE_H
 #include "ftcglyph.h"
@@ -238,8 +237,7 @@
   FT_CALLBACK_DEF( FT_Bool )
   ftc_basic_gnode_compare_faceid( FTC_Node    ftcgnode,
                                   FT_Pointer  ftcface_id,
-                                  FTC_Cache   cache,
-                                  FT_Bool*    list_changed )
+                                  FTC_Cache   cache )
   {
     FTC_GNode        gnode   = (FTC_GNode)ftcgnode;
     FTC_FaceID       face_id = (FTC_FaceID)ftcface_id;
@@ -247,8 +245,6 @@
     FT_Bool          result;
 
 
-    if ( list_changed )
-      *list_changed = FALSE;
     result = FT_BOOL( family->attrs.scaler.face_id == face_id );
     if ( result )
     {

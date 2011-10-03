@@ -9,15 +9,14 @@ import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.models.ZoomModel;
 import org.ebookdroid.core.multitouch.MultiTouchZoom;
 import org.ebookdroid.core.settings.AppSettings;
+import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.settings.BookSettingsActivity;
+import org.ebookdroid.core.settings.Bookmark;
 import org.ebookdroid.core.settings.ISettingsChangeListener;
 import org.ebookdroid.core.settings.SettingsActivity;
 import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.settings.books.BookSettings;
-import org.ebookdroid.core.settings.books.Bookmark;
 import org.ebookdroid.core.utils.PathFromUri;
 import org.ebookdroid.core.views.PageViewZoomControls;
-import org.ebookdroid.utils.StringUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -240,7 +239,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
         final BookSettings bs = SettingsManager.getBookSettings();
 
-        if (bs.singlePage) {
+        if (bs.getSinglePage()) {
             documentController = new SinglePageDocumentView(this);
         } else {
             documentController = new ContiniousDocumentView(this);
@@ -300,9 +299,21 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     private void setWindowTitle() {
         currentFilename = getIntent().getData().getLastPathSegment();
 
-        currentFilename = StringUtils.cleanupTitle(currentFilename);
+        cleanupTitle();
 
         getWindow().setTitle(currentFilename);
+    }
+
+    /**
+     * Cleanup title. Remove from title file extension and (...), [...]
+     */
+    private void cleanupTitle() {
+        try {
+            currentFilename = currentFilename.substring(0, currentFilename.lastIndexOf('.'));
+            currentFilename = currentFilename.replaceAll("\\(.*\\)|\\[.*\\]", "");
+        } catch (final IndexOutOfBoundsException e) {
+
+        }
     }
 
     @Override
@@ -426,7 +437,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
                 return true;
             case R.id.mainmenu_booksettings:
                 final Intent bsa = new Intent(BaseViewerActivity.this, BookSettingsActivity.class);
-                bsa.setData(Uri.fromFile(new File(SettingsManager.getBookSettings().fileName)));
+                bsa.setData(Uri.fromFile(new File(SettingsManager.getBookSettings().getFileName())));
                 startActivity(bsa);
                 return true;
             case R.id.mainmenu_settings:
@@ -460,7 +471,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
                     public void onClick(final DialogInterface dialog, final int whichButton) {
                         final Editable value = input.getText();
                         final BookSettings bs = SettingsManager.getBookSettings();
-                        bs.bookmarks.add(new Bookmark(getDocumentModel().getCurrentIndex(), value.toString()));
+                        bs.getBookmarks().add(new Bookmark(getDocumentModel().getCurrentIndex(), value.toString()));
                         SettingsManager.edit(bs).commit();
                     }
                 }).setNegativeButton(R.string.password_cancel, new DialogInterface.OnClickListener() {
@@ -613,7 +624,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         if (dc != null) {
 
             if (diff.isPageAlignChanged()) {
-                dc.setAlign(newSettings.pageAlign);
+                dc.setAlign(newSettings.getPageAlign());
             }
 
             if (diff.isAnimationTypeChanged()) {

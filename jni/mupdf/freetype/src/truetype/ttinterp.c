@@ -4,7 +4,8 @@
 /*                                                                         */
 /*    TrueType bytecode interpreter (body).                                */
 /*                                                                         */
-/*  Copyright 1996-2011                                                    */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,   */
+/*            2010                                                         */
 /*  by David Turner, Robert Wilhelm, and Werner Lemberg.                   */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -985,8 +986,8 @@
     /*  INS_$83   */  PACK( 0, 0 ),
     /*  INS_$84   */  PACK( 0, 0 ),
     /*  ScanCTRL  */  PACK( 1, 0 ),
-    /*  SDPVTL[0] */  PACK( 2, 0 ),
-    /*  SDPVTL[1] */  PACK( 2, 0 ),
+    /*  SDVPTL[0] */  PACK( 2, 0 ),
+    /*  SDVPTL[1] */  PACK( 2, 0 ),
     /*  GetINFO   */  PACK( 1, 1 ),
     /*  IDEF      */  PACK( 1, 0 ),
     /*  ROLL      */  PACK( 3, 3 ),
@@ -3166,54 +3167,44 @@
     args[0] = CUR.top;
 
 
-#define DO_CINDEX                             \
-  {                                           \
-    FT_Long  L;                               \
-                                              \
-                                              \
-    L = args[0];                              \
-                                              \
-    if ( L <= 0 || L > CUR.args )             \
-    {                                         \
-      if ( CUR.pedantic_hinting )             \
-        CUR.error = TT_Err_Invalid_Reference; \
-      args[0] = 0;                            \
-    }                                         \
-    else                                      \
-      args[0] = CUR.stack[CUR.args - L];      \
+#define DO_CINDEX                           \
+  {                                         \
+    FT_Long  L;                             \
+                                            \
+                                            \
+    L = args[0];                            \
+                                            \
+    if ( L <= 0 || L > CUR.args )           \
+      CUR.error = TT_Err_Invalid_Reference; \
+    else                                    \
+      args[0] = CUR.stack[CUR.args - L];    \
   }
 
 
-#define DO_JROT                            \
-    if ( args[1] != 0 )                    \
-    {                                      \
-      if ( args[0] == 0 && CUR.args == 0 ) \
-        CUR.error = TT_Err_Bad_Argument;   \
-      CUR.IP += args[0];                   \
-      if ( CUR.IP < 0 )                    \
-        CUR.error = TT_Err_Bad_Argument;   \
-      CUR.step_ins = FALSE;                \
+#define DO_JROT                          \
+    if ( args[1] != 0 )                  \
+    {                                    \
+      CUR.IP      += args[0];            \
+      if ( CUR.IP < 0 )                  \
+        CUR.error = TT_Err_Bad_Argument; \
+      CUR.step_ins = FALSE;              \
     }
 
 
-#define DO_JMPR                          \
-    if ( args[0] == 0 && CUR.args == 0 ) \
-      CUR.error = TT_Err_Bad_Argument;   \
-    CUR.IP += args[0];                   \
-    if ( CUR.IP < 0 )                    \
-      CUR.error = TT_Err_Bad_Argument;   \
+#define DO_JMPR                        \
+    CUR.IP      += args[0];            \
+    if ( CUR.IP < 0 )                  \
+      CUR.error = TT_Err_Bad_Argument; \
     CUR.step_ins = FALSE;
 
 
-#define DO_JROF                            \
-    if ( args[1] == 0 )                    \
-    {                                      \
-      if ( args[0] == 0 && CUR.args == 0 ) \
-        CUR.error = TT_Err_Bad_Argument;   \
-      CUR.IP += args[0];                   \
-      if ( CUR.IP < 0 )                    \
-        CUR.error = TT_Err_Bad_Argument;   \
-      CUR.step_ins = FALSE;                \
+#define DO_JROF                          \
+    if ( args[1] == 0 )                  \
+    {                                    \
+      CUR.IP      += args[0];            \
+      if ( CUR.IP < 0 )                  \
+        CUR.error = TT_Err_Bad_Argument; \
+      CUR.step_ins = FALSE;              \
     }
 
 
@@ -4395,19 +4386,17 @@
 
     if ( L <= 0 || L > CUR.args )
     {
-      if ( CUR.pedantic_hinting )
-        CUR.error = TT_Err_Invalid_Reference;
+      CUR.error = TT_Err_Invalid_Reference;
+      return;
     }
-    else
-    {
-      K = CUR.stack[CUR.args - L];
 
-      FT_ARRAY_MOVE( &CUR.stack[CUR.args - L    ],
-                     &CUR.stack[CUR.args - L + 1],
-                     ( L - 1 ) );
+    K = CUR.stack[CUR.args - L];
 
-      CUR.stack[CUR.args - 1] = K;
-    }
+    FT_ARRAY_MOVE( &CUR.stack[CUR.args - L    ],
+                   &CUR.stack[CUR.args - L + 1],
+                   ( L - 1 ) );
+
+    CUR.stack[CUR.args - 1] = K;
   }
 
 
@@ -5050,8 +5039,12 @@
     if ( BOUNDSL( L, CUR.zp2.n_points ) )
     {
       if ( CUR.pedantic_hinting )
+      {
         CUR.error = TT_Err_Invalid_Reference;
-      R = 0;
+        return;
+      }
+      else
+        R = 0;
     }
     else
     {
@@ -5131,7 +5124,10 @@
          BOUNDS( K, CUR.zp1.n_points ) )
     {
       if ( CUR.pedantic_hinting )
+      {
         CUR.error = TT_Err_Invalid_Reference;
+        return;
+      }
       D = 0;
     }
     else
@@ -5469,9 +5465,8 @@
 
     if ( CUR.top < CUR.GS.loop )
     {
-      if ( CUR.pedantic_hinting )
-        CUR.error = TT_Err_Too_Few_Arguments;
-      goto Fail;
+      CUR.error = TT_Err_Too_Few_Arguments;
+      return;
     }
 
     while ( CUR.GS.loop > 0 )
@@ -5494,7 +5489,6 @@
       CUR.GS.loop--;
     }
 
-  Fail:
     CUR.GS.loop = 1;
     CUR.new_top = CUR.args;
   }
@@ -5682,9 +5676,8 @@
 
     if ( CUR.top < CUR.GS.loop )
     {
-      if ( CUR.pedantic_hinting )
-        CUR.error = TT_Err_Invalid_Reference;
-      goto Fail;
+      CUR.error = TT_Err_Invalid_Reference;
+      return;
     }
 
     if ( COMPUTE_Point_Displacement( &dx, &dy, &zp, &refp ) )
@@ -5710,7 +5703,6 @@
       CUR.GS.loop--;
     }
 
-  Fail:
     CUR.GS.loop = 1;
     CUR.new_top = CUR.args;
   }
@@ -5845,9 +5837,8 @@
 
     if ( CUR.top < CUR.GS.loop + 1 )
     {
-      if ( CUR.pedantic_hinting )
-        CUR.error = TT_Err_Invalid_Reference;
-      goto Fail;
+      CUR.error = TT_Err_Invalid_Reference;
+      return;
     }
 
 #ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
@@ -5891,7 +5882,6 @@
       CUR.GS.loop--;
     }
 
-  Fail:
     CUR.GS.loop = 1;
     CUR.new_top = CUR.args;
   }
@@ -6006,7 +5996,7 @@
     {
       if ( CUR.pedantic_hinting )
         CUR.error = TT_Err_Invalid_Reference;
-      goto Fail;
+      return;
     }
 
     /* XXX: UNDOCUMENTED!                                */
@@ -6052,7 +6042,6 @@
 
     CUR_Func_move( &CUR.zp0, point, distance - org_dist );
 
-  Fail:
     CUR.GS.rp0 = point;
     CUR.GS.rp1 = point;
   }
@@ -6078,7 +6067,7 @@
     {
       if ( CUR.pedantic_hinting )
         CUR.error = TT_Err_Invalid_Reference;
-      goto Fail;
+      return;
     }
 
     /* XXX: Is there some undocumented feature while in the */
@@ -6163,7 +6152,6 @@
 
     CUR_Func_move( &CUR.zp1, point, distance - org_dist );
 
-  Fail:
     CUR.GS.rp1 = CUR.GS.rp0;
     CUR.GS.rp2 = point;
 
@@ -6201,7 +6189,7 @@
     {
       if ( CUR.pedantic_hinting )
         CUR.error = TT_Err_Invalid_Reference;
-      goto Fail;
+      return;
     }
 
     if ( !cvtEntry )
@@ -6256,22 +6244,8 @@
       /*      refer to the same zone.                                  */
 
       if ( CUR.GS.gep0 == CUR.GS.gep1 )
-      {
-        /* XXX: According to Greg Hitchcock, the following wording is */
-        /*      the right one:                                        */
-        /*                                                            */
-        /*        When the absolute difference between the value in   */
-        /*        the table [CVT] and the measurement directly from   */
-        /*        the outline is _greater_ than the cut_in value, the */
-        /*        outline measurement is used.                        */
-        /*                                                            */
-        /*      This is from `instgly.doc'.  The description in       */
-        /*      `ttinst2.doc', version 1.66, is thus incorrect since  */
-        /*      it implies `>=' instead of `>'.                       */
-
-        if ( FT_ABS( cvt_dist - org_dist ) > CUR.GS.control_value_cutin )
+        if ( FT_ABS( cvt_dist - org_dist ) >= CUR.GS.control_value_cutin )
           cvt_dist = org_dist;
-      }
 
       distance = CUR_Func_round(
                    cvt_dist,
@@ -6300,7 +6274,6 @@
 
     CUR_Func_move( &CUR.zp1, point, distance - cur_dist );
 
-  Fail:
     CUR.GS.rp1 = CUR.GS.rp0;
 
     if ( ( CUR.opcode & 16 ) != 0 )
@@ -6331,7 +6304,7 @@
     {
       if ( CUR.pedantic_hinting )
         CUR.error = TT_Err_Invalid_Reference;
-      goto Fail;
+      return;
     }
 
     while ( CUR.GS.loop > 0 )
@@ -6359,7 +6332,6 @@
       CUR.GS.loop--;
     }
 
-  Fail:
     CUR.GS.loop = 1;
     CUR.new_top = CUR.args;
   }
@@ -6501,9 +6473,8 @@
 
     if ( CUR.top < CUR.GS.loop )
     {
-      if ( CUR.pedantic_hinting )
-        CUR.error = TT_Err_Invalid_Reference;
-      goto Fail;
+      CUR.error = TT_Err_Invalid_Reference;
+      return;
     }
 
     /*
@@ -6517,7 +6488,7 @@
     {
       if ( CUR.pedantic_hinting )
         CUR.error = TT_Err_Invalid_Reference;
-      goto Fail;
+      return;
     }
 
     if ( twilight )
@@ -6582,8 +6553,6 @@
 
       CUR_Func_move( &CUR.zp2, (FT_UShort)point, new_dist - cur_dist );
     }
-
-  Fail:
     CUR.GS.loop = 1;
     CUR.new_top = CUR.args;
   }
@@ -6876,9 +6845,8 @@
 
       if ( CUR.args < n )
       {
-        if ( CUR.pedantic_hinting )
-          CUR.error = TT_Err_Too_Few_Arguments;
-        n = CUR.args;
+        CUR.error = TT_Err_Too_Few_Arguments;
+        return;
       }
 
       CUR.args -= n;
@@ -6894,10 +6862,8 @@
     {
       if ( CUR.args < 2 )
       {
-        if ( CUR.pedantic_hinting )
-          CUR.error = TT_Err_Too_Few_Arguments;
-        CUR.args = 0;
-        goto Fail;
+        CUR.error = TT_Err_Too_Few_Arguments;
+        return;
       }
 
       CUR.args -= 2;
@@ -6946,7 +6912,6 @@
           CUR.error = TT_Err_Invalid_Reference;
     }
 
-  Fail:
     CUR.new_top = CUR.args;
   }
 
@@ -6974,9 +6939,8 @@
 
       if ( CUR.args < n )
       {
-        if ( CUR.pedantic_hinting )
-          CUR.error = TT_Err_Too_Few_Arguments;
-        n = CUR.args;
+        CUR.error = TT_Err_Too_Few_Arguments;
+        return;
       }
 
       CUR.args -= n;
@@ -6991,10 +6955,8 @@
     {
       if ( CUR.args < 2 )
       {
-        if ( CUR.pedantic_hinting )
-          CUR.error = TT_Err_Too_Few_Arguments;
-        CUR.args = 0;
-        goto Fail;
+        CUR.error = TT_Err_Too_Few_Arguments;
+        return;
       }
 
       CUR.args -= 2;
@@ -7042,7 +7004,6 @@
       }
     }
 
-  Fail:
     CUR.new_top = CUR.args;
   }
 
@@ -7504,19 +7465,8 @@
       /* One can also interpret it as the index of the last argument.    */
       if ( CUR.args < 0 )
       {
-        FT_UShort  i;
-
-
-        if ( CUR.pedantic_hinting )
-        {
-          CUR.error = TT_Err_Too_Few_Arguments;
-          goto LErrorLabel_;
-        }
-
-        /* push zeroes onto the stack */
-        for ( i = 0; i < Pop_Push_Count[CUR.opcode] >> 4; i++ )
-          CUR.stack[i] = 0;
-        CUR.args = 0;
+        CUR.error = TT_Err_Too_Few_Arguments;
+        goto LErrorLabel_;
       }
 
       CUR.new_top = CUR.args + ( Pop_Push_Count[CUR.opcode] & 15 );
@@ -7553,7 +7503,7 @@
         case 0x04:  /* SFvTCA y */
         case 0x05:  /* SFvTCA x */
           {
-            FT_Short  AA, BB;
+            FT_Short AA, BB;
 
 
             AA = (FT_Short)( ( opcode & 1 ) << 14 );

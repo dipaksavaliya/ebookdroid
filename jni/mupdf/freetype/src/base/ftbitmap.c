@@ -105,7 +105,7 @@
     int             new_pitch;
     FT_UInt         bpp;
     FT_Int          i, width, height;
-    unsigned char*  buffer = NULL;
+    unsigned char*  buffer;
 
 
     width  = bitmap->width;

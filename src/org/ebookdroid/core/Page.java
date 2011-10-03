@@ -1,7 +1,6 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.R;
-import org.ebookdroid.core.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.utils.MathUtils;
@@ -37,9 +36,9 @@ public class Page {
         nodes = new PageTree(this);
     }
 
-    public void recycle(List<BitmapRef> bitmapsToRecycle) {
+    public void recycle() {
         recycled = true;
-        nodes.recycle(bitmapsToRecycle);
+        nodes.recycle();
     }
 
     public boolean draw(final Canvas canvas, final ViewState viewState) {
@@ -99,16 +98,16 @@ public class Page {
         bounds = pageBounds;
     }
 
-    public boolean onZoomChanged(final float oldZoom, final ViewState viewState, final List<PageTreeNode> nodesToDecode, List<BitmapRef> bitmapsToRecycle) {
+    public boolean onZoomChanged(final float oldZoom, final ViewState viewState, final List<PageTreeNode> nodesToDecode) {
         if (!recycled) {
-            return nodes.root.onZoomChanged(oldZoom, viewState, viewState.getBounds(this), nodesToDecode, bitmapsToRecycle);
+            return nodes.root.onZoomChanged(oldZoom, viewState, viewState.getBounds(this), nodesToDecode);
         }
         return false;
     }
 
-    public boolean onPositionChanged(final ViewState viewState, final List<PageTreeNode> nodesToDecode, List<BitmapRef> bitmapsToRecycle) {
+    public boolean onPositionChanged(final ViewState viewState, final List<PageTreeNode> nodesToDecode) {
         if (!recycled) {
-            return nodes.root.onPositionChanged(viewState, viewState.getBounds(this), nodesToDecode, bitmapsToRecycle);
+            return nodes.root.onPositionChanged(viewState, viewState.getBounds(this), nodesToDecode);
         }
         return false;
     }

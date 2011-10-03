@@ -4,7 +4,8 @@
 /*                                                                         */
 /*    Objects manager (body).                                              */
 /*                                                                         */
-/*  Copyright 1996-2011                                                    */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,   */
+/*            2010 by                                                      */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -213,18 +214,16 @@
   tt_get_sfnt_checksum( TT_Face    face,
                         FT_UShort  i )
   {
-#if 0 /* if we believe the written value, use following part. */
     if ( face->dir_tables[i].CheckSum )
       return face->dir_tables[i].CheckSum;
-#endif
 
-    if ( !face->goto_table )
+    else if ( !face->goto_table )
       return 0;
 
-    if ( face->goto_table( face,
-                           face->dir_tables[i].Tag,
-                           face->root.stream,
-                           NULL ) )
+    else if ( !face->goto_table( face,
+                                 face->dir_tables[i].Tag,
+                                 face->root.stream,
+                                 NULL ) )
       return 0;
 
     return (FT_ULong)tt_synth_sfnt_checksum( face->root.stream,
@@ -244,7 +243,7 @@
   tt_check_trickyness_sfnt_ids( TT_Face  face )
   {
 #define TRICK_SFNT_IDS_PER_FACE   3
-#define TRICK_SFNT_IDS_NUM_FACES  13
+#define TRICK_SFNT_IDS_NUM_FACES  5
 
     static const tt_sfnt_id_rec sfnt_id[TRICK_SFNT_IDS_NUM_FACES]
                                        [TRICK_SFNT_IDS_PER_FACE] = {
@@ -277,61 +276,16 @@
         { 0xfffbfffc, 0x00000008 }, /* cvt  */
         { 0x0a5a0483, 0x00017c39 }, /* fpgm */
         { 0x70020112, 0x00000008 }  /* prep */
-      },
-      { /* NEC fadpop7.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x40c92555, 0x000000e5 }, /* fpgm */
-        { 0xa39b58e3, 0x0000117c }  /* prep */
-      },
-      { /* NEC fadrei5.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x33c41652, 0x000000e5 }, /* fpgm */
-        { 0x26d6c52a, 0x00000f6a }  /* prep */
-      },
-      { /* NEC fangot7.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x6db1651d, 0x0000019d }, /* fpgm */
-        { 0x6c6e4b03, 0x00002492 }  /* prep */
-      },
-      { /* NEC fangyo5.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x40c92555, 0x000000e5 }, /* fpgm */
-        { 0xde51fad0, 0x0000117c }  /* prep */
-      },
-      { /* NEC fankyo5.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x85e47664, 0x000000e5 }, /* fpgm */
-        { 0xa6c62831, 0x00001caa }  /* prep */
-      },
-      { /* NEC fanrgo5.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x2d891cfd, 0x0000019d }, /* fpgm */
-        { 0xa0604633, 0x00001de8 }  /* prep */
-      },
-      { /* NEC fangot5.ttc */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x40aa774c, 0x000001cb }, /* fpgm */
-        { 0x9b5caa96, 0x00001f9a }  /* prep */
-      },
-      { /* NEC fanmin3.ttc */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x0d3de9cb, 0x00000141 }, /* fpgm */
-        { 0xd4127766, 0x00002280 }  /* prep */
       }
     };
 
-    FT_ULong   checksum;
-    int        num_matched_ids[TRICK_SFNT_IDS_NUM_FACES];
-    FT_Bool    has_cvt, has_fpgm, has_prep;
-    FT_UShort  i;
-    int        j, k;
+    FT_ULong  checksum;
+    int       num_matched_ids[TRICK_SFNT_IDS_NUM_FACES];
+    int       i, j, k;
 
 
     FT_MEM_SET( num_matched_ids, 0,
                 sizeof( int ) * TRICK_SFNT_IDS_NUM_FACES );
-    has_cvt  = FALSE;
-    has_fpgm = FALSE;
-    has_prep = FALSE;
 
     for ( i = 0; i < face->num_tables; i++ )
     {
@@ -341,17 +295,14 @@
       {
       case TTAG_cvt:
         k = TRICK_SFNT_ID_cvt;
-        has_cvt  = TRUE;
         break;
 
       case TTAG_fpgm:
         k = TRICK_SFNT_ID_fpgm;
-        has_fpgm = TRUE;
         break;
 
       case TTAG_prep:
         k = TRICK_SFNT_ID_prep;
-        has_prep = TRUE;
         break;
 
       default:
@@ -372,18 +323,6 @@
         }
     }
 
-    for ( j = 0; j < TRICK_SFNT_IDS_NUM_FACES; j++ )
-    {
-      if ( !has_cvt  && !sfnt_id[j][TRICK_SFNT_ID_cvt].Length )
-        num_matched_ids[j] ++;
-      if ( !has_fpgm && !sfnt_id[j][TRICK_SFNT_ID_fpgm].Length )
-        num_matched_ids[j] ++;
-      if ( !has_prep && !sfnt_id[j][TRICK_SFNT_ID_prep].Length )
-        num_matched_ids[j] ++;
-      if ( num_matched_ids[j] == TRICK_SFNT_IDS_PER_FACE )
-        return TRUE;
-    }
-
     return FALSE;
   }
 
@@ -394,10 +333,14 @@
     if ( !face )
       return FALSE;
 
-    /* For first, check the face name for quick check. */
-    if ( face->family_name                               &&
-         tt_check_trickyness_family( face->family_name ) )
-      return TRUE;
+    /* First, check the face name. */
+    if ( face->family_name )
+    {
+      if ( tt_check_trickyness_family( face->family_name ) )
+        return TRUE;
+      else
+        return FALSE;
+    }
 
     /* Type42 fonts may lack `name' tables, we thus try to identify */
     /* tricky fonts by checking the checksums of Type42-persistent  */
@@ -406,54 +349,6 @@
       return TRUE;
 
     return FALSE;
-  }
-
-
-  /* Check whether `.notdef' is the only glyph in the `loca' table. */
-  static FT_Bool
-  tt_check_single_notdef( FT_Face  ttface )
-  {
-    FT_Bool   result = FALSE;
-
-    TT_Face   face = (TT_Face)ttface;
-    FT_UInt   asize;
-    FT_ULong  i;
-    FT_ULong  glyph_index = 0;
-    FT_UInt   count       = 0;
-
-
-    for( i = 0; i < face->num_locations; i++ )
-    {
-      tt_face_get_location( face, i, &asize );
-      if ( asize > 0 )
-      {
-        count += 1;
-        if ( count > 1 )
-          break;
-        glyph_index = i;
-      }
-    }
-
-    /* Only have a single outline. */
-    if ( count == 1 )
-    {
-      if ( glyph_index == 0 )
-        result = TRUE;
-      else
-      {
-        /* FIXME: Need to test glyphname == .notdef ? */
-        FT_Error error;
-        char buf[8];
-
-
-        error = FT_Get_Glyph_Name( ttface, glyph_index, buf, 8 );
-        if ( !error                                            &&
-             buf[0] == '.' && !ft_strncmp( buf, ".notdef", 8 ) )
-          result = TRUE;
-      }
-    }
-
-    return result;
   }
 
 
@@ -552,20 +447,6 @@
       if ( !error )
         error = tt_face_load_prep( face, stream );
 
-      /* Check the scalable flag based on `loca'. */
-      if ( !ttface->internal->incremental_interface &&
-           ttface->num_fixed_sizes                  &&
-           face->glyph_locations                    &&
-           tt_check_single_notdef( ttface )         )
-      {
-        FT_TRACE5(( "tt_face_init:"
-                    " Only the `.notdef' glyph has an outline.\n"
-                    "             "
-                    " Resetting scalable flag to FALSE.\n" ));
-
-        ttface->face_flags &= ~FT_FACE_FLAG_SCALABLE;
-      }
-
 #else
 
       if ( !error )
@@ -576,19 +457,6 @@
         error = tt_face_load_fpgm( face, stream );
       if ( !error )
         error = tt_face_load_prep( face, stream );
-
-      /* Check the scalable flag based on `loca'. */
-      if ( ttface->num_fixed_sizes          &&
-           face->glyph_locations            &&
-           tt_check_single_notdef( ttface ) )
-      {
-        FT_TRACE5(( "tt_face_init:"
-                    " Only the `.notdef' glyph has an outline.\n"
-                    "             "
-                    " Resetting scalable flag to FALSE.\n" ));
-
-        ttface->face_flags &= ~FT_FACE_FLAG_SCALABLE;
-      }
 
 #endif
 
@@ -702,16 +570,13 @@
   /*    Run the font program.                                              */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    size     :: A handle to the size object.                           */
-  /*                                                                       */
-  /*    pedantic :: Set if bytecode execution should be pedantic.          */
+  /*    size :: A handle to the size object.                               */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  tt_size_run_fpgm( TT_Size  size,
-                    FT_Bool  pedantic )
+  tt_size_run_fpgm( TT_Size  size )
   {
     TT_Face         face = (TT_Face)size->root.face;
     TT_ExecContext  exec;
@@ -729,17 +594,15 @@
 
     TT_Load_Context( exec, face, size );
 
-    exec->callTop = 0;
-    exec->top     = 0;
+    exec->callTop   = 0;
+    exec->top       = 0;
 
     exec->period    = 64;
     exec->phase     = 0;
     exec->threshold = 0;
 
     exec->instruction_trap = FALSE;
-    exec->F_dot_P          = 0x10000L;
-
-    exec->pedantic_hinting = pedantic;
+    exec->F_dot_P = 0x10000L;
 
     {
       FT_Size_Metrics*  metrics    = &exec->metrics;
@@ -796,16 +659,13 @@
   /*    Run the control value program.                                     */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    size     :: A handle to the size object.                           */
-  /*                                                                       */
-  /*    pedantic :: Set if bytecode execution should be pedantic.          */
+  /*    size :: A handle to the size object.                               */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  tt_size_run_prep( TT_Size  size,
-                    FT_Bool  pedantic )
+  tt_size_run_prep( TT_Size  size )
   {
     TT_Face         face = (TT_Face)size->root.face;
     TT_ExecContext  exec;
@@ -827,8 +687,6 @@
     exec->top     = 0;
 
     exec->instruction_trap = FALSE;
-
-    exec->pedantic_hinting = pedantic;
 
     TT_Set_CodeRange( exec,
                       tt_coderange_cvt,
@@ -908,8 +766,7 @@
   /* Initialize bytecode-related fields in the size object.       */
   /* We do this only if bytecode interpretation is really needed. */
   static FT_Error
-  tt_size_init_bytecode( FT_Size  ftsize,
-                         FT_Bool  pedantic )
+  tt_size_init_bytecode( FT_Size  ftsize )
   {
     FT_Error   error;
     TT_Size    size = (TT_Size)ftsize;
@@ -982,7 +839,7 @@
     }
 
     /* Fine, now run the font program! */
-    error = tt_size_run_fpgm( size, pedantic );
+    error = tt_size_run_fpgm( size );
 
   Exit:
     if ( error )
@@ -993,15 +850,14 @@
 
 
   FT_LOCAL_DEF( FT_Error )
-  tt_size_ready_bytecode( TT_Size  size,
-                          FT_Bool  pedantic )
+  tt_size_ready_bytecode( TT_Size  size )
   {
     FT_Error  error = TT_Err_Ok;
 
 
     if ( !size->bytecode_ready )
     {
-      error = tt_size_init_bytecode( (FT_Size)size, pedantic );
+      error = tt_size_init_bytecode( (FT_Size)size );
       if ( error )
         goto Exit;
     }
@@ -1033,7 +889,7 @@
 
       size->GS = tt_default_graphics_state;
 
-      error = tt_size_run_prep( size, pedantic );
+      error = tt_size_run_prep( size );
       if ( !error )
         size->cvt_ready = 1;
     }
