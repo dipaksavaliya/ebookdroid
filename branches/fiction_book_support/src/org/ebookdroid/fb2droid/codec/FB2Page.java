@@ -153,4 +153,9 @@ public class FB2Page implements CodecPage {
         page.commit();
         return page;
     }
+
+    @Override
+    public boolean isRecycled() {
+        return false;
+    }
 }

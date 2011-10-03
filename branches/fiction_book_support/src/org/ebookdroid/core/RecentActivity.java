@@ -314,20 +314,24 @@ public class RecentActivity extends Activity implements IBrowserActivity, ISetti
             if (thumbnailFile.exists()) {
 
                 Bitmap tmpbmp = BitmapFactory.decodeFile(thumbnailFile.getPath());
-                int width = tmpbmp.getWidth() + 33;
-                int height = tmpbmp.getHeight() + 23;
-                bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-                bmp.eraseColor(Color.TRANSPARENT);
-
-                Canvas c = new Canvas(bmp);
-
-                c.drawBitmap(cornerThmbBitmap, null, new Rect(0, 0, 33, 23), null);
-                c.drawBitmap(topThmbBitmap, null, new Rect(33, 0, width, 23), null);
-                c.drawBitmap(leftThmbBitmap, null, new Rect(0, 23, 33, height), null);
-                c.drawBitmap(tmpbmp, null, new Rect(33, 23, width, height), null);
-
-                thumbnails.put(md5, new SoftReference<Bitmap>(bmp));
+                if (tmpbmp == null) {
+                    thumbnailFile.delete();
+                } else {
+                    int width = tmpbmp.getWidth() + 33;
+                    int height = tmpbmp.getHeight() + 23;
+                    bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    
+                    bmp.eraseColor(Color.TRANSPARENT);
+    
+                    Canvas c = new Canvas(bmp);
+    
+                    c.drawBitmap(cornerThmbBitmap, null, new Rect(0, 0, 33, 23), null);
+                    c.drawBitmap(topThmbBitmap, null, new Rect(33, 0, width, 23), null);
+                    c.drawBitmap(leftThmbBitmap, null, new Rect(0, 23, 33, height), null);
+                    c.drawBitmap(tmpbmp, null, new Rect(33, 23, width, height), null);
+    
+                    thumbnails.put(md5, new SoftReference<Bitmap>(bmp));
+                }
             }
         }
 

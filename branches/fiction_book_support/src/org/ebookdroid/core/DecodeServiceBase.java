@@ -8,6 +8,7 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.log.EmergencyHandler;
 import org.ebookdroid.core.log.LogContext;
+import org.ebookdroid.core.settings.SettingsManager;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -21,6 +22,7 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +34,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DecodeServiceBase implements DecodeService {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding");
-
-    static final int PAGE_POOL_SIZE = 16;
 
     static final AtomicLong TASK_ID_SEQ = new AtomicLong();
 
@@ -53,12 +53,16 @@ public class DecodeServiceBase implements DecodeService {
 
         @Override
         protected boolean removeEldestEntry(final Map.Entry<Integer, SoftReference<CodecPage>> eldest) {
-            if (this.size() > PAGE_POOL_SIZE) {
+            if (this.size() > SettingsManager.getAppSettings().getPagesInMemory() + 1) {
                 final SoftReference<CodecPage> value = eldest != null ? eldest.getValue() : null;
                 final CodecPage codecPage = value != null ? value.get() : null;
-                if (codecPage != null) {
+                if (codecPage == null || codecPage.isRecycled()) {
                     if (LCTX.isDebugEnabled()) {
-                        LCTX.d("Recycling old page: " + codecPage);
+                        LCTX.d("Remove auto-recycled codec page reference: " + eldest.getKey());
+                    }
+                } else {
+                    if (LCTX.isDebugEnabled()) {
+                        LCTX.d("Recycle and remove old codec page: " + eldest.getKey());
                     }
                     codecPage.recycle();
                 }
@@ -144,9 +148,10 @@ public class DecodeServiceBase implements DecodeService {
             finishDecoding(task, vuPage, bitmap, r);
         } catch (final OutOfMemoryError ex) {
             LCTX.e("Task " + task.id + ": No memory to decode " + task.node);
-            for (int i = 0; i < PAGE_POOL_SIZE; i++) {
+            for (int i = 0; i <= SettingsManager.getAppSettings().getPagesInMemory(); i++) {
                 pages.put(Integer.MAX_VALUE - i, null);
             }
+            pages.clear();
             vuPage.recycle();
             abortDecoding(task, null, null);
         } catch (final Throwable th) {
@@ -198,15 +203,31 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     CodecPage getPage(final int pageIndex) {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Codec pages in cache: " + pages.size());
+        }
+        for (Iterator<Map.Entry<Integer, SoftReference<CodecPage>>> i = pages.entrySet().iterator(); i.hasNext();) {
+            Map.Entry<Integer, SoftReference<CodecPage>> entry = i.next();
+            int index = entry.getKey();
+            SoftReference<CodecPage> ref = entry.getValue();
+            CodecPage page = ref != null ? ref.get() : null;
+            if (page == null || page.isRecycled()) {
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d("Remove auto-recycled codec page reference: " + index);
+                }
+                i.remove();
+            }
+        }
+
         final SoftReference<CodecPage> ref = pages.get(pageIndex);
         CodecPage page = ref != null ? ref.get() : null;
-        if (page == null) {
+        if (page == null || page.isRecycled()) {
             // Cause native recycling last used page if page cache is full now
             // before opening new native page
             pages.put(pageIndex, null);
             page = document.getPage(pageIndex);
-            pages.put(pageIndex, new SoftReference<CodecPage>(page));
         }
+        pages.put(pageIndex, new SoftReference<CodecPage>(page));
         return page;
     }
 
@@ -387,6 +408,7 @@ public class DecodeServiceBase implements DecodeService {
                                 page.recycle();
                             }
                         }
+                        pages.clear();
                         if (document != null) {
                             document.recycle();
                         }
@@ -514,8 +536,6 @@ public class DecodeServiceBase implements DecodeService {
             bmp = page.renderBitmap(width, height, new RectF(0, 0, 1, 1));
             thumbnail = bmp.getBitmap();
         }
-        
-        
 
         FileOutputStream out;
         try {
@@ -525,9 +545,7 @@ public class DecodeServiceBase implements DecodeService {
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
         } finally {
-            if (bmp != null) {
-                BitmapManager.release(bmp);
-            }
+            BitmapManager.release(bmp);
         }
     }
 
@@ -535,5 +553,4 @@ public class DecodeServiceBase implements DecodeService {
     public boolean isPageSizeCacheable() {
         return codecContext.isPageSizeCacheable();
     }
-
 }

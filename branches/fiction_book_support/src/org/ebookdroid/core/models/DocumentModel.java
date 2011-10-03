@@ -127,6 +127,11 @@ public class DocumentModel extends CurrentPageModel {
         recyclePages();
 
         final BookSettings bs = SettingsManager.getBookSettings();
+
+        if (base == null || base.getView() == null || bs == null) {
+            return;
+        }
+
         final View view = base.getView();
 
         final CodecPageInfo defCpi = new CodecPageInfo();
