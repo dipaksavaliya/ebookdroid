@@ -80,26 +80,25 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    protected final void verticalConfigScroll(final int direction) {
+    public final void verticalConfigScroll(final int direction) {
         final int scrollheight = SettingsManager.getAppSettings().getScrollHeight();
         final int dy = (int) (direction * getHeight() * (scrollheight / 100.0));
 
         getScroller().startScroll(getScrollX(), getScrollY(), 0, dy);
-        scrollBy(0, dy);
 
         redrawView();
     }
 
     @Override
-    protected final void verticalDpadScroll(final int direction) {
+    public final void verticalDpadScroll(final int direction) {
         final int dy = direction * getHeight() / 2;
 
         getScroller().startScroll(getScrollX(), getScrollY(), 0, dy);
-        scrollBy(0, dy);
 
         redrawView();
     }
 
+    
     @Override
     protected final Rect getScrollLimits() {
         final int width = getWidth();
@@ -115,6 +114,9 @@ public class ContiniousDocumentView extends AbstractDocumentView {
 
     @Override
     public synchronized final void drawView(final Canvas canvas, final ViewState viewState) {
+        if(scroller.computeScrollOffset()) {
+            scrollTo(scroller.getCurrX(), scroller.getCurrY());
+        }
         final DocumentModel dm = getBase().getDocumentModel();
         for (int i = viewState.firstVisible; i <= viewState.lastVisible; i++) {
             final Page page = dm.getPageObject(i);

@@ -351,40 +351,9 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     }
 
-    @Override
-    public final boolean dispatchKeyEvent(final KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_DPAD_DOWN:
-                    verticalDpadScroll(1);
-                    return true;
-                case KeyEvent.KEYCODE_DPAD_UP:
-                    verticalDpadScroll(-1);
-                    return true;
+    public abstract void verticalConfigScroll(int direction);
 
-                case KeyEvent.KEYCODE_VOLUME_UP:
-                    verticalConfigScroll(-1);
-                    return true;
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-                    verticalConfigScroll(1);
-                    return true;
-            }
-        }
-        if (event.getAction() == KeyEvent.ACTION_UP) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_DPAD_DOWN:
-                case KeyEvent.KEYCODE_DPAD_UP:
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-                case KeyEvent.KEYCODE_VOLUME_UP:
-                    return true;
-            }
-        }
-        return super.dispatchKeyEvent(event);
-    }
-
-    protected abstract void verticalConfigScroll(int direction);
-
-    protected abstract void verticalDpadScroll(int direction);
+    public abstract void verticalDpadScroll(int direction);
 
     protected abstract Rect getScrollLimits();
 
@@ -400,7 +369,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     @Override
-    public final void computeScroll() {
+    public void computeScroll() {
         if (getScroller().computeScrollOffset()) {
             scrollTo(getScroller().getCurrX(), getScroller().getCurrY());
         }
