@@ -106,19 +106,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         if (inZoom.get()) {
             return;
         }
-
-        Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-                final ViewState viewState = updatePageVisibility(newPage, direction, getBase().getZoomModel().getZoom());
-                redrawView(viewState);
-            }
-        };
-
-        // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
-        base.getActivity().runOnUiThread(r);
-        // r.run();
+        redrawView();
     }
 
     public final ViewState updatePageVisibility(final int newPage, final int direction, final float zoom) {
@@ -536,13 +524,28 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         @Override
         public boolean onFling(final MotionEvent e1, final MotionEvent e2, final float vX, final float vY) {
             final Rect l = getScrollLimits();
-            scroller.fling(getScrollX(), getScrollY(), -(int) vX, -(int) vY, l.left, l.right, l.top, l.bottom);
+            float x = vX, y = vY;
+            if (Math.abs(vX / vY) < 0.5) {
+                x = 0;
+            }
+            if (Math.abs(vY / vX) < 0.5) {
+                y = 0;
+            }
+            scroller.fling(getScrollX(), getScrollY(), -(int) x, -(int) y, l.left, l.right, l.top, l.bottom);
             return true;
         }
 
         @Override
         public boolean onScroll(final MotionEvent e1, final MotionEvent e2, final float distanceX, final float distanceY) {
-            scrollBy((int) distanceX, (int) distanceY);
+            float x = distanceX, y = distanceY;
+            if (Math.abs(distanceX / distanceY) < 0.5) {
+                x = 0;
+            }
+            if (Math.abs(distanceY / distanceX) < 0.5) {
+                y = 0;
+            }
+            
+            scrollBy((int) x, (int) y);
             return true;
         }
 
