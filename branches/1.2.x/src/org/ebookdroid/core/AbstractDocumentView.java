@@ -107,15 +107,19 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         if (inZoom.get()) {
             return;
         }
-        // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
-        base.getActivity().runOnUiThread(new Runnable() {
+
+        Runnable r = new Runnable() {
 
             @Override
             public void run() {
                 final ViewState viewState = updatePageVisibility(newPage, direction, getBase().getZoomModel().getZoom());
                 redrawView(viewState);
             }
-        });
+        };
+
+        // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
+        base.getActivity().runOnUiThread(r);
+        // r.run();
     }
 
     public final ViewState updatePageVisibility(final int newPage, final int direction, final float zoom) {
@@ -236,21 +240,27 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     protected ViewState onZoomChanged(final float newZoom) {
-        final ViewState viewState = calculatePageVisibility(base.getDocumentModel().getCurrentViewPageIndex(), 0,
+        final ViewState oldState = new ViewState(this);
+        final ViewState newState = calculatePageVisibility(base.getDocumentModel().getCurrentViewPageIndex(), 0,
                 newZoom);
 
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
 
-        for (final Page page : getBase().getDocumentModel().getPages()) {
-            page.onZoomChanged(initialZoom, viewState, nodesToDecode);
+        int minIndex = MathUtils.min(oldState.firstVisible, oldState.firstCached, newState.firstVisible,
+                newState.firstCached);
+        int maxIndex = MathUtils.max(oldState.lastVisible, oldState.lastCached, newState.lastVisible,
+                newState.lastCached);
+
+        for (final Page page : getBase().getDocumentModel().getPages(minIndex, maxIndex + 1)) {
+            page.onZoomChanged(initialZoom, newState, nodesToDecode);
         }
         if (!nodesToDecode.isEmpty()) {
-            decodePageTreeNodes(viewState, nodesToDecode);
+            decodePageTreeNodes(newState, nodesToDecode);
         }
 
-        LCTX.d("onZoomChanged: " + viewState + " => " + nodesToDecode.size());
+        LCTX.d("onZoomChanged: " + newState + " => " + nodesToDecode.size());
 
-        return viewState;
+        return newState;
     }
 
     @Override
@@ -326,7 +336,8 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
         scrollTo((int) ((getScrollX() + getWidth() / 2) * ratio - getWidth() / 2),
                 (int) ((getScrollY() + getHeight() / 2) * ratio - getHeight() / 2));
-        redrawView();
+
+        redrawView(onZoomChanged(newZoom));
     }
 
     @Override
@@ -351,6 +362,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     @Override
     public final boolean dispatchKeyEvent(final KeyEvent event) {
+        System.out.println(event);
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (event.getKeyCode()) {
                 case KeyEvent.KEYCODE_DPAD_DOWN:

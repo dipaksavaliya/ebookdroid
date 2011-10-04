@@ -61,8 +61,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
             return;
         }
 
-        // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
-        base.getActivity().runOnUiThread(new Runnable() {
+        Runnable r = new Runnable() {
 
             @Override
             public void run() {
@@ -75,8 +74,11 @@ public class ContiniousDocumentView extends AbstractDocumentView {
                     redrawView(viewState);
                 }
             }
-        });
+        };
 
+        // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
+        base.getActivity().runOnUiThread(r);
+        // r.run();
     }
 
     @Override
