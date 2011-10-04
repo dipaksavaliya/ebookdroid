@@ -50,6 +50,8 @@ public class FB2Document implements CodecDocument {
     private String cover;
 
     private List<OutlineLink> outline = new ArrayList<OutlineLink>();
+    
+    boolean insertSpace = true;
 
     public FB2Document(final String fileName) {
         final String encoding = getEncoding(fileName);
@@ -210,6 +212,10 @@ public class FB2Document implements CodecDocument {
                     commitPage();
                     lastPage = new FB2Page();
                     pages.add(lastPage);
+                    FB2Line ruleLine = new FB2Line();
+                    ruleLine.append(new FB2HorizontalRule(FB2Page.PAGE_WIDTH / 4, RenderingStyle.FOOTNOTE_SIZE));
+                    ruleLine.applyJustification(JustificationMode.Left);
+                    lastPage.appendNoteLine(ruleLine);
                 }
                 lastPage.appendNoteLine(l);
             }
@@ -309,7 +315,7 @@ public class FB2Document implements CodecDocument {
         FB2Line line = FB2Line.getLastLine(paragraphLines);
         int space = (int) RenderingStyle.getTextPaint(line.getHeight()).measureText(" ");
         if (line.width + 2 * FB2Page.MARGIN_X + space + le.getWidth() < FB2Page.PAGE_WIDTH) {
-            if (line.hasNonWhiteSpaces()) {
+            if (line.hasNonWhiteSpaces() && insertSpace) {
                 line.append(new FB2LineWhiteSpace(space, line.getHeight(), true));
             }
         } else {
@@ -317,6 +323,7 @@ public class FB2Document implements CodecDocument {
             paragraphLines.add(line);
         }
         line.append(le);
+        insertSpace = true;
     }
 
     public void commitParagraph() {

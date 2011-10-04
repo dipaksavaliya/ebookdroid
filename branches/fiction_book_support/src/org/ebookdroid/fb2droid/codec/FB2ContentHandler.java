@@ -31,6 +31,8 @@ public class FB2ContentHandler extends FB2BaseHandler {
     private boolean noteFirstWord = true;
     private ArrayList<FB2Line> noteLines = null;
 
+    private boolean spaceNeeded = true;
+    
     private static final Pattern notesPattern = Pattern.compile("n([0-9]+)|n_([0-9]+)");
     private final StringBuilder tmpBinaryContents = new StringBuilder(64 * 1024);
     private final StringBuilder title = new StringBuilder();
@@ -44,6 +46,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
     @Override
     public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
             throws SAXException {
+        spaceNeeded = true;
         if ("p".equals(qName)) {
             if (parsingNotes && !inTitle) {
                 parsingNotesP = true;
@@ -107,6 +110,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
             if (!parsingNotes) {
                 paragraphParsing = true;
                 markup.add(setSubtitleStyle().jm);
+                markup.add(emptyLine(crs.textSize));
                 markup.add(new FB2MarkupNewParagraph(crs.textSize));
             }
         } else if ("text-author".equals(qName)) {
@@ -152,6 +156,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
 
     @Override
     public void endElement(final String uri, final String localName, final String qName) throws SAXException {
+        spaceNeeded = true;
         if ("p".equals(qName) || "v".equals(qName)) {
             if (parsingNotesP) {
                 parsingNotesP = false;
@@ -201,6 +206,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
         } else if ("subtitle".equals(qName)) {
             if (!parsingNotes) {
                 markup.add(FB2MarkupParagraphEnd.E);
+                markup.add(emptyLine(crs.textSize));
                 markup.add(setPrevStyle().jm);
                 paragraphParsing = false;
             }
@@ -280,6 +286,10 @@ public class FB2ContentHandler extends FB2BaseHandler {
             final int count = StringUtils.split(ch, start, length, starts, lengths);
 
             if (count > 0) {
+                if (!spaceNeeded) {
+                    markup.add(new FB2MarkupNoSpace());
+                }
+                spaceNeeded = true;
                 final char[] dst = new char[length];
                 System.arraycopy(ch, start, dst, 0, length);
 
@@ -288,6 +298,11 @@ public class FB2ContentHandler extends FB2BaseHandler {
                     final int len = lengths[i];
                     markup.add(new FB2TextElement(dst, st - start, len, crs));
                 }
+                if (Character.isWhitespace(ch[start + length - 1])) {
+                    markup.add(new FB2MarkupNoSpace());
+                    markup.add(new FB2LineWhiteSpace((int) crs.getTextPaint().measureText(" "), crs.textSize, true));
+                }
+                spaceNeeded = false;
             }
         }
     }
