@@ -236,24 +236,29 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             BitmapManager.increateGeneration();
         }
 
-        final ViewState viewState = calculatePageVisibility(base.getDocumentModel().getCurrentViewPageIndex(), 0,
+        final ViewState oldState = new ViewState(this);
+        final ViewState newState = calculatePageVisibility(base.getDocumentModel().getCurrentViewPageIndex(), 0,
                 newZoom);
-
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
         final List<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
 
-        for (final Page page : getBase().getDocumentModel().getPages()) {
-            page.onZoomChanged(initialZoom, viewState, nodesToDecode, bitmapsToRecycle);
+        final int minIndex = MathUtils.min(oldState.firstVisible, oldState.firstCached, newState.firstVisible,
+                newState.firstCached);
+        final int maxIndex = MathUtils.max(oldState.lastVisible, oldState.lastCached, newState.lastVisible,
+                newState.lastCached);
+
+        for (final Page page : getBase().getDocumentModel().getPages(minIndex, maxIndex + 1)) {
+            page.onZoomChanged(initialZoom, newState, nodesToDecode, bitmapsToRecycle);
         }
         BitmapManager.release(bitmapsToRecycle);
 
         if (!nodesToDecode.isEmpty()) {
-            decodePageTreeNodes(viewState, nodesToDecode);
+            decodePageTreeNodes(newState, nodesToDecode);
         }
 
-        LCTX.d("onZoomChanged: " + viewState + " => " + nodesToDecode.size());
+        LCTX.d("onZoomChanged: " + newState + " => " + nodesToDecode.size());
 
-        return viewState;
+        return newState;
     }
 
     @Override
@@ -336,11 +341,20 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
         scrollTo((int) ((getScrollX() + getWidth() / 2) * ratio - getWidth() / 2),
                 (int) ((getScrollY() + getHeight() / 2) * ratio - getHeight() / 2));
-        redrawView();
+
+        redrawView(onZoomChanged(newZoom));
     }
 
     @Override
     public boolean onTouchEvent(final MotionEvent ev) {
+        super.onTouchEvent(ev);
+
+        try {
+            Thread.sleep(16);
+        } catch (final InterruptedException e) {
+            Thread.interrupted();
+        }
+
         if (getBase().getMultiTouchZoom() != null) {
             if (getBase().getMultiTouchZoom().onTouchEvent(ev)) {
                 return true;
@@ -359,8 +373,17 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     @Override
     public final void scrollTo(final int x, final int y) {
-        final Rect l = getScrollLimits();
-        super.scrollTo(MathUtils.adjust(x, l.left, l.right), MathUtils.adjust(y, l.top, l.bottom));
+        final Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                final Rect l = getScrollLimits();
+                AbstractDocumentView.super.scrollTo(MathUtils.adjust(x, l.left, l.right),
+                        MathUtils.adjust(y, l.top, l.bottom));
+            }
+        };
+
+        base.getActivity().runOnUiThread(r);
     }
 
     @Override
@@ -368,12 +391,12 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         return new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight());
     }
 
-    @Override
-    public void computeScroll() {
-        if (getScroller().computeScrollOffset()) {
-            scrollTo(getScroller().getCurrX(), getScroller().getCurrY());
-        }
-    }
+//    @Override
+//    public void computeScroll() {
+//        if (getScroller().computeScrollOffset()) {
+//            scrollTo(getScroller().getCurrX(), getScroller().getCurrY());
+//        }
+//    }
 
     @Override
     public void changeLayoutLock(final boolean lock) {
@@ -539,6 +562,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
                 y = 0;
             }
             scroller.fling(getScrollX(), getScrollY(), -(int) x, -(int) y, l.left, l.right, l.top, l.bottom);
+            redrawView();
             return true;
         }
 
