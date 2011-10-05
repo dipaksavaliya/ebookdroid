@@ -233,9 +233,9 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
 
-        int minIndex = MathUtils.min(oldState.firstVisible, oldState.firstCached, newState.firstVisible,
+        final int minIndex = MathUtils.min(oldState.firstVisible, oldState.firstCached, newState.firstVisible,
                 newState.firstCached);
-        int maxIndex = MathUtils.max(oldState.lastVisible, oldState.lastCached, newState.lastVisible,
+        final int maxIndex = MathUtils.max(oldState.lastVisible, oldState.lastCached, newState.lastVisible,
                 newState.lastCached);
 
         for (final Page page : getBase().getDocumentModel().getPages(minIndex, maxIndex + 1)) {
@@ -347,16 +347,27 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     }
 
+    @Override
     public abstract void verticalConfigScroll(int direction);
 
+    @Override
     public abstract void verticalDpadScroll(int direction);
 
     protected abstract Rect getScrollLimits();
 
     @Override
     public final void scrollTo(final int x, final int y) {
-        final Rect l = getScrollLimits();
-        super.scrollTo(MathUtils.adjust(x, l.left, l.right), MathUtils.adjust(y, l.top, l.bottom));
+        final Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                final Rect l = getScrollLimits();
+                AbstractDocumentView.super.scrollTo(MathUtils.adjust(x, l.left, l.right),
+                        MathUtils.adjust(y, l.top, l.bottom));
+            }
+        };
+
+        base.getActivity().runOnUiThread(r);
     }
 
     @Override
