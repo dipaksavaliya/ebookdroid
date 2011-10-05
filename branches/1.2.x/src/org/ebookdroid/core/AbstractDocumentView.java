@@ -518,6 +518,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             if (!scroller.isFinished()) { // is flinging
                 scroller.forceFinished(true); // to stop flinging on touch
             }
+            // LCTX.d("onDown(" + e + ")");
             return true;
         }
 
@@ -531,7 +532,10 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             if (Math.abs(vY / vX) < 0.5) {
                 y = 0;
             }
+            // LCTX.d("onFling(" + x + ", " + y + ")");
+            // scroller.computeScrollOffset();
             scroller.fling(getScrollX(), getScrollY(), -(int) x, -(int) y, l.left, l.right, l.top, l.bottom);
+            redrawView();
             return true;
         }
 
@@ -544,7 +548,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             if (Math.abs(distanceY / distanceX) < 0.5) {
                 y = 0;
             }
-            
+            // LCTX.d("onScroll(" + x + ", " + y + ")");
             scrollBy((int) x, (int) y);
             return true;
         }

@@ -100,7 +100,6 @@ public class ContiniousDocumentView extends AbstractDocumentView {
         redrawView();
     }
 
-    
     @Override
     protected final Rect getScrollLimits() {
         final int width = getWidth();
@@ -115,9 +114,10 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    public synchronized final void drawView(final Canvas canvas, final ViewState viewState) {
+    public synchronized final void drawView(final Canvas canvas, ViewState viewState) {
         if(scroller.computeScrollOffset()) {
             scrollTo(scroller.getCurrX(), scroller.getCurrY());
+            viewState = new ViewState(viewState, this);
         }
         final DocumentModel dm = getBase().getDocumentModel();
         for (int i = viewState.firstVisible; i <= viewState.lastVisible; i++) {
@@ -126,7 +126,6 @@ public class ContiniousDocumentView extends AbstractDocumentView {
                 page.draw(canvas, viewState);
             }
         }
-        // setCurrentPageByFirstVisible();
     }
 
     @Override
