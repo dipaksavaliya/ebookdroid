@@ -376,13 +376,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     @Override
-    public final void computeScroll() {
-        if (getScroller().computeScrollOffset()) {
-            scrollTo(getScroller().getCurrX(), getScroller().getCurrY());
-        }
-    }
-
-    @Override
     public void changeLayoutLock(final boolean lock) {
         layoutLocked = lock;
     }
