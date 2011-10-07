@@ -283,20 +283,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     @Override
-    public final void showDocument() {
-        Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-                init();
-                onZoomChanged(base.getZoomModel().getZoom());
-            }
-        };
-        // use post to ensure that document view has width and height before decoding begin
-        base.getActivity().runOnUiThread(r);
-    }
-
-    @Override
     public final void goToPage(final int toPage) {
         if (isInitialized) {
             goToPageImpl(toPage);
@@ -390,6 +376,9 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     protected boolean onLayoutChanged(final boolean changed, final int left, final int top, final int right,
             final int bottom) {
+        if (!isInitialized) {
+            init();
+        }
         if (changed && !layoutLocked) {
             if (isInitialized) {
                 for (final Page page : base.getDocumentModel().getPages()) {

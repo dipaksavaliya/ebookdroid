@@ -269,8 +269,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         documentController.getView().setLayoutParams(
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 
-        documentController.showDocument();
-
         frameLayout.removeView(getZoomControls());
         frameLayout.addView(documentController.getView());
         frameLayout.addView(getZoomControls());
