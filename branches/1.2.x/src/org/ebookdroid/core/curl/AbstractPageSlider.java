@@ -77,9 +77,9 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
             }
             bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
         }
-        final PagePaint paint = !(viewState.nightMode) ? PagePaint.NIGHT : PagePaint.DAY;
 
-        bitmap.eraseColor(paint.fillPaint.getColor());
+        final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+        bitmap.eraseColor(paint.backgroundFillPaint.getColor());
 
         return bitmap;
     }
