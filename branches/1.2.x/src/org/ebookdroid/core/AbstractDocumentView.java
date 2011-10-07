@@ -284,15 +284,16 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     @Override
     public final void showDocument() {
-        // use post to ensure that document view has width and height before decoding begin
-        post(new Runnable() {
+        Runnable r = new Runnable() {
 
             @Override
             public void run() {
                 init();
                 onZoomChanged(base.getZoomModel().getZoom());
             }
-        });
+        };
+        // use post to ensure that document view has width and height before decoding begin
+        base.getActivity().runOnUiThread(r);
     }
 
     @Override

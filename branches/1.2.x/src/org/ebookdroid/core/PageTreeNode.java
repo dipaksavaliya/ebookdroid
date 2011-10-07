@@ -91,10 +91,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
         if (getBitmap() == null) {
             decodePageTreeNode(nodesToDecode);
-        } else if (!viewState.isNodeVisible(this, pageBounds)) {
-            if (viewState.decodeMode == DecodeMode.LOW_MEMORY) {
-                holder.clearDirectRef();
-            }
         }
         return true;
     }
@@ -129,10 +125,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
         if (getBitmap() == null) {
             decodePageTreeNode(nodesToDecode);
-        } else if (!viewState.isNodeVisible(this, pageBounds)) {
-            if (viewState.decodeMode == DecodeMode.LOW_MEMORY) {
-                holder.clearDirectRef();
-            }
         }
         return true;
     }
