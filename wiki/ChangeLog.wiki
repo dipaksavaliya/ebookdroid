@@ -40,7 +40,7 @@
 
 ===Impoved book formats support===
  * DJVU, PDF: native bitmap memory support added
- * DJVU: decoding into 16 bit color space supppord added
+ * DJVU: decoding into 16 bit color space suppport added
 
 ===Configuration and settings===
  * "Load recent book on start" preference added into UI settings
