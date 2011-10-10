@@ -501,6 +501,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
         @Override
         public boolean onDoubleTap(final MotionEvent e) {
+            // LCTX.d("onDoubleTap(" + e + ")");
             if (SettingsManager.getAppSettings().getZoomByDoubleTap()) {
                 getBase().getZoomModel().toggleZoomControls();
             }
@@ -527,7 +528,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
                 y = 0;
             }
             // LCTX.d("onFling(" + x + ", " + y + ")");
-            // scroller.computeScrollOffset();
             scroller.fling(getScrollX(), getScrollY(), -(int) x, -(int) y, l.left, l.right, l.top, l.bottom);
             redrawView();
             return true;
@@ -547,8 +547,15 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             return true;
         }
 
+//        @Override
+//        public boolean onSingleTapUp(final MotionEvent e) {
+//            LCTX.d("onSingleTapUp(" + e + ")");
+//            return false;
+//        }
+
         @Override
-        public boolean onSingleTapUp(final MotionEvent e) {
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            // LCTX.d("onSingleTapConfirmed(" + e + ")");
             float ts;
             if (SettingsManager.getAppSettings().getTapScroll()) {
                 final int tapsize = SettingsManager.getAppSettings().getTapSize();
