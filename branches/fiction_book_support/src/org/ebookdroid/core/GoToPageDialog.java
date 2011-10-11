@@ -233,6 +233,9 @@ public class GoToPageDialog extends Dialog {
             text.setText(b.getName());
 
             final ProgressBar bar = (ProgressBar) itemView.findViewById(R.id.bookmarkPage);
+            bar.setProgress(1);
+            bar.setProgressDrawable(base.getActivity().getResources().getDrawable(R.drawable.progress));
+            
             bar.setMax(base.getDocumentModel().getPageCount() - 1);
             bar.setProgress(b.getPage().viewIndex);
 
