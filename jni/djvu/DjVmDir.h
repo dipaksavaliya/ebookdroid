@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: DjVmDir.h,v 1.14 2007/07/29 16:23:51 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -109,7 +112,8 @@
 
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
-*/
+    @version
+    #$Id: DjVmDir.h,v 1.14 2007/07/29 16:23:51 leonb Exp $# */
 //@{
 
 

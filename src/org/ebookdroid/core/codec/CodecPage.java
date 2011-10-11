@@ -1,7 +1,6 @@
 package org.ebookdroid.core.codec;
 
-import org.ebookdroid.core.bitmaps.BitmapRef;
-
+import android.graphics.Bitmap;
 import android.graphics.RectF;
 
 public interface CodecPage {
@@ -10,7 +9,7 @@ public interface CodecPage {
 
     int getHeight();
 
-    BitmapRef renderBitmap(int width, int height, RectF pageSliceBounds);
+    Bitmap renderBitmap(int width, int height, RectF pageSliceBounds);
 
     void recycle();
 

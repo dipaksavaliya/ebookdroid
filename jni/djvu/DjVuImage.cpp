@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: DjVuImage.cpp,v 1.17 2008/08/06 04:40:41 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -665,7 +668,7 @@ DjVuImage::get_bitmap(const GRect &rect,
 
 GP<GPixmap>
 DjVuImage::get_bg_pixmap(const GRect &rect, 
-                         int subsample, double gamma, GPixel white) const
+                         int subsample, double gamma) const
 {
   GP<GPixmap> pm = 0;
   // Access image size
@@ -749,9 +752,8 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
           ps.scale(xrect, *ipm, rect, *pm);
         }
       // Apply gamma correction
-      if (pm)
-        if (gamma_correction!=1.0 || white != GPixel::WHITE)
-          pm->color_correct(gamma_correction, white);
+      if (pm && gamma_correction!=1.0)
+        pm->color_correct(gamma_correction);
       return pm;
     }
 
@@ -794,9 +796,8 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
           ps.scale(xrect, *bgpm, rect, *pm);
         }
       // Apply gamma correction
-      if (pm)
-        if (gamma_correction!=1.0 || white != GPixel::WHITE)
-          pm->color_correct(gamma_correction, white);
+      if (pm && gamma_correction!=1.0)
+        pm->color_correct(gamma_correction);
       return pm;
     }
 
@@ -805,16 +806,10 @@ DjVuImage::get_bg_pixmap(const GRect &rect,
 }
 
 
-GP<GPixmap>
-DjVuImage::get_bg_pixmap(const GRect &rect, int subsample, double gamma) const
-{
-  return get_bg_pixmap(rect, subsample, gamma, GPixel::WHITE);
-}
-
 
 int  
 DjVuImage::stencil(GPixmap *pm, const GRect &rect,
-		   int subsample, double gamma, GPixel white) const
+		   int subsample, double gamma) const
 {
   // Warping and blending. 
   if (!pm)
@@ -862,8 +857,8 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
           if (pshape.bits &&
               pblit->left <= rect.xmax * subsample &&
               pblit->bottom <= rect.ymax * subsample &&
-              pblit->left+(int)pshape.bits->columns() >= rect.xmin*subsample &&
-              pblit->bottom+(int)pshape.bits->rows() >= rect.ymin*subsample )
+              pblit->left + (int)pshape.bits->columns() >= rect.xmin * subsample &&
+              pblit->bottom + (int)pshape.bits->rows() >= rect.ymin * subsample )
             {
               // Record component list
               if (fgbc) components.append(blitno);
@@ -891,7 +886,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
       GTArray<GPixel> colors(0,palettesize-1);
       for (int i=0; i<palettesize; i++)
         fg->index_to_color(i, colors[i]);
-      GPixmap::color_correct(gamma_correction, white, colors, palettesize);
+      GPixmap::color_correct(gamma_correction, colors, palettesize);
       // Blit all components (one color at a time)
       while (components.size() > 0)
         {
@@ -943,8 +938,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
                        subsample);
             }
           // Blend color into background pixmap
-          pm->blit(bm, comprect.xmin-rect.xmin, comprect.ymin-rect.ymin, 
-                   &colors[colorindex]);
+          pm->blit(bm, comprect.xmin-rect.xmin, comprect.ymin-rect.ymin, &colors[colorindex]);
         }
       return 1;
     }
@@ -973,7 +967,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
       GRect provided(0,0,w,h);
       ps.scale(provided, *fgpm, rect, *nfg);
       // Attenuate background and blit
-      nfg->color_correct(gamma_correction, white);
+      nfg->color_correct(gamma_correction);
       pm->blend(bm, 0, 0, nfg); // blend == attenuate + blit
       return 1;
 #else 
@@ -994,7 +988,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
       if (red == wantedred)
         {
           // Simple foreground upsampling is enough.
-          pm->stencil(bm, fgpm, supersample, &rect, gamma_correction, white);
+          pm->stencil(bm, fgpm, supersample, &rect, gamma_correction);
           return 1;
         }
       else 
@@ -1026,7 +1020,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
               ps.scale(provided, *fgpm, desired, *nfg);
             }
           // Use combined warp+blend function
-          pm->stencil(bm, nfg, supersample, &rect, gamma_correction, white);
+          pm->stencil(bm, nfg, supersample, &rect, gamma_correction);
           // Cache
           tagimage = this;
           tagfgpm = fgpm;
@@ -1043,7 +1037,7 @@ DjVuImage::stencil(GPixmap *pm, const GRect &rect,
 
 GP<GPixmap>
 DjVuImage::get_fg_pixmap(const GRect &rect, 
-                         int subsample, double gamma, GPixel white) const
+                         int subsample, double gamma) const
 {
   // Obtain white background pixmap
   GP<GPixmap> pm;
@@ -1053,7 +1047,7 @@ DjVuImage::get_fg_pixmap(const GRect &rect,
   if (width && height)
   {
     pm = GPixmap::create(rect.height(),rect.width(), &GPixel::WHITE);
-    if (!stencil(pm, rect, subsample, gamma, white))
+    if (!stencil(pm, rect, subsample, gamma))
       pm=0;
   }
   return pm;
@@ -1061,21 +1055,12 @@ DjVuImage::get_fg_pixmap(const GRect &rect,
 
 
 GP<GPixmap>
-DjVuImage::get_fg_pixmap(const GRect &rect, 
-                         int subsample, double gamma) const
-{
-  return get_fg_pixmap(rect, subsample, gamma, GPixel::WHITE);
-}
-
-
-GP<GPixmap>
-DjVuImage::get_pixmap(const GRect &rect, int subsample, 
-                      double gamma, GPixel white) const
+DjVuImage::get_pixmap(const GRect &rect, int subsample, double gamma) const
 {
   // Get background
-  GP<GPixmap> pm = get_bg_pixmap(rect, subsample, gamma, white);
+  GP<GPixmap> pm = get_bg_pixmap(rect, subsample, gamma);
   // Superpose foreground
-  if (! stencil(pm, rect, subsample, gamma, white))
+  if (! stencil(pm, rect, subsample, gamma))
     // Avoid ugly progressive display (hack)
     if (get_fgjb()) return 0;
   // Return
@@ -1083,18 +1068,10 @@ DjVuImage::get_pixmap(const GRect &rect, int subsample,
 }
 
 
-GP<GPixmap>
-DjVuImage::get_pixmap(const GRect &rect, int subsample, 
-                      double gamma) const
-{
-  return get_pixmap(rect, subsample, gamma, GPixel::WHITE);
-}
-
-
 //// DJVUIMAGE: RENDERING (ARBITRARY SCALE)
 
-typedef GP<GBitmap>(DjVuImage::*BImager)(const GRect&,int,int) const;
-typedef GP<GPixmap>(DjVuImage::*PImager)(const GRect&,int,double,GPixel) const;
+typedef GP<GBitmap>(DjVuImage::*BImager)(const GRect &, int, int) const;
+typedef GP<GPixmap>(DjVuImage::*PImager)(const GRect &, int, double) const;
 
 static GP<GBitmap>
 do_bitmap(const DjVuImage &dimg, BImager get,
@@ -1162,8 +1139,7 @@ do_bitmap(const DjVuImage &dimg, BImager get,
 
 static GP<GPixmap>
 do_pixmap(const DjVuImage &dimg, PImager get,
-          const GRect &inrect, const GRect &inall, 
-          double gamma, GPixel white )
+          const GRect &inrect, const GRect &inall, double gamma )
 {
   GRect rect=inrect;
   GRect all=inall;
@@ -1192,7 +1168,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   for (red=1; red<=15; red++)
     if (rw*red>w-red && rw*red<w+red && rh*red>h-red && rh*red<h+red)
     {
-      GP<GPixmap> pm = (dimg.*get)(zrect, red, gamma, white);
+        GP<GPixmap> pm = (dimg.*get)(zrect, red, gamma);
         if( pm ) 
             return pm->rotate(dimg.get_rotate());
         else
@@ -1216,7 +1192,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   // Scale
   GRect srect;
   ps.get_input_rect(zrect, srect);
-  GP<GPixmap> spm = (dimg.*get)(srect, red, gamma, white);
+  GP<GPixmap> spm = (dimg.*get)(srect, red, gamma);
   if (!spm) return 0;
   GP<GPixmap> pm = GPixmap::create();
   ps.scale(srect, *spm, zrect, *pm);
@@ -1227,45 +1203,27 @@ do_pixmap(const DjVuImage &dimg, PImager get,
 }
 
 GP<GPixmap>  
-DjVuImage::get_pixmap(const GRect &r, const GRect &a, double g, GPixel w) const
+DjVuImage::get_pixmap(const GRect &rect, const GRect &all, double gamma) const
 {
-  return do_pixmap(*this, &DjVuImage::get_pixmap, r, a, g, w);
-}
-
-GP<GPixmap>  
-DjVuImage::get_pixmap(const GRect &r, const GRect &a, double g) const
-{
-  return do_pixmap(*this, &DjVuImage::get_pixmap, r, a, g, GPixel::WHITE);
+  return do_pixmap(*this, & DjVuImage::get_pixmap, rect, all, gamma);
 }
 
 GP<GBitmap>  
 DjVuImage::get_bitmap(const GRect &rect, const GRect &all, int align) const
 {
-  return do_bitmap(*this, &DjVuImage::get_bitmap, rect, all, align);
+  return do_bitmap(*this, & DjVuImage::get_bitmap, rect, all, align);
 }
 
 GP<GPixmap>  
-DjVuImage::get_bg_pixmap(const GRect&r, const GRect&a, double g, GPixel w) const
+DjVuImage::get_bg_pixmap(const GRect &rect, const GRect &all, double gamma) const
 {
-  return do_pixmap(*this, &DjVuImage::get_bg_pixmap, r, a, g, w);
+  return do_pixmap(*this, & DjVuImage::get_bg_pixmap, rect, all, gamma);
 }
 
 GP<GPixmap>  
-DjVuImage::get_bg_pixmap(const GRect&r, const GRect&a, double g) const
+DjVuImage::get_fg_pixmap(const GRect &rect, const GRect &all, double gamma) const
 {
-  return do_pixmap(*this, &DjVuImage::get_bg_pixmap, r, a, g, GPixel::WHITE);
-}
-
-GP<GPixmap>  
-DjVuImage::get_fg_pixmap(const GRect&r, const GRect&a, double g, GPixel w) const
-{
-  return do_pixmap(*this, &DjVuImage::get_fg_pixmap, r, a, g, w);
-}
-
-GP<GPixmap>  
-DjVuImage::get_fg_pixmap(const GRect&r, const GRect&a, double g) const
-{
-  return do_pixmap(*this, &DjVuImage::get_fg_pixmap, r, a, g, GPixel::WHITE);
+  return do_pixmap(*this, & DjVuImage::get_fg_pixmap, rect, all, gamma);
 }
 
 int 

@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+//
+// $Id: UnicodeByteStream.h,v 1.11 2009/05/06 12:57:49 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _UNICODEBYTESTREAM_H_
 #define _UNICODEBYTESTREAM_H_
@@ -81,14 +84,14 @@
     XML file parser.
     @author
     Bill C Riemers <docbill@sourceforge.net>
-*/
+    @version
+    #$Id: UnicodeByteStream.h,v 1.11 2009/05/06 12:57:49 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
 #include "GString.h"
 #include "ByteStream.h"
 
-#include <stddef.h>
 
 #ifdef HAVE_NAMESPACES
 namespace DJVU {

@@ -15,6 +15,7 @@
 // GNU General Public License for more details.
 // -------------------------------------------------------------------
 */
+/* $Id: miniexp.cpp,v 1.23 2008/08/05 20:50:35 bpearlmutter Exp $ */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -23,7 +24,6 @@
 # pragma implementation "miniexp.h"
 #endif
 
-#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -1003,11 +1003,8 @@ must_quote_symbol(const char *s)
         minilisp_macrochar_parser[c] )
       return true;
   char *end;
-#ifdef __GNUC__
-  long junk __attribute__ ((unused)) =
-#endif
-  strtol(s, &end, 0);
-  return (!*end);
+  strtol(s,&end,0);
+  return !(*end);
 }
 
 BEGIN_ANONYMOUS_NAMESPACE

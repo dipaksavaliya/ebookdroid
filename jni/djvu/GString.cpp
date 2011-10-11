@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: GString.cpp,v 1.27 2009/05/17 23:57:42 leonb Exp $
+// $Name: release_3_5_22 $
 
 // From: Leon Bottou, 1/31/2002
 // This file has very little to do with my initial implementation.
@@ -73,7 +76,6 @@
 #include "GThreads.h"
 #include "debug.h"
 
-#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -643,22 +645,26 @@ GBaseString::UTF8ToNative(
   const char *source=(*this);
   GP<GStringRep> retval;
   if(source && source[0]) 
+  {
+#if DO_CHANGELOCALE
+    GUTF8String lc_ctype(setlocale(LC_CTYPE,0));
+#endif
+    bool repeat;
+    for(repeat=!currentlocale;;repeat=false)
     {
+      retval=(*this)->toNative((GStringRep::EscapeMode)escape);
 #if DO_CHANGELOCALE
-      GUTF8String lc_ctype(setlocale(LC_CTYPE,0));
-      bool repeat;
-      for(repeat=!currentlocale;;repeat=false)
-        {
+      if (!repeat || retval || (lc_ctype == setlocale(LC_CTYPE,"")))
 #endif
-          retval=(*this)->toNative((GStringRep::EscapeMode)escape);
-#if DO_CHANGELOCALE
-          if (!repeat || retval || (lc_ctype == setlocale(LC_CTYPE,"")))
-            break;
-        }
-      if(!repeat)
-        setlocale(LC_CTYPE,(const char *)lc_ctype);
-#endif
+        break;
     }
+#if DO_CHANGELOCALE
+    if(!repeat)
+      {
+        setlocale(LC_CTYPE,(const char *)lc_ctype);
+      }
+#endif
+  }
   return GNativeString(retval);
 }
 
@@ -693,19 +699,27 @@ GBaseString::NativeToUTF8(void) const
     const char *source=(*this);
 #if DO_CHANGELOCALE
     GUTF8String lc_ctype=setlocale(LC_CTYPE,0);
+#endif
     bool repeat;
     for(repeat=true;;repeat=false)
+    {
+      if( (retval=GStringRep::NativeToUTF8(source)) )
       {
-#endif
-        if( (retval=GStringRep::NativeToUTF8(source)) )
-          if(GStringRep::cmp(retval->toNative(),source))
-            retval=GStringRep::UTF8::create((unsigned int)0);
-#if DO_CHANGELOCALE
-        if(!repeat || retval || (lc_ctype == setlocale(LC_CTYPE,"")))
-          break;
+        if(GStringRep::cmp(retval->toNative(),source))
+        {
+          retval=GStringRep::UTF8::create((unsigned int)0);
+        }
       }
+#if DO_CHANGELOCALE
+      if(!repeat || retval || (lc_ctype == setlocale(LC_CTYPE,"")))
+#endif
+        break;
+    }
+#if DO_CHANGELOCALE
     if(!repeat)
+    {
       setlocale(LC_CTYPE,(const char *)lc_ctype);
+    }
 #endif
   }
   return GUTF8String(retval);
@@ -1231,19 +1245,18 @@ GStringRep::getbuf(int n) const
 }
 
 const char *
-GStringRep::isCharType(bool (*xiswtest)(const unsigned long wc), 
-                       const char *ptr, 
-                       const bool reverse) const
+GStringRep::isCharType(
+  bool (*xiswtest)(const unsigned long wc), const char *ptr, const bool reverse) const
 {
-  const char *xptr = ptr;
+  char const * xptr=ptr;
   unsigned long w=getValidUCS4(xptr);
   if(ptr != xptr)
-    {
-      if (sizeof(wchar_t) == 2)
-        w &= 0xffff;
-      if (reverse ^ xiswtest(w))
-        ptr = xptr;
-    }
+  {
+    if (sizeof(wchar_t) == 2)
+	w &= 0xffff;
+    if (reverse ^ xiswtest(w))
+	ptr = xptr;
+  }
   return ptr;
 }
 
@@ -1283,7 +1296,7 @@ bool
 GStringRep::giswspace(const unsigned long w)
 {
 #if HAS_WCTYPE
-  return !!iswspace((wchar_t)w);
+  return iswspace((wchar_t)w);
 #else
   return (w & ~0xff) ? false : !!isspace((int)(w & 0xff));
 #endif
@@ -1293,9 +1306,9 @@ bool
 GStringRep::giswupper(const unsigned long w)
 {
 #if HAS_WCTYPE
-  return !!iswupper((wchar_t)w);
+  return iswupper((wchar_t)w);
 #else
-  return (w & ~0xff) ? false : !!isupper((int)(w & 0xff));
+  return (w & ~0xff) ? false : isupper((int)(w & 0xff));
 #endif
 }
 
@@ -1303,9 +1316,9 @@ bool
 GStringRep::giswlower(const unsigned long w)
 {
 #if HAS_WCTYPE
-  return !!iswlower((wchar_t)w);
+  return iswlower((wchar_t)w);
 #else
-  return (w & ~0xff) ? false : !!islower((int)(w & 0xff));
+  return (w & ~0xff) ? false : islower((int)(w & 0xff));
 #endif
 }
 
@@ -1865,7 +1878,7 @@ GStringRep::UTF8::toNative(const EscapeMode escape) const
         }
         else
         {
-          *r++ = '?';
+    	  *r++ = '?';
         }
       }
     }

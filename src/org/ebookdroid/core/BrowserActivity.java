@@ -4,8 +4,7 @@ import org.ebookdroid.R;
 import org.ebookdroid.core.presentation.BrowserAdapter;
 import org.ebookdroid.core.settings.SettingsActivity;
 import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.utils.CompositeFilter;
-import org.ebookdroid.core.utils.DirectoryFilter;
+import org.ebookdroid.core.utils.DirectoryOrFileFilter;
 import org.ebookdroid.core.views.FileBrowserView;
 
 import android.app.Activity;
@@ -35,8 +34,8 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
     private TextView header;
 
     public BrowserActivity() {
-        this.filter = new CompositeFilter(false, DirectoryFilter.NOT_HIDDEN, SettingsManager.getAppSettings()
-                .getAllowedFileTypes());
+        this.filter = new DirectoryOrFileFilter(SettingsManager.getAppSettings().getAllowedFileTypes(
+                Activities.getAllExtensions()));
     }
 
     @Override
@@ -50,10 +49,9 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
         viewflipper = (ViewFlipper) findViewById(R.id.browserflip);
         viewflipper.addView(new FileBrowserView(this, adapter));
 
-        final View.OnClickListener handler = new View.OnClickListener() {
+        View.OnClickListener handler = new View.OnClickListener() {
 
-            @Override
-            public void onClick(final View v) {
+            public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.browserhome:
                         goHome(v);
@@ -72,6 +70,7 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
         findViewById(R.id.browserrecent).setOnClickListener(handler);
         findViewById(R.id.browserupfolder).setOnClickListener(handler);
     }
+
 
     @Override
     protected void onPostCreate(final Bundle savedInstanceState) {
@@ -106,7 +105,7 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void goHome(final View view) {
+    public void goHome(View view) {
         final File sdcardPath = new File("/sdcard");
         if (sdcardPath.exists()) {
             setCurrentDir(sdcardPath);
@@ -183,11 +182,8 @@ public class BrowserActivity extends Activity implements IBrowserActivity {
     }
 
     @Override
-    public void showProgress(final boolean show) {
-    }
+    public void showProgress(final boolean show)
+    {
 
-    @Override
-    public void loadThumbnail(final String path, final ImageView imageView, final int defaultResID) {
-        imageView.setImageResource(defaultResID);
     }
 }

@@ -3,11 +3,8 @@ package org.ebookdroid.core;
 import org.ebookdroid.core.log.LogContext;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.SurfaceHolder;
 
-import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -21,9 +18,6 @@ public class DrawThread extends Thread {
     private final AbstractDocumentView view;
 
     private final BlockingQueue<DrawTask> queue = new ArrayBlockingQueue<DrawThread.DrawTask>(16, true);
-
-    private long lastUpdate = 0;
-    private static final long TIME_INTERVAL = 30;
 
     public DrawThread(final SurfaceHolder surfaceHolder, final AbstractDocumentView view) {
         this.surfaceHolder = surfaceHolder;
@@ -52,16 +46,7 @@ public class DrawThread extends Thread {
                 break;
             }
             canvas = null;
-            long interval = System.currentTimeMillis() - lastUpdate;
-            if (interval < TIME_INTERVAL) {
-                try {
-                    Thread.sleep(TIME_INTERVAL - interval);
-                } catch (InterruptedException e) {
-                    Thread.interrupted();
-                }
-            }
             try {
-                lastUpdate = System.currentTimeMillis();
                 canvas = surfaceHolder.lockCanvas(null);
                 performDrawing(canvas, task);
             } catch (final Throwable th) {
@@ -91,9 +76,8 @@ public class DrawThread extends Thread {
     }
 
     private void performDrawing(final Canvas canvas, final DrawTask task) {
-        final Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        canvas.drawRect(canvas.getClipBounds(), paint);
+        final PagePaint paint = task.viewState.nightMode ? PagePaint.NIGHT: PagePaint.DAY;
+        canvas.drawRect(canvas.getClipBounds(), paint.backgroundFillPaint);
         view.drawView(canvas, task.viewState);
     }
 

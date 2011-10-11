@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: Arrays.cpp,v 1.9 2007/03/25 20:48:29 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -239,7 +242,9 @@ ArrayRep::ins(int n, const void * what, unsigned int howmany)
       copy(ndata, lobound-minlo, hibound-minlo,
 	   data, lobound-minlo, hibound-minlo);
       destroy(data, lobound-minlo, hibound-minlo);
+      void *tmp=data;
       data=ndata;
+      tmp=data;
       maxhi = nmaxhi;
    }
 

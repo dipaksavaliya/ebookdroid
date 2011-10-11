@@ -62,7 +62,7 @@ public class ViewState {
         }
 
         this.decodeMode = SettingsManager.getAppSettings().getDecodeMode();
-        this.nightMode = SettingsManager.getAppSettings().getNightMode();
+        this.nightMode  = SettingsManager.getAppSettings().getNightMode();
     }
 
     public ViewState(final ViewState oldState, final IDocumentViewController dc) {
@@ -86,7 +86,7 @@ public class ViewState {
         this.lastCached = Math.min(this.currentIndex + inMemory, dc.getBase().getDocumentModel().getPageCount());
 
         this.decodeMode = oldState.decodeMode;
-        this.nightMode = oldState.nightMode;
+        this.nightMode  = oldState.nightMode;
     }
 
     public ViewState(final ViewState state) {
@@ -102,7 +102,7 @@ public class ViewState {
         this.lastCached = state.lastCached;
 
         this.decodeMode = state.decodeMode;
-        this.nightMode = state.nightMode;
+        this.nightMode  = state.nightMode;
     }
 
     public RectF getBounds(final Page page) {
@@ -146,8 +146,7 @@ public class ViewState {
     public String toString() {
         StringBuilder buf = new StringBuilder();
 
-        buf.append("visible: ").append("[").append(firstVisible).append(", ").append(currentIndex).append(", ")
-                .append(lastVisible).append("]");
+        buf.append("visible: ").append("[").append(firstVisible).append(", ").append(currentIndex).append(", ").append(lastVisible).append("]");
         buf.append(" ");
         buf.append("cached: ").append("[").append(firstCached).append(", ").append(lastCached).append("]");
         buf.append(" ");

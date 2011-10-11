@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: GException.cpp,v 1.15 2007/03/25 20:48:31 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -60,7 +63,6 @@
 # pragma implementation
 #endif
 
-#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -68,7 +70,6 @@
 #include "DjVuMessageLite.h"
 #include "debug.h"
 
-#include "DjvuDroidTrace.h"
 
 #ifdef HAVE_NAMESPACES
 namespace DJVU {
@@ -109,8 +110,6 @@ GException::GException (const char *xcause, const char *file, int line,
 {
   // good place to set a breakpoint and DEBUG message too. 
   // It'd hard to track exceptions which seem to go from nowhere
-  DEBUG_PRINT("GException::GException(): cause= %s ", (xcause ? xcause : "unknown"));
-
 #ifdef DEBUG_MSG
   DEBUG_MSG("GException::GException(): cause=" << (xcause ? xcause : "unknown") << "\n");
 #endif
@@ -267,7 +266,7 @@ static int (*old_handler)(size_t) = _set_new_handler(throw_memory_error);
 # else // !_MSC_VER
 // Standard C++
 static void throw_memory_error() { G_THROW(GException::outofmemory); }
-#  if !defined(WIN32) && !defined(__CYGWIN32__) && !defined(OS2)
+#  if!defined(WIN32) && !defined(__CYGWIN32__) && !defined(OS2)
 #   ifdef HAVE_STDINCLUDES
 //static void (*old_handler)() = std::set_new_handler(throw_memory_error);
 #   else

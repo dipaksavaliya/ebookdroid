@@ -1,7 +1,5 @@
 package org.ebookdroid.djvudroid.codec;
 
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPage;
 
 import android.graphics.Bitmap;
@@ -50,14 +48,15 @@ public class DjvuPage implements CodecPage {
     }
 
     @Override
-    public BitmapRef renderBitmap(final int width, final int height, final RectF pageSliceBounds) {
-        if (useNativeGraphics) {
-            BitmapRef bmp = BitmapManager.getBitmap(width, height, Bitmap.Config.RGB_565);
+    public Bitmap renderBitmap(final int width, final int height, final RectF pageSliceBounds) {
+        if (useNativeGraphics /*&& AndroidVersion.VERSION >= 8*/) {
+            //Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
             if (renderPageBitmap(pageHandle, width, height, pageSliceBounds.left, pageSliceBounds.top,
-                    pageSliceBounds.width(), pageSliceBounds.height(), bmp.getBitmap())) {
+                    pageSliceBounds.width(), pageSliceBounds.height(), bmp)) {
                 return bmp;
             } else {
-                BitmapManager.release(bmp);
+                bmp.recycle();
                 return null;
             }
         }
@@ -65,9 +64,7 @@ public class DjvuPage implements CodecPage {
         final int[] buffer = new int[width * height];
         renderPage(pageHandle, width, height, pageSliceBounds.left, pageSliceBounds.top, pageSliceBounds.width(),
                 pageSliceBounds.height(), buffer);
-        BitmapRef b = BitmapManager.getBitmap(width, height, Bitmap.Config.RGB_565);
-        b.getBitmap().setPixels(buffer, 0, width, 0, 0, width, height);
-        return b;
+        return Bitmap.createBitmap(buffer, width, height, Bitmap.Config.RGB_565);
     }
 
     @Override

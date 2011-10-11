@@ -1,8 +1,7 @@
 package org.ebookdroid.core.presentation;
 
 import org.ebookdroid.R;
-import org.ebookdroid.core.IBrowserActivity;
-import org.ebookdroid.core.settings.books.BookSettings;
+import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.utils.FileExtensionFilter;
 import org.ebookdroid.utils.FileUtils;
 
@@ -20,13 +19,7 @@ import java.util.List;
 
 public class RecentAdapter extends BaseAdapter {
 
-    final IBrowserActivity base;
-
     private List<BookSettings> books = Collections.emptyList();
-
-    public RecentAdapter(IBrowserActivity base) {
-        this.base = base;
-    }
 
     @Override
     public int getCount() {
@@ -49,12 +42,11 @@ public class RecentAdapter extends BaseAdapter {
                 parent);
 
         final BookSettings bs = books.get(i);
-        final File file = new File(bs.fileName);
+        final File file = new File(bs.getFileName());
 
         holder.name.setText(file.getName());
 
-        // holder.imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        base.loadThumbnail(file.getPath(), holder.imageView, R.drawable.book);
+        holder.imageView.setImageResource(R.drawable.book);
 
         holder.info.setText(FileUtils.getFileDate(file.lastModified()));
         holder.fileSize.setText(FileUtils.getFileSize(file.length()));
@@ -71,7 +63,7 @@ public class RecentAdapter extends BaseAdapter {
         if (filter != null) {
             this.books = new ArrayList<BookSettings>(books.size());
             for (final BookSettings bs : books) {
-                if (filter.accept(bs.fileName)) {
+                if (filter.accept(bs.getFileName())) {
                     this.books.add(bs);
                 }
             }

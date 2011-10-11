@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: GURL.cpp,v 1.29 2008/01/27 16:16:26 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -72,7 +75,6 @@
 #include "GURL.h"
 #include "debug.h"
 
-#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>

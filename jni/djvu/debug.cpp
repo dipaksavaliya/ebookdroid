@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: debug.cpp,v 1.17 2008/01/27 09:24:35 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -70,12 +73,11 @@
 #include "GString.h"
 #include "ByteStream.h"
 #include "GURL.h"
+#include "DjvuDroidTrace.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <errno.h>
-
-#include "DjvuDroidTrace.h"
 
 #ifdef WIN32
 # include <windows.h>  // OutputDebugString
@@ -151,8 +153,6 @@ DjVuDebug::format(const char *fmt, ... )
       GUTF8String buffer(fmt,ap);
       va_end(ap);
       GCriticalSectionLock glock(&debug_lock);
-      DEBUG_PRINT("%s", (const char *)buffer);
-      
       if (debug_file)
         {
           fprintf(debug_file,"%s", (const char*)buffer);
@@ -164,6 +164,7 @@ DjVuDebug::format(const char *fmt, ... )
           OutputDebugStringA((const char *)buffer);
         }
 #endif
+      DEBUG_PRINT("%s", (const char *)buffer);
     }
 }
 

@@ -9,15 +9,14 @@ import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.models.ZoomModel;
 import org.ebookdroid.core.multitouch.MultiTouchZoom;
 import org.ebookdroid.core.settings.AppSettings;
+import org.ebookdroid.core.settings.BookSettings;
 import org.ebookdroid.core.settings.BookSettingsActivity;
+import org.ebookdroid.core.settings.Bookmark;
 import org.ebookdroid.core.settings.ISettingsChangeListener;
 import org.ebookdroid.core.settings.SettingsActivity;
 import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.settings.books.BookSettings;
-import org.ebookdroid.core.settings.books.Bookmark;
 import org.ebookdroid.core.utils.PathFromUri;
 import org.ebookdroid.core.views.PageViewZoomControls;
-import org.ebookdroid.utils.StringUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -130,53 +129,73 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
             @Override
             protected void onPreExecute() {
-                progressDialog = ProgressDialog.show(BaseViewerActivity.this, "", "Loading... Please wait", true);
+                LCTX.d("onPreExecute(): start");
+                try {
+                    progressDialog = ProgressDialog.show(BaseViewerActivity.this, "", "Loading... Please wait", true);
+                } catch (Throwable th) {
+                    LCTX.e("Unexpected error", th);
+                } finally {
+                    LCTX.d("onPreExecute(): finish");
+                }
             }
 
             @Override
             protected Exception doInBackground(final String... params) {
+                LCTX.d("doInBackground(): start");
                 try {
                     decodeService.open(params[0], params[1]);
                     return null;
                 } catch (final Exception e) {
                     LCTX.e(e.getMessage(), e);
                     return e;
+                } catch (final Throwable th) {
+                    LCTX.e("Unexpected error", th);
+                    return new Exception(th.getMessage());
+                } finally {
+                    LCTX.d("doInBackground(): finish");
                 }
             }
 
             @Override
             protected void onPostExecute(final Exception result) {
-                if (result == null) {
-                    zoomModel = new ZoomModel();
-                    initMultiTouchZoomIfAvailable();
-                    setContentView(frameLayout);
+                LCTX.d("onPostExecute(): start");
+                try {
+                    if (result == null) {
+                        zoomModel = new ZoomModel();
+                        initMultiTouchZoomIfAvailable();
+                        setContentView(frameLayout);
 
-                    documentModel = new DocumentModel(decodeService);
-                    documentModel.addEventListener(BaseViewerActivity.this);
-                    progressModel = new DecodingProgressModel();
-                    progressModel.addEventListener(BaseViewerActivity.this);
+                        documentModel = new DocumentModel(decodeService);
+                        documentModel.addEventListener(BaseViewerActivity.this);
+                        progressModel = new DecodingProgressModel();
+                        progressModel.addEventListener(BaseViewerActivity.this);
 
-                    SettingsManager.applyBookSettingsChanges(null, SettingsManager.getBookSettings(), null);
+                        SettingsManager.applyBookSettingsChanges(null, SettingsManager.getBookSettings(), null);
 
-                    if (documentModel != null) {
-                        final BookSettings bs = SettingsManager.getBookSettings();
-                        if (bs != null) {
-                            currentPageChanged(PageIndex.NULL, bs.getCurrentPage());
+                        if (documentModel != null) {
+                            final BookSettings bs = SettingsManager.getBookSettings();
+                            if (bs != null) {
+                                currentPageChanged(PageIndex.NULL, bs.getCurrentPage());
+                            }
+                        }
+
+                        setProgressBarIndeterminateVisibility(false);
+
+                        progressDialog.dismiss();
+                    } else {
+                        progressDialog.dismiss();
+
+                        final String msg = result.getMessage();
+                        if ("PDF needs a password!".equals(msg)) {
+                            askPassword(decodeService, fileName);
+                        } else {
+                            showErrorDlg(msg);
                         }
                     }
-
-                    setProgressBarIndeterminateVisibility(false);
-
-                    progressDialog.dismiss();
-                } else {
-                    progressDialog.dismiss();
-
-                    final String msg = result.getMessage();
-                    if ("PDF needs a password!".equals(msg)) {
-                        askPassword(decodeService, fileName);
-                    } else {
-                        showErrorDlg(msg);
-                    }
+                } catch (final Throwable th) {
+                    LCTX.e("Unexpected error", th);
+                } finally {
+                    LCTX.d("onPostExecute(): finish");
                 }
             }
         }.execute(fileName, password);
@@ -240,7 +259,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
 
         final BookSettings bs = SettingsManager.getBookSettings();
 
-        if (bs.singlePage) {
+        if (bs.getSinglePage()) {
             documentController = new SinglePageDocumentView(this);
         } else {
             documentController = new ContiniousDocumentView(this);
@@ -249,8 +268,6 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         zoomModel.addEventListener(documentController);
         documentController.getView().setLayoutParams(
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
-
-        documentController.showDocument();
 
         frameLayout.removeView(getZoomControls());
         frameLayout.addView(documentController.getView());
@@ -300,9 +317,21 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
     private void setWindowTitle() {
         currentFilename = getIntent().getData().getLastPathSegment();
 
-        currentFilename = StringUtils.cleanupTitle(currentFilename);
+        cleanupTitle();
 
         getWindow().setTitle(currentFilename);
+    }
+
+    /**
+     * Cleanup title. Remove from title file extension and (...), [...]
+     */
+    private void cleanupTitle() {
+        try {
+            currentFilename = currentFilename.substring(0, currentFilename.lastIndexOf('.'));
+            currentFilename = currentFilename.replaceAll("\\(.*\\)|\\[.*\\]", "");
+        } catch (final IndexOutOfBoundsException e) {
+
+        }
     }
 
     @Override
@@ -426,7 +455,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
                 return true;
             case R.id.mainmenu_booksettings:
                 final Intent bsa = new Intent(BaseViewerActivity.this, BookSettingsActivity.class);
-                bsa.setData(Uri.fromFile(new File(SettingsManager.getBookSettings().fileName)));
+                bsa.setData(Uri.fromFile(new File(SettingsManager.getBookSettings().getFileName())));
                 startActivity(bsa);
                 return true;
             case R.id.mainmenu_settings:
@@ -460,7 +489,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
                     public void onClick(final DialogInterface dialog, final int whichButton) {
                         final Editable value = input.getText();
                         final BookSettings bs = SettingsManager.getBookSettings();
-                        bs.bookmarks.add(new Bookmark(getDocumentModel().getCurrentIndex(), value.toString()));
+                        bs.getBookmarks().add(new Bookmark(getDocumentModel().getCurrentIndex(), value.toString()));
                         SettingsManager.edit(bs).commit();
                     }
                 }).setNegativeButton(R.string.password_cancel, new DialogInterface.OnClickListener() {
@@ -540,41 +569,40 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         return this;
     }
 
-    
     @Override
     public final boolean dispatchKeyEvent(final KeyEvent event) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_DPAD_DOWN:
-                    if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                        documentController.verticalDpadScroll(1);
-                    }
-                    return true;
-                case KeyEvent.KEYCODE_DPAD_UP:
-                    if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                        documentController.verticalDpadScroll(-1);
-                    }
-                    return true;
+        switch (event.getKeyCode()) {
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    documentController.verticalDpadScroll(1);
+                }
+                return true;
+            case KeyEvent.KEYCODE_DPAD_UP:
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    documentController.verticalDpadScroll(-1);
+                }
+                return true;
 
-                case KeyEvent.KEYCODE_VOLUME_UP:
-                    if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                        documentController.verticalConfigScroll(-1);
-                    }
-                    return true;
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-                    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    documentController.verticalConfigScroll(-1);
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     documentController.verticalConfigScroll(1);
-                    }
-                    return true;
-                case KeyEvent.KEYCODE_BACK:
-                    if (event.getRepeatCount() == 0) {
-                        closeActivity();
-                    }
-                    return true;
-                default:
-                    return super.dispatchKeyEvent(event);
-            }
+                }
+                return true;
+            case KeyEvent.KEYCODE_BACK:
+                if (event.getRepeatCount() == 0) {
+                    closeActivity();
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
     }
-    
+
     private void closeActivity() {
         SettingsManager.clearCurrentBookSettings();
         finish();
@@ -639,7 +667,7 @@ public abstract class BaseViewerActivity extends Activity implements IViewerActi
         if (dc != null) {
 
             if (diff.isPageAlignChanged()) {
-                dc.setAlign(newSettings.pageAlign);
+                dc.setAlign(newSettings.getPageAlign());
             }
 
             if (diff.isAnimationTypeChanged()) {

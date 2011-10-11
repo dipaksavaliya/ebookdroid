@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: DjVuDocEditor.cpp,v 1.23 2008/09/28 12:46:14 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -555,25 +558,27 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
                                          can_compress_flag);
   }
 
-   // Oh. It does exist... Check that it has IFF structure
+         // Oh. It does exist... Check that it has IFF structure
   {
-    const GP<IFFByteStream> giff(
-       IFFByteStream::create(file_pool->get_stream()));
-    IFFByteStream &iff=*giff;
-    GUTF8String chkid;
-    iff.get_chunk(chkid);
-    if (chkid!="FORM:DJVI" && chkid!="FORM:DJVU" &&
-        chkid!="FORM:BM44" && chkid!="FORM:PM44")
-      G_THROW( ERR_MSG("DjVuDocEditor.not_1_page") "\t"
-               + file_url.get_string());
-    // Wonderful. It's even a DjVu file. Scan for NDIR chunks.
-    // If NDIR chunk is found, ignore the file
-    while(iff.get_chunk(chkid))
-      {
-        if (chkid=="NDIR")
-          return false;
-        iff.close_chunk();
-      }
+       const GP<IFFByteStream> giff(
+         IFFByteStream::create(file_pool->get_stream()));
+       IFFByteStream &iff=*giff;
+       GUTF8String chkid;
+
+       int length;
+       length=iff.get_chunk(chkid);
+       if (chkid!="FORM:DJVI" && chkid!="FORM:DJVU" &&
+         chkid!="FORM:BM44" && chkid!="FORM:PM44")
+       G_THROW( ERR_MSG("DjVuDocEditor.not_1_page") "\t"+file_url.get_string());
+
+       // Wonderful. It's even a DjVu file. Scan for NDIR chunks.
+       // If NDIR chunk is found, ignore the file
+       while(iff.get_chunk(chkid))
+       {
+         if (chkid=="NDIR")
+           return false;
+         iff.close_chunk();
+       }
   }
   return insert_file(file_pool,file_url,is_page,file_pos,name2id,source);
 }

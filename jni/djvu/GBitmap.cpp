@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: GBitmap.cpp,v 1.14 2007/07/14 01:21:56 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -66,10 +69,9 @@
 #include "GString.h"
 #include "GThreads.h"
 #include "GException.h"
-#include <stddef.h>
-#include <stdlib.h>
 #include <string.h>
 
+// File "$Id: GBitmap.cpp,v 1.14 2007/07/14 01:21:56 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 

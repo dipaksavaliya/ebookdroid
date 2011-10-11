@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: DjVuMessage.cpp,v 1.24 2008/01/27 17:32:56 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -71,7 +74,6 @@
 #include "debug.h"
 #include <ctype.h>
 #include <string.h>
-#include <stddef.h>
 #include <stdlib.h>
 #ifdef WIN32
 # include <tchar.h>

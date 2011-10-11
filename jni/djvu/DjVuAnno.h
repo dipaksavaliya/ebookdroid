@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: DjVuAnno.h,v 1.10 2007/05/19 03:07:33 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -83,7 +86,8 @@
     and fills them with decoded data. 
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
-*/
+    @version
+    #$Id: DjVuAnno.h,v 1.10 2007/05/19 03:07:33 leonb Exp $# */
 //@{
 
 
@@ -159,14 +163,14 @@ public:
       /** List of defined map areas. They may be just areas of highlighting
 	  or hyperlink. Please refer to \Ref{GMapArea}, \Ref{GMapRect},
 	  \Ref{GMapPoly} and \Ref{GMapOval} for details. */
-   GPList<GMapArea> map_areas;
+   GPList<GMapArea>	map_areas;
+#ifndef NO_METADATA_IN_ANT_CHUNK
       /** Metainformations like title, author ... */
    GMap<GUTF8String,GUTF8String> metadata;
-      /** Metainformations like title, author ... */
-   GUTF8String xmpmetadata;
+#endif
       /** Returns TRUE if no features are specified or specified features
-         are not different from default ones */
-   bool	is_empty(void) const;
+	  are not different from default ones */
+   bool		is_empty(void) const;
 
       /** Decodes contents of annotation chunk #ANTa#. The chunk data is
 	  read from ByteStream #bs# until reaching an end-of-stream marker.
@@ -214,8 +218,9 @@ private:
    static alignment get_hor_align(class GLParser & parser);
    static alignment get_ver_align(class GLParser & parser);
    static GPList<GMapArea> get_map_areas(class GLParser & parser);
+#ifndef NO_METADATA_IN_ANT_CHUNK
    static GMap<GUTF8String, GUTF8String>get_metadata(GLParser & parser);
-   static GUTF8String get_xmpmetadata(GLParser & parser);
+#endif
    static void del_all_items(const char * name, class GLParser & parser);
 };
 

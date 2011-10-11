@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: DjVuPalette.cpp,v 1.13 2007/03/25 20:48:31 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -64,7 +67,6 @@
 #include "ByteStream.h"
 #include "BSByteStream.h"
 #include "DjVuPalette.h"
-#include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
 

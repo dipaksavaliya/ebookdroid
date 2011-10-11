@@ -52,6 +52,9 @@
 //C- | TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- | MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- +------------------------------------------------------------------
+// 
+// $Id: IW44Image.cpp,v 1.13 2007/03/25 20:48:32 leonb Exp $
+// $Name: release_3_5_22 $
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -76,7 +79,6 @@
 #include "IFFByteStream.h"
 #include "GRect.h"
 
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>

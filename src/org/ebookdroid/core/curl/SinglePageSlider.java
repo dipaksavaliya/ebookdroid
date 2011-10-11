@@ -3,9 +3,8 @@ package org.ebookdroid.core.curl;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageDocumentView;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -31,8 +30,8 @@ public class SinglePageSlider extends AbstractPageSlider {
             page = view.getBase().getDocumentModel().getCurrentPageObject();
         }
         if (page != null) {
-            final BitmapRef fore = getBitmap(canvas, viewState);
-            final Canvas tmp = new Canvas(fore.getBitmap());
+            final Bitmap fore = getBitmap(canvas, viewState);
+            final Canvas tmp = new Canvas(fore);
             page.draw(tmp, viewState, true);
 
             final Rect src = new Rect((int) mA.x, 0, (int) viewState.viewRect.width(),
@@ -42,8 +41,7 @@ public class SinglePageSlider extends AbstractPageSlider {
             paint.setFilterBitmap(true);
             paint.setAntiAlias(true);
             paint.setDither(true);
-            canvas.drawBitmap(fore.getBitmap(), src, dst, paint);
-            BitmapManager.release(fore);
+            canvas.drawBitmap(fore, src, dst, paint);
         }
     }
 
@@ -58,8 +56,8 @@ public class SinglePageSlider extends AbstractPageSlider {
     protected void drawBackground(final Canvas canvas, final ViewState viewState) {
         final Page page = view.getBase().getDocumentModel().getPageObject(backIndex);
         if (page != null) {
-            final BitmapRef back = getBitmap(canvas, viewState);
-            final Canvas tmp = new Canvas(back.getBitmap());
+            final Bitmap back = getBitmap(canvas, viewState);
+            final Canvas tmp = new Canvas(back);
             page.draw(tmp, viewState, true);
 
             final Paint paint = new Paint();
@@ -69,8 +67,7 @@ public class SinglePageSlider extends AbstractPageSlider {
             final Rect src = new Rect(0, 0, (int) mA.x, view.getHeight());
             final RectF dst = new RectF(viewState.viewRect.width() - mA.x, 0, viewState.viewRect.width(),
                     viewState.viewRect.height());
-            canvas.drawBitmap(back.getBitmap(), src, dst, paint);
-            BitmapManager.release(back);
+            canvas.drawBitmap(back, src, dst, paint);
         }
 
     }

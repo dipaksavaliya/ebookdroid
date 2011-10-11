@@ -28,6 +28,4 @@ public interface CodecContext {
      */
     boolean isRecycled();
 
-    boolean isPageSizeCacheable();
-
 }
