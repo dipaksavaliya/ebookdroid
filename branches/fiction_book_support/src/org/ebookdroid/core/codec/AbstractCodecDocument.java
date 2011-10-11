@@ -54,7 +54,7 @@ public abstract class AbstractCodecDocument implements CodecDocument {
 
     protected void freeDocument() {
     }
-    
+
     @Override
     public Bitmap getEmbeddedThumbnail() {
         return null;

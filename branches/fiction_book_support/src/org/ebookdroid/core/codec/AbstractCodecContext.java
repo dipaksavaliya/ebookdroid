@@ -66,7 +66,7 @@ public abstract class AbstractCodecContext implements CodecContext {
     public final long getContextHandle() {
         return contextHandle;
     }
-    
+
     @Override
     public boolean isPageSizeCacheable() {
         return true;

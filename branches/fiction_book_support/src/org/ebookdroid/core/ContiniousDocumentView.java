@@ -61,8 +61,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
             return;
         }
 
-        // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
-        base.getActivity().runOnUiThread(new Runnable() {
+        final Runnable r = new Runnable() {
 
             @Override
             public void run() {
@@ -75,8 +74,10 @@ public class ContiniousDocumentView extends AbstractDocumentView {
                     redrawView(viewState);
                 }
             }
-        });
+        };
 
+        // on scrollChanged can be called from scrollTo just after new layout applied so we should wait for relayout
+        base.getActivity().runOnUiThread(r);
     }
 
     @Override
@@ -98,7 +99,6 @@ public class ContiniousDocumentView extends AbstractDocumentView {
         redrawView();
     }
 
-    
     @Override
     protected final Rect getScrollLimits() {
         final int width = getWidth();
@@ -113,11 +113,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     }
 
     @Override
-    public synchronized final void drawView(final Canvas canvas, ViewState viewState) {
-        if(scroller.computeScrollOffset()) {
-            scrollTo(scroller.getCurrX(), scroller.getCurrY());
-            viewState = new ViewState(viewState, this);
-        }
+    public synchronized final void drawView(final Canvas canvas, final ViewState viewState) {
         final DocumentModel dm = getBase().getDocumentModel();
         for (int i = viewState.firstVisible; i <= viewState.lastVisible; i++) {
             final Page page = dm.getPageObject(i);
@@ -125,7 +121,9 @@ public class ContiniousDocumentView extends AbstractDocumentView {
                 page.draw(canvas, viewState);
             }
         }
-        // setCurrentPageByFirstVisible();
+        if (scroller.computeScrollOffset()) {
+            scrollTo(scroller.getCurrX(), scroller.getCurrY());
+        }
     }
 
     @Override

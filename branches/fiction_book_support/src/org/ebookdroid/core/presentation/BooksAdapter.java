@@ -38,7 +38,8 @@ public class BooksAdapter extends BaseAdapter {
     private final static AtomicInteger SEQ = new AtomicInteger(1);
 
     private int currentList = 0;
-    public final DataSetObserver observer = new DataSetObserver() {
+
+    private final DataSetObserver observer = new DataSetObserver() {
 
         @Override
         public void onChanged() {
@@ -49,16 +50,16 @@ public class BooksAdapter extends BaseAdapter {
         public void onInvalidated() {
             updateRecentBooks();
         };
-        
+
         private void updateRecentBooks() {
             ArrayList<Node> arrayList = data.get(0);
             if (arrayList == null) {
                 arrayList = createRecent();
             }
             arrayList.clear();
-            int count = recent.getCount();
+            final int count = recent.getCount();
             for (int i = 0; i < count; i++) {
-                BookSettings item = recent.getItem(i);
+                final BookSettings item = recent.getItem(i);
                 final File file = new File(item.fileName);
 
                 arrayList.add(new Node(0, file.getName(), file.getAbsolutePath()));
@@ -66,11 +67,13 @@ public class BooksAdapter extends BaseAdapter {
             BooksAdapter.this.notifyDataSetChanged();
         }
     };
+
     private final RecentAdapter recent;
 
-    public BooksAdapter(final IBrowserActivity base, RecentAdapter adapter) {
+    public BooksAdapter(final IBrowserActivity base, final RecentAdapter adapter) {
         this.base = base;
         this.recent = adapter;
+        this.recent.registerDataSetObserver(observer);
     }
 
     public int getListCount() {
@@ -147,11 +150,11 @@ public class BooksAdapter extends BaseAdapter {
     }
 
     public void clearData() {
-        ArrayList<Node> al = data.get(0);
+        final ArrayList<Node> al = data.get(0);
         data.clear();
         names.clear();
         SEQ.set(1);
-        ArrayList<Node> recentList = createRecent();
+        final ArrayList<Node> recentList = createRecent();
         if (al != null) {
             recentList.clear();
             recentList.addAll(al);
@@ -160,10 +163,10 @@ public class BooksAdapter extends BaseAdapter {
     }
 
     private ArrayList<Node> createRecent() {
-        ArrayList<Node> recentList = data.get(0);
+        final ArrayList<Node> recentList = data.get(0);
         if (recentList == null) {
             names.put(0, base.getContext().getString(R.string.recent_title));
-            ArrayList<Node> arrayList = new ArrayList<Node>();
+            final ArrayList<Node> arrayList = new ArrayList<Node>();
             data.put(0, arrayList);
             return arrayList;
         }

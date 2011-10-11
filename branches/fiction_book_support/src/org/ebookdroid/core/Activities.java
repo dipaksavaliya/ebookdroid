@@ -63,8 +63,8 @@ public enum Activities {
 
     public static Class<? extends Activity> getByUri(final Uri uri) {
         final String uriString = uri.toString();
-        for (String ext :extensionToActivity.keySet()) {
-            if (uriString.endsWith("."+ext)) {
+        for (final String ext : extensionToActivity.keySet()) {
+            if (uriString.endsWith("." + ext)) {
                 return extensionToActivity.get(ext);
             }
         }

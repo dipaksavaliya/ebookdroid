@@ -9,11 +9,6 @@
 		android:summary="@string/pref_ui_category_summary">
 
 		<CheckBoxPreference
-			android:key="usebookcase"
-			android:title="@string/pref_usebookcase_title"
-			android:summary="@string/pref_usebookcase_summary"
-			android:defaultValue="false" />
-		<CheckBoxPreference
 			android:key="loadrecent"
 			android:title="@string/pref_loadrecent_title"
 			android:summary="@string/pref_loadrecent_summary"
@@ -217,6 +212,11 @@
 		android:title="@string/pref_browser_category"
 		android:summary="@string/pref_browser_category_summary">
 
+		<CheckBoxPreference
+			android:key="usebookcase"
+			android:title="@string/pref_usebookcase_title"
+			android:summary="@string/pref_usebookcase_summary"
+			android:defaultValue="true" />
 		<EditTextPreference
 			android:key="brautoscandir"
 			android:title="@string/pref_brautoscandir_title"

@@ -3,11 +3,8 @@ package org.ebookdroid.core;
 import org.ebookdroid.core.log.LogContext;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.SurfaceHolder;
 
-import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -52,14 +49,14 @@ public class DrawThread extends Thread {
                 break;
             }
             canvas = null;
-//            long interval = System.currentTimeMillis() - lastUpdate;
-//            if (interval < TIME_INTERVAL) {
-//                try {
-//                    Thread.sleep(TIME_INTERVAL - interval);
-//                } catch (InterruptedException e) {
-//                    Thread.interrupted();
-//                }
-//            }
+            final long interval = System.currentTimeMillis() - lastUpdate;
+            if (interval < TIME_INTERVAL) {
+                try {
+                    Thread.sleep(TIME_INTERVAL - interval);
+                } catch (final InterruptedException e) {
+                    Thread.interrupted();
+                }
+            }
             try {
                 lastUpdate = System.currentTimeMillis();
                 canvas = surfaceHolder.lockCanvas(null);
@@ -91,9 +88,8 @@ public class DrawThread extends Thread {
     }
 
     private void performDrawing(final Canvas canvas, final DrawTask task) {
-        final Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        canvas.drawRect(canvas.getClipBounds(), paint);
+        final PagePaint paint = task.viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+        canvas.drawRect(canvas.getClipBounds(), paint.backgroundFillPaint);
         view.drawView(canvas, task.viewState);
     }
 

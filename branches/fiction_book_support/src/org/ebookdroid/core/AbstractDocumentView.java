@@ -12,7 +12,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -239,6 +238,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         final ViewState oldState = new ViewState(this);
         final ViewState newState = calculatePageVisibility(base.getDocumentModel().getCurrentViewPageIndex(), 0,
                 newZoom);
+
         final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
         final List<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
 
@@ -301,19 +301,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
     }
 
     @Override
-    public final void showDocument() {
-        // use post to ensure that document view has width and height before decoding begin
-        post(new Runnable() {
-
-            @Override
-            public void run() {
-                init();
-                onZoomChanged(base.getZoomModel().getZoom());
-            }
-        });
-    }
-
-    @Override
     public final void goToPage(final int toPage) {
         if (isInitialized) {
             goToPageImpl(toPage);
@@ -365,10 +352,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     }
 
-    public abstract void verticalConfigScroll(int direction);
-
-    public abstract void verticalDpadScroll(int direction);
-
     protected abstract Rect getScrollLimits();
 
     @Override
@@ -391,13 +374,6 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         return new RectF(getScrollX(), getScrollY(), getScrollX() + getWidth(), getScrollY() + getHeight());
     }
 
-//    @Override
-//    public void computeScroll() {
-//        if (getScroller().computeScrollOffset()) {
-//            scrollTo(getScroller().getCurrX(), getScroller().getCurrY());
-//        }
-//    }
-
     @Override
     public void changeLayoutLock(final boolean lock) {
         layoutLocked = lock;
@@ -412,9 +388,12 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
 
     protected boolean onLayoutChanged(final boolean changed, final int left, final int top, final int right,
             final int bottom) {
+        if (!isInitialized) {
+            init();
+        }
         if (changed && !layoutLocked) {
             if (isInitialized) {
-                ArrayList<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
+                final ArrayList<BitmapRef> bitmapsToRecycle = new ArrayList<BitmapRef>();
                 for (final Page page : base.getDocumentModel().getPages()) {
                     page.nodes.root.recycle(bitmapsToRecycle);
                 }
@@ -533,10 +512,11 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
         drawThread.finish();
     }
 
-    private final class GestureListener extends SimpleOnGestureListener {
+    protected class GestureListener extends SimpleOnGestureListener {
 
         @Override
         public boolean onDoubleTap(final MotionEvent e) {
+            // LCTX.d("onDoubleTap(" + e + ")");
             if (SettingsManager.getAppSettings().getZoomByDoubleTap()) {
                 getBase().getZoomModel().toggleZoomControls();
             }
@@ -548,6 +528,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             if (!scroller.isFinished()) { // is flinging
                 scroller.forceFinished(true); // to stop flinging on touch
             }
+            // LCTX.d("onDown(" + e + ")");
             return true;
         }
 
@@ -561,6 +542,7 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             if (Math.abs(vY / vX) < 0.5) {
                 y = 0;
             }
+            // LCTX.d("onFling(" + x + ", " + y + ")");
             scroller.fling(getScrollX(), getScrollY(), -(int) x, -(int) y, l.left, l.right, l.top, l.bottom);
             redrawView();
             return true;
@@ -575,13 +557,14 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             if (Math.abs(distanceY / distanceX) < 0.5) {
                 y = 0;
             }
-            
+            // LCTX.d("onScroll(" + x + ", " + y + ")");
             scrollBy((int) x, (int) y);
             return true;
         }
 
         @Override
-        public boolean onSingleTapUp(final MotionEvent e) {
+        public boolean onSingleTapConfirmed(final MotionEvent e) {
+            // LCTX.d("onSingleTapConfirmed(" + e + ")");
             float ts;
             if (SettingsManager.getAppSettings().getTapScroll()) {
                 final int tapsize = SettingsManager.getAppSettings().getTapSize();
@@ -599,6 +582,5 @@ public abstract class AbstractDocumentView extends SurfaceView implements ZoomLi
             }
             return false;
         }
-
     }
 }

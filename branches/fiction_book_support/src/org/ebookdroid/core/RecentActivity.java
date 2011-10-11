@@ -79,8 +79,6 @@ public class RecentActivity extends Activity implements IBrowserActivity, ISetti
         libraryAdapter = new FileListAdapter(this);
         bookshelfAdapter = new BooksAdapter(this, recentAdapter);
 
-        recentAdapter.registerDataSetObserver(bookshelfAdapter.observer);
-
         libraryButton = (ImageView) findViewById(R.id.recentlibrary);
 
         viewflipper = (ViewFlipper) findViewById(R.id.recentflip);
@@ -111,6 +109,7 @@ public class RecentActivity extends Activity implements IBrowserActivity, ISetti
 
             libraryButton.setOnClickListener(handler);
         }
+
         final View recentBrowser = findViewById(R.id.recentbrowser);
         if (recentBrowser != null) {
             recentBrowser.setOnClickListener(handler);
@@ -157,8 +156,8 @@ public class RecentActivity extends Activity implements IBrowserActivity, ISetti
 
         if (SettingsManager.getAppSettings().getUseBookcase()) {
             bookshelfAdapter.startScan(SettingsManager.getAppSettings().getAllowedFileTypes());
-            recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), SettingsManager
-                    .getAppSettings().getAllowedFileTypes());
+            recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), SettingsManager.getAppSettings()
+                    .getAllowedFileTypes());
         } else {
             if (viewflipper.getDisplayedChild() == VIEW_RECENT) {
                 if (SettingsManager.getRecentBook() == null) {
@@ -244,7 +243,7 @@ public class RecentActivity extends Activity implements IBrowserActivity, ISetti
         libraryAdapter.stopScan();
         bookshelfAdapter.stopScan();
         final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        Class<? extends Activity> activity = Activities.getByUri(uri);
+        final Class<? extends Activity> activity = Activities.getByUri(uri);
         if (activity != null) {
             intent.setClass(this, activity);
             // Issue 33
@@ -313,23 +312,23 @@ public class RecentActivity extends Activity implements IBrowserActivity, ISetti
             final File thumbnailFile = new File(cacheDir, md5 + ".thumbnail");
             if (thumbnailFile.exists()) {
 
-                Bitmap tmpbmp = BitmapFactory.decodeFile(thumbnailFile.getPath());
+                final Bitmap tmpbmp = BitmapFactory.decodeFile(thumbnailFile.getPath());
                 if (tmpbmp == null) {
                     thumbnailFile.delete();
                 } else {
-                    int width = tmpbmp.getWidth() + 33;
-                    int height = tmpbmp.getHeight() + 23;
+                    final int width = tmpbmp.getWidth() + 33;
+                    final int height = tmpbmp.getHeight() + 23;
                     bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-    
+
                     bmp.eraseColor(Color.TRANSPARENT);
-    
-                    Canvas c = new Canvas(bmp);
-    
+
+                    final Canvas c = new Canvas(bmp);
+
                     c.drawBitmap(cornerThmbBitmap, null, new Rect(0, 0, 33, 23), null);
                     c.drawBitmap(topThmbBitmap, null, new Rect(33, 0, width, 23), null);
                     c.drawBitmap(leftThmbBitmap, null, new Rect(0, 23, 33, height), null);
                     c.drawBitmap(tmpbmp, null, new Rect(33, 23, width, height), null);
-    
+
                     thumbnails.put(md5, new SoftReference<Bitmap>(bmp));
                 }
             }
@@ -343,15 +342,15 @@ public class RecentActivity extends Activity implements IBrowserActivity, ISetti
     }
 
     @Override
-    public void onAppSettingsChanged(AppSettings oldSettings, AppSettings newSettings, Diff diff) {
+    public void onAppSettingsChanged(final AppSettings oldSettings, final AppSettings newSettings, final Diff diff) {
         if (diff.isUseBookcaseChanged()) {
             // TODO
         }
     }
 
     @Override
-    public void onBookSettingsChanged(BookSettings oldSettings, BookSettings newSettings,
-            org.ebookdroid.core.settings.books.BookSettings.Diff diff, Diff appDiff) {
+    public void onBookSettingsChanged(final BookSettings oldSettings, final BookSettings newSettings,
+            final org.ebookdroid.core.settings.books.BookSettings.Diff diff, final Diff appDiff) {
 
     }
 }
