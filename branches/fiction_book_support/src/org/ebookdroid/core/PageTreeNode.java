@@ -226,17 +226,35 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             return;
         }
 
-        final Bitmap bitmap = viewState.nightMode ? holder.getNightBitmap(paint.nightBitmapPaint) : holder.getBitmap();
+        final Bitmap bitmap = getBitmap(viewState, paint);
 
-        if (bitmap != null) {
-            canvas.drawBitmap(bitmap, holder.getBitmapBounds(), tr, paint.bitmapPaint);
+        if (!allChildrenHasBitmap(viewState, paint)) {
+            if (bitmap != null) {
+                canvas.drawBitmap(bitmap, holder.getBitmapBounds(), tr, paint.bitmapPaint);
+            }
+    
+            drawBrightnessFilter(canvas, tr);
         }
-
-        drawBrightnessFilter(canvas, tr);
-
         drawChildren(canvas, viewState, pageBounds, paint);
     }
 
+    private boolean allChildrenHasBitmap(ViewState viewState, PagePaint paint) {
+        for (final PageTreeNode child : page.nodes.getChildren(this)) {
+            if (!child.hasBitmap(viewState, paint)) {
+                return false;
+            }
+        }
+        return page.nodes.getChildren(this).length > 0;
+    }
+
+    private Bitmap getBitmap(ViewState viewState, PagePaint paint) {
+        return viewState.nightMode ? holder.getNightBitmap(paint.nightBitmapPaint) : holder.getBitmap();
+    }
+    
+    boolean hasBitmap(ViewState viewState, PagePaint paint) {
+        return getBitmap(viewState, paint) != null;
+    }
+    
     void drawBrightnessFilter(final Canvas canvas, final RectF tr) {
         final int brightness = SettingsManager.getAppSettings().getBrightness();
         if (brightness < 100) {

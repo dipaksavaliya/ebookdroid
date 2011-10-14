@@ -488,7 +488,7 @@ public class DecodeServiceBase implements DecodeService {
 
         @Override
         public void run() {
-            Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 1);
+            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
             performDecode(this);
         }
 

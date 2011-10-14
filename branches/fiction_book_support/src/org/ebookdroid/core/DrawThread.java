@@ -38,7 +38,7 @@ public class DrawThread extends Thread {
     @Override
     public void run() {
         Canvas canvas;
-        Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
         while (true) {
             final DrawTask task = takeTask();
@@ -49,16 +49,16 @@ public class DrawThread extends Thread {
                 break;
             }
             canvas = null;
-            final long interval = System.currentTimeMillis() - lastUpdate;
-            if (interval < TIME_INTERVAL) {
-                try {
-                    Thread.sleep(TIME_INTERVAL - interval);
-                } catch (final InterruptedException e) {
-                    Thread.interrupted();
-                }
-            }
+//            final long interval = System.currentTimeMillis() - lastUpdate;
+//            if (interval < TIME_INTERVAL) {
+//                try {
+//                    Thread.sleep(TIME_INTERVAL - interval);
+//                } catch (final InterruptedException e) {
+//                    Thread.interrupted();
+//                }
+//            }
             try {
-                lastUpdate = System.currentTimeMillis();
+//                lastUpdate = System.currentTimeMillis();
                 canvas = surfaceHolder.lockCanvas(null);
                 performDrawing(canvas, task);
             } catch (final Throwable th) {
