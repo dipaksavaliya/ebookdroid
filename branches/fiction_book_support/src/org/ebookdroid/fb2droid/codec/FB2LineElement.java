@@ -2,9 +2,6 @@ package org.ebookdroid.fb2droid.codec;
 
 import android.graphics.Canvas;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public interface FB2LineElement extends FB2MarkupElement {
 
     int TEXT_ELEMENT_TAG = 0;
@@ -14,14 +11,11 @@ public interface FB2LineElement extends FB2MarkupElement {
     
     int getHeight();
 
-    int getWidth();
+    float getWidth();
 
     void render(Canvas c, int y, int x);
 
-    void adjustWidth(int w);
+    void adjustWidth(float w);
 
     boolean isSizeable();
-
-    void serialize(DataOutputStream out) throws IOException;
-
 }

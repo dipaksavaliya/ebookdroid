@@ -8,14 +8,12 @@ import android.graphics.Rect;
 import android.util.Base64;
 import android.util.Base64InputStream;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class FB2Image extends AbstractFB2LineElement {
 
-    private final int width;
+    private final float width;
     private final int height;
     private final int origWidth;
     private final int origHeight;
@@ -33,7 +31,7 @@ public class FB2Image extends AbstractFB2LineElement {
             width = origWidth;
             height = origHeight;
         } else {
-            int w = 0, h = 0;
+            float w = 0, h = 0;
             if (origWidth > FB2Page.PAGE_WIDTH) {
                 w = FB2Page.PAGE_WIDTH;
                 h = origHeight * w / origWidth;
@@ -46,12 +44,12 @@ public class FB2Image extends AbstractFB2LineElement {
                 h = FB2Page.PAGE_HEIGHT;
             }
             width = w;
-            height = h;
+            height = (int) h;
         }
     }
 
     @Override
-    public void adjustWidth(final int w) {
+    public void adjustWidth(final float w) {
     }
 
     @Override
@@ -60,7 +58,7 @@ public class FB2Image extends AbstractFB2LineElement {
     }
 
     @Override
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
@@ -73,7 +71,7 @@ public class FB2Image extends AbstractFB2LineElement {
     public void render(final Canvas c, final int y, final int x) {
         final byte[] data = getData();
         final Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-        c.drawBitmap(bmp, null, new Rect(x, y - height, x + width, y), null);
+        c.drawBitmap(bmp, null, new Rect(x, y - height, (int) (x + width), y), null);
         bmp.recycle();
     }
 
@@ -105,20 +103,5 @@ public class FB2Image extends AbstractFB2LineElement {
         public int read() throws IOException {
             return index >= str.length() ? -1 : (0xFF & str.charAt(index++));
         }
-    }
-
-    @Override
-    public void serialize(DataOutputStream out) throws IOException {
-        out.writeInt(IMAGE_ELEMENT_TAG);
-        byte[] bytes = encoded.getBytes("US-ASCII");
-        out.writeInt(bytes.length);
-        out.write(bytes);
-    }
-
-    public static FB2LineElement deserializeImpl(DataInputStream in) throws IOException {
-        int length = in.readInt();
-        byte[] bytes = new byte[length];
-        in.readFully(bytes);
-        return new FB2Image(new String(bytes,"US-ASCII"));
     }
 }

@@ -4,14 +4,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 
 public class FB2HorizontalRule extends AbstractFB2LineElement {
 
-    private final int width;
+    private final float width;
     private final int height;
     private static Paint rulePaint;
 
@@ -29,7 +25,7 @@ public class FB2HorizontalRule extends AbstractFB2LineElement {
     }
 
     @Override
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
@@ -39,23 +35,11 @@ public class FB2HorizontalRule extends AbstractFB2LineElement {
     }
 
     @Override
-    public void adjustWidth(int w) {
+    public void adjustWidth(float w) {
     }
 
     @Override
     public boolean isSizeable() {
         return false;
     }
-    @Override
-    public void serialize(DataOutputStream out) throws IOException {
-        out.writeInt(RULE_ELEMENT_TAG);
-        out.writeInt(height);
-        out.writeInt(width);
-    }
-    public static FB2LineElement deserializeImpl(DataInputStream in) throws IOException {
-        int height = in.readInt();
-        int width = in.readInt();
-        return new FB2HorizontalRule(width, height);
-    }
-
 }

@@ -2,9 +2,6 @@ package org.ebookdroid.fb2droid.codec;
 
 import android.graphics.Canvas;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +9,7 @@ public class FB2Line {
 
     private final ArrayList<FB2LineElement> elements = new ArrayList<FB2LineElement>();
     private int height;
-    int width = 0;
+    float width = 0;
     private boolean hasNonWhiteSpaces = false;
     private List<FB2Line> footnotes;
     private boolean committed;
@@ -45,9 +42,9 @@ public class FB2Line {
     }
 
     public void render(final Canvas c, final int y) {
-        int x = FB2Page.MARGIN_X;
+        float x = FB2Page.MARGIN_X;
         for (final FB2LineElement e : elements) {
-            e.render(c, y, x);
+            e.render(c, y, (int) x);
             x += e.getWidth();
         }
     }
@@ -67,7 +64,7 @@ public class FB2Line {
     public void applyJustification(final JustificationMode jm) {
         switch (jm) {
             case Center:
-                final int x = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / 2;
+                final float x = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / 2;
                 elements.add(0, new FB2LineWhiteSpace(x, height, false));
 //                elements.add(new FB2LineWhiteSpace(x, height, false));
                 break;
@@ -77,7 +74,7 @@ public class FB2Line {
                 break;
             case Justify:
                 if (sizeableCount> 0) {
-                    final int wsx = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / sizeableCount;
+                    final float wsx = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / sizeableCount;
                     for (final FB2LineElement e : elements) {
                         if (e.isSizeable()) {
                             e.adjustWidth(wsx);
@@ -86,7 +83,7 @@ public class FB2Line {
                 }
                 break;
             case Right:
-                final int x1 = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X));
+                final float x1 = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X));
                 elements.add(0, new FB2LineWhiteSpace(x1, height, false));
                 break;
         }
@@ -113,27 +110,5 @@ public class FB2Line {
 
     public int getHeight() {
         return height;
-    }
-
-    public void serialize(DataOutputStream out) throws IOException {
-        out.writeInt(height);
-        out.writeInt(width);
-        out.writeBoolean(hasNonWhiteSpaces);
-        out.writeInt(elements.size());
-        for (FB2LineElement element : elements) {
-            element.serialize(out);
-        }
-    }
-
-    public static FB2Line deserialize(DataInputStream in) throws IOException {
-        FB2Line line = new FB2Line();
-        line.height = in.readInt();
-        line.width = in.readInt();
-        line.hasNonWhiteSpaces = in.readBoolean();
-        int elCount = in.readInt();
-        for (int i = 0; i < elCount; i++) {
-            line.append(AbstractFB2LineElement.deserialize(in));
-        }
-        return line;
     }
 }

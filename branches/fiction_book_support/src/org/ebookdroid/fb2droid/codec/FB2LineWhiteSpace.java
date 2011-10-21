@@ -2,17 +2,13 @@ package org.ebookdroid.fb2droid.codec;
 
 import android.graphics.Canvas;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class FB2LineWhiteSpace extends AbstractFB2LineElement {
 
     private final int height;
-    private int width;
+    private float width;
     private final boolean sizeable;
 
-    public FB2LineWhiteSpace(final int width, final int height, final boolean sizeable) {
+    public FB2LineWhiteSpace(final float width, final int height, final boolean sizeable) {
         this.width = width;
         this.height = height;
         this.sizeable = sizeable;
@@ -24,7 +20,7 @@ public class FB2LineWhiteSpace extends AbstractFB2LineElement {
     }
 
     @Override
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
@@ -33,7 +29,7 @@ public class FB2LineWhiteSpace extends AbstractFB2LineElement {
     }
 
     @Override
-    public void adjustWidth(final int w) {
+    public void adjustWidth(final float w) {
         if (sizeable) {
             width += w;
         }
@@ -43,20 +39,4 @@ public class FB2LineWhiteSpace extends AbstractFB2LineElement {
     public boolean isSizeable() {
         return sizeable;
     }
-
-    @Override
-    public void serialize(DataOutputStream out) throws IOException {
-        out.writeInt(WHITESPACE_ELEMENT_TAG);
-        out.writeInt(height);
-        out.writeInt(width);
-        out.writeBoolean(sizeable);
-    }
-
-    public static FB2LineElement deserializeImpl(DataInputStream in) throws IOException {
-        int height = in.readInt();
-        int width = in.readInt();
-        boolean sizeable = in.readBoolean();
-        return new FB2LineWhiteSpace(width, height, sizeable);
-    }
-
 }

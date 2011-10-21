@@ -11,9 +11,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class FB2Page implements CodecPage {
@@ -134,26 +131,6 @@ public class FB2Page implements CodecPage {
         committed = true;
     }
     
-    public void serialize(DataOutputStream out) throws IOException {
-        if (!committed) {
-            commit();
-        }
-        out.writeInt(lines.size());
-        for (FB2Line line : lines) {
-            line.serialize(out);
-        }
-    }
-
-    public static FB2Page deserialize(DataInputStream in) throws IOException {
-        FB2Page page = new FB2Page();
-        int lineCount = in.readInt();
-        for (int i = 0; i < lineCount; i++) {
-            page.appendLine(FB2Line.deserialize(in));
-        }
-        page.commit();
-        return page;
-    }
-
     @Override
     public boolean isRecycled() {
         return false;
