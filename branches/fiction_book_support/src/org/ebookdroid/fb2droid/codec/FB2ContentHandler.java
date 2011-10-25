@@ -134,6 +134,12 @@ public class FB2ContentHandler extends FB2BaseHandler {
             }
         } else if ("strong".equals(qName)) {
             setBoldStyle();
+        } else if ("sup".equals(qName)) {
+            setSupStyle();
+            spaceNeeded = false;
+        } else if ("sub".equals(qName)) {
+            setSubStyle();
+            spaceNeeded = false;
         } else if ("emphasis".equals(qName)) {
             setEmphasisStyle();
         } else if ("epigraph".equals(qName)) {
@@ -227,6 +233,16 @@ public class FB2ContentHandler extends FB2BaseHandler {
             }
         } else if ("strong".equals(qName)) {
             setPrevStyle();
+        } else if ("sup".equals(qName)) {
+            setPrevStyle();
+            if (markup.get(markup.size() - 1) instanceof FB2MarkupNoSpace) {
+                markup.remove(markup.size() - 1);
+            }
+        } else if ("sub".equals(qName)) {
+            setPrevStyle();
+            if (markup.get(markup.size() - 1) instanceof FB2MarkupNoSpace) {
+                markup.remove(markup.size() - 1);
+            }
         } else if ("emphasis".equals(qName)) {
             setPrevStyle();
         } else if ("epigraph".equals(qName)) {
@@ -287,7 +303,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
 
             if (count > 0) {
                 if (!spaceNeeded) {
-                    markup.add(new FB2MarkupNoSpace());
+                    markup.add(FB2MarkupNoSpace._instance);
                 }
                 spaceNeeded = true;
                 final char[] dst = new char[length];
@@ -297,9 +313,12 @@ public class FB2ContentHandler extends FB2BaseHandler {
                     final int st = starts[i];
                     final int len = lengths[i];
                     markup.add(new FB2TextElement(dst, st - start, len, crs));
+                    if (crs.isSuperScript() || crs.isSubScript()) {
+                        markup.add(FB2MarkupNoSpace._instance);
+                    }
                 }
                 if (Character.isWhitespace(ch[start + length - 1])) {
-                    markup.add(new FB2MarkupNoSpace());
+                    markup.add(FB2MarkupNoSpace._instance);
                     markup.add(new FB2LineWhiteSpace((int) crs.getTextPaint().measureText(" "), crs.textSize, true));
                 }
                 spaceNeeded = false;

@@ -39,7 +39,8 @@ public class FB2TextElement extends AbstractFB2LineElement {
 
     @Override
     public void render(final Canvas c, final int y, final int x) {
-        c.drawText(chars, start, length, x, y, renderingState.getTextPaint());
+        c.drawText(chars, start, length, x, renderingState.isSuperScript() ? y - renderingState.textSize
+                : renderingState.isSubScript() ? y + renderingState.textSize / 2 : y, renderingState.getTextPaint());
     }
 
     @Override

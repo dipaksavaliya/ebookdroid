@@ -43,6 +43,20 @@ public class FB2BaseHandler extends DefaultHandler {
         return crs;
     }
 
+    protected final RenderingStyle setSupStyle() {
+        renderingStates.addFirst(crs);
+        crs = new RenderingStyle(crs, (crs.textSize / 2));
+        crs.setSuperScript(true);
+        return crs;
+    }
+    
+    protected final RenderingStyle setSubStyle() {
+        renderingStates.addFirst(crs);
+        crs = new RenderingStyle(crs, (crs.textSize / 2));
+        crs.setSubScript(true);
+        return crs;
+    }
+
     protected final RenderingStyle setEmphasisStyle() {
         renderingStates.addFirst(crs);
         crs = new RenderingStyle(crs, RenderingStyle.ITALIC_TF);

@@ -28,6 +28,8 @@ class RenderingStyle {
     final boolean bold;
     final Typeface face;
     final TextPaint paint;
+    private boolean superScript;
+    private boolean subScript;
 
     public RenderingStyle(final int textSize) {
         this.textSize = textSize;
@@ -141,5 +143,22 @@ class RenderingStyle {
             styles.append(key, style);
         }
         return style;
+    }
+
+    public void setSuperScript(boolean b) {
+        this.superScript = b;
+    }
+
+    
+    public boolean isSuperScript() {
+        return superScript;
+    }
+
+    public void setSubScript(boolean b) {
+        this.subScript = b;
+    }
+
+    public boolean isSubScript() {
+        return subScript;
     }
 }
