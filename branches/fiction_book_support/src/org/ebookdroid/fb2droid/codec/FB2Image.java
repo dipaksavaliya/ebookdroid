@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.Base64;
 import android.util.Base64InputStream;
 
@@ -13,25 +14,25 @@ import java.io.InputStream;
 
 public class FB2Image extends AbstractFB2LineElement {
 
-    private final float width;
-    private final int height;
-    private final int origWidth;
-    private final int origHeight;
-
     private final String encoded;
     private byte[] data;
 
     public FB2Image(final String encoded) {
+        super(calculateImageRect(encoded));
         this.encoded = encoded;
-        final Options opts = getImageSize(encoded);
-        origWidth = opts.outWidth;
-        origHeight = opts.outHeight;
+    }
 
+    private static RectF calculateImageRect(final String encoded) {
+        final Options opts = getImageSize(encoded);
+        int origWidth = opts.outWidth;
+        int origHeight = opts.outHeight;
+
+        float w = 0, h = 0;
+        
         if (origWidth <= FB2Page.PAGE_WIDTH && origHeight <= FB2Page.PAGE_HEIGHT) {
-            width = origWidth;
-            height = origHeight;
+            w = origWidth;
+            h = origHeight;
         } else {
-            float w = 0, h = 0;
             if (origWidth > FB2Page.PAGE_WIDTH) {
                 w = FB2Page.PAGE_WIDTH;
                 h = origHeight * w / origWidth;
@@ -43,28 +44,12 @@ public class FB2Image extends AbstractFB2LineElement {
                 w = w * FB2Page.PAGE_HEIGHT / h;
                 h = FB2Page.PAGE_HEIGHT;
             }
-            width = w;
-            height = (int) h;
         }
+        return new RectF(0f,0f, w, h);
     }
 
     @Override
     public void adjustWidth(final float w) {
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public float getWidth() {
-        return width;
-    }
-
-    @Override
-    public boolean isSizeable() {
-        return false;
     }
 
     @Override

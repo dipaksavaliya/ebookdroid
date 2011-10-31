@@ -7,34 +7,24 @@ public class FB2TextElement extends AbstractFB2LineElement {
     private final char[] chars;
     private final int start;
     private final int length;
-    private final float width;
 
-    private RenderingStyle renderingState;
+    private final RenderingStyle renderingState;
 
     public FB2TextElement(char[] ch, int st, int len, RenderingStyle renderingState) {
+        super(renderingState.getTextPaint().measureText(ch, st, len), renderingState.textSize, false);
         this.chars = ch;
         this.start = st;
         this.length = len;
         this.renderingState = renderingState;
-        this.width = (int) renderingState.getTextPaint().measureText(ch, st, len);
     }
 
     public FB2TextElement(char[] ch, int st, int len, RenderingStyle style, int width) {
+        super(width, style.textSize, false);
         this.chars = ch;
         this.start = st;
         this.length = len;
         this.renderingState = style;
         this.width = width;
-    }
-
-    @Override
-    public int getHeight() {
-        return renderingState.textSize;
-    }
-
-    @Override
-    public float getWidth() {
-        return width;
     }
 
     @Override
@@ -45,10 +35,5 @@ public class FB2TextElement extends AbstractFB2LineElement {
 
     @Override
     public void adjustWidth(final float w) {
-    }
-
-    @Override
-    public boolean isSizeable() {
-        return false;
     }
 }

@@ -7,28 +7,15 @@ import android.graphics.Paint;
 
 public class FB2HorizontalRule extends AbstractFB2LineElement {
 
-    private final float width;
-    private final int height;
     private static Paint rulePaint;
 
     public FB2HorizontalRule(final int width, final int height) {
-        this.width = width;
-        this.height = height;
+        super(width, height, false);
         if (rulePaint == null) {
             rulePaint = new Paint();
             rulePaint.setColor(Color.BLACK);
         }
     }
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public float getWidth() {
-        return width;
-    }
-
     @Override
     public void render(Canvas c, int y, int x) {
         c.drawLine(x, y - height/2, x + width, y - height/2, rulePaint);
@@ -36,10 +23,5 @@ public class FB2HorizontalRule extends AbstractFB2LineElement {
 
     @Override
     public void adjustWidth(float w) {
-    }
-
-    @Override
-    public boolean isSizeable() {
-        return false;
     }
 }

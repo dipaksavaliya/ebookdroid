@@ -4,24 +4,8 @@ import android.graphics.Canvas;
 
 public class FB2LineWhiteSpace extends AbstractFB2LineElement {
 
-    private final int height;
-    private float width;
-    private final boolean sizeable;
-
     public FB2LineWhiteSpace(final float width, final int height, final boolean sizeable) {
-        this.width = width;
-        this.height = height;
-        this.sizeable = sizeable;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public float getWidth() {
-        return width;
+        super(width, height, sizeable);
     }
 
     @Override
@@ -33,10 +17,5 @@ public class FB2LineWhiteSpace extends AbstractFB2LineElement {
         if (sizeable) {
             width += w;
         }
-    }
-
-    @Override
-    public boolean isSizeable() {
-        return sizeable;
     }
 }

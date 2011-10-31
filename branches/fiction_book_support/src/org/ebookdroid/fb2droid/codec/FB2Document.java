@@ -11,6 +11,8 @@ import org.ebookdroid.core.utils.archives.zip.ZipArchiveEntry;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -90,7 +92,7 @@ public class FB2Document implements CodecDocument {
                 inStream = new FileInputStream(fileName);
             }
             if (inStream != null) {
-                final Reader isr = new InputStreamReader(inStream, encoding);
+                final Reader isr = new BufferedReader(new  InputStreamReader(inStream, encoding), 1024*1024);
                 final InputSource is = new InputSource();
                 is.setCharacterStream(isr);
                 parser.parse(is, h);
@@ -250,10 +252,10 @@ public class FB2Document implements CodecDocument {
         return null;
     }
 
-    public void publishElement(FB2LineElement le) {
+    public void publishElement(AbstractFB2LineElement le) {
         FB2Line line = FB2Line.getLastLine(paragraphLines);
-        int space = (int) RenderingStyle.getTextPaint(line.getHeight()).measureText(" ");
-        if (line.width + 2 * FB2Page.MARGIN_X + space + le.getWidth() < FB2Page.PAGE_WIDTH) {
+        int space = (int) RenderingStyle.getTextPaint(line.getHeight()).spaceSize;
+        if (line.width + 2 * FB2Page.MARGIN_X + space + le.width < FB2Page.PAGE_WIDTH) {
             if (line.hasNonWhiteSpaces() && insertSpace) {
                 line.append(new FB2LineWhiteSpace(space, line.getHeight(), true));
             }

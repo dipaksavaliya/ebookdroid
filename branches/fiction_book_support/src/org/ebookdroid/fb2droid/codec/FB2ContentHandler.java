@@ -284,7 +284,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
                     }
                     final FB2TextElement te = new FB2TextElement(dst, st - start, len, crs);
                     FB2Line line = FB2Line.getLastLine(noteLines);
-                    if (line.width + 2 * FB2Page.MARGIN_X + space + te.getWidth() < FB2Page.PAGE_WIDTH) {
+                    if (line.width + 2 * FB2Page.MARGIN_X + space + te.width < FB2Page.PAGE_WIDTH) {
                         if (line.hasNonWhiteSpaces()) {
                             line.append(new FB2LineWhiteSpace(space, crs.textSize, true));
                         }

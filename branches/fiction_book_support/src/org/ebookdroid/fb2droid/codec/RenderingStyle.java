@@ -14,7 +14,7 @@ class RenderingStyle {
     public static final Typeface ITALIC_TF = Typeface.createFromAsset(EBookDroidApp.getAppContext().getAssets(),
             "fonts/OldStandard-Italic.ttf");
 
-    private static final SparseArray<TextPaint> paints = new SparseArray<TextPaint>();
+    private static final SparseArray<CustomTextPaint> paints = new SparseArray<CustomTextPaint>();
     private static final SparseArray<RenderingStyle> styles = new SparseArray<RenderingStyle>();
 
     public static final int MAIN_TITLE_SIZE = 48;
@@ -115,20 +115,20 @@ class RenderingStyle {
         return paint;
     }
 
-    public static Paint getTextPaint(final int textSize) {
+    public static CustomTextPaint getTextPaint(final int textSize) {
         return getTextPaint(NORMAL_TF, textSize, false);
     }
 
-    private static final TextPaint getTextPaint(final Typeface face, final int textSize, final boolean bold) {
+    private static final CustomTextPaint getTextPaint(final Typeface face, final int textSize, final boolean bold) {
         final int key = (textSize & 0x0FFF) + (face == ITALIC_TF ? 1 << 14 : 0) + (bold ? 1 << 15 : 0);
-        TextPaint paint = paints.get(key);
+        CustomTextPaint paint = paints.get(key);
         if (paint == null) {
-            paint = new TextPaint();
+            paint = new CustomTextPaint();
             paint.setTextSize(textSize);
             paint.setTypeface(face);
             paint.setFakeBoldText(bold);
             paint.setAntiAlias(true);
-
+            paint.initMeasures();
             paints.append(key, paint);
         }
         return paint;

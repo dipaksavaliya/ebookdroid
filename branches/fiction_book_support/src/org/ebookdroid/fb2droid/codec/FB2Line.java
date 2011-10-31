@@ -7,7 +7,7 @@ import java.util.List;
 
 public class FB2Line {
 
-    private final ArrayList<FB2LineElement> elements = new ArrayList<FB2LineElement>();
+    private final ArrayList<AbstractFB2LineElement> elements = new ArrayList<AbstractFB2LineElement>();
     private int height;
     float width = 0;
     private boolean hasNonWhiteSpaces = false;
@@ -18,18 +18,18 @@ public class FB2Line {
     public FB2Line() {
     }
 
-    public FB2Line append(final FB2LineElement element) {
+    public FB2Line append(final AbstractFB2LineElement element) {
         elements.add(element);
-        if (element.getHeight() > height) {
-            height = element.getHeight();
+        if (element.height > height) {
+            height = element.height;
         }
         if (!(element instanceof FB2LineWhiteSpace)) {
             hasNonWhiteSpaces = true;
         }
-        if (element.isSizeable()) {
+        if (element.sizeable) {
             sizeableCount++;
         }
-        width += element.getWidth();
+        width += element.width;
         return this;
     }
 
@@ -43,9 +43,9 @@ public class FB2Line {
 
     public void render(final Canvas c, final int y) {
         float x = FB2Page.MARGIN_X;
-        for (final FB2LineElement e : elements) {
+        for (final AbstractFB2LineElement e : elements) {
             e.render(c, y, (int) x);
-            x += e.getWidth();
+            x += e.width;
         }
     }
 
@@ -75,8 +75,8 @@ public class FB2Line {
             case Justify:
                 if (sizeableCount> 0) {
                     final float wsx = (FB2Page.PAGE_WIDTH - (width + 2 * FB2Page.MARGIN_X)) / sizeableCount;
-                    for (final FB2LineElement e : elements) {
-                        if (e.isSizeable()) {
+                    for (final AbstractFB2LineElement e : elements) {
+                        if (e.sizeable) {
                             e.adjustWidth(wsx);
                         }
                     }
