@@ -9,3 +9,4 @@
 || .xps, .oxps || application/vnd.ms-xpsdocument, application/oxps||
 || .cbz || application/x-cbz ||
 || .cbr || application/x-cbr ||
+|| .fb2 || application/x-fb2 ||
