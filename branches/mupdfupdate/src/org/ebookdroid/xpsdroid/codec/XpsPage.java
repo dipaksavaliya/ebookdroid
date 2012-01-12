@@ -24,12 +24,12 @@ public class XpsPage implements CodecPage {
 
     @Override
     public int getWidth() {
-        return (int)pageBounds.width();
+        return XpsContext.getWidthInPixels(pageBounds.width());
     }
 
     @Override
     public int getHeight() {
-        return (int)pageBounds.height();
+        return XpsContext.getHeightInPixels(pageBounds.height());
     }
     
     private RectF getBounds() {

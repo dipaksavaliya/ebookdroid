@@ -24,12 +24,12 @@ public class PdfPage implements CodecPage {
 
     @Override
     public int getWidth() {
-        return (int)pageBounds.width();
+        return PdfContext.getWidthInPixels(pageBounds.width());
     }
 
     @Override
     public int getHeight() {
-        return (int)pageBounds.height();
+        return PdfContext.getHeightInPixels(pageBounds.height());
     }
 
     @Override

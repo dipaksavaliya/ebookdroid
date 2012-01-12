@@ -47,6 +47,8 @@ public class PdfDocument extends AbstractCodecDocument {
         } else {
             // Check rotation
             info.rotation = (360 + info.rotation) %360;
+            info.width = (PdfContext.getWidthInPixels(info.width));
+            info.height = (PdfContext.getHeightInPixels(info.height));
             return info;
         }
     }
