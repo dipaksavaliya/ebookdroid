@@ -13,43 +13,54 @@ public class PdfPage implements CodecPage {
 
     private long pageHandle;
     private final long docHandle;
-    
-    private final RectF pageBounds;
+
+    final RectF pageBounds;
+    final int actualWidth;
+    final int actualHeight;
 
     private PdfPage(final long pageHandle, final long docHandle) {
         this.pageHandle = pageHandle;
         this.docHandle = docHandle;
         this.pageBounds = getBounds();
+        this.actualWidth = PdfContext.getWidthInPixels(pageBounds.width());
+        this.actualHeight = PdfContext.getHeightInPixels(pageBounds.height());
     }
 
     @Override
     public int getWidth() {
-        return PdfContext.getWidthInPixels(pageBounds.width());
+        return actualWidth;
     }
 
     @Override
     public int getHeight() {
-        return PdfContext.getHeightInPixels(pageBounds.height());
+        return actualHeight;
     }
 
     @Override
     public BitmapRef renderBitmap(final int width, final int height, final RectF pageSliceBounds) {
+        final float[] matrixArray = calculateFz(width, height, pageSliceBounds);
+        return render(new Rect(0, 0, width, height), matrixArray);
+    }
+
+    private float[] calculateFz(final int width, final int height, final RectF pageSliceBounds) {
         final Matrix matrix = new Matrix();
         matrix.postScale(width / (float) pageBounds.width(), height / (float) pageBounds.height());
         matrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height);
         matrix.postScale(1 / pageSliceBounds.width(), 1 / pageSliceBounds.height());
-        
+
         final float[] matrixSource = new float[9];
-        final float[] matrixArray = new float[6];
         matrix.getValues(matrixSource);
+
+        final float[] matrixArray = new float[6];
+
         matrixArray[0] = matrixSource[0];
         matrixArray[1] = matrixSource[3];
         matrixArray[2] = matrixSource[1];
         matrixArray[3] = matrixSource[4];
         matrixArray[4] = matrixSource[2];
         matrixArray[5] = matrixSource[5];
-        
-        return render(new Rect(0, 0, width, height), matrixArray);
+
+        return matrixArray;
     }
 
     static PdfPage createPage(final long dochandle, final int pageno) {
@@ -74,7 +85,7 @@ public class PdfPage implements CodecPage {
     public boolean isRecycled() {
         return pageHandle == 0;
     }
-    
+
     private RectF getBounds() {
         final float[] box = new float[4];
         getBounds(docHandle, pageHandle, box);
@@ -108,7 +119,7 @@ public class PdfPage implements CodecPage {
         return b;
     }
 
-    
+
     private static native void getBounds(long dochandle, long handle, float[] bounds);
 
     private static native void free(long dochandle, long handle);
