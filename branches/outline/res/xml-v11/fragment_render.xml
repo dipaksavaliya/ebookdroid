@@ -1,0 +1,66 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:summary="@string/pref_render_category_summary"
+    android:title="@string/pref_render_category" >
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="splitpages"
+        android:summary="@string/pref_splitpages_summary"
+        android:title="@string/pref_splitpages_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="croppages"
+        android:summary="@string/pref_croppages_summary"
+        android:title="@string/pref_croppages_title" />
+
+    <ListPreference
+        android:defaultValue="Vertical scroll"
+        android:entries="@array/list_viewmode"
+        android:entryValues="@array/list_viewmode_values"
+        android:key="viewmode"
+        android:summary="@string/pref_viewmode_summary"
+        android:title="@string/pref_viewmode_title" />
+
+    <PreferenceCategory
+        android:summary="@string/pref_singlepage_category_summary"
+        android:title="@string/pref_singlepage_category" >
+
+        <ListPreference
+            android:defaultValue="By Width"
+            android:entries="@array/list_align"
+            android:entryValues="@array/list_align_values"
+            android:key="align"
+            android:summary="@string/pref_align_summary"
+            android:title="@string/pref_align_title" />
+
+        <ListPreference
+            android:defaultValue="None"
+            android:entries="@array/list_animation"
+            android:entryValues="@array/list_animation_values"
+            android:key="animationType"
+            android:summary="@string/pref_animationtype_summary"
+            android:title="@string/pref_animationtype_title" />
+    </PreferenceCategory>
+
+    <PreferenceScreen
+        android:key="brfiletypespecific"
+        android:summary="@string/pref_brfiletypespecific_summary"
+        android:title="@string/pref_brfiletypespecific_title" >
+
+        <PreferenceCategory
+            android:key="brfiletypespecificdjvu"
+            android:summary="@string/pref_brfiletypespecificdjvu_summary"
+            android:title="@string/pref_brfiletypespecificdjvu_title" >
+
+            <ListPreference
+                android:defaultValue="0"
+                android:entries="@array/list_djvu_rendering_mode"
+                android:entryValues="@array/list_djvu_rendering_mode_values"
+                android:key="djvu_rendering_mode"
+                android:summary="@string/pref_djvu_rendering_mode_summary"
+                android:title="@string/pref_djvu_rendering_mode_title" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+</PreferenceScreen>
