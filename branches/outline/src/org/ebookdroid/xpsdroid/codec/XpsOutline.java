@@ -21,16 +21,15 @@ public class XpsOutline {
 
     private void ttOutline(final List<OutlineLink> ls, long outline, int level) {
         while (outline > 0) {
-
             final String title = getTitle(outline);
             final String link = getLink(outline, docHandle);
+            OutlineLink lnk = null;
             if (title != null) {
-                ls.add(new OutlineLink(title, link, level));
+                lnk = new OutlineLink(title, link, level);
+                ls.add(lnk);
             }
-
             final long child = getChild(outline);
-            ttOutline(ls, child, level + 1);
-
+            ttOutline(lnk != null ? lnk.children : ls, child, level + 1);
             outline = getNext(outline);
         }
     }

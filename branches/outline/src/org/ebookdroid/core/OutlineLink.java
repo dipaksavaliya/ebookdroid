@@ -1,11 +1,15 @@
 package org.ebookdroid.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OutlineLink implements CharSequence {
 
     public final String title;
     public final String link;
     public final int level;
-    
+    public final List<OutlineLink> children = new ArrayList<OutlineLink>();
+
     public OutlineLink(final String title, final String link, final int level) {
         this.title = title;
         this.level = level;

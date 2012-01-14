@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringUtils {
 
@@ -29,6 +31,19 @@ public class StringUtils {
         } catch (final IndexOutOfBoundsException e) {
         }
         return out;
+    }
+
+    public static String fixXmlEntities(String text) {
+        Pattern p = Pattern.compile("\\&\\#(\\d+)\\;");
+        StringBuffer buf = new StringBuffer();
+        Matcher m = p.matcher(text);
+        while (m.find()) {
+            String code = m.group(1);
+            char ch = (char)Integer.parseInt(code);
+            m.appendReplacement(buf, "" + ch);
+        }
+        m.appendTail(buf);
+        return buf.toString();
     }
 
     public static String md5(final String in) {

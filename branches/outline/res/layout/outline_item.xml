@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:background="@color/outline_background"
@@ -9,10 +9,8 @@
         android:id="@+id/outline_title"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="20sp"
+        android:layout_marginLeft="36dip"
         android:ellipsize="marquee"
-        android:gravity="center_vertical"
-        />
+        android:gravity="center_vertical" />
 
-</RelativeLayout>
+</FrameLayout>

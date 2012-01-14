@@ -8,8 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class OutlineAdapter extends ArrayAdapter<OutlineLink> {
         OutlineLink item = getItem(position);
         view.setText(item.title.trim());
 
-        RelativeLayout.LayoutParams l = (LayoutParams) view.getLayoutParams();
+        FrameLayout.LayoutParams l = (FrameLayout.LayoutParams) view.getLayoutParams();
         if (firstTime) {
             margin = l.leftMargin;
         }

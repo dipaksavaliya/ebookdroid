@@ -9,6 +9,7 @@ import org.ebookdroid.core.actions.ActionTarget;
 import org.ebookdroid.core.actions.IActionController;
 import org.ebookdroid.core.actions.params.Constant;
 import org.ebookdroid.core.actions.params.EditableValue;
+import org.ebookdroid.core.dialogs.OutlineDialog;
 import org.ebookdroid.core.events.CurrentPageListener;
 import org.ebookdroid.core.events.DecodingProgressListener;
 import org.ebookdroid.core.log.LogContext;
@@ -315,7 +316,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
     /**
      * Called on creation options menu
-     * 
+     *
      * @param menu
      *            the main menu
      * @return true, if successful
@@ -401,12 +402,8 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
     public void showOutline(final ActionEx action) {
         final List<OutlineLink> outline = documentModel.getDecodeService().getOutline();
         if ((outline != null) && (outline.size() > 0)) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Outline");
-            builder.setAdapter(new OutlineAdapter(this, outline),
-                    actions.getOrCreateAction(R.id.actions_gotoOutlineItem).putValue("outline", outline));
-            final AlertDialog alert = builder.create();
-            alert.show();
+            OutlineDialog dlg = new OutlineDialog(this, new OutlineAdapter(getContext(), outline));
+            dlg.show();
         } else {
             Toast.makeText(getApplicationContext(), "Document without Outline", Toast.LENGTH_SHORT).show();
         }
@@ -484,7 +481,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
     /**
      * Gets the zoom model.
-     * 
+     *
      * @return the zoom model
      */
     @Override
@@ -502,7 +499,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
     /**
      * Gets the decoding progress model.
-     * 
+     *
      * @return the decoding progress model
      */
     @Override

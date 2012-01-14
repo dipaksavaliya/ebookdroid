@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -41,6 +42,7 @@ public class FB2Document implements CodecDocument {
     private String cover;
 
     private final List<OutlineLink> outline = new ArrayList<OutlineLink>();
+    private final LinkedList<OutlineLink> stack = new LinkedList<OutlineLink>();
 
     boolean insertSpace = true;
 
@@ -313,7 +315,24 @@ public class FB2Document implements CodecDocument {
     }
 
     public void addTitle(final FB2MarkupTitle title) {
-        outline.add(new OutlineLink(title.title, "#" + pages.size(), title.level));
-    }
+        OutlineLink lnk = new OutlineLink(title.title, "#" + pages.size(), title.level);
 
+        while (!stack.isEmpty()) {
+            OutlineLink top = stack.getFirst();
+
+            if (top.level < title.level) {
+                top.children.add(lnk);
+                stack.addFirst(lnk);
+                return;
+            }
+
+            stack.removeFirst();
+        }
+
+        if (stack.isEmpty()) {
+            outline.add(lnk);
+            stack.addFirst(lnk);
+            return;
+        }
+    }
 }
