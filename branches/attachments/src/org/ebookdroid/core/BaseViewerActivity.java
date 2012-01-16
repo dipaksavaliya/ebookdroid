@@ -60,6 +60,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -183,10 +184,19 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         String fileName = "";
 
         if (getIntent().getScheme().equals("content")) {
-            fileName = uri.getLastPathSegment();
+            File tempFile;
+            try {
+                tempFile = CacheManager.createTempFile(getIntent().getData());
+                fileName = tempFile.getAbsolutePath();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
         } else {
             fileName = PathFromUri.retrieve(getContentResolver(), uri);
         }
+        
         SettingsManager.init(fileName);
         SettingsManager.applyBookSettingsChanges(null, SettingsManager.getBookSettings(), null);
 
@@ -691,10 +701,6 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         protected Exception doInBackground(final String... params) {
             LCTX.d("doInBackground(): start");
             try {
-                if (getIntent().getScheme().equals("content")) {
-                    File tempFile = CacheManager.createTempFile(getIntent().getData());
-                    m_fileName = tempFile.getAbsolutePath();
-                }
                 getView().waitForInitialization();
                 m_decodeService.open(m_fileName, m_password);
                 getDocumentController().init();
