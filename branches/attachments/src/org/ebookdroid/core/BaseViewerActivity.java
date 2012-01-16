@@ -29,6 +29,7 @@ import org.ebookdroid.core.utils.AndroidVersion;
 import org.ebookdroid.core.utils.PathFromUri;
 import org.ebookdroid.core.views.PageViewZoomControls;
 import org.ebookdroid.core.views.ViewEffects;
+import org.ebookdroid.utils.LengthUtils;
 import org.ebookdroid.utils.StringUtils;
 
 import android.app.Activity;
@@ -88,6 +89,8 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         DecodingProgressListener, CurrentPageListener, ISettingsChangeListener {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Core");
+
+    private static final String E_MAIL_ATTACHMENT = "[E-mail Attachment]";
 
     private static final int DIALOG_GOTO = 0;
 
@@ -183,7 +186,8 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         String fileName = "";
 
         if (getIntent().getScheme().equals("content")) {
-            fileName = uri.getLastPathSegment();
+            // fileName = uri.getLastPathSegment();
+            fileName = E_MAIL_ATTACHMENT;
         } else {
             fileName = PathFromUri.retrieve(getContentResolver(), uri);
         }
@@ -294,10 +298,8 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
     }
 
     private void setWindowTitle() {
-        currentFilename = getIntent().getData().getLastPathSegment();
-
+        currentFilename = LengthUtils.safeString(getIntent().getData().getLastPathSegment(), E_MAIL_ATTACHMENT);
         currentFilename = StringUtils.cleanupTitle(currentFilename);
-
         getWindow().setTitle(currentFilename);
     }
 
@@ -577,7 +579,11 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
             documentModel.recycle();
             documentModel = null;
         }
-        SettingsManager.clearCurrentBookSettings();
+        if (currentFilename.equals(E_MAIL_ATTACHMENT)) {
+            SettingsManager.clearCurrentBookSettings();
+        } else {
+            SettingsManager.removeCurrentBookSettings();
+        }
         finish();
     }
 
