@@ -580,9 +580,9 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
             documentModel = null;
         }
         if (currentFilename.equals(E_MAIL_ATTACHMENT)) {
-            SettingsManager.clearCurrentBookSettings();
-        } else {
             SettingsManager.removeCurrentBookSettings();
+        } else {
+            SettingsManager.clearCurrentBookSettings();
         }
         finish();
     }
