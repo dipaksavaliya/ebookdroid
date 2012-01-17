@@ -9,6 +9,7 @@ import org.ebookdroid.core.actions.ActionTarget;
 import org.ebookdroid.core.actions.IActionController;
 import org.ebookdroid.core.cache.CacheManager;
 import org.ebookdroid.core.log.LogContext;
+import org.ebookdroid.core.presentation.BookNode;
 import org.ebookdroid.core.presentation.BooksAdapter;
 import org.ebookdroid.core.presentation.FileListAdapter;
 import org.ebookdroid.core.presentation.RecentAdapter;
@@ -35,10 +36,16 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ViewFlipper;
@@ -171,6 +178,32 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @Override
+    public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
+        if (menuInfo instanceof AdapterContextMenuInfo) {
+            final MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.book_menu, menu);
+
+            final AbsListView list = (AbsListView) v;
+            final AdapterView.AdapterContextMenuInfo mi = (AdapterContextMenuInfo) menuInfo;
+            final Object source = (Object) list.getAdapter().getItem(mi.position);
+
+            if (source instanceof BookNode) {
+                BookNode node = (BookNode) source;
+                menu.findItem(R.id.bookmenu_removefromrecent).setVisible(
+                        SettingsManager.getBookSettings(node.path) != null);
+                menu.findItem(R.id.bookmenu_cleardata).setVisible(SettingsManager.getBookSettings(node.path) != null);
+                menu.findItem(R.id.bookmenu_deletesettings).setVisible(
+                        SettingsManager.getBookSettings(node.path) != null);
+            } else if (source instanceof BookSettings) {
+                menu.findItem(R.id.bookmenu_move).setVisible(false);
+                menu.findItem(R.id.bookmenu_delete).setVisible(false);
+            }
+        } else if (menu instanceof ExpandableListContextMenuInfo) {
+
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
 
         final MenuInflater inflater = getMenuInflater();
@@ -190,7 +223,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @ActionMethod(ids = R.id.actions_clearRecent)
-    public void doClearRecent(ActionEx action) {
+    public void doClearRecent(final ActionEx action) {
         if (action.isDialogItemSelected(ERASE_DISK_CACHE)) {
             CacheManager.clear();
             recentAdapter.notifyDataSetInvalidated();
@@ -215,7 +248,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @ActionMethod(ids = R.id.mainmenu_settings)
-    public void showSettings(ActionEx action) {
+    public void showSettings(final ActionEx action) {
         libraryAdapter.stopScan();
         bookshelfAdapter.stopScan();
         SettingsUI.showAppSettings(this);
@@ -273,7 +306,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @ActionMethod(ids = R.id.ShelfCaption)
-    public void showSelectShelfDlg(ActionEx action) {
+    public void showSelectShelfDlg(final ActionEx action) {
         final List<String> names = bookshelfAdapter.getListNames();
 
         if (LengthUtils.isNotEmpty(names)) {
@@ -286,22 +319,22 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @ActionMethod(ids = R.id.actions_selectShelf)
-    public void selectShelf(ActionEx action) {
-        Integer item = action.getParameter(IActionController.DIALOG_ITEM_PROPERTY);
+    public void selectShelf(final ActionEx action) {
+        final Integer item = action.getParameter(IActionController.DIALOG_ITEM_PROPERTY);
         if (bookcaseView != null) {
             bookcaseView.setCurrentList(item);
         }
     }
 
     @ActionMethod(ids = R.id.ShelfLeftButton)
-    public void selectPrevShelf(ActionEx action) {
+    public void selectPrevShelf(final ActionEx action) {
         if (bookcaseView != null) {
             bookcaseView.prevList();
         }
     }
 
     @ActionMethod(ids = R.id.ShelfRightButton)
-    public void selectNextShelf(ActionEx action) {
+    public void selectNextShelf(final ActionEx action) {
         if (bookcaseView != null) {
             bookcaseView.nextList();
         }
@@ -357,8 +390,8 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
                     tmpbmp.eraseColor(Color.WHITE);
                     store = false;
                 }
-                int left = 15;
-                int top = 10;
+                final int left = 15;
+                final int top = 10;
                 final int width = tmpbmp.getWidth() + left;
                 final int height = tmpbmp.getHeight() + top;
                 bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -375,7 +408,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
                 if (store) {
                     thumbnails.put(path, new SoftReference<Bitmap>(bmp));
                 }
-            } catch (OutOfMemoryError ex) {
+            } catch (final OutOfMemoryError ex) {
             }
         }
 
@@ -400,8 +433,13 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
             } else {
                 libraryButton.setImageResource(R.drawable.actionbar_library);
 
-                viewflipper.addView(new RecentBooksView(this, recentAdapter), VIEW_RECENT);
-                viewflipper.addView(new LibraryView(this, libraryAdapter), VIEW_LIBRARY);
+                View child = new RecentBooksView(this, recentAdapter);
+                registerForContextMenu(child);
+                viewflipper.addView(child, VIEW_RECENT);
+
+                child = new LibraryView(this, libraryAdapter);
+                registerForContextMenu(child);
+                viewflipper.addView(child, VIEW_LIBRARY);
             }
             return;
         }
@@ -429,4 +467,5 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
             final org.ebookdroid.core.settings.books.BookSettings.Diff diff, final Diff appDiff) {
 
     }
+
 }

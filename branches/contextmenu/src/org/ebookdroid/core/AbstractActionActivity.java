@@ -29,6 +29,17 @@ public abstract class AbstractActionActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final int actionId = item.getItemId();
+        final ActionEx action = actions.getOrCreateAction(actionId);
+        if (action.getMethod().isValid()) {
+            action.run();
+            return true;
+        }
+        return super.onContextItemSelected(item);
+    }
+
     public final void onButtonClick(final View view) {
         final int actionId = view.getId();
         final ActionEx action = actions.getOrCreateAction(actionId);
@@ -42,7 +53,7 @@ public abstract class AbstractActionActivity extends Activity {
             view.setOnClickListener(action);
         }
     }
-    
+
     @ActionMethod(ids = R.id.mainmenu_about)
     public void showAbout(final ActionEx action) {
         final Intent i = new Intent(this, AboutActivity.class);

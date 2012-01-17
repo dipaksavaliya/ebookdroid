@@ -75,6 +75,7 @@ public class BookshelfView extends GridView implements OnItemClickListener {
         init(base.getContext());
         setOnItemClickListener(this);
 
+        base.getActivity().registerForContextMenu(this);
     }
 
     private void init(final Context context) {
