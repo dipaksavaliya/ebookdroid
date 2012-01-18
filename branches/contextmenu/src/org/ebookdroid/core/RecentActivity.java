@@ -189,14 +189,8 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
 
             if (source instanceof BookNode) {
                 BookNode node = (BookNode) source;
-                menu.findItem(R.id.bookmenu_removefromrecent).setVisible(
-                        SettingsManager.getBookSettings(node.path) != null);
-                menu.findItem(R.id.bookmenu_cleardata).setVisible(SettingsManager.getBookSettings(node.path) != null);
-                menu.findItem(R.id.bookmenu_deletesettings).setVisible(
-                        SettingsManager.getBookSettings(node.path) != null);
-            } else if (source instanceof BookSettings) {
-                menu.findItem(R.id.bookmenu_move).setVisible(false);
-                menu.findItem(R.id.bookmenu_delete).setVisible(false);
+                menu.setHeaderTitle(node.name);
+                menu.findItem(R.id.bookmenu_recentgroup).setVisible(node.settings != null);
             }
         } else if (menu instanceof ExpandableListContextMenuInfo) {
 

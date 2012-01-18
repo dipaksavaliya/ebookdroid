@@ -3,7 +3,6 @@ package org.ebookdroid.core.presentation;
 import org.ebookdroid.R;
 import org.ebookdroid.core.IBrowserActivity;
 import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.settings.books.BookSettings;
 import org.ebookdroid.core.views.BookshelfView;
 import org.ebookdroid.utils.LengthUtils;
 
@@ -215,12 +214,20 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
                 data.append(a.id, a);
                 folders.put(dir, a);
                 for (final File f : files) {
-                    a.nodes.add(new BookNode(f));
+                    BookNode node = recent.getNode(f.getAbsolutePath());
+                    if (node == null) {
+                        node = new BookNode(f, null);
+                    }
+                    a.nodes.add(node);
                 }
                 notifyDataSetChanged();
             } else {
                 for (final File f : files) {
-                    a.nodes.add(new BookNode(f));
+                    BookNode node = recent.getNode(f.getAbsolutePath());
+                    if (node == null) {
+                        node = new BookNode(f, null);
+                    }
+                    a.nodes.add(node);
                 }
                 a.notifyDataSetChanged();
             }
@@ -236,11 +243,19 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
                 a = new BookShelfAdapter(base, SEQ.getAndIncrement(), parent.getName(), dir);
                 data.append(a.id, a);
                 folders.put(dir, a);
-                a.nodes.add(new BookNode(f));
+                BookNode node = recent.getNode(f.getAbsolutePath());
+                if (node == null) {
+                    node = new BookNode(f, null);
+                }
+                a.nodes.add(node);
                 Collections.sort(a.nodes);
                 notifyDataSetChanged();
             } else {
-                a.nodes.add(new BookNode(f));
+                BookNode node = recent.getNode(f.getAbsolutePath());
+                if (node == null) {
+                    node = new BookNode(f, null);
+                }
+                a.nodes.add(node);
                 Collections.sort(a.nodes);
                 a.notifyDataSetChanged();
             }
@@ -334,9 +349,7 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
             ra.nodes.clear();
             final int count = recent.getCount();
             for (int i = 0; i < count; i++) {
-                final BookSettings item = recent.getItem(i);
-                final File file = new File(item.fileName);
-                final BookNode book = new BookNode(file);
+                final BookNode book = recent.getItem(i);
                 ra.nodes.add(book);
                 final BookShelfAdapter a = folders.get(new File(book.path).getParent());
                 if (a != null) {

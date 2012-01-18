@@ -1,8 +1,8 @@
 package org.ebookdroid.core.views;
 
 import org.ebookdroid.core.IBrowserActivity;
+import org.ebookdroid.core.presentation.BookNode;
 import org.ebookdroid.core.presentation.RecentAdapter;
-import org.ebookdroid.core.settings.books.BookSettings;
 
 import android.net.Uri;
 import android.view.View;
@@ -33,7 +33,7 @@ public class RecentBooksView extends android.widget.ListView implements AdapterV
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
-        final BookSettings bs = adapter.getItem(i);
-        base.showDocument(Uri.fromFile(new File(bs.fileName)));
+        final BookNode bs = adapter.getItem(i);
+        base.showDocument(Uri.fromFile(new File(bs.path)));
     }
 }
