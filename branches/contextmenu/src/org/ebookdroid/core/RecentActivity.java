@@ -10,6 +10,7 @@ import org.ebookdroid.core.actions.IActionController;
 import org.ebookdroid.core.cache.CacheManager;
 import org.ebookdroid.core.log.LogContext;
 import org.ebookdroid.core.presentation.BookNode;
+import org.ebookdroid.core.presentation.BookShelfAdapter;
 import org.ebookdroid.core.presentation.BooksAdapter;
 import org.ebookdroid.core.presentation.FileListAdapter;
 import org.ebookdroid.core.presentation.RecentAdapter;
@@ -43,8 +44,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -179,21 +181,41 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
 
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
+        Object source = null;
+
         if (menuInfo instanceof AdapterContextMenuInfo) {
+            final AbsListView list = (AbsListView) v;
+            final AdapterContextMenuInfo mi = (AdapterContextMenuInfo) menuInfo;
+            source = list.getAdapter().getItem(mi.position);
+        } else if (menuInfo instanceof ExpandableListContextMenuInfo) {
+            final ExpandableListView list = (ExpandableListView) v;
+            final ExpandableListAdapter adapter = list.getExpandableListAdapter();
+            final ExpandableListContextMenuInfo mi = (ExpandableListContextMenuInfo) menuInfo;
+            final long pp = mi.packedPosition;
+            final int group = ExpandableListView.getPackedPositionGroup(pp);
+            final int child = ExpandableListView.getPackedPositionChild(pp);
+            if(child >= 0) {
+                source = ((ExpandableListAdapter)adapter).getChild(group, child);
+            } else {
+                source = ((ExpandableListAdapter)adapter).getGroup(group);
+            }
+        }
+
+        if (source instanceof BookNode) {
+            final BookNode node = (BookNode) source;
+
             final MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.book_menu, menu);
 
-            final AbsListView list = (AbsListView) v;
-            final AdapterView.AdapterContextMenuInfo mi = (AdapterContextMenuInfo) menuInfo;
-            final Object source = (Object) list.getAdapter().getItem(mi.position);
+            menu.setHeaderTitle(node.name);
+            menu.findItem(R.id.bookmenu_recentgroup).setVisible(node.settings != null);
+        } else if (source instanceof BookShelfAdapter) {
+            BookShelfAdapter a = (BookShelfAdapter) source;
 
-            if (source instanceof BookNode) {
-                BookNode node = (BookNode) source;
-                menu.setHeaderTitle(node.name);
-                menu.findItem(R.id.bookmenu_recentgroup).setVisible(node.settings != null);
-            }
-        } else if (menu instanceof ExpandableListContextMenuInfo) {
+            final MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.library_menu, menu);
 
+            menu.setHeaderTitle(a.name);
         }
     }
 
