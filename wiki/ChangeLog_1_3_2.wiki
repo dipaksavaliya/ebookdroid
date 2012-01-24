@@ -2,6 +2,7 @@
 
 === Optimization of decoding and drawing process ===
  * Bitmap memory management improved
+ * Faster Night mode implementation
 
 === Impoved book formats support ===
  * MuPDF library update
