@@ -1,7 +1,7 @@
 == Q: How to obtail program log file? ==
 == A: ==
 === 1. Using Android SDK ===
-Connet phone to PC and use _"adb logcat"_ command.
+Connect phone to PC and use _"adb logcat"_ command.
 === 2. On the phone ===
 Use programs from the market
 For example:
