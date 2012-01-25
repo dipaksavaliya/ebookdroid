@@ -1,16 +1,14 @@
-
-== Получение лога программы ==
-
+== Q: How to obtail program log file? ==
+== A: ==
+=== 1. Using Android SDK ===
+Connet phone to PC and use _"adb logcat"_ command.
 === Android SDK ===
-
-При установленном Android SDK логи программы можно получить, присоединив устройство к компьютеру
-и набрав в командной строке:
-
-adb logcat
-
-=== Непосредственно на устройстве ===
-
-На маркете доступны программы для записи и просмотра логов:
-Например:
+=== 2. On the phone ===
+Use programs from the market
+For example:
  * https://market.android.com/details?id=com.nolanlawson.logcat
  * https://market.android.com/details?id=org.jtb.alogcat
+
+== Q: Program does not open document from external file manager? ==
+== A: ==
+EbookDroid use mime types to handle different file types. But android and lot of file managers does not support some types. This cause that you can not open files from this file managers. Some file managers has ability to add new mime types and associate it with extension. Refer to your file manager manual or use internal file manager. Mime types supported by EBookDroid you can find in our wiki pages.
