@@ -1,0 +1,16 @@
+
+== Получение лога программы ==
+
+=== Android SDK ===
+
+При установленном Android SDK логи программы можно получить, присоединив устройство к компьютеру
+и набрав в командной строке:
+
+adb logcat
+
+=== Непосредственно на устройстве ===
+
+На маркете доступны программы для записи и просмотра логов:
+Например:
+ * https://market.android.com/details?id=com.nolanlawson.logcat
+ * https://market.android.com/details?id=org.jtb.alogcat
