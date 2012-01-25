@@ -2,7 +2,6 @@
 == A: ==
 === 1. Using Android SDK ===
 Connet phone to PC and use _"adb logcat"_ command.
-=== Android SDK ===
 === 2. On the phone ===
 Use programs from the market
 For example:
@@ -11,4 +10,4 @@ For example:
 
 == Q: Program does not open document from external file manager? ==
 == A: ==
-EbookDroid use mime types to handle different file types. But android and lot of file managers does not support some types. This cause that you can not open files from this file managers. Some file managers has ability to add new mime types and associate it with extension. Refer to your file manager manual or use internal file manager. Mime types supported by EBookDroid you can find in our wiki pages.
+EbookDroid use mime types to handle different file types. But android and lot of file managers does not support some types. This cause that you can not open files from this file managers. Some file managers has ability to add new mime types and associate it with extension. Refer to your file manager manual or use internal file manager. Mime types supported by EBookDroid you can find [MimeTypes there].
