@@ -1,16 +1,18 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.IDocumentViewController.InvalidateSizeReason;
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
-import org.ebookdroid.core.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.common.bitmaps.BitmapRef;
+import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.crop.PageCropper;
-import org.ebookdroid.core.log.LogContext;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.settings.books.BookSettings;
+import org.ebookdroid.ui.viewer.IController;
+import org.ebookdroid.ui.viewer.IActivity;
+import org.ebookdroid.ui.viewer.IController.InvalidateSizeReason;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -287,7 +289,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                     setDecodingNow(false);
 
                     page.base.getDocumentController().pageUpdated(page.index.viewIndex);
-                    final IDocumentViewController dc = page.base.getDocumentController();
+                    final IController dc = page.base.getDocumentController();
                     final DocumentModel dm = page.base.getDocumentModel();
 
                     if (dc != null && dm != null) {
@@ -389,7 +391,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return new RectF(targetRectF);
     }
 
-    public IViewerActivity getBase() {
+    public IActivity getBase() {
         return page.base;
     }
 

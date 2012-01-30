@@ -1,14 +1,15 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
+import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.common.bitmaps.BitmapRef;
+import org.ebookdroid.common.log.EmergencyHandler;
+import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.codec.CodecContext;
 import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
-import org.ebookdroid.core.log.EmergencyHandler;
-import org.ebookdroid.core.log.LogContext;
-import org.ebookdroid.core.settings.SettingsManager;
+import org.ebookdroid.core.codec.OutlineLink;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;

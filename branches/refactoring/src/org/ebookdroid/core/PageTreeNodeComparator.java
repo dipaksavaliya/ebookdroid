@@ -1,10 +1,11 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.utils.CompareUtils;
 
 import android.graphics.RectF;
 
 import java.util.Comparator;
+
+import org.emdev.utils.CompareUtils;
 
 public class PageTreeNodeComparator implements Comparator<PageTreeNode> {
 

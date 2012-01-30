@@ -1,11 +1,11 @@
 package org.ebookdroid.core.curl;
 
-import org.ebookdroid.core.DragMark;
+import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageDocumentView;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.log.LogContext;
-import org.ebookdroid.core.settings.SettingsManager;
+import org.ebookdroid.ui.viewer.views.DragMark;
 
 import android.graphics.Canvas;
 import android.view.MotionEvent;

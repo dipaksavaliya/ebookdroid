@@ -1,7 +1,7 @@
 package org.ebookdroid.core.crop;
 
-import org.ebookdroid.core.bitmaps.BitmapRef;
-import org.ebookdroid.core.bitmaps.RawBitmap;
+import org.ebookdroid.common.bitmaps.BitmapRef;
+import org.ebookdroid.common.bitmaps.RawBitmap;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;

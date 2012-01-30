@@ -1,6 +1,6 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.log.LogContext;
+import org.ebookdroid.common.log.LogContext;
 
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;

@@ -1,9 +1,10 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.R;
-import org.ebookdroid.core.hwa.IHardwareAcceleration;
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.core.settings.SettingsManager;
+import org.ebookdroid.ui.viewer.IActivity;
+import org.ebookdroid.ui.viewer.views.DragMark;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,11 +12,13 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import org.emdev.ui.hwa.IHardwareAcceleration;
+
 public class ContiniousDocumentView extends AbstractDocumentView {
 
     protected static Bitmap dragBitmap;
 
-    public ContiniousDocumentView(final IViewerActivity base) {
+    public ContiniousDocumentView(final IActivity base) {
         super(base);
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
@@ -54,7 +57,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.IDocumentViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.ui.viewer.IController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override
     public final int calculateCurrentPage(final ViewState viewState) {
@@ -82,7 +85,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.IDocumentViewController#verticalConfigScroll(int)
+     * @see org.ebookdroid.ui.viewer.IController#verticalConfigScroll(int)
      */
     @Override
     public final void verticalConfigScroll(final int direction) {
@@ -95,7 +98,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.IDocumentViewController#getScrollLimits()
+     * @see org.ebookdroid.ui.viewer.IController#getScrollLimits()
      */
     @Override
     public final Rect getScrollLimits() {
@@ -163,7 +166,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.IDocumentViewController#invalidatePageSizes(org.ebookdroid.core.IDocumentViewController.InvalidateSizeReason,
+     * @see org.ebookdroid.ui.viewer.IController#invalidatePageSizes(org.ebookdroid.ui.viewer.IController.InvalidateSizeReason,
      *      org.ebookdroid.core.Page)
      */
     @Override
@@ -212,7 +215,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.IDocumentViewController#updateAnimationType()
+     * @see org.ebookdroid.ui.viewer.IController#updateAnimationType()
      */
     @Override
     public final void updateAnimationType() {
@@ -222,7 +225,7 @@ public class ContiniousDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.IDocumentViewController#pageUpdated(int)
+     * @see org.ebookdroid.ui.viewer.IController#pageUpdated(int)
      */
     @Override
     public void pageUpdated(final int viewIndex) {

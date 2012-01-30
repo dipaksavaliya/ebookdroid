@@ -1,7 +1,8 @@
 package org.ebookdroid.core.models;
 
 import org.ebookdroid.core.events.DecodingProgressListener;
-import org.ebookdroid.core.events.ListenerProxy;
+
+import org.emdev.utils.listeners.ListenerProxy;
 
 public class DecodingProgressModel extends ListenerProxy {
 

@@ -1,11 +1,9 @@
 package org.ebookdroid.core.touch;
 
 import org.ebookdroid.R;
-import org.ebookdroid.core.actions.ActionEx;
-import org.ebookdroid.core.log.LogContext;
-import org.ebookdroid.core.settings.AppSettings;
-import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.utils.LengthUtils;
+import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.AppSettings;
+import org.ebookdroid.common.settings.SettingsManager;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -18,6 +16,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.emdev.ui.actions.ActionEx;
+import org.emdev.utils.LengthUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

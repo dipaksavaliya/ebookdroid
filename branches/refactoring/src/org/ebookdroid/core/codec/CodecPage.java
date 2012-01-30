@@ -1,6 +1,6 @@
 package org.ebookdroid.core.codec;
 
-import org.ebookdroid.core.bitmaps.BitmapRef;
+import org.ebookdroid.common.bitmaps.BitmapRef;
 
 import android.graphics.RectF;
 

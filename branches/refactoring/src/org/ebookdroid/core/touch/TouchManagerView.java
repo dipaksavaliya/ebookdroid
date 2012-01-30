@@ -1,12 +1,9 @@
 package org.ebookdroid.core.touch;
 
-import org.ebookdroid.core.IViewerActivity;
-import org.ebookdroid.core.actions.ActionController;
-import org.ebookdroid.core.actions.ActionEx;
-import org.ebookdroid.core.log.LogContext;
+import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.core.touch.TouchManager.Region;
 import org.ebookdroid.core.touch.TouchManager.TouchProfile;
-import org.ebookdroid.utils.MathUtils;
+import org.ebookdroid.ui.viewer.IActivity;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,6 +17,10 @@ import android.view.View;
 
 import java.util.ListIterator;
 
+import org.emdev.ui.actions.ActionController;
+import org.emdev.ui.actions.ActionEx;
+import org.emdev.utils.MathUtils;
+
 public class TouchManagerView extends View {
 
     private static final LogContext LCTX = LogContext.ROOT.lctx("TouchManagerView");
@@ -31,7 +32,7 @@ public class TouchManagerView extends View {
 
     private static final int[] COLORS = { Color.BLUE, Color.CYAN, Color.GRAY, Color.MAGENTA, Color.RED, Color.YELLOW };
 
-    private final IViewerActivity base;
+    private final IActivity base;
 
     private final Paint bgPaint;
     private final Paint gridPaint;
@@ -40,7 +41,7 @@ public class TouchManagerView extends View {
 
     private TouchProfile profile;
 
-    public TouchManagerView(final IViewerActivity base) {
+    public TouchManagerView(final IActivity base) {
         super(base.getContext());
         this.base = base;
         this.actions = new ActionController<TouchManagerView>(base.getActivity(), base.getActionController(), this);

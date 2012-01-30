@@ -1,7 +1,8 @@
 package org.ebookdroid.core.touch;
 
 import org.ebookdroid.core.models.ZoomModel;
-import org.ebookdroid.core.utils.AndroidVersion;
+
+import org.emdev.utils.android.AndroidVersion;
 
 public interface IMultiTouchZoom extends IGestureDetector {
 

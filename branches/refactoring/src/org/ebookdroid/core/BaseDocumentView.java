@@ -1,10 +1,11 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.utils.Flag;
-import org.ebookdroid.utils.MathUtils;
+import org.ebookdroid.ui.viewer.IView;
+import org.ebookdroid.ui.viewer.IController;
+import org.ebookdroid.ui.viewer.IActivity;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -16,9 +17,12 @@ import android.widget.Scroller;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class BaseDocumentView extends View implements IDocumentView {
+import org.emdev.utils.MathUtils;
+import org.emdev.utils.concurrent.Flag;
 
-    protected final IViewerActivity base;
+public final class BaseDocumentView extends View implements IView {
+
+    protected final IActivity base;
 
     protected final Scroller scroller;
 
@@ -32,7 +36,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
 
     protected final Flag layoutFlag = new Flag();
 
-    public BaseDocumentView(final IViewerActivity baseActivity) {
+    public BaseDocumentView(final IActivity baseActivity) {
         super(baseActivity.getContext());
         this.base = baseActivity;
         this.scroller = new Scroller(getContext());
@@ -47,7 +51,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#getView()
+     * @see org.ebookdroid.ui.viewer.IView#getView()
      */
     @Override
     public final View getView() {
@@ -57,17 +61,17 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#getBase()
+     * @see org.ebookdroid.ui.viewer.IView#getBase()
      */
     @Override
-    public final IViewerActivity getBase() {
+    public final IActivity getBase() {
         return base;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#getScroller()
+     * @see org.ebookdroid.ui.viewer.IView#getScroller()
      */
     @Override
     public final Scroller getScroller() {
@@ -77,7 +81,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#invalidateScroll()
+     * @see org.ebookdroid.ui.viewer.IView#invalidateScroll()
      */
     @Override
     public final void invalidateScroll() {
@@ -90,7 +94,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#invalidateScroll(float, float)
+     * @see org.ebookdroid.ui.viewer.IView#invalidateScroll(float, float)
      */
     @Override
     public final void invalidateScroll(final float newZoom, final float oldZoom) {
@@ -104,7 +108,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#startPageScroll(int, int)
+     * @see org.ebookdroid.ui.viewer.IView#startPageScroll(int, int)
      */
     @Override
     public void startPageScroll(final int dx, final int dy) {
@@ -115,7 +119,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#startFling(float, float, android.graphics.Rect)
+     * @see org.ebookdroid.ui.viewer.IView#startFling(float, float, android.graphics.Rect)
      */
     @Override
     public void startFling(final float vX, final float vY, final Rect limits) {
@@ -126,7 +130,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#continueScroll()
+     * @see org.ebookdroid.ui.viewer.IView#continueScroll()
      */
     @Override
     public void continueScroll() {
@@ -138,7 +142,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#forceFinishScroll()
+     * @see org.ebookdroid.ui.viewer.IView#forceFinishScroll()
      */
     @Override
     public void forceFinishScroll() {
@@ -173,7 +177,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#scrollTo(int, int)
+     * @see org.ebookdroid.ui.viewer.IView#scrollTo(int, int)
      */
     @Override
     public final void scrollTo(final int x, final int y) {
@@ -181,7 +185,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
 
             @Override
             public void run() {
-                final IDocumentViewController dc = base.getDocumentController();
+                final IController dc = base.getDocumentController();
                 final DocumentModel dm = base.getDocumentModel();
                 if (dc != null && dm != null) {
                     final Rect l = dc.getScrollLimits();
@@ -197,7 +201,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#getViewRect()
+     * @see org.ebookdroid.ui.viewer.IView#getViewRect()
      */
     @Override
     public final RectF getViewRect() {
@@ -207,7 +211,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#changeLayoutLock(boolean)
+     * @see org.ebookdroid.ui.viewer.IView#changeLayoutLock(boolean)
      */
     @Override
     public void changeLayoutLock(final boolean lock) {
@@ -223,7 +227,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#isLayoutLocked()
+     * @see org.ebookdroid.ui.viewer.IView#isLayoutLocked()
      */
     @Override
     public boolean isLayoutLocked() {
@@ -251,7 +255,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#waitForInitialization()
+     * @see org.ebookdroid.ui.viewer.IView#waitForInitialization()
      */
     @Override
     public final void waitForInitialization() {
@@ -263,7 +267,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#getScrollScaleRatio()
+     * @see org.ebookdroid.ui.viewer.IView#getScrollScaleRatio()
      */
     @Override
     public float getScrollScaleRatio() {
@@ -279,7 +283,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#stopScroller()
+     * @see org.ebookdroid.ui.viewer.IView#stopScroller()
      */
     @Override
     public void stopScroller() {
@@ -291,7 +295,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#redrawView()
+     * @see org.ebookdroid.ui.viewer.IView#redrawView()
      */
     @Override
     public final void redrawView() {
@@ -301,7 +305,7 @@ public final class BaseDocumentView extends View implements IDocumentView {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.IDocumentView#redrawView(org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.ui.viewer.IView#redrawView(org.ebookdroid.core.ViewState)
      */
     @Override
     public final void redrawView(final ViewState viewState) {

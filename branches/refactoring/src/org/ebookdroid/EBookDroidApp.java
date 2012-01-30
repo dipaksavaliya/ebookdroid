@@ -1,10 +1,9 @@
 package org.ebookdroid;
 
-import org.ebookdroid.core.cache.CacheManager;
-import org.ebookdroid.core.log.EmergencyHandler;
-import org.ebookdroid.core.log.LogContext;
-import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.utils.AndroidVersion;
+import org.ebookdroid.common.cache.CacheManager;
+import org.ebookdroid.common.log.EmergencyHandler;
+import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.SettingsManager;
 
 import android.app.Application;
 import android.content.Context;
@@ -15,6 +14,8 @@ import android.os.Build;
 import android.os.Environment;
 
 import java.io.File;
+
+import org.emdev.utils.android.AndroidVersion;
 
 public class EBookDroidApp extends Application {
 

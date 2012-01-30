@@ -19,10 +19,10 @@
 
 package org.ebookdroid.core.curl;
 
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageDocumentView;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.settings.SettingsManager;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

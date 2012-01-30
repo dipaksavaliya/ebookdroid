@@ -1,8 +1,9 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.core.bitmaps.BitmapRef;
+import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
+import org.ebookdroid.core.codec.OutlineLink;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;

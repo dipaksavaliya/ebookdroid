@@ -1,6 +1,6 @@
 package org.ebookdroid.core.codec;
 
-import org.ebookdroid.core.BaseViewerActivity;
+import org.ebookdroid.ui.viewer.BaseViewerActivity;
 
 import android.graphics.Bitmap;
 

@@ -1,9 +1,11 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.settings.AppSettings;
+import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.core.settings.AppSettings;
-import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.settings.books.BookSettings;
+import org.ebookdroid.ui.viewer.IView;
+import org.ebookdroid.ui.viewer.IController;
 
 import android.graphics.RectF;
 import android.util.SparseArray;
@@ -13,8 +15,8 @@ import java.util.Map;
 
 public class ViewState {
 
-    public final IDocumentViewController ctrl;
-    public final IDocumentView view;
+    public final IController ctrl;
+    public final IView view;
 
     public final int currentIndex;
     public final int firstVisible;
@@ -42,11 +44,11 @@ public class ViewState {
         this(node.page.base.getDocumentController());
     }
 
-    public ViewState(final IDocumentViewController dc) {
+    public ViewState(final IController dc) {
         this(dc, dc.getBase().getZoomModel().getZoom());
     }
 
-    public ViewState(final IDocumentViewController dc, final float zoom) {
+    public ViewState(final IController dc, final float zoom) {
         this.ctrl = dc;
         this.view = dc.getView();
 
@@ -82,7 +84,7 @@ public class ViewState {
         this.nightMode = as.getNightMode();
     }
 
-    public ViewState(final ViewState oldState, final IDocumentViewController dc) {
+    public ViewState(final ViewState oldState, final IController dc) {
         this.ctrl = dc;
         this.view = dc.getView();
 

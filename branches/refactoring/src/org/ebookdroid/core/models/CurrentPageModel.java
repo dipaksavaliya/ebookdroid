@@ -1,10 +1,11 @@
 package org.ebookdroid.core.models;
 
+import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.events.CurrentPageListener;
-import org.ebookdroid.core.events.ListenerProxy;
-import org.ebookdroid.core.log.LogContext;
-import org.ebookdroid.utils.CompareUtils;
+
+import org.emdev.utils.CompareUtils;
+import org.emdev.utils.listeners.ListenerProxy;
 
 public class CurrentPageModel extends ListenerProxy {
 

@@ -1,7 +1,5 @@
 package org.ebookdroid.core.codec;
 
-import org.ebookdroid.core.OutlineLink;
-import org.ebookdroid.core.PageLink;
 
 import android.graphics.Bitmap;
 

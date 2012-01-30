@@ -1,7 +1,8 @@
 package org.ebookdroid.core.models;
 
-import org.ebookdroid.core.events.ListenerProxy;
 import org.ebookdroid.core.events.ZoomListener;
+
+import org.emdev.utils.listeners.ListenerProxy;
 
 public class ZoomModel extends ListenerProxy {
 

@@ -1,12 +1,12 @@
 package org.ebookdroid.core.curl;
 
+import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.common.bitmaps.BitmapRef;
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PagePaint;
 import org.ebookdroid.core.SinglePageDocumentView;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.BitmapRef;
-import org.ebookdroid.core.settings.SettingsManager;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

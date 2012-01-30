@@ -1,19 +1,18 @@
 package org.ebookdroid.core.models;
 
 import org.ebookdroid.R;
+import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.cache.CacheManager;
+import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.core.DecodeService;
-import org.ebookdroid.core.IDocumentView;
-import org.ebookdroid.core.IViewerActivity;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.PageType;
-import org.ebookdroid.core.bitmaps.BitmapManager;
-import org.ebookdroid.core.bitmaps.Bitmaps;
-import org.ebookdroid.core.cache.CacheManager;
 import org.ebookdroid.core.codec.CodecPageInfo;
-import org.ebookdroid.core.settings.SettingsManager;
-import org.ebookdroid.core.settings.books.BookSettings;
-import org.ebookdroid.utils.LengthUtils;
+import org.ebookdroid.ui.viewer.IView;
+import org.ebookdroid.ui.viewer.IActivity;
 
 import android.graphics.RectF;
 
@@ -28,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.emdev.utils.LengthUtils;
 
 public class DocumentModel extends CurrentPageModel {
 
@@ -128,7 +129,7 @@ public class DocumentModel extends CurrentPageModel {
         }
     }
 
-    public void initPages(final IViewerActivity base, final IViewerActivity.IBookLoadTask task) {
+    public void initPages(final IActivity base, final IActivity.IBookLoadTask task) {
         recyclePages();
 
         final BookSettings bs = SettingsManager.getBookSettings();
@@ -137,7 +138,7 @@ public class DocumentModel extends CurrentPageModel {
             return;
         }
 
-        final IDocumentView view = base.getView();
+        final IView view = base.getView();
 
         final CodecPageInfo defCpi = new CodecPageInfo();
         defCpi.width = (view.getWidth());
@@ -193,8 +194,8 @@ public class DocumentModel extends CurrentPageModel {
         decodeService.createThumbnail(thumbnailFile, width, height, page.index.docIndex, page.type.getInitialRect());
     }
 
-    private CodecPageInfo[] retrievePagesInfo(final IViewerActivity base, final BookSettings bs,
-            IViewerActivity.IBookLoadTask task) {
+    private CodecPageInfo[] retrievePagesInfo(final IActivity base, final BookSettings bs,
+            IActivity.IBookLoadTask task) {
         final File pagesFile = CacheManager.getPageFile(bs.fileName);
 
         if (CACHE_ENABLED) {
