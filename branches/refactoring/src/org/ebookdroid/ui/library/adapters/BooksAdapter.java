@@ -289,7 +289,7 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         }
     }
 
-    static class ViewHolder extends BaseViewHolder {
+    public static class ViewHolder extends BaseViewHolder {
 
         ImageView imageView;
         TextView textView;

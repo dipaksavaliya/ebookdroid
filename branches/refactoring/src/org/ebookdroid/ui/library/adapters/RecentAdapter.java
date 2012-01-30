@@ -83,7 +83,7 @@ public class RecentAdapter extends BaseAdapter {
         notifyDataSetInvalidated();
     }
 
-    static class ViewHolder extends BaseViewHolder {
+    public static class ViewHolder extends BaseViewHolder {
 
         TextView name;
         ImageView imageView;

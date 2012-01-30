@@ -5,7 +5,7 @@
 #include "hqx.h"
 
 JNIEXPORT void JNICALL
-Java_org_ebookdroid_core_bitmaps_RawBitmap_nativeHq4x(JNIEnv* env, jclass classObject, jintArray srcArray,
+Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeHq4x(JNIEnv* env, jclass classObject, jintArray srcArray,
                                                           jintArray dstArray, jint width, jint height)
 {
 
@@ -22,7 +22,7 @@ Java_org_ebookdroid_core_bitmaps_RawBitmap_nativeHq4x(JNIEnv* env, jclass classO
 }
 
 JNIEXPORT void JNICALL
- Java_org_ebookdroid_core_bitmaps_RawBitmap_nativeHq3x(JNIEnv* env, jclass classObject, jintArray srcArray,
+ Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeHq3x(JNIEnv* env, jclass classObject, jintArray srcArray,
                                                           jintArray dstArray, jint width, jint height)
 {
 
@@ -39,7 +39,7 @@ JNIEXPORT void JNICALL
 }
 
 JNIEXPORT void JNICALL
- Java_org_ebookdroid_core_bitmaps_RawBitmap_nativeHq2x(JNIEnv* env, jclass classObject, jintArray srcArray,
+ Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeHq2x(JNIEnv* env, jclass classObject, jintArray srcArray,
                                                           jintArray dstArray, jint width, jint height)
 {
 
@@ -57,7 +57,7 @@ JNIEXPORT void JNICALL
 
 
 JNIEXPORT void JNICALL
- Java_org_ebookdroid_core_bitmaps_RawBitmap_nativeInvert(JNIEnv* env, jclass classObject, jintArray srcArray,
+ Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeInvert(JNIEnv* env, jclass classObject, jintArray srcArray,
                                                           jint width, jint height)
 {
     jint* src;

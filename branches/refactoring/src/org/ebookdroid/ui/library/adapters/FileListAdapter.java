@@ -130,7 +130,7 @@ public class FileListAdapter extends BaseExpandableListAdapter {
         adapter.stopScan();
     }
 
-    static class ViewHolder extends BaseViewHolder {
+    public static class ViewHolder extends BaseViewHolder {
 
         TextView name;
         ImageView image;

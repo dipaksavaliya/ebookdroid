@@ -108,7 +108,7 @@ public class BrowserAdapter extends BaseAdapter implements Comparator<File> {
         return f1.getName().compareTo(f2.getName());
     }
 
-    static class ViewHolder extends BaseViewHolder {
+    public static class ViewHolder extends BaseViewHolder {
 
         TextView textView;
         ImageView imageView;
