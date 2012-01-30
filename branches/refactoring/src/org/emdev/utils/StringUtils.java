@@ -89,11 +89,6 @@ public class StringUtils {
         return result.toString();
     }
 
-    @Deprecated
-    public static Comparator<? super String> getNaturalComparator() {
-        return NSC;
-    }
-
     public static final int compareNatural(String firstString, String secondString) {
         int firstIndex = 0;
         int secondIndex = 0;

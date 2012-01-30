@@ -2,9 +2,9 @@ package org.ebookdroid.ui.settings;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
-import org.ebookdroid.core.DecodeMode;
-import org.ebookdroid.core.DocumentViewMode;
-import org.ebookdroid.core.PageAlign;
+import org.ebookdroid.common.settings.types.DecodeMode;
+import org.ebookdroid.common.settings.types.DocumentViewMode;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.curl.PageAnimationType;
 
 import android.preference.EditTextPreference;

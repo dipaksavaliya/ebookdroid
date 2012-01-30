@@ -6,13 +6,14 @@ import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.types.DecodeMode;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.crop.PageCropper;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.ui.viewer.IController;
-import org.ebookdroid.ui.viewer.IActivity;
-import org.ebookdroid.ui.viewer.IController.InvalidateSizeReason;
+import org.ebookdroid.ui.viewer.IActivityController;
+import org.ebookdroid.ui.viewer.IViewController;
+import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -289,7 +290,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                     setDecodingNow(false);
 
                     page.base.getDocumentController().pageUpdated(page.index.viewIndex);
-                    final IController dc = page.base.getDocumentController();
+                    final IViewController dc = page.base.getDocumentController();
                     final DocumentModel dm = page.base.getDocumentModel();
 
                     if (dc != null && dm != null) {
@@ -391,7 +392,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return new RectF(targetRectF);
     }
 
-    public IActivity getBase() {
+    public IActivityController getBase() {
         return page.base;
     }
 

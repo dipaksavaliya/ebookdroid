@@ -37,7 +37,7 @@ public class CbxDocument<ArchiveEntryType extends ArchiveEntry> extends Abstract
         this.archive = archive;
 
         if (archive != null) {
-            final Map<String, ArchiveEntryType> pages = new TreeMap<String, ArchiveEntryType>(StringUtils.getNaturalComparator());
+            final Map<String, ArchiveEntryType> pages = new TreeMap<String, ArchiveEntryType>(StringUtils.NSC);
             final Enumeration<ArchiveEntryType> entries = archive.entries();
             while (entries.hasMoreElements()) {
                 final ArchiveEntryType fh = entries.nextElement();

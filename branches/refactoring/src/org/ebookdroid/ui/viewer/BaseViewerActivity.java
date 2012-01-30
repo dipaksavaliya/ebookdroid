@@ -8,10 +8,10 @@ import org.ebookdroid.common.settings.ISettingsChangeListener;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.BaseDocumentView;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.Page;
-import org.ebookdroid.core.PageAlign;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.codec.OutlineLink;
@@ -95,7 +95,7 @@ actions = {
         @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu")
 // finish
 })
-public abstract class BaseViewerActivity extends AbstractActionActivity implements IActivity,
+public abstract class BaseViewerActivity extends AbstractActionActivity implements IActivityController,
         DecodingProgressListener, CurrentPageListener, ISettingsChangeListener {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Core");
@@ -108,7 +108,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
     private IView view;
 
-    private final AtomicReference<IController> ctrl = new AtomicReference<IController>(
+    private final AtomicReference<IViewController> ctrl = new AtomicReference<IViewController>(
             new EmptyContoller());
 
     private Toast pageNumberToast;
@@ -257,12 +257,12 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
     }
 
     @Override
-    public IController switchDocumentController() {
+    public IViewController switchDocumentController() {
         try {
             final BookSettings bs = SettingsManager.getBookSettings();
 
-            final IController newDc = bs.viewMode.create(this);
-            final IController oldDc = ctrl.getAndSet(newDc);
+            final IViewController newDc = bs.viewMode.create(this);
+            final IViewController oldDc = ctrl.getAndSet(newDc);
 
             getZoomModel().removeListener(oldDc);
             getZoomModel().addListener(newDc);
@@ -531,7 +531,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
     }
 
     @Override
-    public IController getDocumentController() {
+    public IViewController getDocumentController() {
         return ctrl.get();
     }
 
@@ -641,7 +641,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         boolean redrawn = false;
         if (diff.isViewModeChanged() || diff.isSplitPagesChanged() || diff.isCropPagesChanged()) {
             redrawn = true;
-            final IController newDc = switchDocumentController();
+            final IViewController newDc = switchDocumentController();
             if (!diff.isFirstTime()) {
                 newDc.init(null);
                 newDc.show();
@@ -652,7 +652,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
             getZoomModel().initZoom(newSettings.getZoom());
         }
 
-        final IController dc = getDocumentController();
+        final IViewController dc = getDocumentController();
         if (diff.isPageAlignChanged()) {
             dc.setAlign(newSettings.pageAlign);
         }
@@ -772,7 +772,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
     }
 
-    private class EmptyContoller implements IController {
+    private class EmptyContoller implements IViewController {
 
         @Override
         public void zoomChanged(final float newZoom, final float oldZoom) {
@@ -822,7 +822,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         }
 
         @Override
-        public IActivity getBase() {
+        public IActivityController getBase() {
             return BaseViewerActivity.this;
         }
 

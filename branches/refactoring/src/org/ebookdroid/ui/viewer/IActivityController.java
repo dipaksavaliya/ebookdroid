@@ -10,7 +10,7 @@ import android.content.Context;
 
 import org.emdev.ui.actions.IActionController;
 
-public interface IActivity {
+public interface IActivityController {
 
     Context getContext();
 
@@ -22,7 +22,7 @@ public interface IActivity {
 
     IView getView();
 
-    IController getDocumentController();
+    IViewController getDocumentController();
 
     IActionController<?> getActionController();
 
@@ -30,7 +30,7 @@ public interface IActivity {
 
     DecodingProgressModel getDecodingProgressModel();
 
-    IController switchDocumentController();
+    IViewController switchDocumentController();
 
     static interface IBookLoadTask {
 

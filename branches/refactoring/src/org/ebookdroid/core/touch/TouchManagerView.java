@@ -3,7 +3,7 @@ package org.ebookdroid.core.touch;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.core.touch.TouchManager.Region;
 import org.ebookdroid.core.touch.TouchManager.TouchProfile;
-import org.ebookdroid.ui.viewer.IActivity;
+import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -32,7 +32,7 @@ public class TouchManagerView extends View {
 
     private static final int[] COLORS = { Color.BLUE, Color.CYAN, Color.GRAY, Color.MAGENTA, Color.RED, Color.YELLOW };
 
-    private final IActivity base;
+    private final IActivityController base;
 
     private final Paint bgPaint;
     private final Paint gridPaint;
@@ -41,7 +41,7 @@ public class TouchManagerView extends View {
 
     private TouchProfile profile;
 
-    public TouchManagerView(final IActivity base) {
+    public TouchManagerView(final IActivityController base) {
         super(base.getContext());
         this.base = base;
         this.actions = new ActionController<TouchManagerView>(base.getActivity(), base.getActionController(), this);

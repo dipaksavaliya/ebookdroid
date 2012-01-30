@@ -6,13 +6,13 @@ import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;
-import org.ebookdroid.core.PageType;
 import org.ebookdroid.core.codec.CodecPageInfo;
+import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IView;
-import org.ebookdroid.ui.viewer.IActivity;
 
 import android.graphics.RectF;
 
@@ -129,7 +129,7 @@ public class DocumentModel extends CurrentPageModel {
         }
     }
 
-    public void initPages(final IActivity base, final IActivity.IBookLoadTask task) {
+    public void initPages(final IActivityController base, final IActivityController.IBookLoadTask task) {
         recyclePages();
 
         final BookSettings bs = SettingsManager.getBookSettings();
@@ -194,8 +194,8 @@ public class DocumentModel extends CurrentPageModel {
         decodeService.createThumbnail(thumbnailFile, width, height, page.index.docIndex, page.type.getInitialRect());
     }
 
-    private CodecPageInfo[] retrievePagesInfo(final IActivity base, final BookSettings bs,
-            IActivity.IBookLoadTask task) {
+    private CodecPageInfo[] retrievePagesInfo(final IActivityController base, final BookSettings bs,
+            IActivityController.IBookLoadTask task) {
         final File pagesFile = CacheManager.getPageFile(bs.fileName);
 
         if (CACHE_ENABLED) {

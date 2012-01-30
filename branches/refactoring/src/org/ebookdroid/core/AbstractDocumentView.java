@@ -6,15 +6,16 @@ import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.touch.DefaultGestureDetector;
 import org.ebookdroid.core.touch.IGestureDetector;
 import org.ebookdroid.core.touch.IMultiTouchZoom;
 import org.ebookdroid.core.touch.TouchManager;
+import org.ebookdroid.ui.viewer.IActivityController;
+import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
+import org.ebookdroid.ui.viewer.IViewController;
 import org.ebookdroid.ui.viewer.IView;
-import org.ebookdroid.ui.viewer.IController;
-import org.ebookdroid.ui.viewer.IActivity;
-import org.ebookdroid.ui.viewer.IActivity.IBookLoadTask;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -43,13 +44,13 @@ actions = {
 // no more
 })
 public abstract class AbstractDocumentView extends AbstractComponentController<IView> implements
-        IController {
+        IViewController {
 
     protected static final LogContext LCTX = LogContext.ROOT.lctx("View", true);
 
     public static final int DOUBLE_TAP_TIME = 500;
 
-    protected final IActivity base;
+    protected final IActivityController base;
 
     protected final IView view;
 
@@ -71,7 +72,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
 
     private List<IGestureDetector> detectors;
 
-    public AbstractDocumentView(final IActivity baseActivity) {
+    public AbstractDocumentView(final IActivityController baseActivity) {
         super(baseActivity.getActivity(), baseActivity.getActionController(), baseActivity.getView());
 
         this.base = baseActivity;
@@ -102,7 +103,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#getView()
+     * @see org.ebookdroid.ui.viewer.IViewController#getView()
      */
     @Override
     public final IView getView() {
@@ -112,17 +113,17 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#getBase()
+     * @see org.ebookdroid.ui.viewer.IViewController#getBase()
      */
     @Override
-    public final IActivity getBase() {
+    public final IActivityController getBase() {
         return base;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#init(org.ebookdroid.ui.viewer.IActivity.IBookLoadTask)
+     * @see org.ebookdroid.ui.viewer.IViewController#init(org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask)
      */
     @Override
     public final void init(final IBookLoadTask task) {
@@ -138,7 +139,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#show()
+     * @see org.ebookdroid.ui.viewer.IViewController#show()
      */
     @Override
     public final void show() {
@@ -209,7 +210,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#onScrollChanged(int, int)
+     * @see org.ebookdroid.ui.viewer.IViewController#onScrollChanged(int, int)
      */
     @Override
     public void onScrollChanged(final int newPage, final int direction) {
@@ -237,7 +238,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#updatePageVisibility(int, int, float)
+     * @see org.ebookdroid.ui.viewer.IViewController#updatePageVisibility(int, int, float)
      */
     @Override
     public final ViewState updatePageVisibility(final int newPage, final int direction, final float zoom) {
@@ -396,7 +397,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#updateMemorySettings()
+     * @see org.ebookdroid.ui.viewer.IViewController#updateMemorySettings()
      */
     @Override
     public final void updateMemorySettings() {
@@ -443,7 +444,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#goToPage(int)
+     * @see org.ebookdroid.ui.viewer.IViewController#goToPage(int)
      */
     @Override
     public final void goToPage(final int toPage) {
@@ -501,7 +502,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#dispatchKeyEvent(android.view.KeyEvent)
+     * @see org.ebookdroid.ui.viewer.IViewController#dispatchKeyEvent(android.view.KeyEvent)
      */
     @Override
     public boolean dispatchKeyEvent(final KeyEvent event) {
@@ -532,7 +533,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#onTouchEvent(android.view.MotionEvent)
+     * @see org.ebookdroid.ui.viewer.IViewController#onTouchEvent(android.view.MotionEvent)
      */
     @Override
     public final boolean onTouchEvent(final MotionEvent ev) {
@@ -554,7 +555,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#onLayoutChanged(boolean, boolean, android.graphics.Rect,
+     * @see org.ebookdroid.ui.viewer.IViewController#onLayoutChanged(boolean, boolean, android.graphics.Rect,
      *      android.graphics.Rect)
      */
     @Override
@@ -629,7 +630,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#getFirstVisiblePage()
+     * @see org.ebookdroid.ui.viewer.IViewController#getFirstVisiblePage()
      */
     @Override
     public final int getFirstVisiblePage() {
@@ -639,7 +640,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#getLastVisiblePage()
+     * @see org.ebookdroid.ui.viewer.IViewController#getLastVisiblePage()
      */
     @Override
     public final int getLastVisiblePage() {
@@ -649,7 +650,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#redrawView()
+     * @see org.ebookdroid.ui.viewer.IViewController#redrawView()
      */
     @Override
     public final void redrawView() {
@@ -659,7 +660,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IController#redrawView(org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.ui.viewer.IViewController#redrawView(org.ebookdroid.core.ViewState)
      */
     @Override
     public final void redrawView(final ViewState viewState) {

@@ -5,6 +5,8 @@ import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.log.EmergencyHandler;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.types.DecodeMode;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.codec.CodecContext;
 import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;

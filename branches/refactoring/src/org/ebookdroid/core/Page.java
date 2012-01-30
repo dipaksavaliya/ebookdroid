@@ -3,8 +3,9 @@ package org.ebookdroid.core;
 import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.core.codec.CodecPageInfo;
-import org.ebookdroid.ui.viewer.IActivity;
+import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
@@ -21,7 +22,7 @@ public class Page {
     public final PageIndex index;
     public final PageType type;
 
-    final IActivity base;
+    final IActivityController base;
     final PageTree nodes;
 
     RectF bounds;
@@ -32,7 +33,7 @@ public class Page {
 
     int zoomLevel = 1;
 
-    public Page(final IActivity base, final PageIndex index, final PageType pt, final CodecPageInfo cpi) {
+    public Page(final IActivityController base, final PageIndex index, final PageType pt, final CodecPageInfo cpi) {
         this.base = base;
         this.index = index;
         this.type = pt != null ? pt : PageType.FULL_PAGE;

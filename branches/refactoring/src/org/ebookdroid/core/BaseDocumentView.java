@@ -1,11 +1,12 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.models.DocumentModel;
+import org.ebookdroid.ui.viewer.IActivityController;
+import org.ebookdroid.ui.viewer.IViewController;
 import org.ebookdroid.ui.viewer.IView;
-import org.ebookdroid.ui.viewer.IController;
-import org.ebookdroid.ui.viewer.IActivity;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -22,7 +23,7 @@ import org.emdev.utils.concurrent.Flag;
 
 public final class BaseDocumentView extends View implements IView {
 
-    protected final IActivity base;
+    protected final IActivityController base;
 
     protected final Scroller scroller;
 
@@ -36,7 +37,7 @@ public final class BaseDocumentView extends View implements IView {
 
     protected final Flag layoutFlag = new Flag();
 
-    public BaseDocumentView(final IActivity baseActivity) {
+    public BaseDocumentView(final IActivityController baseActivity) {
         super(baseActivity.getContext());
         this.base = baseActivity;
         this.scroller = new Scroller(getContext());
@@ -64,7 +65,7 @@ public final class BaseDocumentView extends View implements IView {
      * @see org.ebookdroid.ui.viewer.IView#getBase()
      */
     @Override
-    public final IActivity getBase() {
+    public final IActivityController getBase() {
         return base;
     }
 
@@ -185,7 +186,7 @@ public final class BaseDocumentView extends View implements IView {
 
             @Override
             public void run() {
-                final IController dc = base.getDocumentController();
+                final IViewController dc = base.getDocumentController();
                 final DocumentModel dm = base.getDocumentModel();
                 if (dc != null && dm != null) {
                     final Rect l = dc.getScrollLimits();

@@ -1,17 +1,17 @@
 package org.ebookdroid.ui.viewer;
 
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.Page;
-import org.ebookdroid.core.PageAlign;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.events.ZoomListener;
-import org.ebookdroid.ui.viewer.IActivity.IBookLoadTask;
+import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
-public interface IController extends ZoomListener {
+public interface IViewController extends ZoomListener {
 
     void init(IBookLoadTask bookLoadTask);
 
@@ -38,7 +38,7 @@ public interface IController extends ZoomListener {
 
     /* Infrastructure methods */
 
-    IActivity getBase();
+    IActivityController getBase();
 
     IView getView();
 

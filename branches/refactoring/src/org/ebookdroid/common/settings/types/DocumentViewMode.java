@@ -1,9 +1,12 @@
-package org.ebookdroid.core;
+package org.ebookdroid.common.settings.types;
 
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.books.BookSettings;
-import org.ebookdroid.ui.viewer.IController;
-import org.ebookdroid.ui.viewer.IActivity;
+import org.ebookdroid.core.ContiniousDocumentView;
+import org.ebookdroid.core.HScrollDocumentView;
+import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.ui.viewer.IActivityController;
+import org.ebookdroid.ui.viewer.IViewController;
 
 import java.lang.reflect.Constructor;
 
@@ -22,21 +25,21 @@ public enum DocumentViewMode {
 
     private final PageAlign pageAlign;
 
-    private Constructor<? extends IController> c;
+    private Constructor<? extends IViewController> c;
 
     private DocumentViewMode(final String res, final PageAlign pageAlign,
-            final Class<? extends IController> clazz) {
+            final Class<? extends IViewController> clazz) {
         this.resValue = res;
         this.pageAlign = pageAlign;
         try {
-            this.c = clazz.getConstructor(IActivity.class);
+            this.c = clazz.getConstructor(IActivityController.class);
         } catch (final Exception e) {
             LCTX.e("Cannot find appropriate view controller constructor: ", e);
             this.c = null;
         }
     }
 
-    public IController create(final IActivity base) {
+    public IViewController create(final IActivityController base) {
         if (c != null) {
             try {
                 return c.newInstance(base);

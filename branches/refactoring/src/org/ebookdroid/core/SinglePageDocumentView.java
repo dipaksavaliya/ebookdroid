@@ -2,6 +2,7 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.curl.PageAnimationType;
 import org.ebookdroid.core.curl.PageAnimator;
 import org.ebookdroid.core.curl.PageAnimatorProxy;
@@ -10,7 +11,7 @@ import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.touch.DefaultGestureDetector;
 import org.ebookdroid.core.touch.IGestureDetector;
 import org.ebookdroid.core.touch.IMultiTouchZoom;
-import org.ebookdroid.ui.viewer.IActivity;
+import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -36,7 +37,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
      * @param baseActivity
      *            the base activity
      */
-    public SinglePageDocumentView(final IActivity baseActivity) {
+    public SinglePageDocumentView(final IActivityController baseActivity) {
         super(baseActivity);
         updateAnimationType();
     }
@@ -91,7 +92,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IController#onScrollChanged(int, int)
+     * @see org.ebookdroid.ui.viewer.IViewController#onScrollChanged(int, int)
      */
     @Override
     public void onScrollChanged(final int newPage, final int direction) {
@@ -113,7 +114,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IController#calculateCurrentPage(org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.ui.viewer.IViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override
     public final int calculateCurrentPage(final ViewState viewState) {
@@ -123,7 +124,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IController#verticalConfigScroll(int)
+     * @see org.ebookdroid.ui.viewer.IViewController#verticalConfigScroll(int)
      */
     @Override
     public final void verticalConfigScroll(final int direction) {
@@ -133,7 +134,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IController#getScrollLimits()
+     * @see org.ebookdroid.ui.viewer.IViewController#getScrollLimits()
      */
     @Override
     public final Rect getScrollLimits() {
@@ -173,7 +174,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IController#drawView(android.graphics.Canvas, org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.ui.viewer.IViewController#drawView(android.graphics.Canvas, org.ebookdroid.core.ViewState)
      */
     @Override
     public final void drawView(final Canvas canvas, final ViewState viewState) {
@@ -183,7 +184,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IController#invalidatePageSizes(org.ebookdroid.ui.viewer.IController.InvalidateSizeReason, org.ebookdroid.core.Page)
+     * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason, org.ebookdroid.core.Page)
      */
     @Override
     public final void invalidatePageSizes(final InvalidateSizeReason reason, final Page changedPage) {
@@ -244,7 +245,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IController#updateAnimationType()
+     * @see org.ebookdroid.ui.viewer.IViewController#updateAnimationType()
      */
     @Override
     public final void updateAnimationType() {
@@ -260,7 +261,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IController#pageUpdated(int)
+     * @see org.ebookdroid.ui.viewer.IViewController#pageUpdated(int)
      */
     @Override
     public void pageUpdated(final int viewIndex) {

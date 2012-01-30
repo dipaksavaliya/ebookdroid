@@ -3,7 +3,6 @@ package org.ebookdroid.common.log;
 import org.ebookdroid.EBookDroidApp;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -68,7 +67,6 @@ public class EmergencyHandler implements UncaughtExceptionHandler {
 
     public static void init(final Context context) {
         if (system == null) {
-            final PackageManager pm = context.getPackageManager();
             File dir = EBookDroidApp.EXT_STORAGE;
             if (dir != null) {
                 File appDir = new File(dir, "." + EBookDroidApp.APP_PACKAGE);

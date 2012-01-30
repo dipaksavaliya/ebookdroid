@@ -1,4 +1,4 @@
-package org.ebookdroid.core;
+package org.ebookdroid.common.settings.types;
 
 import android.content.pm.ActivityInfo;
 

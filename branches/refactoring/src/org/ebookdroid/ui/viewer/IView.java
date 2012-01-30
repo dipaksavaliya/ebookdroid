@@ -14,7 +14,7 @@ public interface IView {
 
     View getView();
 
-    IActivity getBase();
+    IActivityController getBase();
 
     Scroller getScroller();
 

@@ -7,7 +7,7 @@ import org.ebookdroid.common.settings.books.Bookmark;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.ui.viewer.IActivity;
+import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -52,11 +52,11 @@ actions = {
 })
 public class GoToPageDialog extends Dialog {
 
-    final IActivity base;
+    final IActivityController base;
     BookmarkAdapter adapter;
     ActionController<GoToPageDialog> actions;
 
-    public GoToPageDialog(final IActivity base) {
+    public GoToPageDialog(final IActivityController base) {
         super(base.getContext());
         this.base = base;
         this.actions = new ActionController<GoToPageDialog>(base.getActivity(), this);

@@ -1,7 +1,7 @@
 package org.ebookdroid.common.settings.books;
 
-import org.ebookdroid.core.DocumentViewMode;
-import org.ebookdroid.core.PageAlign;
+import org.ebookdroid.common.settings.types.DocumentViewMode;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.curl.PageAnimationType;
 
