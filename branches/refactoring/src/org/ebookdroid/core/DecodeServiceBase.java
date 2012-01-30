@@ -50,8 +50,6 @@ public class DecodeServiceBase implements DecodeService {
 
     final AtomicReference<ViewState> viewState = new AtomicReference<ViewState>();
 
-    final AtomicLong memoryLimit = new AtomicLong(Long.MAX_VALUE);
-
     CodecDocument document;
 
     final Map<Integer, SoftReference<CodecPage>> pages = new LinkedHashMap<Integer, SoftReference<CodecPage>>() {
@@ -103,16 +101,6 @@ public class DecodeServiceBase implements DecodeService {
     @Override
     public Config getBitmapConfig() {
         return this.codecContext.getBitmapConfig();
-    }
-
-    @Override
-    public long getMemoryLimit() {
-        return memoryLimit.get();
-    }
-
-    @Override
-    public void decreaseMemortLimit() {
-        memoryLimit.decrementAndGet();
     }
 
     @Override
@@ -190,15 +178,7 @@ public class DecodeServiceBase implements DecodeService {
 
             finishDecoding(task, vuPage, bitmap, r);
         } catch (final OutOfMemoryError ex) {
-            if (r != null) {
-                final int limit = BitmapManager.getBitmapBufferSize(r.width(), r.height(),
-                        codecContext.getBitmapConfig());
-                memoryLimit.set(Math.min(memoryLimit.get(), limit));
-                LCTX.e("Task " + task.id + ": No memory to decode " + task.node + ": new memory limit: "
-                        + memoryLimit.get());
-            } else {
-                LCTX.e("Task " + task.id + ": No memory to decode " + task.node);
-            }
+            LCTX.e("Task " + task.id + ": No memory to decode " + task.node);
 
             for (int i = 0; i <= SettingsManager.getAppSettings().getPagesInMemory(); i++) {
                 pages.put(Integer.MAX_VALUE - i, null);

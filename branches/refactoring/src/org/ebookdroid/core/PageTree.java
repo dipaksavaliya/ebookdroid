@@ -190,7 +190,7 @@ public class PageTree {
         return null != nodes.get(childId);
     }
 
-    private int getFirstChildId(final long parentId) {
+    int getFirstChildId(final long parentId) {
         return (int) (parentId * splitMasks.length + 1);
     }
 

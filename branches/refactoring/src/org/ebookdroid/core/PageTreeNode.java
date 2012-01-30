@@ -207,7 +207,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             return false;
         }
 
-        long memoryLimit = ds.getMemoryLimit();
+        long memoryLimit = Long.MAX_VALUE;
         if (viewState.decodeMode == DecodeMode.LOW_MEMORY) {
             memoryLimit = Math.min(memoryLimit, SettingsManager.getAppSettings().getMaxImageSize());
         }
@@ -216,10 +216,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         final Rect rect = getActualRect(viewState, ds);
 
         final long size = BitmapManager.getBitmapBufferSize(rect.width(), rect.height(), ds.getBitmapConfig());
-
-        // if (LCTX.isDebugEnabled()) {
-        // LCTX.d(getFullId() + ".isChildrenRequired(): rect=" + rect + ", size=" + size + ", limit=" + memoryLimit);
-        // }
 
         final boolean textureSizeExceedeed = (rect.width() > 2048) || (rect.height() > 2048);
         final boolean memoryLimitExceeded = size + 4096 >= memoryLimit;
@@ -314,7 +310,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         } catch (OutOfMemoryError ex) {
             LCTX.e("No memory: ", ex);
             BitmapManager.clear("PageTreeNode OutOfMemoryError: ");
-            page.base.getDecodeService().decreaseMemortLimit();
             page.base.getActivity().runOnUiThread(new Runnable() {
 
                 @Override
@@ -342,7 +337,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return false;
     }
 
-    private void stopDecodingThisNode(final String reason) {
+    void stopDecodingThisNode(final String reason) {
         if (setDecodingNow(false)) {
             final DecodeService ds = page.base.getDecodeService();
             if (ds != null) {

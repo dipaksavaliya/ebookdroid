@@ -45,9 +45,4 @@ public interface DecodeService {
     int getPixelFormat();
 
     Bitmap.Config getBitmapConfig();
-
-    long getMemoryLimit();
-
-    void decreaseMemortLimit();
-
 }

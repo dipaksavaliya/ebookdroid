@@ -175,9 +175,6 @@ public abstract class AbstractViewController extends AbstractComponentController
         final RectF cpBounds = viewState.getBounds(page);
         final float offsetX = (left - cpBounds.left) / cpBounds.width();
         final float offsetY = (top - cpBounds.top) / cpBounds.height();
-        // if (LCTX.isDebugEnabled()) {
-        // LCTX.d("Position into page: " + page.index.viewIndex + ", " + offsetX + ", " + offsetY);
-        // }
         SettingsManager.positionChanged(offsetX, offsetY);
     }
 
@@ -242,25 +239,19 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final ViewState updatePageVisibility(final int newPage, final int direction, final float zoom) {
-        final ViewState viewState = calculatePageVisibility(newPage, direction, zoom);
-
-        final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-        final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-
-        for (final Page page : getBase().getDocumentModel().getPages()) {
-            page.onPositionChanged(viewState, nodesToDecode, bitmapsToRecycle);
+        if (newPage != -1) {
+            return new CmdScrollTo(this, newPage).execute();
         }
 
-        BitmapManager.release(bitmapsToRecycle);
-
-        if (!nodesToDecode.isEmpty()) {
-            decodePageTreeNodes(viewState, nodesToDecode);
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("updatePageVisibility: " + viewState + " => " + nodesToDecode.size());
-            }
+        if (direction > 0) {
+            return new CmdScrollDown(this).execute();
+        }
+        
+        if (direction < 0) {
+            return new CmdScrollUp(this).execute();
         }
 
-        return viewState;
+        return new ViewState(this, zoom);
     }
 
     protected final void decodePageTreeNodes(final ViewState viewState, final List<PageTreeNode> nodesToDecode) {

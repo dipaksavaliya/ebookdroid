@@ -7,14 +7,16 @@ import org.ebookdroid.common.settings.types.DecodeMode;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.ui.viewer.IViewController;
 import org.ebookdroid.ui.viewer.IView;
+import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.RectF;
 import android.util.SparseArray;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.emdev.utils.MathUtils;
 
 public class ViewState {
 
@@ -40,8 +42,6 @@ public class ViewState {
     public final SparseArray<RectF> pages = new SparseArray<RectF>();
 
     public final Map<String, Boolean> nodeVisibility = new HashMap<String, Boolean>();
-
-    public final boolean outOfMemoryOccured;
 
     public ViewState(final PageTreeNode node) {
         this(node.page.base.getDocumentController());
@@ -71,12 +71,10 @@ public class ViewState {
             final int inMemory = (int) Math.ceil(SettingsManager.getAppSettings().getPagesInMemory() / 2.0);
             this.firstCached = Math.max(0, this.currentIndex - inMemory);
             this.lastCached = Math.min(this.currentIndex + inMemory, dm.getPageCount());
-            this.outOfMemoryOccured = dm.getDecodeService().getMemoryLimit() < Long.MAX_VALUE;
         } else {
             this.currentIndex = 0;
             this.firstCached = 0;
             this.lastCached = 0;
-            this.outOfMemoryOccured = false;
         }
 
         final BookSettings bs = SettingsManager.getBookSettings();
@@ -113,7 +111,41 @@ public class ViewState {
         this.pageAlign = oldState.pageAlign;
         this.decodeMode = oldState.decodeMode;
         this.nightMode = oldState.nightMode;
-        this.outOfMemoryOccured = oldState.outOfMemoryOccured;
+    }
+
+    public ViewState(final ViewState oldState, final int firstVisiblePage, final int lastVisiblePage) {
+        this.ctrl = oldState.ctrl;
+        this.view = oldState.view;
+
+        this.firstVisible = firstVisiblePage;
+        this.lastVisible = lastVisiblePage;
+
+        this.realRect = oldState.realRect;
+        this.viewRect = oldState.viewRect;
+        this.zoom = oldState.zoom;
+
+        this.currentIndex = ctrl.calculateCurrentPage(this);
+
+        final DocumentModel dm = ctrl.getBase().getDocumentModel();
+        if (dm != null) {
+            final int inMemory = (int) Math.ceil(SettingsManager.getAppSettings().getPagesInMemory() / 2.0);
+            this.firstCached = Math.max(0, this.currentIndex - inMemory);
+            this.lastCached = Math.min(this.currentIndex + inMemory, dm.getPageCount());
+
+            final int min = MathUtils.min(firstVisible, oldState.firstVisible, this.firstCached);
+            final int max = MathUtils.max(lastVisible, oldState.lastVisible, this.lastCached);
+            for (final Page page : dm.getPages(min, max + 1)) {
+                pages.append(page.index.viewIndex, page.getBounds(zoom));
+            }
+
+        } else {
+            this.firstCached = firstVisible;
+            this.lastCached = lastVisible;
+        }
+
+        this.pageAlign = oldState.pageAlign;
+        this.decodeMode = oldState.decodeMode;
+        this.nightMode = oldState.nightMode;
     }
 
     public ViewState(final ViewState oldState) {
@@ -134,7 +166,6 @@ public class ViewState {
         this.pageAlign = oldState.pageAlign;
         this.decodeMode = oldState.decodeMode;
         this.nightMode = oldState.nightMode;
-        this.outOfMemoryOccured = oldState.outOfMemoryOccured;
     }
 
     public RectF getBounds(final Page page) {
@@ -147,7 +178,7 @@ public class ViewState {
     }
 
     public final boolean isPageKeptInMemory(final Page page) {
-        return !outOfMemoryOccured && firstCached <= page.index.viewIndex && page.index.viewIndex <= lastCached;
+        return firstCached <= page.index.viewIndex && page.index.viewIndex <= lastCached;
     }
 
     public final boolean isPageVisible(final Page page) {
@@ -156,12 +187,12 @@ public class ViewState {
 
     public final boolean isNodeKeptInMemory(final PageTreeNode node, final RectF pageBounds) {
         if (this.decodeMode == DecodeMode.NATIVE_RESOLUTION || this.zoom < 1.5) {
-            return !outOfMemoryOccured && this.isPageKeptInMemory(node.page) || this.isPageVisible(node.page);
+            return this.isPageKeptInMemory(node.page) || this.isPageVisible(node.page);
         }
         if (this.zoom < 2.5) {
-            return !outOfMemoryOccured && this.isPageKeptInMemory(node.page) || isPageVisible(node.page) && this.isNodeVisible(node, pageBounds);
+            return this.isPageKeptInMemory(node.page) || this.isNodeVisible(node, pageBounds);
         }
-        return this.isPageVisible(node.page) && this.isNodeVisible(node, pageBounds);
+        return this.isNodeVisible(node, pageBounds);
     }
 
     public final boolean isNodeVisible(final PageTreeNode node, final RectF pageBounds) {

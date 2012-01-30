@@ -100,9 +100,7 @@ public class SinglePageController extends AbstractViewController {
         if (inZoom.get()) {
             return;
         }
-        // if (LCTX.isDebugEnabled()) {
-        // LCTX.d("onScrollChanged(" + newPage + ", " + direction + ")");
-        // }
+
         final ViewState viewState = updatePageVisibility(newPage, direction, getBase().getZoomModel().getZoom());
         DocumentModel dm = base.getDocumentModel();
         if (dm != null) {
