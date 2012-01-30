@@ -2,9 +2,9 @@ package org.ebookdroid.common.settings.types;
 
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.books.BookSettings;
-import org.ebookdroid.core.ContiniousDocumentView;
-import org.ebookdroid.core.HScrollDocumentView;
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.VScrollController;
+import org.ebookdroid.core.HScrollController;
+import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IViewController;
 
@@ -12,11 +12,11 @@ import java.lang.reflect.Constructor;
 
 public enum DocumentViewMode {
 
-    VERTICALL_SCROLL("Vertical scroll", PageAlign.WIDTH, ContiniousDocumentView.class),
+    VERTICALL_SCROLL("Vertical scroll", PageAlign.WIDTH, VScrollController.class),
 
-    HORIZONTAL_SCROLL("Horizontal scroll", PageAlign.HEIGHT, HScrollDocumentView.class),
+    HORIZONTAL_SCROLL("Horizontal scroll", PageAlign.HEIGHT, HScrollController.class),
 
-    SINGLE_PAGE("Single page", null, SinglePageDocumentView.class);
+    SINGLE_PAGE("Single page", null, SinglePageController.class);
 
     private final LogContext LCTX = LogContext.ROOT.lctx("View");
 

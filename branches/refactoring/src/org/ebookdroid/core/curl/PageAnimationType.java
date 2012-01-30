@@ -1,6 +1,6 @@
 package org.ebookdroid.core.curl;
 
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.SinglePageController;
 
 public enum PageAnimationType {
 
@@ -59,7 +59,7 @@ public enum PageAnimationType {
         return NONE;
     }
 
-    public static PageAnimator create(final PageAnimationType type, final SinglePageDocumentView singlePageDocumentView) {
+    public static PageAnimator create(final PageAnimationType type, final SinglePageController singlePageDocumentView) {
         if (type != null) {
             switch (type) {
                 case CURLER:

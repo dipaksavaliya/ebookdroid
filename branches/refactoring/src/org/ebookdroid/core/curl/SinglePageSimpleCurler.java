@@ -1,6 +1,6 @@
 package org.ebookdroid.core.curl;
 
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.SinglePageController;
 
 /**
  * The Class SinglePageCurler.
@@ -12,7 +12,7 @@ import org.ebookdroid.core.SinglePageDocumentView;
  */
 public class SinglePageSimpleCurler extends AbstractSinglePageCurler {
 
-    public SinglePageSimpleCurler(final SinglePageDocumentView singlePageDocumentView) {
+    public SinglePageSimpleCurler(final SinglePageController singlePageDocumentView) {
         super(PageAnimationType.CURLER, singlePageDocumentView);
     }
 

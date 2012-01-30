@@ -2,7 +2,7 @@ package org.ebookdroid.core.curl;
 
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PagePaint;
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 
 import android.graphics.Canvas;
@@ -21,7 +21,7 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
     /** Our points used to define the current clipping paths in our draw call */
     protected Vector2D mB, mC, mD, mE, mF, mOldF, mOrigin;
 
-    public AbstractSinglePageCurler(final PageAnimationType type, final SinglePageDocumentView singlePageDocumentView) {
+    public AbstractSinglePageCurler(final PageAnimationType type, final SinglePageController singlePageDocumentView) {
         super(type, singlePageDocumentView);
     }
 

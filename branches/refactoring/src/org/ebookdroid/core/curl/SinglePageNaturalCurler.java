@@ -21,7 +21,7 @@ package org.ebookdroid.core.curl;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.Page;
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 
 import android.graphics.Bitmap;
@@ -45,7 +45,7 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
     private final Paint backPaint = new Paint();
     private final Paint edgePaint = new Paint();
 
-    public SinglePageNaturalCurler(final SinglePageDocumentView singlePageDocumentView) {
+    public SinglePageNaturalCurler(final SinglePageController singlePageDocumentView) {
         super(PageAnimationType.CURLER_DYNAMIC, singlePageDocumentView);
 
         backPaint.setAntiAlias(false);

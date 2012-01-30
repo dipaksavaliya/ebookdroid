@@ -9,7 +9,7 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
 import org.ebookdroid.common.settings.types.PageAlign;
-import org.ebookdroid.core.BaseDocumentView;
+import org.ebookdroid.core.BaseView;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;
@@ -152,7 +152,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         actions.createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
 
         frameLayout = createMainContainer();
-        view = new BaseDocumentView(this);
+        view = new BaseView(this);
 
         initActivity();
         initView();

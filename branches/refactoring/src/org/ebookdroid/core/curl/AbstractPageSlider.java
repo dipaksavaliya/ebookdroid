@@ -5,7 +5,7 @@ import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PagePaint;
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 
 import android.graphics.Bitmap;
@@ -14,7 +14,7 @@ import android.graphics.Paint;
 
 public abstract class AbstractPageSlider extends AbstractPageAnimator {
 
-    public AbstractPageSlider(final PageAnimationType type, final SinglePageDocumentView singlePageDocumentView) {
+    public AbstractPageSlider(final PageAnimationType type, final SinglePageController singlePageDocumentView) {
         super(type, singlePageDocumentView);
     }
 

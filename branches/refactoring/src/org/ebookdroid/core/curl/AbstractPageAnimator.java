@@ -4,7 +4,7 @@ import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.core.Page;
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.models.DocumentModel;
 
@@ -52,7 +52,7 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
 
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public AbstractPageAnimator(final PageAnimationType type, final SinglePageDocumentView singlePageDocumentView) {
+    public AbstractPageAnimator(final PageAnimationType type, final SinglePageController singlePageDocumentView) {
         super(type, singlePageDocumentView);
     }
 

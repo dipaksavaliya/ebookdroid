@@ -43,7 +43,7 @@ actions = {
         @ActionMethodDef(id = R.id.actions_verticalConfigScrollDown, method = "verticalConfigScroll")
 // no more
 })
-public abstract class AbstractDocumentView extends AbstractComponentController<IView> implements
+public abstract class AbstractViewController extends AbstractComponentController<IView> implements
         IViewController {
 
     protected static final LogContext LCTX = LogContext.ROOT.lctx("View", true);
@@ -72,7 +72,7 @@ public abstract class AbstractDocumentView extends AbstractComponentController<I
 
     private List<IGestureDetector> detectors;
 
-    public AbstractDocumentView(final IActivityController baseActivity) {
+    public AbstractViewController(final IActivityController baseActivity) {
         super(baseActivity.getActivity(), baseActivity.getActionController(), baseActivity.getView());
 
         this.base = baseActivity;

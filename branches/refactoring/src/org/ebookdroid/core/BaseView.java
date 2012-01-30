@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.emdev.utils.MathUtils;
 import org.emdev.utils.concurrent.Flag;
 
-public final class BaseDocumentView extends View implements IView {
+public final class BaseView extends View implements IView {
 
     protected final IActivityController base;
 
@@ -37,7 +37,7 @@ public final class BaseDocumentView extends View implements IView {
 
     protected final Flag layoutFlag = new Flag();
 
-    public BaseDocumentView(final IActivityController baseActivity) {
+    public BaseView(final IActivityController baseActivity) {
         super(baseActivity.getContext());
         this.base = baseActivity;
         this.scroller = new Scroller(getContext());
@@ -190,7 +190,7 @@ public final class BaseDocumentView extends View implements IView {
                 final DocumentModel dm = base.getDocumentModel();
                 if (dc != null && dm != null) {
                     final Rect l = dc.getScrollLimits();
-                    BaseDocumentView.super.scrollTo(MathUtils.adjust(x, l.left, l.right),
+                    BaseView.super.scrollTo(MathUtils.adjust(x, l.left, l.right),
                             MathUtils.adjust(y, l.top, l.bottom));
                 }
             }

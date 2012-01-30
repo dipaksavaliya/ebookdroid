@@ -3,7 +3,7 @@ package org.ebookdroid.core.curl;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.Page;
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.ui.viewer.views.DragMark;
 
@@ -16,7 +16,7 @@ public class SinglePageView implements PageAnimator {
     
     protected final PageAnimationType type;
 
-    protected final SinglePageDocumentView view;
+    protected final SinglePageController view;
 
     protected boolean bViewDrawn;
 
@@ -24,11 +24,11 @@ public class SinglePageView implements PageAnimator {
 
     protected int backIndex = -1;
 
-    public SinglePageView(final SinglePageDocumentView view) {
+    public SinglePageView(final SinglePageController view) {
         this(PageAnimationType.NONE, view);
     }
 
-    protected SinglePageView(PageAnimationType type, final SinglePageDocumentView view) {
+    protected SinglePageView(PageAnimationType type, final SinglePageController view) {
         this.type = type;
         this.view = view;
     }

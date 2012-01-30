@@ -26,7 +26,7 @@ import org.emdev.ui.hwa.IHardwareAcceleration;
  *
  * Used in single page view mode
  */
-public class SinglePageDocumentView extends AbstractDocumentView {
+public class SinglePageController extends AbstractViewController {
 
     /** The curler. */
     private final PageAnimatorProxy curler = new PageAnimatorProxy(new SinglePageView(this));
@@ -37,7 +37,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
      * @param baseActivity
      *            the base activity
      */
-    public SinglePageDocumentView(final IActivityController baseActivity) {
+    public SinglePageController(final IActivityController baseActivity) {
         super(baseActivity);
         updateAnimationType();
     }
@@ -45,7 +45,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractDocumentView#goToPageImpl(int)
+     * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int)
      */
     @Override
     public final void goToPageImpl(final int toPage) {
@@ -64,7 +64,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractDocumentView#goToPageImpl(int, float, float)
+     * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int, float, float)
      */
     @Override
     protected void goToPageImpl(final int toPage, final float offsetX, final float offsetY) {
@@ -161,7 +161,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractDocumentView#initGestureDetectors(java.util.List)
+     * @see org.ebookdroid.core.AbstractViewController#initGestureDetectors(java.util.List)
      */
     @Override
     protected List<IGestureDetector> initGestureDetectors(final List<IGestureDetector> list) {
@@ -235,7 +235,7 @@ public class SinglePageDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractDocumentView#isPageVisibleImpl(org.ebookdroid.core.Page, org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.core.AbstractViewController#isPageVisibleImpl(org.ebookdroid.core.Page, org.ebookdroid.core.ViewState)
      */
     @Override
     protected final boolean isPageVisibleImpl(final Page page, final ViewState viewState) {

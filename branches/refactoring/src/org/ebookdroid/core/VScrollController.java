@@ -14,11 +14,11 @@ import android.graphics.RectF;
 
 import org.emdev.ui.hwa.IHardwareAcceleration;
 
-public class HScrollDocumentView extends AbstractDocumentView {
+public class VScrollController extends AbstractViewController {
 
     protected static Bitmap dragBitmap;
 
-    public HScrollDocumentView(final IActivityController base) {
+    public VScrollController(final IActivityController base) {
         super(base);
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
@@ -29,7 +29,7 @@ public class HScrollDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractDocumentView#goToPageImpl(int)
+     * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int)
      */
     @Override
     protected final void goToPageImpl(final int toPage) {
@@ -41,7 +41,7 @@ public class HScrollDocumentView extends AbstractDocumentView {
                 final RectF viewRect = view.getViewRect();
                 final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
                 dm.setCurrentPageIndex(page.index);
-                view.scrollTo(Math.round(bounds.left - (viewRect.width() - bounds.width()) / 2), getScrollY());
+                view.scrollTo(getScrollX(), Math.round(bounds.top - (viewRect.height() - bounds.height()) / 2));
             } else {
                 if (LCTX.isDebugEnabled()) {
                     LCTX.d("No page found for index: " + toPage);
@@ -64,14 +64,14 @@ public class HScrollDocumentView extends AbstractDocumentView {
         int result = 0;
         long bestDistance = Long.MAX_VALUE;
 
-        final int viewX = Math.round(viewState.viewRect.centerX());
+        final int viewY = Math.round(viewState.viewRect.centerY());
 
         if (viewState.firstVisible != -1) {
             for (final Page page : getBase().getDocumentModel().getPages(viewState.firstVisible,
                     viewState.lastVisible + 1)) {
                 final RectF bounds = viewState.getBounds(page);
-                final int pageX = Math.round(bounds.centerX());
-                final long dist = Math.abs(pageX - viewX);
+                final int pageY = Math.round(bounds.centerY());
+                final long dist = Math.abs(pageY - viewY);
                 if (dist < bestDistance) {
                     bestDistance = dist;
                     result = page.index.viewIndex;
@@ -90,9 +90,9 @@ public class HScrollDocumentView extends AbstractDocumentView {
     @Override
     public final void verticalConfigScroll(final int direction) {
         final int scrollheight = SettingsManager.getAppSettings().getScrollHeight();
-        final int dx = (int) (direction * getWidth() * (scrollheight / 100.0));
+        final int dy = (int) (direction * getHeight() * (scrollheight / 100.0));
 
-        view.startPageScroll(dx, 0);
+        view.startPageScroll(0, dy);
     }
 
     /**
@@ -107,8 +107,8 @@ public class HScrollDocumentView extends AbstractDocumentView {
         final Page lpo = getBase().getDocumentModel().getLastPageObject();
         final float zoom = getBase().getZoomModel().getZoom();
 
-        final int right = lpo != null ? (int) lpo.getBounds(zoom).right - width : 0;
-        final int bottom = (int) (height * zoom) - height;
+        final int bottom = lpo != null ? (int) lpo.getBounds(zoom).bottom - height : 0;
+        final int right = (int) (width * zoom) - width;
 
         return new Rect(0, 0, right, bottom);
     }
@@ -116,7 +116,7 @@ public class HScrollDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IViewController#drawView(android.graphics.Canvas, org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.core.AbstractViewController#drawView(android.graphics.Canvas, org.ebookdroid.core.ViewState)
      */
     @Override
     public synchronized final void drawView(final Canvas canvas, final ViewState viewState) {
@@ -139,14 +139,20 @@ public class HScrollDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractDocumentView#onLayoutChanged(boolean, boolean, android.graphics.Rect, android.graphics.Rect)
+     * @see org.ebookdroid.core.AbstractViewController#onLayoutChanged(boolean, boolean, android.graphics.Rect,
+     *      android.graphics.Rect)
      */
     @Override
     public final boolean onLayoutChanged(final boolean layoutChanged, final boolean layoutLocked, final Rect oldLaout,
             final Rect newLayout) {
         int page = -1;
+        final DocumentModel dm = base.getDocumentModel();
+        if (dm == null) {
+            return false;
+        }
+
         if (isShown && layoutChanged) {
-            page = base.getDocumentModel().getCurrentViewPageIndex();
+            page = dm.getCurrentViewPageIndex();
         }
         if (super.onLayoutChanged(layoutChanged, layoutLocked, oldLaout, newLayout)) {
             if (page > 0) {
@@ -160,7 +166,8 @@ public class HScrollDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason, org.ebookdroid.core.Page)
+     * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason,
+     *      org.ebookdroid.core.Page)
      */
     @Override
     public synchronized final void invalidatePageSizes(final InvalidateSizeReason reason, final Page changedPage) {
@@ -176,23 +183,21 @@ public class HScrollDocumentView extends AbstractDocumentView {
             return;
         }
 
-        final int height = getHeight();
+        final int width = getWidth();
 
         if (changedPage == null) {
-            float widthAccum = 0;
+            float heightAccum = 0;
             for (final Page page : getBase().getDocumentModel().getPages()) {
-                final float pageWidth = height * page.getAspectRatio();
-                final float pageHeight = pageWidth / page.getAspectRatio();
-                page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, pageHeight));
-                widthAccum += pageWidth + 1;
+                final float pageHeight = width / page.getAspectRatio();
+                page.setBounds(new RectF(0, heightAccum, width, heightAccum + pageHeight));
+                heightAccum += pageHeight + 1;
             }
         } else {
-            float widthAccum = changedPage.getBounds(1.0f).left;
+            float heightAccum = changedPage.getBounds(1.0f).top;
             for (final Page page : getBase().getDocumentModel().getPages(changedPage.index.viewIndex)) {
-                final float pageWidth = height * page.getAspectRatio();
-                final float pageHeight = pageWidth / page.getAspectRatio();
-                page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, pageHeight));
-                widthAccum += pageWidth + 1;
+                final float pageHeight = width / page.getAspectRatio();
+                page.setBounds(new RectF(0, heightAccum, width, heightAccum + pageHeight));
+                heightAccum += pageHeight + 1;
             }
         }
     }
@@ -200,7 +205,7 @@ public class HScrollDocumentView extends AbstractDocumentView {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractDocumentView#isPageVisibleImpl(org.ebookdroid.core.Page, org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.core.AbstractViewController#isPageVisibleImpl(org.ebookdroid.core.Page, org.ebookdroid.core.ViewState)
      */
     @Override
     protected final boolean isPageVisibleImpl(final Page page, final ViewState viewState) {

@@ -1,7 +1,7 @@
 package org.ebookdroid.core.curl;
 
 import org.ebookdroid.core.Page;
-import org.ebookdroid.core.SinglePageDocumentView;
+import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 
 import android.graphics.Canvas;
@@ -11,7 +11,7 @@ import android.graphics.RectF;
 
 public class SinglePageSlider extends AbstractPageSlider {
 
-    public SinglePageSlider(final SinglePageDocumentView singlePageDocumentView) {
+    public SinglePageSlider(final SinglePageController singlePageDocumentView) {
         super(PageAnimationType.SLIDER, singlePageDocumentView);
     }
 
