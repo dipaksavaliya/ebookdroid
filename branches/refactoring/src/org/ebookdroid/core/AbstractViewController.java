@@ -357,7 +357,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         LCTX.d("commitZoom()");
         inZoom.set(false);
         final float newZoom = base.getZoomModel().getZoom();
-        SettingsManager.zoomChanged(newZoom);
+        SettingsManager.zoomChanged(newZoom, true);
         onZoomChanged(newZoom, true);
         initialZoom = newZoom;
     }

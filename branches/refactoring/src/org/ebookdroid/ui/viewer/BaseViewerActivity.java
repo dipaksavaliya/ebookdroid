@@ -162,6 +162,13 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        SettingsManager.storeBookSettings();
+    }
+
+    @Override
     protected void onDestroy() {
         if (documentModel != null) {
             documentModel.recycle();
