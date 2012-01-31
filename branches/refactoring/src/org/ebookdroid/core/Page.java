@@ -59,7 +59,7 @@ public class Page {
 
             final RectF bounds = viewState.getBounds(this);
 
-            if (!nodes.root.hasBitmap()) {
+            if (!nodes.root.holder.hasBitmaps()) {
                 canvas.drawRect(bounds, paint.fillPaint);
 
                 final TextPaint textPaint = paint.textPaint;

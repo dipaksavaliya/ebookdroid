@@ -65,7 +65,7 @@ public class PageTree {
     }
 
     public boolean createChildren(final PageTreeNode parent) {
-        final float newThreshold = parent.calculateChildThreshold();
+        final float newThreshold = parent.childrenZoomThreshold * parent.childrenZoomThreshold;
         int childId = getFirstChildId(parent.id);
         for (int i = 0; i < splitMasks.length; i++, childId++) {
             PageTreeNode child = new PageTreeNode(owner, parent, childId, splitMasks[i], newThreshold);
@@ -120,7 +120,7 @@ public class PageTree {
         int newCount = bitmapsToRecycle.size();
         if (LCTX.isDebugEnabled()) {
             if (newCount != oldCount) {
-                LCTX.d("Recycle children for: " + parent.getFullId() + " : " + (newCount - oldCount));
+                LCTX.d("Recycle children for: " + parent.fullId + " : " + (newCount - oldCount));
             }
         }
 
@@ -131,7 +131,7 @@ public class PageTree {
         int childId = (int) getFirstChildId(parent.id);
         for (int end = childId + splitMasks.length; childId < end; childId++) {
             PageTreeNode child = nodes.get(childId);
-            if (child == null || !child.hasBitmap()) {
+            if (child == null || !child.holder.hasBitmaps()) {
                 return false;
             }
         }
@@ -156,7 +156,7 @@ public class PageTree {
             if (child == null) {
                 return false;
             }
-            if (!child.hasBitmap() && !child.decodingNow.get()) {
+            if (!child.holder.hasBitmaps() && !child.decodingNow.get()) {
                 return false;
             }
         }

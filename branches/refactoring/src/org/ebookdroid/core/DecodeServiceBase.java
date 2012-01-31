@@ -545,7 +545,7 @@ public class DecodeServiceBase implements DecodeService {
         final int sliceGeneration;
 
         DecodeTask(final ViewState viewState, final PageTreeNode node, final RectF nodeBounds, final int sliceGeneration) {
-            this.pageNumber = node.getDocumentPageIndex();
+            this.pageNumber = node.page.index.docIndex;
             this.viewState = viewState;
             this.node = node;
             this.pageSliceBounds = nodeBounds;
