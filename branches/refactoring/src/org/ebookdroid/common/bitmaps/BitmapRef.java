@@ -34,7 +34,7 @@ public class BitmapRef {
         return bitmap;
     }
 
-    public boolean clearEmptyRef() {
+    public boolean isRecycled() {
         if (bitmap != null && !bitmap.isRecycled()) {
             return false;
         }

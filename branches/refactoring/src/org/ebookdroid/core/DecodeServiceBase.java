@@ -19,10 +19,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -593,34 +589,22 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     @Override
-    public void createThumbnail(final File thumbnailFile, int width, int height, final int pageNo, final RectF region) {
-        Bitmap thumbnail = document.getEmbeddedThumbnail();
-        BitmapRef bmp = null;
+    public BitmapRef createThumbnail(int width, int height, final int pageNo, final RectF region) {
+        final Bitmap thumbnail = document.getEmbeddedThumbnail();
         if (thumbnail != null) {
             width = 200;
             height = 200;
             if (thumbnail.getHeight() > thumbnail.getWidth()) {
-                width = 200 * thumbnail.getWidth() / thumbnail.getHeight();
+                width = width * thumbnail.getWidth() / thumbnail.getHeight();
             } else {
-                height = 200 * thumbnail.getHeight() / thumbnail.getWidth();
+                height = height * thumbnail.getHeight() / thumbnail.getWidth();
             }
-
-            thumbnail = Bitmap.createScaledBitmap(thumbnail, width, height, true);
+            final Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, width, height, true);
+            final BitmapRef ref = BitmapManager.addBitmap("Thumbnail", scaled);
+            return ref;
         } else {
             final CodecPage page = getPage(pageNo);
-            bmp = page.renderBitmap(width, height, region);
-            thumbnail = bmp.getBitmap();
-        }
-
-        FileOutputStream out;
-        try {
-            out = new FileOutputStream(thumbnailFile);
-            thumbnail.compress(Bitmap.CompressFormat.JPEG, 50, out);
-            out.close();
-        } catch (final FileNotFoundException e) {
-        } catch (final IOException e) {
-        } finally {
-            BitmapManager.release(bmp);
+            return page.renderBitmap(width, height, region);
         }
     }
 

@@ -1,5 +1,6 @@
 package org.ebookdroid.common.cache;
 
+import org.ebookdroid.common.log.LogContext;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,10 +8,13 @@ import android.net.Uri;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.StringUtils;
@@ -18,22 +22,34 @@ import org.emdev.utils.filesystem.FilePrefixFilter;
 
 public class CacheManager {
 
+    public static final LogContext LCTX = LogContext.ROOT.lctx("CacheManager");
+
     private static Context s_context;
+
+    private static final Map<String, WeakReference<ThumbnailFile>> thumbmails = new HashMap<String, WeakReference<ThumbnailFile>>();
 
     public static void init(final Context context) {
         s_context = context;
     }
 
-    public static File getThumbnailFile(final String path) {
+    public static ThumbnailFile getThumbnailFile(final String path) {
         final String md5 = StringUtils.md5(path);
-        final File cacheDir = s_context.getFilesDir();
-        return new File(cacheDir, md5 + ".thumbnail");
+
+        final WeakReference<ThumbnailFile> ref = thumbmails.get(md5);
+        ThumbnailFile file = ref != null ? ref.get() : null;
+        if (file == null) {
+            final File cacheDir = s_context.getFilesDir();
+            file = new ThumbnailFile(cacheDir, md5 + ".thumbnail");
+            thumbmails.put(md5, new WeakReference<ThumbnailFile>(file));
+        }
+
+        return file;
     }
 
-    public static File getPageFile(final String path) {
+    public static PageCacheFile getPageFile(final String path) {
         final String md5 = StringUtils.md5(path);
         final File cacheDir = s_context.getFilesDir();
-        return new File(cacheDir, md5 + ".cache");
+        return new PageCacheFile(cacheDir, md5 + ".cache");
     }
 
     public static File createTempFile(final Uri uri) throws IOException {

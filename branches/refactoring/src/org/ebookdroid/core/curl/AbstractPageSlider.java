@@ -70,7 +70,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
 
     protected BitmapRef getBitmap(final Canvas canvas, final ViewState viewState, final BitmapRef ref) {
         BitmapRef bitmap = ref;
-        if (ref == null || ref.clearEmptyRef() || ref.width != canvas.getWidth() || ref.height != canvas.getHeight()) {
+        if (ref == null || ref.isRecycled() || ref.width != canvas.getWidth() || ref.height != canvas.getHeight()) {
             BitmapManager.release(ref);
             bitmap = BitmapManager.getBitmap("Curler image", canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
         }

@@ -56,6 +56,23 @@ public class BitmapManager {
         return bitmap;
     }
 
+    public static synchronized BitmapRef addBitmap(final String name, Bitmap bitmap) {
+        final BitmapRef ref = new BitmapRef(bitmap, generation);
+        used.put(ref.id, ref);
+
+        created++;
+        memoryUsed += ref.size;
+
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Added bitmap: [" + ref.id + ", " + name + ", " + ref.width + ", " + ref.height + "], created="
+                    + created + ", reused=" + reused + ", memoryUsed=" + used.size() + "/" + (memoryUsed / 1024) + "KB"
+                    + ", memoryInPool=" + pool.size() + "/" + (memoryPooled / 1024) + "KB");
+        }
+
+        ref.name = name;
+        return ref;
+    }
+
     public static synchronized BitmapRef getBitmap(final String name, final int width, final int height,
             final Bitmap.Config config) {
         if (used.size() == 0 && pool.size() == 0) {
@@ -124,7 +141,7 @@ public class BitmapManager {
     private static void print(final String msg, final boolean showRefs) {
         long sum = 0;
         for (final BitmapRef ref : pool) {
-            if (!ref.clearEmptyRef()) {
+            if (!ref.isRecycled()) {
                 if (showRefs) {
                     LCTX.e("Pool: " + ref);
                 }
@@ -132,7 +149,7 @@ public class BitmapManager {
             }
         }
         for (final BitmapRef ref : used.values()) {
-            if (!ref.clearEmptyRef()) {
+            if (!ref.isRecycled()) {
                 if (showRefs) {
                     LCTX.e("Used: " + ref);
                 }
@@ -208,7 +225,7 @@ public class BitmapManager {
         } else {
             LCTX.e("The bitmap " + ref + " not found in used ones");
         }
-        if (!ref.clearEmptyRef()) {
+        if (!ref.isRecycled()) {
             pool.add(ref);
             memoryPooled += ref.size;
         }
@@ -221,7 +238,7 @@ public class BitmapManager {
         final Iterator<BitmapRef> it = pool.iterator();
         while (it.hasNext()) {
             final BitmapRef ref = it.next();
-            if (ref.clearEmptyRef()) {
+            if (ref.isRecycled()) {
                 it.remove();
                 invalid++;
                 memoryPooled -= ref.size;
@@ -246,7 +263,7 @@ public class BitmapManager {
         final Iterator<BitmapRef> it = used.values().iterator();
         while (it.hasNext()) {
             final BitmapRef ref = it.next();
-            if (ref.clearEmptyRef()) {
+            if (ref.isRecycled()) {
                 it.remove();
                 recycled++;
                 memoryUsed -= ref.size;

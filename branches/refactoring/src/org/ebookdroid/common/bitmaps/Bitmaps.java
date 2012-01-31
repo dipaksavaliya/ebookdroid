@@ -138,7 +138,7 @@ public class Bitmaps {
             if (bitmaps[i] == null) {
                 return false;
             }
-            if (bitmaps[i].clearEmptyRef()) {
+            if (bitmaps[i].isRecycled()) {
                 return false;
             }
         }

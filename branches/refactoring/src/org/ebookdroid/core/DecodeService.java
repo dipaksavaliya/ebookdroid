@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import java.io.File;
 import java.util.List;
 
 public interface DecodeService {
@@ -38,7 +37,7 @@ public interface DecodeService {
         void decodeComplete(CodecPage codecPage, BitmapRef bitmap, Rect bitmapBounds);
     }
 
-    void createThumbnail(File thumbnailFile, int width, int height, int pageNo, RectF region);
+    BitmapRef createThumbnail(int width, int height, int pageNo, RectF region);
 
     boolean isPageSizeCacheable();
 

@@ -2,6 +2,7 @@ package org.ebookdroid.ui.library;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
+import org.ebookdroid.common.cache.ThumbnailFile;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.AppSettings.Diff;
@@ -21,10 +22,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -36,10 +33,7 @@ import android.widget.ProgressBar;
 import android.widget.ViewFlipper;
 
 import java.io.File;
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.emdev.ui.AbstractActionActivity;
 import org.emdev.ui.actions.ActionDialogBuilder;
@@ -87,14 +81,6 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     private ViewFlipper viewflipper;
     private ImageView libraryButton;
 
-    private final Map<String, SoftReference<Bitmap>> thumbnails = new HashMap<String, SoftReference<Bitmap>>();
-
-    private Bitmap cornerThmbBitmap;
-
-    private Bitmap leftThmbBitmap;
-
-    private Bitmap topThmbBitmap;
-
     private BookcaseView bookcaseView;
 
     private boolean firstResume = true;
@@ -104,10 +90,6 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.recent);
-
-        cornerThmbBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.bt_corner);
-        leftThmbBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.bt_left);
-        topThmbBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.bt_top);
 
         recentAdapter = new RecentAdapter(this);
         bookshelfAdapter = new BooksAdapter(this, recentAdapter);
@@ -151,7 +133,6 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     protected void onResume() {
         super.onResume();
 
-        thumbnails.clear();
         if (SettingsManager.getAppSettings().getUseBookcase()) {
             if (firstResume) {
                 bookshelfAdapter.startScan();
@@ -193,7 +174,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @ActionMethod(ids = R.id.actions_clearRecent)
-    public void doClearRecent(ActionEx action) {
+    public void doClearRecent(final ActionEx action) {
         if (action.isDialogItemSelected(ERASE_DISK_CACHE)) {
             CacheManager.clear();
             recentAdapter.notifyDataSetInvalidated();
@@ -218,7 +199,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @ActionMethod(ids = R.id.mainmenu_settings)
-    public void showSettings(ActionEx action) {
+    public void showSettings(final ActionEx action) {
         libraryAdapter.stopScan();
         bookshelfAdapter.stopScan();
         SettingsUI.showAppSettings(this);
@@ -273,7 +254,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @ActionMethod(ids = R.id.ShelfCaption)
-    public void showSelectShelfDlg(ActionEx action) {
+    public void showSelectShelfDlg(final ActionEx action) {
         final List<String> names = bookshelfAdapter.getListNames();
 
         if (LengthUtils.isNotEmpty(names)) {
@@ -286,22 +267,22 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     }
 
     @ActionMethod(ids = R.id.actions_selectShelf)
-    public void selectShelf(ActionEx action) {
-        Integer item = action.getParameter(IActionController.DIALOG_ITEM_PROPERTY);
+    public void selectShelf(final ActionEx action) {
+        final Integer item = action.getParameter(IActionController.DIALOG_ITEM_PROPERTY);
         if (bookcaseView != null) {
             bookcaseView.setCurrentList(item);
         }
     }
 
     @ActionMethod(ids = R.id.ShelfLeftButton)
-    public void selectPrevShelf(ActionEx action) {
+    public void selectPrevShelf(final ActionEx action) {
         if (bookcaseView != null) {
             bookcaseView.prevList();
         }
     }
 
     @ActionMethod(ids = R.id.ShelfRightButton)
-    public void selectNextShelf(ActionEx action) {
+    public void selectNextShelf(final ActionEx action) {
         if (bookcaseView != null) {
             bookcaseView.nextList();
         }
@@ -336,49 +317,8 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
 
     @Override
     public void loadThumbnail(final String path, final ImageView imageView, final int defaultResID) {
-        final SoftReference<Bitmap> ref = thumbnails.get(path);
-        Bitmap bmp = ref != null ? ref.get() : null;
-        if (bmp == null) {
-            try {
-                final File thumbnailFile = CacheManager.getThumbnailFile(path);
-                Bitmap tmpbmp = null;
-                boolean store = true;
-                if (thumbnailFile.exists()) {
-
-                    tmpbmp = BitmapFactory.decodeFile(thumbnailFile.getPath());
-                    if (tmpbmp == null) {
-                        thumbnailFile.delete();
-                        tmpbmp = Bitmap.createBitmap(160, 200, Bitmap.Config.ARGB_8888);
-                        tmpbmp.eraseColor(Color.WHITE);
-                        store = false;
-                    }
-                } else {
-                    tmpbmp = Bitmap.createBitmap(160, 200, Bitmap.Config.ARGB_8888);
-                    tmpbmp.eraseColor(Color.WHITE);
-                    store = false;
-                }
-                int left = 15;
-                int top = 10;
-                final int width = tmpbmp.getWidth() + left;
-                final int height = tmpbmp.getHeight() + top;
-                bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-                bmp.eraseColor(Color.TRANSPARENT);
-
-                final Canvas c = new Canvas(bmp);
-
-                c.drawBitmap(cornerThmbBitmap, null, new Rect(0, 0, left, top), null);
-                c.drawBitmap(topThmbBitmap, null, new Rect(left, 0, width, top), null);
-                c.drawBitmap(leftThmbBitmap, null, new Rect(0, top, left, height), null);
-                c.drawBitmap(tmpbmp, null, new Rect(left, top, width, height), null);
-
-                if (store) {
-                    thumbnails.put(path, new SoftReference<Bitmap>(bmp));
-                }
-            } catch (OutOfMemoryError ex) {
-            }
-        }
-
+        final ThumbnailFile tf = CacheManager.getThumbnailFile(path);
+        final Bitmap bmp = tf.getImage();
         if (bmp != null) {
             imageView.setImageBitmap(bmp);
         }
