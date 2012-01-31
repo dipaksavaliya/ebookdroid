@@ -1,6 +1,6 @@
 package org.ebookdroid.common.settings;
 
-import org.ebookdroid.Activities;
+import org.ebookdroid.CodecType;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DecodeMode;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
@@ -125,7 +125,7 @@ public class AppSettings {
     }
 
     public FileExtensionFilter getAllowedFileTypes() {
-        return getAllowedFileTypes(Activities.getAllExtensions());
+        return getAllowedFileTypes(CodecType.getAllExtensions());
     }
 
     public FileExtensionFilter getAllowedFileTypes(final Set<String> fileTypes) {

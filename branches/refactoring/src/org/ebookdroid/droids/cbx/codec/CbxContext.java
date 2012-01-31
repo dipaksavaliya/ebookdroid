@@ -10,27 +10,22 @@ import java.io.IOException;
 import org.emdev.utils.archives.ArchiveEntry;
 import org.emdev.utils.archives.ArchiveFile;
 
-public class CbxContext<ArchiveEntryType extends ArchiveEntry> extends AbstractCodecContext {
+public abstract class CbxContext<ArchiveEntryType extends ArchiveEntry> extends AbstractCodecContext implements
+        CbxArchiveFactory<ArchiveEntryType> {
 
     static {
         EBookDroidLibraryLoader.load();
     }
-    
-    private final CbxArchiveFactory<ArchiveEntryType> factory;
-
-    public CbxContext(final CbxArchiveFactory<ArchiveEntryType> factory) {
-        this.factory = factory;
-    }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.codec.CodecContext#openDocument(java.lang.String, java.lang.String)
      */
     @Override
     public CodecDocument openDocument(final String fileName, final String password) {
         try {
-            final ArchiveFile<ArchiveEntryType> archive = factory.create(new File(fileName), password);
+            final ArchiveFile<ArchiveEntryType> archive = createArchive(new File(fileName), password);
             return new CbxDocument<ArchiveEntryType>(this, archive);
         } catch (final IOException e) {
             if (CbxDocument.LCTX.isDebugEnabled()) {

@@ -1,5 +1,6 @@
 package org.ebookdroid.core.models;
 
+import org.ebookdroid.CodecType;
 import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.Bitmaps;
@@ -8,8 +9,10 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.core.DecodeService;
+import org.ebookdroid.core.DecodeServiceBase;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;
+import org.ebookdroid.core.codec.CodecContext;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IView;
@@ -36,12 +39,22 @@ public class DocumentModel extends CurrentPageModel {
 
     private static final Page[] EMPTY_PAGES = {};
 
-    private DecodeService decodeService;
+    private final CodecContext context;
+    private final DecodeService decodeService;
 
     private Page[] pages = EMPTY_PAGES;
 
-    public DocumentModel(final DecodeService decodeService) {
-        this.decodeService = decodeService;
+    public DocumentModel(final CodecType activityType) {
+        try {
+            context = activityType.getContextClass().newInstance();
+            decodeService = new DecodeServiceBase(context);
+        } catch (final Throwable th) {
+            throw new RuntimeException(th);
+        }
+    }
+
+    public void open(String fileName, String password) {
+        decodeService.open(fileName, password);
     }
 
     public Page[] getPages() {
@@ -66,7 +79,6 @@ public class DocumentModel extends CurrentPageModel {
 
     public void recycle() {
         decodeService.recycle();
-        decodeService = null;
         recyclePages();
     }
 
@@ -174,16 +186,16 @@ public class DocumentModel extends CurrentPageModel {
         }
     }
 
-    public void createBookThumbnail(final BookSettings bs, Page page, boolean override) {
+    public void createBookThumbnail(final BookSettings bs, final Page page, final boolean override) {
         final File thumbnailFile = CacheManager.getThumbnailFile(bs.fileName);
         if (!override && thumbnailFile.exists()) {
             return;
         }
 
         int width = 200, height = 200;
-        RectF bounds = page.getBounds(1.0f);
-        float pageWidth = bounds.width();
-        float pageHeight = bounds.height();
+        final RectF bounds = page.getBounds(1.0f);
+        final float pageWidth = bounds.width();
+        final float pageHeight = bounds.height();
 
         if (pageHeight > pageWidth) {
             width = (int) (200 * pageWidth / pageHeight);
@@ -195,7 +207,7 @@ public class DocumentModel extends CurrentPageModel {
     }
 
     private CodecPageInfo[] retrievePagesInfo(final IActivityController base, final BookSettings bs,
-            IActivityController.IBookLoadTask task) {
+            final IActivityController.IBookLoadTask task) {
         final File pagesFile = CacheManager.getPageFile(bs.fileName);
 
         if (CACHE_ENABLED) {
@@ -203,7 +215,7 @@ public class DocumentModel extends CurrentPageModel {
                 final CodecPageInfo[] infos = loadPagesInfo(pagesFile);
                 if (infos != null) {
                     boolean nullInfoFound = false;
-                    for (CodecPageInfo info : infos) {
+                    for (final CodecPageInfo info : infos) {
                         if (info == null) {
                             nullInfoFound = true;
                             break;

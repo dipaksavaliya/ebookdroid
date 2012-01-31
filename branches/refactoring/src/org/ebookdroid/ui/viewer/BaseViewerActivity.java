@@ -1,5 +1,6 @@
 package org.ebookdroid.ui.viewer;
 
+import org.ebookdroid.CodecType;
 import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.log.LogContext;
@@ -95,7 +96,7 @@ actions = {
         @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu")
 // finish
 })
-public abstract class BaseViewerActivity extends AbstractActionActivity implements IActivityController,
+public class BaseViewerActivity extends AbstractActionActivity implements IActivityController,
         DecodingProgressListener, CurrentPageListener, ISettingsChangeListener {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Core");
@@ -108,8 +109,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
     private IView view;
 
-    private final AtomicReference<IViewController> ctrl = new AtomicReference<IViewController>(
-            new EmptyContoller());
+    private final AtomicReference<IViewController> ctrl = new AtomicReference<IViewController>(new EmptyContoller());
 
     private Toast pageNumberToast;
 
@@ -131,6 +131,8 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
     private boolean temporaryBook;
 
+    private CodecType codecType;
+
     /**
      * Instantiates a new base viewer activity.
      */
@@ -147,18 +149,23 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
         getWindowManager().getDefaultDisplay().getMetrics(DM);
 
-        SettingsManager.addListener(this);
-
-        actions.createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
-
         frameLayout = createMainContainer();
         view = new BaseView(this);
+
+        actions.createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
+        actions.createAction(R.id.mainmenu_zoom).putValue("view", getZoomControls());
+        actions.createAction(R.id.actions_toggleTouchManagerView).putValue("view", getTouchView());
+
+        codecType = CodecType.getByUri(getIntent().getData());
+        if (codecType == null) {
+            throw new RuntimeException("Unknown intent data type: " + getIntent().getData());
+        }
+
+        SettingsManager.addListener(this);
 
         initActivity();
         initView();
 
-        actions.createAction(R.id.mainmenu_zoom).putValue("view", getZoomControls());
-        actions.createAction(R.id.actions_toggleTouchManagerView).putValue("view", getTouchView());
     }
 
     @Override
@@ -198,8 +205,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         frameLayout.addView(getTouchView());
         setContentView(frameLayout);
 
-        final DecodeService decodeService = createDecodeService();
-        documentModel = new DocumentModel(decodeService);
+        documentModel = new DocumentModel(codecType);
         documentModel.addListener(BaseViewerActivity.this);
         progressModel = new DecodingProgressModel();
         progressModel.addListener(BaseViewerActivity.this);
@@ -217,7 +223,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         SettingsManager.init(fileName);
         SettingsManager.applyBookSettingsChanges(null, SettingsManager.getBookSettings(), null);
 
-        startDecoding(decodeService, fileName, "");
+        startDecoding(fileName, "");
     }
 
     private TouchManagerView getTouchView() {
@@ -227,16 +233,16 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         return touchView;
     }
 
-    private void startDecoding(final DecodeService decodeService, final String fileName, final String password) {
-        view.getView().post(new BookLoadTask(decodeService, fileName, password));
+    private void startDecoding(final String fileName, final String password) {
+        view.getView().post(new BookLoadTask(fileName, password));
     }
 
-    private void askPassword(final DecodeService decodeService, final String fileName) {
+    private void askPassword(final String fileName) {
         setContentView(R.layout.password);
         final Button ok = (Button) findViewById(R.id.pass_ok);
 
-        ok.setOnClickListener(actions.getOrCreateAction(R.id.actions_redecodingWithPassord)
-                .putValue("decodeService", decodeService).putValue("fileName", fileName));
+        ok.setOnClickListener(actions.getOrCreateAction(R.id.actions_redecodingWithPassord).putValue("fileName",
+                fileName));
 
         final Button cancel = (Button) findViewById(R.id.pass_cancel);
         cancel.setOnClickListener(actions.getOrCreateAction(R.id.mainmenu_close));
@@ -245,10 +251,9 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
     @ActionMethod(ids = R.id.actions_redecodingWithPassord)
     public void redecodingWithPassord(final ActionEx action) {
         final EditText te = (EditText) findViewById(R.id.pass_req);
-        final DecodeService decodeService = action.getParameter("decodeService");
         final String fileName = action.getParameter("fileName");
 
-        startDecoding(decodeService, fileName, te.getText().toString());
+        startDecoding(fileName, te.getText().toString());
     }
 
     private void showErrorDlg(final String msg) {
@@ -343,8 +348,6 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
     private FrameLayout createMainContainer() {
         return new FrameLayout(this);
     }
-
-    protected abstract DecodeService createDecodeService();
 
     /**
      * Called on creation options menu
@@ -682,13 +685,11 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
     final class BookLoadTask extends AsyncTask<String, String, Exception> implements IBookLoadTask, Runnable {
 
-        private final DecodeService m_decodeService;
         private String m_fileName;
         private String m_password;
         private ProgressDialog progressDialog;
 
-        public BookLoadTask(final DecodeService decodeService, final String fileName, final String password) {
-            m_decodeService = decodeService;
+        public BookLoadTask(final String fileName, final String password) {
             m_fileName = fileName;
             m_password = password;
         }
@@ -720,7 +721,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
                     m_fileName = tempFile.getAbsolutePath();
                 }
                 getView().waitForInitialization();
-                m_decodeService.open(m_fileName, m_password);
+                documentModel.open(m_fileName, m_password);
                 getDocumentController().init(this);
                 return null;
             } catch (final Exception e) {
@@ -752,7 +753,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
 
                     final String msg = result.getMessage();
                     if ("PDF needs a password!".equals(msg)) {
-                        askPassword(m_decodeService, m_fileName);
+                        askPassword(m_fileName);
                     } else {
                         showErrorDlg(msg);
                     }

@@ -9,5 +9,5 @@ import org.emdev.utils.archives.ArchiveFile;
 
 public interface CbxArchiveFactory<ArchiveEntryType extends ArchiveEntry> {
 
-    ArchiveFile<ArchiveEntryType> create(final File file, final String password) throws IOException;
+    ArchiveFile<ArchiveEntryType> createArchive(final File file, final String password) throws IOException;
 }

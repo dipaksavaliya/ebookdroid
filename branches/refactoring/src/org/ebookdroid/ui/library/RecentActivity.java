@@ -1,13 +1,12 @@
 package org.ebookdroid.ui.library;
 
-import org.ebookdroid.Activities;
 import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.AppSettings;
+import org.ebookdroid.common.settings.AppSettings.Diff;
 import org.ebookdroid.common.settings.ISettingsChangeListener;
 import org.ebookdroid.common.settings.SettingsManager;
-import org.ebookdroid.common.settings.AppSettings.Diff;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.ui.library.adapters.BooksAdapter;
 import org.ebookdroid.ui.library.adapters.FileListAdapter;
@@ -16,6 +15,7 @@ import org.ebookdroid.ui.library.views.BookcaseView;
 import org.ebookdroid.ui.library.views.LibraryView;
 import org.ebookdroid.ui.library.views.RecentBooksView;
 import org.ebookdroid.ui.settings.SettingsUI;
+import org.ebookdroid.ui.viewer.BaseViewerActivity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -243,11 +243,8 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
         libraryAdapter.stopScan();
         bookshelfAdapter.stopScan();
         final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        final Class<? extends Activity> activity = Activities.getByUri(uri);
-        if (activity != null) {
-            intent.setClass(this, activity);
-            startActivity(intent);
-        }
+        intent.setClass(this, BaseViewerActivity.class);
+        startActivity(intent);
     }
 
     @Override
