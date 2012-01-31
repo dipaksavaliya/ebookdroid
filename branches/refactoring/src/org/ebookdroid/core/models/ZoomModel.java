@@ -6,9 +6,11 @@ import org.emdev.utils.listeners.ListenerProxy;
 
 public class ZoomModel extends ListenerProxy {
 
-    private float zoom = 1.0f;
     private static final float INCREMENT_DELTA = 0.05f;
-    private boolean horizontalScrollEnabled;
+
+    private float initialZoom = 1.0f;
+    private float currentZoom = 1.0f;
+
     private boolean isCommited;
 
     public ZoomModel() {
@@ -16,23 +18,22 @@ public class ZoomModel extends ListenerProxy {
     }
 
     public void initZoom(final float zoom) {
-        this.zoom = Math.max(zoom, 1.0f);
+        this.initialZoom = this.currentZoom = Math.max(zoom, 1.0f);
         isCommited = true;
     }
 
     public void setZoom(float zoom) {
-        zoom = Math.max(zoom, 1.0f);
-        if (this.zoom != zoom) {
-            final float oldZoom = this.zoom;
-            this.zoom = zoom;
+        final float newZoom = Math.max(zoom, 1.0f);
+        final float oldZoom = this.currentZoom;
+        if (newZoom != oldZoom) {
             isCommited = false;
-
-            this.<ZoomListener> getListener().zoomChanged(zoom, oldZoom);
+            this.currentZoom = newZoom;
+            this.<ZoomListener> getListener().zoomChanged(oldZoom, newZoom, false);
         }
     }
 
     public float getZoom() {
-        return zoom;
+        return currentZoom;
     }
 
     public void increaseZoom() {
@@ -43,22 +44,11 @@ public class ZoomModel extends ListenerProxy {
         setZoom(getZoom() - INCREMENT_DELTA);
     }
 
-    public void setHorizontalScrollEnabled(final boolean horizontalScrollEnabled) {
-        this.horizontalScrollEnabled = horizontalScrollEnabled;
-    }
-
-    public boolean isHorizontalScrollEnabled() {
-        return horizontalScrollEnabled;
-    }
-
-    public boolean canDecrement() {
-        return zoom > 1.0f;
-    }
-
     public void commit() {
         if (!isCommited) {
             isCommited = true;
-            this.<ZoomListener> getListener().commitZoom();
+            this.<ZoomListener> getListener().zoomChanged(initialZoom, currentZoom, true);
+            initialZoom = currentZoom;
         }
     }
 }

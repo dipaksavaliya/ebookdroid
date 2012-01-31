@@ -172,10 +172,6 @@ public class HScrollController extends AbstractViewController {
             return;
         }
 
-        if (reason == InvalidateSizeReason.ZOOM) {
-            return;
-        }
-
         final int height = getHeight();
 
         if (changedPage == null) {

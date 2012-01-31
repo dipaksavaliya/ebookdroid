@@ -13,7 +13,6 @@ import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IViewController;
-import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -94,87 +93,12 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return res;
     }
 
-    public boolean onZoomChanged(final float oldZoom, final ViewState viewState, final boolean committed,
-            final RectF pageBounds, final List<PageTreeNode> nodesToDecode, final List<Bitmaps> bitmapsToRecycle) {
-        if (!viewState.isNodeKeptInMemory(this, pageBounds)) {
-            recycleWithChildren(bitmapsToRecycle);
-            return false;
-        }
-
-        final boolean childrenRequired = isChildrenRequired(viewState);
-        final boolean hasChildren = page.nodes.hasChildren(this);
-
-        if (viewState.zoom < oldZoom) {
-            if (!childrenRequired) {
-                if (hasChildren) {
-                    page.nodes.recycleChildren(this, bitmapsToRecycle);
-                }
-                if (viewState.isNodeVisible(this, pageBounds) && (!holder.hasBitmaps() || committed)) {
-                    decodePageTreeNode(nodesToDecode, viewState);
-                }
-            }
-            return true;
-        }
-
-        if (childrenRequired) {
-            if (!hasChildren) {
-                if (id != 0 || viewState.decodeMode == DecodeMode.LOW_MEMORY) {
-                    stopDecodingThisNode("children should be created");
-                }
-                page.nodes.createChildren(this, calculateChildThreshold());
-            }
-
-            page.nodes.onZoomChanged(oldZoom, viewState, committed, pageBounds, this, nodesToDecode, bitmapsToRecycle);
-
-            return true;
-        }
-
-        if (isReDecodingRequired(committed, viewState)) {
-            stopDecodingThisNode("Zoom changed");
-            decodePageTreeNode(nodesToDecode, viewState);
-        } else if (!holder.hasBitmaps()) {
-            decodePageTreeNode(nodesToDecode, viewState);
-        }
-        return true;
-    }
-
-    private boolean isReDecodingRequired(final boolean committed, final ViewState viewState) {
+    protected boolean isReDecodingRequired(final boolean committed, final ViewState viewState) {
         return (committed && viewState.zoom != bitmapZoom) || viewState.zoom > 1.2 * bitmapZoom;
     }
 
     protected float calculateChildThreshold() {
         return childrenZoomThreshold * childrenZoomThreshold;
-    }
-
-    public boolean onPositionChanged(final ViewState viewState, final RectF pageBounds,
-            final List<PageTreeNode> nodesToDecode, final List<Bitmaps> bitmapsToRecycle) {
-
-        if (!viewState.isNodeKeptInMemory(this, pageBounds)) {
-            recycleWithChildren(bitmapsToRecycle);
-            return false;
-        }
-
-        final boolean childrenRequired = isChildrenRequired(viewState);
-        final boolean hasChildren = page.nodes.hasChildren(this);
-
-        if (hasChildren) {
-            page.nodes.onPositionChanged(viewState, pageBounds, this, nodesToDecode, bitmapsToRecycle);
-            return true;
-        }
-
-        if (childrenRequired) {
-            if (id != 0 || viewState.decodeMode == DecodeMode.LOW_MEMORY) {
-                stopDecodingThisNode("children created");
-            }
-            page.nodes.createChildren(this, calculateChildThreshold());
-            page.nodes.onPositionChanged(viewState, pageBounds, this, nodesToDecode, bitmapsToRecycle);
-            return true;
-        }
-
-        if (!holder.hasBitmaps()) {
-            decodePageTreeNode(nodesToDecode, viewState);
-        }
-        return true;
     }
 
     protected void onChildLoaded(final PageTreeNode child, final ViewState viewState, final RectF bounds) {
@@ -285,22 +209,17 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                     holder.setBitmap(bitmaps);
                     setDecodingNow(false);
 
-                    page.base.getDocumentController().pageUpdated(page.index.viewIndex);
                     final IViewController dc = page.base.getDocumentController();
                     final DocumentModel dm = page.base.getDocumentModel();
 
                     if (dc != null && dm != null) {
-                        final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
+                        ViewState viewState = dc.updatePageSize(dm, page, bitmapBounds);
 
-                        ViewState viewState = new ViewState(dc);
-                        if (changed) {
-                            dc.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-                            viewState = dc.updatePageVisibility(dm.getCurrentViewPageIndex(), 0, viewState.zoom);
-                        }
                         final RectF bounds = viewState.getBounds(page);
                         if (parent != null) {
                             parent.onChildLoaded(PageTreeNode.this, viewState, bounds);
                         }
+
                         if (viewState.isNodeVisible(PageTreeNode.this, bounds)) {
                             dc.redrawView(viewState);
                         }

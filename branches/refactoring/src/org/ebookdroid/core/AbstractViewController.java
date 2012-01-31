@@ -14,8 +14,8 @@ import org.ebookdroid.core.touch.IMultiTouchZoom;
 import org.ebookdroid.core.touch.TouchManager;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
-import org.ebookdroid.ui.viewer.IViewController;
 import org.ebookdroid.ui.viewer.IView;
+import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -24,7 +24,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -43,8 +42,7 @@ actions = {
         @ActionMethodDef(id = R.id.actions_verticalConfigScrollDown, method = "verticalConfigScroll")
 // no more
 })
-public abstract class AbstractViewController extends AbstractComponentController<IView> implements
-        IViewController {
+public abstract class AbstractViewController extends AbstractComponentController<IView> implements IViewController {
 
     protected static final LogContext LCTX = LogContext.ROOT.lctx("View", true);
 
@@ -65,8 +63,6 @@ public abstract class AbstractViewController extends AbstractComponentController
     protected int firstVisiblePage;
 
     protected int lastVisiblePage;
-
-    protected float initialZoom;
 
     protected boolean layoutLocked;
 
@@ -155,8 +151,7 @@ public abstract class AbstractViewController extends AbstractComponentController
             final Page page = pageToGo.getActualPage(base.getDocumentModel(), bs);
             final int toPage = page != null ? page.index.viewIndex : 0;
 
-            updatePageVisibility(toPage, 0, base.getZoomModel().getZoom());
-
+            new CmdScrollTo(this, toPage).execute();
             goToPageImpl(toPage, bs.offsetX, bs.offsetY);
 
         } else {
@@ -188,9 +183,6 @@ public abstract class AbstractViewController extends AbstractComponentController
                 final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
                 final float left = bounds.left + offsetX * bounds.width();
                 final float top = bounds.top + offsetY * bounds.height();
-                // if (LCTX.isDebugEnabled()) {
-                // LCTX.d("goToPageImpl(): Scroll to: " + page.index.viewIndex + left + ", " + top);
-                // }
                 view.scrollTo((int) left, (int) top);
             } else {
                 if (LCTX.isDebugEnabled()) {
@@ -210,16 +202,17 @@ public abstract class AbstractViewController extends AbstractComponentController
      * @see org.ebookdroid.ui.viewer.IViewController#onScrollChanged(int, int)
      */
     @Override
-    public void onScrollChanged(final int newPage, final int direction) {
+    public void onScrollChanged(final int direction) {
         if (inZoom.get()) {
             return;
         }
 
+        final CmdScroll cmd = direction > 0 ? new CmdScrollDown(AbstractViewController.this) : new CmdScrollUp(this);
         final Runnable r = new Runnable() {
 
             @Override
             public void run() {
-                final ViewState viewState = updatePageVisibility(newPage, direction, getBase().getZoomModel().getZoom());
+                final ViewState viewState = cmd.execute();
                 final DocumentModel dm = getBase().getDocumentModel();
                 final Page page = dm.getPageObject(viewState.currentIndex);
                 if (page != null) {
@@ -234,155 +227,52 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.ui.viewer.IViewController#updatePageVisibility(int, int, float)
+     *
+     * @see org.ebookdroid.ui.viewer.IViewController#updatePageSize(org.ebookdroid.core.models.DocumentModel, org.ebookdroid.core.Page, android.graphics.Rect)
      */
     @Override
-    public final ViewState updatePageVisibility(final int newPage, final int direction, final float zoom) {
-        if (newPage != -1) {
-            return new CmdScrollTo(this, newPage).execute();
+    public ViewState updatePageSize(DocumentModel model, Page page, Rect bitmapBounds) {
+        this.pageUpdated(page.index.viewIndex);
+
+        final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
+
+        ViewState viewState = new ViewState(this);
+        if (changed) {
+            this.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
+            viewState = new CmdScrollTo(this, model.getCurrentViewPageIndex()).execute();
         }
 
-        if (direction > 0) {
-            return new CmdScrollDown(this).execute();
-        }
-        
-        if (direction < 0) {
-            return new CmdScrollUp(this).execute();
-        }
-
-        return new ViewState(this, zoom);
+        return viewState;
     }
 
-    protected final void decodePageTreeNodes(final ViewState viewState, final List<PageTreeNode> nodesToDecode) {
-        final PageTreeNode best = Collections.min(nodesToDecode, new PageTreeNodeComparator(viewState));
-        final DecodeService ds = base.getDecodeService();
-        if (ds != null) {
-            ds.decodePage(viewState, best, best.croppedBounds != null ? best.croppedBounds : best.pageSliceBounds);
-
-            for (final PageTreeNode node : nodesToDecode) {
-                if (node != best) {
-                    ds.decodePage(viewState, node, node.croppedBounds != null ? node.croppedBounds
-                            : node.pageSliceBounds);
-                }
-            }
-        }
-    }
-
-    protected final ViewState calculatePageVisibility(final int newPage, final int direction, final float zoom) {
-        final Page[] pages = getBase().getDocumentModel().getPages();
-        final ViewState initial = new ViewState(this, zoom);
-
-        if (newPage != -1) {
-            firstVisiblePage = newPage;
-            lastVisiblePage = newPage;
-            while (firstVisiblePage > 0) {
-                final int index = firstVisiblePage - 1;
-                if (!isPageVisibleImpl(pages[index], initial)) {
-                    break;
-                }
-                firstVisiblePage = index;
-            }
-            while (lastVisiblePage < pages.length - 1) {
-                final int index = lastVisiblePage + 1;
-                if (!isPageVisibleImpl(pages[index], initial)) {
-                    break;
-                }
-                lastVisiblePage = index;
-            }
-        } else if (direction < 0 && lastVisiblePage != -1) {
-            for (int i = lastVisiblePage; i >= 0; i--) {
-                if (!isPageVisibleImpl(pages[i], initial)) {
-                    continue;
-                } else {
-                    lastVisiblePage = i;
-                    break;
-                }
-            }
-            firstVisiblePage = lastVisiblePage;
-            while (firstVisiblePage > 0) {
-                final int index = firstVisiblePage - 1;
-                if (!isPageVisibleImpl(pages[index], initial)) {
-                    break;
-                }
-                firstVisiblePage = index;
-            }
-
-        } else if (direction > 0 && firstVisiblePage != -1) {
-            for (int i = firstVisiblePage; i < pages.length; i++) {
-                if (!isPageVisibleImpl(pages[i], initial)) {
-                    continue;
-                } else {
-                    firstVisiblePage = i;
-                    break;
-                }
-            }
-            lastVisiblePage = firstVisiblePage;
-            while (lastVisiblePage < pages.length - 1) {
-                final int index = lastVisiblePage + 1;
-                if (!isPageVisibleImpl(pages[index], initial)) {
-                    break;
-                }
-                lastVisiblePage = index;
-            }
-        } else {
-            firstVisiblePage = -1;
-            lastVisiblePage = 1;
-            for (final Page page : getBase().getDocumentModel().getPages()) {
-                if (isPageVisibleImpl(page, initial)) {
-                    if (firstVisiblePage == -1) {
-                        firstVisiblePage = page.index.viewIndex;
-                    }
-                    lastVisiblePage = page.index.viewIndex;
-                } else if (firstVisiblePage != -1) {
-                    break;
-                }
-            }
-        }
-
-        return new ViewState(initial, this);
+    protected void pageUpdated(int viewIndex) {
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.core.events.ZoomListener#commitZoom()
+     *
+     * @see org.ebookdroid.core.events.ZoomListener#zoomChanged(float, float, boolean)
      */
     @Override
-    public final void commitZoom() {
+    public void zoomChanged(final float oldZoom, final float newZoom, final boolean committed) {
         if (!isShown) {
             return;
         }
 
-        LCTX.d("commitZoom()");
-        inZoom.set(false);
-        final float newZoom = base.getZoomModel().getZoom();
-        SettingsManager.zoomChanged(newZoom, true);
-        onZoomChanged(newZoom, true);
-        initialZoom = newZoom;
-    }
+        inZoom.set(!committed);
+        final CmdZoom cmd = newZoom > oldZoom ? new CmdZoomIn(this, oldZoom, newZoom, committed) : new CmdZoomOut(this,
+                oldZoom, newZoom, committed);
 
-    protected final ViewState onZoomChanged(final float newZoom, final boolean committed) {
-        final DocumentModel dm = base.getDocumentModel();
-        final ViewState newState = calculatePageVisibility(dm.getCurrentViewPageIndex(), 0, newZoom);
-
-        final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-        final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-
-        for (final Page page : getBase().getDocumentModel().getPages()) {
-            page.onZoomChanged(initialZoom, newState, committed, nodesToDecode, bitmapsToRecycle);
+        if (!committed) {
+            view.invalidateScroll(newZoom, oldZoom);
         }
-        BitmapManager.release(bitmapsToRecycle);
-
-        if (!nodesToDecode.isEmpty()) {
-            decodePageTreeNodes(newState, nodesToDecode);
+        final ViewState newState = cmd.execute();
+        if (!committed) {
+            redrawView(newState);
+        } else {
+            SettingsManager.zoomChanged(newZoom, true);
+            updatePosition(cmd.model, cmd.model.getCurrentPageObject(), newState);
         }
-
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onZoomChanged: " + committed + ", " + newState + " => " + nodesToDecode.size());
-        }
-        updatePosition(dm, dm.getCurrentPageObject(), newState);
-        return newState;
     }
 
     /**
@@ -392,44 +282,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void updateMemorySettings() {
-        final ViewState viewState = new ViewState(this);
-
-        final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-        final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-
-        for (final Page page : getBase().getDocumentModel().getPages()) {
-            page.onZoomChanged(0, viewState, true, nodesToDecode, bitmapsToRecycle);
-        }
-        BitmapManager.release(bitmapsToRecycle);
-
-        if (!nodesToDecode.isEmpty()) {
-            decodePageTreeNodes(viewState, nodesToDecode);
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("updateMemorySettings: " + viewState + " => " + nodesToDecode.size());
-            }
-        }
-
-    }
-
-    public final ViewState invalidatePages(final ViewState oldState, final Page... pages) {
-        final ViewState viewState = calculatePageVisibility(pages[0].index.viewIndex, 0, oldState.zoom);
-
-        final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-        final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-
-        for (final Page page : pages) {
-            page.onPositionChanged(viewState, nodesToDecode, bitmapsToRecycle);
-        }
-        BitmapManager.release(bitmapsToRecycle);
-
-        if (!nodesToDecode.isEmpty()) {
-            decodePageTreeNodes(viewState, nodesToDecode);
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("invalidatePages: " + viewState + " => " + nodesToDecode.size());
-            }
-        }
-
-        return viewState;
+        new CmdZoomIn(this).execute();
     }
 
     /**
@@ -441,36 +294,6 @@ public abstract class AbstractViewController extends AbstractComponentController
     public final void goToPage(final int toPage) {
         if (isShown) {
             goToPageImpl(toPage);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.core.events.ZoomListener#zoomChanged(float, float)
-     */
-    @Override
-    public final void zoomChanged(final float newZoom, final float oldZoom) {
-        if (!isShown) {
-            return;
-        }
-
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("zoomChanged(" + newZoom + ", " + oldZoom + ")");
-        }
-
-        try {
-            if (inZoom.compareAndSet(false, true)) {
-                initialZoom = oldZoom;
-            }
-
-            invalidatePageSizes(InvalidateSizeReason.ZOOM, null);
-
-            view.invalidateScroll(newZoom, oldZoom);
-
-            view.redrawView(onZoomChanged(newZoom, false));
-        } catch (final Throwable th) {
-            LCTX.e("Unexpected error: ", th);
         }
     }
 
@@ -512,9 +335,9 @@ public abstract class AbstractViewController extends AbstractComponentController
         // Avoid sound
         if (event.getAction() == KeyEvent.ACTION_UP) {
             switch (event.getKeyCode()) {
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                return true;
+                case KeyEvent.KEYCODE_VOLUME_DOWN:
+                case KeyEvent.KEYCODE_VOLUME_UP:
+                    return true;
             }
         }
 
@@ -565,9 +388,8 @@ public abstract class AbstractViewController extends AbstractComponentController
 
                 invalidatePageSizes(InvalidateSizeReason.LAYOUT, null);
                 invalidateScroll();
-                final float oldZoom = base.getZoomModel().getZoom();
-                initialZoom = 0;
-                view.redrawView(onZoomChanged(oldZoom, true));
+
+                new CmdZoomIn(this).execute();
                 return true;
             }
         }
@@ -575,16 +397,14 @@ public abstract class AbstractViewController extends AbstractComponentController
     }
 
     @Override
-    public void toggleNightMode(boolean nightMode) {
+    public void toggleNightMode(final boolean nightMode) {
         final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
         for (final Page page : base.getDocumentModel().getPages()) {
             page.nodes.recycleAll(bitmapsToRecycle, true);
         }
         BitmapManager.release(bitmapsToRecycle);
 
-        final float oldZoom = base.getZoomModel().getZoom();
-        initialZoom = 0;
-        view.redrawView(onZoomChanged(oldZoom, true));
+        new CmdZoomIn(this).execute();
     }
 
     protected final void invalidateScroll() {
@@ -604,7 +424,7 @@ public abstract class AbstractViewController extends AbstractComponentController
     public final void setAlign(final PageAlign align) {
         invalidatePageSizes(InvalidateSizeReason.PAGE_ALIGN, null);
         invalidateScroll();
-        commitZoom();
+        new CmdZoomIn(this).execute();
     }
 
     /**

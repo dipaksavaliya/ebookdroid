@@ -55,8 +55,7 @@ public class SinglePageController extends AbstractViewController {
             dm.setCurrentPageIndex(page.index);
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
-            final ViewState viewState = updatePageVisibility(page.index.viewIndex, 0, getBase().getZoomModel()
-                    .getZoom());
+            final ViewState viewState = new CmdScrollTo(this, page.index.viewIndex).execute();
             view.redrawView(viewState);
         }
     }
@@ -74,17 +73,11 @@ public class SinglePageController extends AbstractViewController {
             dm.setCurrentPageIndex(page.index);
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
-            final ViewState viewState = updatePageVisibility(page.index.viewIndex, 0, getBase().getZoomModel()
-                    .getZoom());
-
+            final ViewState viewState = new CmdScrollTo(this, page.index.viewIndex).execute();
             final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
             final float left = bounds.left + offsetX * bounds.width();
             final float top = bounds.top + offsetY * bounds.height();
-            // if (LCTX.isDebugEnabled()) {
-            // LCTX.d("goToPageImpl(): Scroll to: " + page.index.viewIndex + left + ", " + top);
-            // }
             view.scrollTo((int) left, (int) top);
-
             view.redrawView(viewState);
         }
     }
@@ -95,13 +88,14 @@ public class SinglePageController extends AbstractViewController {
      * @see org.ebookdroid.ui.viewer.IViewController#onScrollChanged(int, int)
      */
     @Override
-    public void onScrollChanged(final int newPage, final int direction) {
+    public void onScrollChanged(final int direction) {
         // bounds could be not updated
         if (inZoom.get()) {
             return;
         }
 
-        final ViewState viewState = updatePageVisibility(newPage, direction, getBase().getZoomModel().getZoom());
+        CmdScroll cmd = direction > 0 ? new CmdScrollDown(this)  :new CmdScrollUp(this);
+        final ViewState viewState = cmd.execute();
         DocumentModel dm = base.getDocumentModel();
         if (dm != null) {
             updatePosition(dm, dm.getCurrentPageObject(), viewState);
@@ -179,6 +173,10 @@ public class SinglePageController extends AbstractViewController {
         curler.draw(canvas, viewState);
     }
 
+    public final ViewState invalidatePages(final ViewState oldState, final Page... pages) {
+        return new CmdScrollTo(this, pages[0].index.viewIndex).execute();
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -189,10 +187,6 @@ public class SinglePageController extends AbstractViewController {
         if (!isShown()) {
             return;
         }
-        if (reason == InvalidateSizeReason.ZOOM) {
-            return;
-        }
-
         final int width = getWidth();
         final int height = getHeight();
 

@@ -179,10 +179,6 @@ public class VScrollController extends AbstractViewController {
             return;
         }
 
-        if (reason == InvalidateSizeReason.ZOOM) {
-            return;
-        }
-
         final int width = getWidth();
 
         if (changedPage == null) {

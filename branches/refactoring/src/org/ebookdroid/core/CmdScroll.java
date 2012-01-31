@@ -32,7 +32,7 @@ public abstract class CmdScroll extends AbstractCommand {
             if (node.id != 0 || viewState.decodeMode == DecodeMode.LOW_MEMORY) {
                 node.stopDecodingThisNode("children created");
             }
-            node.page.nodes.createChildren(node, node.calculateChildThreshold());
+            node.page.nodes.createChildren(node);
             execute(viewState, node.page.nodes, node);
             return true;
         }

@@ -103,46 +103,6 @@ public class Page {
         bounds = pageBounds;
     }
 
-    public boolean onZoomChanged(final float oldZoom, final ViewState viewState, boolean committed,
-            final List<PageTreeNode> nodesToDecode, List<Bitmaps> bitmapsToRecycle) {
-        if (!recycled) {
-            if (viewState.isPageKeptInMemory(this)) {
-                return nodes.root.onZoomChanged(oldZoom, viewState, committed, viewState.getBounds(this),
-                        nodesToDecode, bitmapsToRecycle);
-            } else {
-                int oldSize = bitmapsToRecycle.size();
-                if (nodes.recycleAll(bitmapsToRecycle, true)) {
-                    if (LCTX.isDebugEnabled()) {
-                        if (LCTX.isDebugEnabled()) {
-                            LCTX.d("onZoomChanged: recycle page " + index + " " + viewState.firstCached + ":"
-                                    + viewState.lastCached + " = " + (bitmapsToRecycle.size() - oldSize));
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean onPositionChanged(final ViewState viewState, final List<PageTreeNode> nodesToDecode,
-            List<Bitmaps> bitmapsToRecycle) {
-        if (!recycled) {
-            if (viewState.isPageKeptInMemory(this)) {
-                return nodes.root.onPositionChanged(viewState, viewState.getBounds(this), nodesToDecode,
-                        bitmapsToRecycle);
-            } else {
-                int oldSize = bitmapsToRecycle.size();
-                if (nodes.recycleAll(bitmapsToRecycle, true)) {
-                    if (LCTX.isDebugEnabled()) {
-                        LCTX.d("onPositionChanged: recycle page " + index + " " + viewState.firstCached + ":"
-                                + viewState.lastCached + " = " + (bitmapsToRecycle.size() - oldSize));
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     public RectF getBounds(final float zoom) {
         if (zoom != storedZoom) {
             storedZoom = zoom;

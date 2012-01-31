@@ -161,7 +161,7 @@ public final class BaseView extends View implements IView {
     protected final void onScrollChanged(final int l, final int t, final int oldl, final int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
 
-        base.getDocumentController().onScrollChanged(-1, t - oldt);
+        base.getDocumentController().onScrollChanged(t - oldt);
     }
 
     /**

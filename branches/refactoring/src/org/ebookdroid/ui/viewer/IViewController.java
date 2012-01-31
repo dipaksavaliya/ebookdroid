@@ -4,6 +4,7 @@ import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.events.ZoomListener;
+import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
 
 import android.graphics.Canvas;
@@ -47,7 +48,7 @@ public interface IViewController extends ZoomListener {
     void updateMemorySettings();
 
     public static enum InvalidateSizeReason {
-        INIT, LAYOUT, PAGE_ALIGN, ZOOM, PAGE_LOADED;
+        INIT, LAYOUT, PAGE_ALIGN, PAGE_LOADED;
     }
 
     void drawView(Canvas canvas, ViewState viewState);
@@ -58,13 +59,11 @@ public interface IViewController extends ZoomListener {
 
     boolean onTouchEvent(MotionEvent ev);
 
-    void onScrollChanged(final int newPage, final int direction);
+    void onScrollChanged(final int direction);
 
     boolean dispatchKeyEvent(final KeyEvent event);
 
-    ViewState updatePageVisibility(final int newPage, final int direction, final float zoom);
-
-    void pageUpdated(int viewIndex);
+    ViewState updatePageSize(DocumentModel model, Page page, Rect bitmapBounds);
 
     void toggleNightMode(boolean nightMode);
 }

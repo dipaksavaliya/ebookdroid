@@ -64,7 +64,8 @@ public class PageTree {
         return root;
     }
 
-    public boolean createChildren(final PageTreeNode parent, final float newThreshold) {
+    public boolean createChildren(final PageTreeNode parent) {
+        final float newThreshold = parent.calculateChildThreshold();
         int childId = getFirstChildId(parent.id);
         for (int i = 0; i < splitMasks.length; i++, childId++) {
             PageTreeNode child = new PageTreeNode(owner, parent, childId, splitMasks[i], newThreshold);
@@ -144,29 +145,6 @@ public class PageTree {
             PageTreeNode child = nodes.get(childId);
             if (child != null) {
                 child.draw(canvas, viewState, pageBounds, paint);
-            }
-        }
-    }
-
-    public void onPositionChanged(final ViewState viewState, final RectF pageBounds, final PageTreeNode parent,
-            final List<PageTreeNode> nodesToDecode, final List<Bitmaps> bitmapsToRecycle) {
-        int childId = (int) getFirstChildId(parent.id);
-        for (int end = childId + splitMasks.length; childId < end; childId++) {
-            PageTreeNode child = nodes.get(childId);
-            if (child != null) {
-                child.onPositionChanged(viewState, pageBounds, nodesToDecode, bitmapsToRecycle);
-            }
-        }
-    }
-
-    public void onZoomChanged(final float oldZoom, final ViewState viewState, final boolean committed,
-            final RectF pageBounds, final PageTreeNode parent, final List<PageTreeNode> nodesToDecode,
-            final List<Bitmaps> bitmapsToRecycle) {
-        int childId = (int) getFirstChildId(parent.id);
-        for (int end = childId + splitMasks.length; childId < end; childId++) {
-            PageTreeNode child = nodes.get(childId);
-            if (child != null) {
-                child.onZoomChanged(oldZoom, viewState, committed, pageBounds, nodesToDecode, bitmapsToRecycle);
             }
         }
     }

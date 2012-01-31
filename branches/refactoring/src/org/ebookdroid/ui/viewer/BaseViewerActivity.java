@@ -782,11 +782,7 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
     private class EmptyContoller implements IViewController {
 
         @Override
-        public void zoomChanged(final float newZoom, final float oldZoom) {
-        }
-
-        @Override
-        public void commitZoom() {
+        public void zoomChanged(float oldZoom, float newZoom, boolean committed) {
         }
 
         @Override
@@ -867,17 +863,12 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         }
 
         @Override
-        public void onScrollChanged(final int newPage, final int direction) {
+        public void onScrollChanged(final int direction) {
         }
 
         @Override
         public boolean dispatchKeyEvent(final KeyEvent event) {
             return false;
-        }
-
-        @Override
-        public ViewState updatePageVisibility(final int newPage, final int direction, final float zoom) {
-            return new ViewState(this);
         }
 
         @Override
@@ -889,11 +880,12 @@ public abstract class BaseViewerActivity extends AbstractActionActivity implemen
         }
 
         @Override
-        public void pageUpdated(final int viewIndex) {
+        public void toggleNightMode(boolean nightMode) {
         }
 
         @Override
-        public void toggleNightMode(boolean nightMode) {
+        public ViewState updatePageSize(DocumentModel model, Page page, Rect bitmapBounds) {
+            return new ViewState(this);
         }
     }
 }

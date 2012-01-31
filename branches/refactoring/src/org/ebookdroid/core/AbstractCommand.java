@@ -21,7 +21,7 @@ public abstract class AbstractCommand {
     protected final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
     protected final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
 
-    public AbstractCommand(final AbstractViewController ctrl) {
+    protected AbstractCommand(final AbstractViewController ctrl) {
         this.ctrl = ctrl;
         this.model = ctrl.getBase().getDocumentModel();
         this.view = ctrl.getView();
@@ -33,6 +33,7 @@ public abstract class AbstractCommand {
 
     public ViewState execute(final ViewState initial) {
         final ViewState viewState = calculatePageVisibility(initial);
+
         ctrl.firstVisiblePage = viewState.firstVisible;
         ctrl.lastVisiblePage = viewState.lastVisible;
 
