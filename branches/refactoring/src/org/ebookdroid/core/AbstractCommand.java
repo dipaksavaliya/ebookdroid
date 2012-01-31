@@ -107,12 +107,11 @@ public abstract class AbstractCommand {
         final DecodeService ds = ctrl.getBase().getDecodeService();
 
         if (ds != null) {
-            ds.decodePage(viewState, best, best.croppedBounds != null ? best.croppedBounds : best.pageSliceBounds);
+            ds.decodePage(viewState, best);
 
             for (final PageTreeNode node : nodesToDecode) {
                 if (node != best) {
-                    ds.decodePage(viewState, node, node.croppedBounds != null ? node.croppedBounds
-                            : node.pageSliceBounds);
+                    ds.decodePage(viewState, node);
                 }
             }
         }

@@ -119,7 +119,8 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     @Override
-    public void decodePage(final ViewState viewState, final PageTreeNode node, final RectF nodeBounds) {
+    public void decodePage(final ViewState viewState, final PageTreeNode node) {
+        final RectF nodeBounds = node.croppedBounds != null ? node.croppedBounds : node.pageSliceBounds;
         final DecodeTask decodeTask = new DecodeTask(viewState, node, nodeBounds, node.getSliceGeneration());
         updateViewState(viewState);
 

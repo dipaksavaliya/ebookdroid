@@ -43,7 +43,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
     float bitmapZoom = 1;
 
-    boolean cropped;
     RectF croppedBounds = null;
 
     PageTreeNode(final Page page, final float childrenZoomThreshold) {
@@ -186,15 +185,14 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
             BookSettings bs = SettingsManager.getBookSettings();
             if (bs != null && bs.cropPages) {
-                if (id == 0 && !cropped) {
+                if (id == 0 && croppedBounds == null) {
                     croppedBounds = PageCropper.getCropBounds(bitmap, bitmapBounds, pageSliceBounds);
-                    cropped = true;
                     final DecodeService decodeService = page.base.getDecodeService();
                     if (decodeService != null) {
                         if (LCTX.isDebugEnabled()) {
                             LCTX.d(fullId + ": cropped image requested: " + croppedBounds);
                         }
-                        decodeService.decodePage(new ViewState(PageTreeNode.this), PageTreeNode.this, croppedBounds);
+                        decodeService.decodePage(new ViewState(PageTreeNode.this), PageTreeNode.this);
                     }
                 }
             }
