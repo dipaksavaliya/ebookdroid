@@ -263,7 +263,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     void draw(final Canvas canvas, final ViewState viewState, final RectF pageBounds, final PagePaint paint) {
-        final RectF tr = getTargetRect(viewState.viewRect, pageBounds);
+        final RectF tr = getTargetRect(viewState, viewState.viewRect, pageBounds);
         if (!viewState.isNodeVisible(this, pageBounds)) {
             return;
         }
@@ -287,12 +287,13 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         }
     }
 
-    public RectF getTargetRect(final RectF viewRect, final RectF pageBounds) {
+    public RectF getTargetRect(final ViewState viewState, final RectF viewRect, final RectF pageBounds) {
         final Matrix matrix = new Matrix();
-        matrix.reset();
 
-        matrix.postScale(pageBounds.width() * page.getTargetRectScale(), pageBounds.height());
-        matrix.postTranslate(pageBounds.left - pageBounds.width() * page.getTargetTranslate(), pageBounds.top);
+        final RectF bounds = viewState.view.getAdjustedPageBounds(viewState, pageBounds);
+
+        matrix.postScale(bounds.width() * page.getTargetRectScale(), bounds.height());
+        matrix.postTranslate(bounds.left - bounds.width() * page.getTargetTranslate(), bounds.top);
 
         final RectF targetRectF = new RectF();
         matrix.mapRect(targetRectF, pageSliceBounds);

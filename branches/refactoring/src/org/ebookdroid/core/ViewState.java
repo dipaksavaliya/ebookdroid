@@ -196,8 +196,8 @@ public class ViewState {
     }
 
     public final boolean isNodeVisible(final PageTreeNode node, final RectF pageBounds) {
-        final RectF tr = node.getTargetRect(this.viewRect, pageBounds);
-        return RectF.intersects(tr, this.viewRect);
+        final RectF tr = node.getTargetRect(this, this.viewRect, pageBounds);
+        return view.intersects(viewRect, realRect, tr);
     }
 
     @Override

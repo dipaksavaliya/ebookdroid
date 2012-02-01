@@ -14,6 +14,8 @@ public class DrawThread extends Thread {
 
     private static final LogContext LCTX = LogContext.ROOT.lctx("Imaging");
 
+    private static boolean useLastState = true;
+
     private final SurfaceHolder surfaceHolder;
 
     private final BlockingQueue<DrawTask> queue = new ArrayBlockingQueue<DrawThread.DrawTask>(16, true);
@@ -62,7 +64,7 @@ public class DrawThread extends Thread {
         DrawTask task = null;
         try {
             task = queue.poll(timeout, unit);
-            if (task != null) {
+            if (task != null && useLastState) {
                 final ArrayList<DrawTask> list = new ArrayList<DrawTask>();
                 if (queue.drainTo(list) > 0) {
                     task = list.get(list.size() - 1);

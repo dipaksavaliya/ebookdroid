@@ -57,4 +57,8 @@ public interface IView {
     int getWidth();
 
     int getHeight();
+
+    RectF getAdjustedPageBounds(ViewState viewState, RectF bounds);
+    
+    boolean intersects(RectF viewRect, RectF realRect, RectF bounds);
 }
