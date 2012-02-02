@@ -4,38 +4,32 @@ import android.graphics.RectF;
 
 public class CmdZoomIn extends CmdZoom {
 
-    public CmdZoomIn(AbstractViewController ctrl, float oldZoom, float newZoom, boolean committed) {
+    public CmdZoomIn(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
+            final boolean committed) {
         super(ctrl, oldZoom, newZoom, committed);
     }
 
-    public CmdZoomIn(AbstractViewController ctrl) {
+    public CmdZoomIn(final AbstractViewController ctrl) {
         super(ctrl);
     }
 
     @Override
-    public boolean execute(ViewState viewState, PageTreeNode node) {
+    public boolean execute(final ViewState viewState, final PageTree nodes) {
+        return execute(viewState, nodes, newLevel);
+    }
+
+    @Override
+    public boolean execute(final ViewState viewState, final PageTreeNode node) {
 
         final RectF pageBounds = viewState.getBounds(node.page);
 
         if (!viewState.isNodeKeptInMemory(node, pageBounds)) {
-            node.recycleWithChildren(bitmapsToRecycle);
+            node.recycle(bitmapsToRecycle);
             return false;
         }
 
-        final boolean childrenRequired = node.page.nodes.isChildrenRequired(viewState, node);
-        final boolean hasChildren = node.page.nodes.hasChildren(node);
-
-        if (childrenRequired) {
-            if (!hasChildren) {
-                if (node.id != 0) {
-                    node.stopDecodingThisNode("children should be created");
-                }
-                node.page.nodes.createChildren(node);
-            }
-
-            execute(viewState, node.page.nodes, node);
-
-            return true;
+        if (oldLevel != newLevel) {
+            node.page.nodes.recycleParents(node);
         }
 
         if (node.isReDecodingRequired(committed, viewState)) {
@@ -46,4 +40,5 @@ public class CmdZoomIn extends CmdZoom {
         }
         return true;
     }
+
 }

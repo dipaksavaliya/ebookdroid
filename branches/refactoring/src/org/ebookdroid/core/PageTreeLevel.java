@@ -49,16 +49,14 @@ public class PageTreeLevel {
         this.end = this.start + (int) Math.pow(PageTree.splitMasks.length, this.level);
 
         this.prev = parent;
-        this.next = count > 0 ? new PageTreeLevel(this, count - 1) : null;
+        this.next = count > 1 ? new PageTreeLevel(this, count - 1) : null;
     }
 
     public static PageTreeLevel getLevel(float zoom) {
-        if (zoom <= ZoomModel.MIN_ZOOM) {
-            return ROOT;
-        }
-
         for (int i = 1; i < LEVELS.length; i++) {
             if (zoom < LEVELS[i].zoom) {
+                return LEVELS[i - 1];
+            } else if (zoom == LEVELS[i].zoom) {
                 return LEVELS[i];
             }
         }

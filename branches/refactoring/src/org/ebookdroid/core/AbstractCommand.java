@@ -31,7 +31,7 @@ public abstract class AbstractCommand {
         return execute(new ViewState(ctrl));
     }
 
-    public ViewState execute(final ViewState initial) {
+    public final ViewState execute(final ViewState initial) {
         final ViewState viewState = calculatePageVisibility(initial);
 
         ctrl.firstVisiblePage = viewState.firstVisible;
@@ -44,6 +44,7 @@ public abstract class AbstractCommand {
         BitmapManager.release(bitmapsToRecycle);
 
         if (!nodesToDecode.isEmpty()) {
+            ctrl.base.getDecodingProgressModel().increase(nodesToDecode.size());
             decodePageTreeNodes(viewState, nodesToDecode);
             if (LCTX.isDebugEnabled()) {
                 LCTX.d(viewState + " => " + nodesToDecode.size());
@@ -53,38 +54,32 @@ public abstract class AbstractCommand {
         return viewState;
     }
 
-    public boolean execute(final ViewState viewState, final Page page) {
+    public final boolean execute(final ViewState viewState, final Page page) {
         if (page.recycled) {
             return false;
         }
         if (viewState.isPageKeptInMemory(page) || viewState.isPageVisible(page)) {
-            return execute(viewState, page.nodes.nodes[0]);
+            return execute(viewState, page.nodes);
         }
 
-        final int oldSize = bitmapsToRecycle.size();
-        if (page.nodes.recycleAll(bitmapsToRecycle, true)) {
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("Recycle page " + page.index + " " + viewState.firstCached + ":" + viewState.lastCached + " = "
-                        + (bitmapsToRecycle.size() - oldSize));
-            }
-        }
-
+        recyclePage(viewState, page);
         return false;
     }
 
-    public void execute(final ViewState viewState, final PageTree nodes, final PageTreeNode parent) {
-        int childId = PageTree.getFirstChildId(parent.id);
-        for (final int end = Math.min(nodes.nodes.length, childId + PageTree.splitMasks.length); childId < end; childId++) {
-            final PageTreeNode child = nodes.nodes[childId];
-            if (child != null) {
-                execute(viewState, child);
+    public abstract boolean execute(final ViewState viewState, final PageTree nodes);
+
+    public boolean execute(final ViewState viewState, final PageTree nodes, final PageTreeLevel level) {
+        boolean res = false;
+        for (int nodeIndex = level.start; nodeIndex < level.end; nodeIndex++) {
+            if (nodes.nodes[nodeIndex] == null) {
+                nodes.createChildren(nodes.getParent(nodeIndex, true));
             }
+            res |= execute(viewState, nodes.nodes[nodeIndex]);
         }
+        return res;
     }
 
-    public boolean execute(final ViewState viewState, final PageTreeNode node) {
-        return false;
-    }
+    public abstract boolean execute(final ViewState viewState, final PageTreeNode node);
 
     protected ViewState calculatePageVisibility(final ViewState initial) {
         int firstVisiblePage = -1;
@@ -117,4 +112,13 @@ public abstract class AbstractCommand {
         }
     }
 
+    protected final void recyclePage(final ViewState viewState, final Page page) {
+        final int oldSize = bitmapsToRecycle.size();
+        if (page.nodes.recycleAll(bitmapsToRecycle, true)) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Recycle page " + page.index + " " + viewState.firstCached + ":" + viewState.lastCached + " = "
+                        + (bitmapsToRecycle.size() - oldSize));
+            }
+        }
+    }
 }

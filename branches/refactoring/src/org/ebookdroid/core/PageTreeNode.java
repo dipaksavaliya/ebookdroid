@@ -30,7 +30,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
     final Page page;
     final PageTreeNode parent;
-    final long id;
+    final int id;
     final PageTreeLevel level;
     final String shortId;
     final String fullId;
@@ -56,7 +56,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         this.croppedBounds = null;
     }
 
-    PageTreeNode(final Page page, final PageTreeNode parent, final long id, final RectF localPageSliceBounds) {
+    PageTreeNode(final Page page, final PageTreeNode parent, final int id, final RectF localPageSliceBounds) {
         assert id != 0;
         assert page != null;
         assert parent != null;
@@ -79,17 +79,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     public boolean recycle(final List<Bitmaps> bitmapsToRecycle) {
         stopDecodingThisNode("node recycling");
         return holder.recycle(bitmapsToRecycle);
-    }
-
-    public boolean recycleWithChildren(final List<Bitmaps> bitmapsToRecycle) {
-        stopDecodingThisNode("node recycling");
-        boolean res = holder.recycle(bitmapsToRecycle);
-        if (id == 0) {
-            res |= page.nodes.recycleAll(bitmapsToRecycle, false);
-        } else {
-            res |= page.nodes.recycleChildren(this, bitmapsToRecycle);
-        }
-        return res;
     }
 
     protected boolean isReDecodingRequired(final boolean committed, final ViewState viewState) {
@@ -117,9 +106,28 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     protected void decodePageTreeNode(final List<PageTreeNode> nodesToDecode, final ViewState viewState) {
-        if (setDecodingNow(true)) {
+        if (this.decodingNow.compareAndSet(false, true)) {
+//            final DecodingProgressModel dpm = page.base.getDecodingProgressModel();
+//            if (dpm != null) {
+//                dpm.increase();
+//            }
             bitmapZoom = viewState.zoom;
             nodesToDecode.add(this);
+        }
+    }
+
+    void stopDecodingThisNode(final String reason) {
+        if (this.decodingNow.compareAndSet(true, false)) {
+            final DecodingProgressModel dpm = page.base.getDecodingProgressModel();
+            if (dpm != null) {
+                dpm.decrease();
+            }
+            if (reason != null) {
+                final DecodeService ds = page.base.getDecodeService();
+                if (ds != null) {
+                    ds.stopDecoding(this, reason);
+                }
+            }
         }
     }
 
@@ -132,7 +140,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
                     @Override
                     public void run() {
-                        setDecodingNow(false);
+                        stopDecodingThisNode(null);
                     }
                 });
                 return;
@@ -159,7 +167,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                 @Override
                 public void run() {
                     holder.setBitmap(bitmaps);
-                    setDecodingNow(false);
+                    stopDecodingThisNode(null);
 
                     final IViewController dc = page.base.getDocumentController();
                     final DocumentModel dm = page.base.getDocumentModel();
@@ -185,35 +193,11 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
                 @Override
                 public void run() {
-                    setDecodingNow(false);
+                    stopDecodingThisNode(null);
                 }
             });
         } finally {
             BitmapManager.release(bitmap);
-        }
-    }
-
-    private boolean setDecodingNow(final boolean decodingNow) {
-        if (this.decodingNow.compareAndSet(!decodingNow, decodingNow)) {
-            final DecodingProgressModel dpm = page.base.getDecodingProgressModel();
-            if (dpm != null) {
-                if (decodingNow) {
-                    dpm.increase();
-                } else {
-                    dpm.decrease();
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    void stopDecodingThisNode(final String reason) {
-        if (setDecodingNow(false)) {
-            final DecodeService ds = page.base.getDecodeService();
-            if (ds != null) {
-                ds.stopDecoding(this, reason);
-            }
         }
     }
 

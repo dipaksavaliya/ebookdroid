@@ -4,6 +4,10 @@ public abstract class CmdZoom extends AbstractCommand {
 
     public final float oldZoom;
     public final float newZoom;
+
+    public final PageTreeLevel oldLevel;
+    public final PageTreeLevel newLevel;
+
     public final boolean committed;
 
     protected CmdZoom(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
@@ -11,6 +15,10 @@ public abstract class CmdZoom extends AbstractCommand {
         super(ctrl);
         this.oldZoom = oldZoom;
         this.newZoom = newZoom;
+
+        this.oldLevel = PageTreeLevel.getLevel(oldZoom);
+        this.newLevel = PageTreeLevel.getLevel(newZoom);
+
         this.committed = committed;
     }
 
@@ -18,6 +26,10 @@ public abstract class CmdZoom extends AbstractCommand {
         super(ctrl);
         this.oldZoom = 0;
         this.newZoom = ctrl.getBase().getZoomModel().getZoom();
+
+        this.oldLevel = PageTreeLevel.ROOT;
+        this.newLevel = PageTreeLevel.getLevel(newZoom);
+
         this.committed = true;
     }
 
@@ -27,8 +39,8 @@ public abstract class CmdZoom extends AbstractCommand {
     }
 
     @Override
-    protected ViewState calculatePageVisibility(ViewState initial) {
-        int viewIndex = model.getCurrentViewPageIndex();
+    protected ViewState calculatePageVisibility(final ViewState initial) {
+        final int viewIndex = model.getCurrentViewPageIndex();
         int firstVisiblePage = viewIndex;
         int lastVisiblePage = viewIndex;
 

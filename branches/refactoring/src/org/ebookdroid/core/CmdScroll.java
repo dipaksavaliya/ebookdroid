@@ -4,8 +4,24 @@ import android.graphics.RectF;
 
 public abstract class CmdScroll extends AbstractCommand {
 
+    protected PageTreeLevel level;
+
     protected CmdScroll(final AbstractViewController ctrl) {
         super(ctrl);
+    }
+
+    @Override
+    public ViewState execute() {
+        ViewState initial = new ViewState(ctrl);
+        level = PageTreeLevel.getLevel(initial.zoom);
+        return execute(initial);
+    }
+
+    public boolean execute(final ViewState viewState, final PageTree nodes) {
+        if (level.next != null) {
+            nodes.recycleNodes(level.next, bitmapsToRecycle);
+        }
+        return execute(viewState, nodes, level);
     }
 
     @Override
@@ -14,31 +30,16 @@ public abstract class CmdScroll extends AbstractCommand {
         final RectF pageBounds = viewState.getBounds(node.page);
 
         if (!viewState.isNodeKeptInMemory(node, pageBounds)) {
-            node.recycleWithChildren(bitmapsToRecycle);
+            node.recycle(bitmapsToRecycle);
             return false;
         }
 
-        final boolean childrenRequired = node.page.nodes.isChildrenRequired(viewState, node);
-        final boolean hasChildren = node.page.nodes.hasChildren(node);
-
-        if (hasChildren) {
-            execute(viewState, node.page.nodes, node);
-            return true;
-        }
-
-        if (childrenRequired) {
-            if (node.id != 0) {
-                node.stopDecodingThisNode("children created");
-            }
-            node.page.nodes.createChildren(node);
-            execute(viewState, node.page.nodes, node);
-            return true;
-        }
+        node.page.nodes.recycleParents(node);
 
         if (!node.holder.hasBitmaps()) {
             node.decodePageTreeNode(nodesToDecode, viewState);
         }
+
         return true;
     }
-
 }
