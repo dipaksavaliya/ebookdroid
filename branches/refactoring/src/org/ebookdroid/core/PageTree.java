@@ -2,7 +2,6 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
-import org.ebookdroid.core.models.ZoomModel;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
@@ -24,30 +23,14 @@ public class PageTree {
             // Right Bottom
             new RectF(0.5f, 0.5f, 1.0f, 1.0f), };
 
-    static final int ZOOM_THRESHOLD = 2;
-
-    public static int LEVELS = 1;
-    public static int NODES = 1;
-    public static float[] levels;
-
     final Page owner;
 
     final PageTreeNode[] nodes;
 
-    static {
-        LEVELS = 1 + (int) Math.ceil(Math.log(ZoomModel.MAX_ZOOM) / Math.log(2));
-        levels = new float[LEVELS];
-        levels[0] = 1.0f;
-        for (int i = 1; i < LEVELS; i++) {
-            levels[i] = levels[i - 1] * 2;
-            NODES = NODES + (int) Math.pow(splitMasks.length, i);
-        }
-    }
-
     public PageTree(final Page owner) {
         this.owner = owner;
-        this.nodes = new PageTreeNode[NODES];
-        this.nodes[0] = new PageTreeNode(owner, ZOOM_THRESHOLD);
+        this.nodes = new PageTreeNode[PageTreeLevel.NODES];
+        this.nodes[0] = new PageTreeNode(owner);
     }
 
     public boolean recycleAll(final List<Bitmaps> bitmapsToRecycle, final boolean includeRoot) {
@@ -164,11 +147,8 @@ public class PageTree {
     }
 
     public boolean isChildrenRequired(final ViewState viewState, final PageTreeNode node) {
-        final int childLevel = node.level + 1;
-        if (childLevel >= PageTree.LEVELS) {
-            return false;
-        }
-        return viewState.zoom >= PageTree.levels[childLevel];
+        final PageTreeLevel next = node.level;
+        return next.next != null && next.next.zoom < viewState.zoom;
     }
 
     public boolean hasChildren(final PageTreeNode parent) {

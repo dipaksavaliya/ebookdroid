@@ -197,12 +197,12 @@ public class DecodeServiceBase implements DecodeService {
         final RectF nodeBounds = task.pageSliceBounds;
 
         return getScaledSize(task.viewState, pageWidth, pageHeight, nodeBounds, task.node.page.getTargetRectScale(),
-               (int)PageTree.levels[task.node.level]);
+               task.node.level.zoom);
     }
 
     @Override
     public Rect getScaledSize(final ViewState viewState, final float pageWidth, final float pageHeight,
-            final RectF nodeBounds, final float pageTypeWidthScale, final int sliceGeneration) {
+            final RectF nodeBounds, final float pageTypeWidthScale, final float levelZoom) {
 
         final float viewWidth = viewState.realRect.width();
         final float viewHeight = viewState.realRect.height();
@@ -222,11 +222,11 @@ public class DecodeServiceBase implements DecodeService {
         }
 
         if (effectiveAlign == PageAlign.WIDTH) {
-            final float scale = 1.0f * (viewWidth / pageWidth) * viewState.zoom / sliceGeneration;
+            final float scale = 1.0f * (viewWidth / pageWidth) * viewState.zoom / levelZoom;
             scaledWidth = Math.round((scale * pageWidth));
             scaledHeight = Math.round((scale * nodeHeight) / nodeBounds.width());
         } else {
-            final float scale = 1.0f * (viewHeight / pageHeight) * viewState.zoom / sliceGeneration;
+            final float scale = 1.0f * (viewHeight / pageHeight) * viewState.zoom / levelZoom;
             scaledHeight = Math.round((scale * pageHeight));
             scaledWidth = Math.round((scale * nodeWidth) / nodeBounds.height());
         }

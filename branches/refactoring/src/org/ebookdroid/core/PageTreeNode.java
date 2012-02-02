@@ -31,7 +31,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     final Page page;
     final PageTreeNode parent;
     final long id;
-    final int level;
+    final PageTreeLevel level;
     final String shortId;
     final String fullId;
 
@@ -43,13 +43,13 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     float bitmapZoom = 1;
     RectF croppedBounds = null;
 
-    PageTreeNode(final Page page, final float childrenZoomThreshold) {
+    PageTreeNode(final Page page) {
         assert page != null;
 
         this.page = page;
         this.parent = null;
         this.id = 0;
-        this.level = 0;
+        this.level = PageTreeLevel.ROOT;
         this.shortId = page.index.viewIndex + ":0";
         this.fullId = page.index + ":0";
         this.pageSliceBounds = page.type.getInitialRect();
@@ -64,7 +64,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         this.page = page;
         this.parent = parent;
         this.id = id;
-        this.level = parent.level + 1;
+        this.level = parent.level.next;
         this.shortId = page.index.viewIndex + ":" + id;
         this.fullId = page.index + ":" + id;
         this.pageSliceBounds = evaluatePageSliceBounds(localPageSliceBounds, parent);

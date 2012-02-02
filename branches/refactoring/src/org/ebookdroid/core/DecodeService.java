@@ -27,7 +27,7 @@ public interface DecodeService {
 
     void recycle();
 
-    Rect getScaledSize(final ViewState viewState, float pageWidth, float pageHeight, RectF nodeBounds, float pageTypeWidthScale, int sliceGeneration);
+    Rect getScaledSize(final ViewState viewState, float pageWidth, float pageHeight, RectF nodeBounds, float pageTypeWidthScale, float levelZoom);
 
     void updateViewState(ViewState viewState);
 
