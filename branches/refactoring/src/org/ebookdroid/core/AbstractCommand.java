@@ -58,7 +58,7 @@ public abstract class AbstractCommand {
             return false;
         }
         if (viewState.isPageKeptInMemory(page) || viewState.isPageVisible(page)) {
-            return execute(viewState, page.nodes.root);
+            return execute(viewState, page.nodes.nodes[0]);
         }
 
         final int oldSize = bitmapsToRecycle.size();
@@ -73,9 +73,9 @@ public abstract class AbstractCommand {
     }
 
     public void execute(final ViewState viewState, final PageTree nodes, final PageTreeNode parent) {
-        int childId = nodes.getFirstChildId(parent.id);
-        for (final int end = childId + PageTree.splitMasks.length; childId < end; childId++) {
-            final PageTreeNode child = nodes.nodes.get(childId);
+        int childId = PageTree.getFirstChildId(parent.id);
+        for (final int end = Math.min(nodes.nodes.length, childId + PageTree.splitMasks.length); childId < end; childId++) {
+            final PageTreeNode child = nodes.nodes[childId];
             if (child != null) {
                 execute(viewState, child);
             }

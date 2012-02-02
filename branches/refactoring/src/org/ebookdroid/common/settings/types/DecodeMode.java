@@ -1,17 +1,18 @@
 package org.ebookdroid.common.settings.types;
 
 public enum DecodeMode {
+
     /**
-*
-*/
+     *
+     */
     NATIVE_RESOLUTION("Native"),
     /**
-*
-*/
+     *
+     */
     NORMAL("Normal"),
     /**
-*
-*/
+     *
+     */
     LOW_MEMORY("Low");
 
     /** The _values. */

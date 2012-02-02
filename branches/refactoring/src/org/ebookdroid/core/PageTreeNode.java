@@ -32,6 +32,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     final Page page;
     final PageTreeNode parent;
     final long id;
+    final int level;
     final String shortId;
     final String fullId;
 
@@ -42,7 +43,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     final RectF pageSliceBounds;
 
     float bitmapZoom = 1;
-
     RectF croppedBounds = null;
 
     PageTreeNode(final Page page, final float childrenZoomThreshold) {
@@ -51,6 +51,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         this.page = page;
         this.parent = null;
         this.id = 0;
+        this.level = 0;
         this.shortId = page.index.viewIndex + ":0";
         this.fullId = page.index + ":0";
         this.pageSliceBounds = page.type.getInitialRect();
@@ -67,6 +68,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         this.page = page;
         this.parent = parent;
         this.id = id;
+        this.level = parent.level + 1;
         this.shortId = page.index.viewIndex + ":" + id;
         this.fullId = page.index + ":" + id;
         this.pageSliceBounds = evaluatePageSliceBounds(localPageSliceBounds, parent);
@@ -120,7 +122,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     protected boolean isChildrenRequired(final ViewState viewState) {
-        if (viewState.decodeMode == DecodeMode.NORMAL && viewState.zoom > childrenZoomThreshold) {
+        if (viewState.decodeMode == DecodeMode.NORMAL && viewState.zoom >= childrenZoomThreshold) {
             return true;
         }
 
@@ -293,7 +295,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         final RectF bounds = viewState.view.getAdjustedPageBounds(viewState, pageBounds);
 
         matrix.postScale(bounds.width() * page.getTargetRectScale(), bounds.height());
-        matrix.postTranslate(bounds.left - bounds.width() * page.getTargetTranslate(), bounds.top);
+        matrix.postTranslate(bounds.left - bounds.width() * page.type.getLeftPos(), bounds.top);
 
         final RectF targetRectF = new RectF();
         matrix.mapRect(targetRectF, pageSliceBounds);

@@ -60,7 +60,7 @@ public class Page {
             final RectF nodesBounds = viewState.getBounds(this);
             final RectF bounds = viewState.view.getAdjustedPageBounds(viewState, nodesBounds);
 
-            if (!nodes.root.holder.hasBitmaps()) {
+            if (!nodes.nodes[0].holder.hasBitmaps()) {
                 canvas.drawRect(bounds, paint.fillPaint);
 
                 final TextPaint textPaint = paint.textPaint;
@@ -68,7 +68,7 @@ public class Page {
                 canvas.drawText(base.getContext().getString(R.string.text_page) + " " + (index.viewIndex + 1),
                         bounds.centerX(), bounds.centerY(), textPaint);
             }
-            nodes.root.draw(canvas, viewState, nodesBounds, paint);
+            nodes.nodes[0].draw(canvas, viewState, nodesBounds, paint);
 
             return true;
         }
@@ -131,13 +131,4 @@ public class Page {
     public float getTargetRectScale() {
         return type.getWidthScale();
     }
-
-    public float getTargetTranslate() {
-        return type.getLeftPos();
-    }
-
-    public RectF getCroppedRegion() {
-        return nodes.root.croppedBounds;
-    }
-
 }
