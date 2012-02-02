@@ -26,17 +26,21 @@ public class PageTree {
 
     static final int ZOOM_THRESHOLD = 2;
 
-    private static int LEVELS = 1;
-    private static int NODES = 1;
+    public static int LEVELS = 1;
+    public static int NODES = 1;
+    public static float[] levels;
 
     final Page owner;
 
     final PageTreeNode[] nodes;
 
     static {
-        for (float th = ZOOM_THRESHOLD; th <= ZoomModel.MAX_ZOOM; th = th * th) {
-            NODES = NODES + (int) Math.pow(splitMasks.length, LEVELS);
-            LEVELS++;
+        LEVELS = 1 + (int) Math.ceil(Math.log(ZoomModel.MAX_ZOOM) / Math.log(2));
+        levels = new float[LEVELS];
+        levels[0] = 1.0f;
+        for (int i = 1; i < LEVELS; i++) {
+            levels[i] = levels[i - 1] * 2;
+            NODES = NODES + (int) Math.pow(splitMasks.length, i);
         }
     }
 
@@ -69,11 +73,10 @@ public class PageTree {
     }
 
     public boolean createChildren(final PageTreeNode parent) {
-        final float newThreshold = parent.childrenZoomThreshold * parent.childrenZoomThreshold;
         int childId = getFirstChildId(parent.id);
         for (int i = 0; i < splitMasks.length; i++, childId++) {
             if (nodes[childId] == null) {
-                nodes[childId] = new PageTreeNode(owner, parent, childId, splitMasks[i], newThreshold);
+                nodes[childId] = new PageTreeNode(owner, parent, childId, splitMasks[i]);
             }
         }
         return true;
@@ -158,6 +161,14 @@ public class PageTree {
             }
         }
         return true;
+    }
+
+    public boolean isChildrenRequired(final ViewState viewState, final PageTreeNode node) {
+        final int childLevel = node.level + 1;
+        if (childLevel >= PageTree.LEVELS) {
+            return false;
+        }
+        return viewState.zoom >= PageTree.levels[childLevel];
     }
 
     public boolean hasChildren(final PageTreeNode parent) {

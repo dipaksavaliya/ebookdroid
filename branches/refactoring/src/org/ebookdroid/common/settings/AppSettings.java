@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.emdev.utils.LengthUtils;
 import org.emdev.utils.StringUtils;
 import org.emdev.utils.android.AndroidVersion;
 import org.emdev.utils.filesystem.FileExtensionFilter;
@@ -248,21 +247,7 @@ public class AppSettings {
     }
 
     public DecodeMode getDecodeMode() {
-        if (decodeMode == null) {
-            String val = prefs.getString("decodemode", null);
-            if (LengthUtils.isEmpty(val)) {
-                if (prefs.getBoolean("nativeresolution", false)) {
-                    decodeMode = DecodeMode.NATIVE_RESOLUTION;
-                } else if (prefs.getBoolean("slicelimit", false)) {
-                    decodeMode = DecodeMode.LOW_MEMORY;
-                } else {
-                    decodeMode = DecodeMode.NORMAL;
-                }
-            } else {
-                decodeMode = DecodeMode.getByResValue(val);
-            }
-        }
-        return decodeMode;
+        return DecodeMode.NORMAL;
     }
 
     public int getMaxImageSize() {

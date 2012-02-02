@@ -1,7 +1,5 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.common.settings.types.DecodeMode;
-
 import android.graphics.RectF;
 
 public class CmdZoomIn extends CmdZoom {
@@ -24,12 +22,12 @@ public class CmdZoomIn extends CmdZoom {
             return false;
         }
 
-        final boolean childrenRequired = node.isChildrenRequired(viewState);
+        final boolean childrenRequired = node.page.nodes.isChildrenRequired(viewState, node);
         final boolean hasChildren = node.page.nodes.hasChildren(node);
 
         if (childrenRequired) {
             if (!hasChildren) {
-                if (node.id != 0 || viewState.decodeMode == DecodeMode.LOW_MEMORY) {
+                if (node.id != 0) {
                     node.stopDecodingThisNode("children should be created");
                 }
                 node.page.nodes.createChildren(node);

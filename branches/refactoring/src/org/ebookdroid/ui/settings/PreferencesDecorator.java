@@ -23,7 +23,7 @@ import org.emdev.utils.android.AndroidVersion;
 
 /**
  * @author whippet
- *
+ * 
  */
 public class PreferencesDecorator implements IPreferenceContainer {
 
@@ -67,23 +67,12 @@ public class PreferencesDecorator implements IPreferenceContainer {
     }
 
     public void decorateMemorySettings() {
+        findPreference("maximagesize").setEnabled(false);
+        final ListPreference modes = (ListPreference) findPreference("decodemode");
+        modes.setValue(DecodeMode.NORMAL.getResValue());
+        modes.setEnabled(false);
+
         decoratePreferences("pagesinmemory", "decodemode", "maximagesize");
-
-        addListener("decodemode", new OnPreferenceChangeListener() {
-
-            @Override
-            public boolean onPreferenceChange(final Preference preference, final Object newValue) {
-                enableMaxImageSizePref(DecodeMode.getByResValue(newValue.toString()));
-                return true;
-            }
-        });
-
-        enableMaxImageSizePref(SettingsManager.getAppSettings().getDecodeMode());
-    }
-
-    protected void enableMaxImageSizePref(final DecodeMode decodeMode) {
-        final Preference pref = findPreference("maximagesize");
-        pref.setEnabled(DecodeMode.LOW_MEMORY == decodeMode);
     }
 
     public void decorateRenderSettings() {

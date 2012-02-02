@@ -19,8 +19,8 @@ import android.widget.Scroller;
 
 public class ZoomRoll extends View {
 
-    private static final int MAX_VALUE = 10000;
     private static final float MULTIPLIER = 400.0f;
+    private static final float MAX_VALUE = (1 + ZoomModel.MAX_ZOOM)* MULTIPLIER;
 
     private final Bitmap left;
     private final Bitmap right;
@@ -140,7 +140,7 @@ public class ZoomRoll extends View {
         @Override
         public boolean onFling(final MotionEvent e1, final MotionEvent e2, final float vX, final float vY) {
             inTouch = false;
-            scroller.fling((int) getCurrentValue(), 0, -(int)vX, 0, 0, MAX_VALUE, 0, 0);
+            scroller.fling((int) getCurrentValue(), 0, -(int)vX, 0, 0, (int)MAX_VALUE, 0, 0);
             ZoomRoll.this.postInvalidate();
             return true;
         }

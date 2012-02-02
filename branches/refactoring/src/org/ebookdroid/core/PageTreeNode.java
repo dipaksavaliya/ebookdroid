@@ -6,7 +6,6 @@ import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
-import org.ebookdroid.common.settings.types.DecodeMode;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.crop.PageCropper;
 import org.ebookdroid.core.models.DecodingProgressModel;
@@ -39,7 +38,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     final AtomicBoolean decodingNow = new AtomicBoolean();
     final BitmapHolder holder = new BitmapHolder();
 
-    final float childrenZoomThreshold;
     final RectF pageSliceBounds;
 
     float bitmapZoom = 1;
@@ -56,11 +54,9 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         this.fullId = page.index + ":0";
         this.pageSliceBounds = page.type.getInitialRect();
         this.croppedBounds = null;
-        this.childrenZoomThreshold = childrenZoomThreshold;
     }
 
-    PageTreeNode(final Page page, final PageTreeNode parent, final long id, final RectF localPageSliceBounds,
-            final float childrenZoomThreshold) {
+    PageTreeNode(final Page page, final PageTreeNode parent, final long id, final RectF localPageSliceBounds) {
         assert id != 0;
         assert page != null;
         assert parent != null;
@@ -73,7 +69,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         this.fullId = page.index + ":" + id;
         this.pageSliceBounds = evaluatePageSliceBounds(localPageSliceBounds, parent);
         this.croppedBounds = evaluateCroppedPageSliceBounds(localPageSliceBounds, parent);
-        this.childrenZoomThreshold = childrenZoomThreshold;
     }
 
     @Override
@@ -102,7 +97,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     protected void onChildLoaded(final PageTreeNode child, final ViewState viewState, final RectF bounds) {
-        if (viewState.decodeMode == DecodeMode.LOW_MEMORY || viewState.zoom > 1.5) {
+        if (viewState.zoom > 1.5) {
             boolean hiddenByChildren = page.nodes.isHiddenByChildren(this, viewState, bounds);
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Node " + fullId + "is: " + (hiddenByChildren ? "" : "not") + " hidden by children");
@@ -119,48 +114,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                 }
             }
         }
-    }
-
-    protected boolean isChildrenRequired(final ViewState viewState) {
-        if (viewState.decodeMode == DecodeMode.NORMAL && viewState.zoom >= childrenZoomThreshold) {
-            return true;
-        }
-
-        final DecodeService ds = page.base.getDecodeService();
-        if (ds == null) {
-            return false;
-        }
-
-        long memoryLimit = Long.MAX_VALUE;
-        if (viewState.decodeMode == DecodeMode.LOW_MEMORY) {
-            memoryLimit = Math.min(memoryLimit, SettingsManager.getAppSettings().getMaxImageSize());
-        }
-        memoryLimit = Math.max(64 * 1024, memoryLimit);
-
-        final Rect rect = getActualRect(viewState, ds);
-
-        final long size = BitmapManager.getBitmapBufferSize(rect.width(), rect.height(), ds.getBitmapConfig());
-
-        final boolean textureSizeExceedeed = (rect.width() > 2048) || (rect.height() > 2048);
-        final boolean memoryLimitExceeded = size + 4096 >= memoryLimit;
-
-        return textureSizeExceedeed || memoryLimitExceeded;
-    }
-
-    private Rect getActualRect(final ViewState viewState, final DecodeService ds) {
-        final RectF actual = croppedBounds != null ? croppedBounds : pageSliceBounds;
-        final float widthScale = page.getTargetRectScale();
-        final float pageWidth = page.bounds.width() * widthScale;
-
-        if (viewState.decodeMode == DecodeMode.NATIVE_RESOLUTION) {
-            return ds.getNativeSize(pageWidth, page.bounds.height(), actual, widthScale);
-        }
-
-        return ds.getScaledSize(viewState, pageWidth, page.bounds.height(), actual, widthScale, getSliceGeneration());
-    }
-
-    public int getSliceGeneration() {
-        return (int) (parent != null ? parent.childrenZoomThreshold : 1);
     }
 
     protected void decodePageTreeNode(final List<PageTreeNode> nodesToDecode, final ViewState viewState) {

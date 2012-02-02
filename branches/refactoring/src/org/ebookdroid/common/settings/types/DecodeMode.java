@@ -5,15 +5,7 @@ public enum DecodeMode {
     /**
      *
      */
-    NATIVE_RESOLUTION("Native"),
-    /**
-     *
-     */
-    NORMAL("Normal"),
-    /**
-     *
-     */
-    LOW_MEMORY("Low");
+    NORMAL("Normal");
 
     /** The _values. */
     private static DecodeMode[] _values = values();

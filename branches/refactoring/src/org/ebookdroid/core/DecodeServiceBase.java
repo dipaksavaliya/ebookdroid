@@ -5,7 +5,6 @@ import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.log.EmergencyHandler;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
-import org.ebookdroid.common.settings.types.DecodeMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.codec.CodecContext;
 import org.ebookdroid.core.codec.CodecDocument;
@@ -117,7 +116,7 @@ public class DecodeServiceBase implements DecodeService {
     @Override
     public void decodePage(final ViewState viewState, final PageTreeNode node) {
         final RectF nodeBounds = node.croppedBounds != null ? node.croppedBounds : node.pageSliceBounds;
-        final DecodeTask decodeTask = new DecodeTask(viewState, node, nodeBounds, node.getSliceGeneration());
+        final DecodeTask decodeTask = new DecodeTask(viewState, node, nodeBounds);
         updateViewState(viewState);
 
         if (isRecycled.get()) {
@@ -197,21 +196,8 @@ public class DecodeServiceBase implements DecodeService {
         final int pageHeight = vuPage.getHeight();
         final RectF nodeBounds = task.pageSliceBounds;
 
-        if (task.viewState.decodeMode == DecodeMode.NATIVE_RESOLUTION) {
-            return getNativeSize(pageWidth, pageHeight, nodeBounds, task.node.page.getTargetRectScale());
-        }
-
         return getScaledSize(task.viewState, pageWidth, pageHeight, nodeBounds, task.node.page.getTargetRectScale(),
-                task.sliceGeneration);
-    }
-
-    @Override
-    public Rect getNativeSize(final float pageWidth, final float pageHeight, final RectF nodeBounds,
-            final float pageTypeWidthScale) {
-
-        final int scaledWidth = Math.round((pageWidth * pageTypeWidthScale) * nodeBounds.width());
-        final int scaledHeight = Math.round((pageHeight * pageTypeWidthScale) * nodeBounds.height());
-        return new Rect(0, 0, scaledWidth, scaledHeight);
+               (int)PageTree.levels[task.node.level]);
     }
 
     @Override
@@ -539,14 +525,12 @@ public class DecodeServiceBase implements DecodeService {
         final ViewState viewState;
         final int pageNumber;
         final RectF pageSliceBounds;
-        final int sliceGeneration;
 
-        DecodeTask(final ViewState viewState, final PageTreeNode node, final RectF nodeBounds, final int sliceGeneration) {
+        DecodeTask(final ViewState viewState, final PageTreeNode node, final RectF nodeBounds) {
             this.pageNumber = node.page.index.docIndex;
             this.viewState = viewState;
             this.node = node;
             this.pageSliceBounds = nodeBounds;
-            this.sliceGeneration = sliceGeneration;
         }
 
         @Override

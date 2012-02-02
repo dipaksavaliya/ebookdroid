@@ -18,7 +18,7 @@ public class CmdZoomOut extends CmdZoom {
             return false;
         }
 
-        final boolean childrenRequired = node.isChildrenRequired(viewState);
+        final boolean childrenRequired = node.page.nodes.isChildrenRequired(viewState, node);
         final boolean hasChildren = node.page.nodes.hasChildren(node);
 
         if (!childrenRequired) {

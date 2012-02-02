@@ -7,7 +7,7 @@ import org.emdev.utils.listeners.ListenerProxy;
 public class ZoomModel extends ListenerProxy {
 
     public static final float MIN_ZOOM = 1.0f;
-    public static final float MAX_ZOOM = 16.0f;
+    public static final float MAX_ZOOM = 32.0f;
 
     private static final float INCREMENT_DELTA = 0.05f;
 

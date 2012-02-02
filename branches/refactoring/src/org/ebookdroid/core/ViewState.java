@@ -186,7 +186,7 @@ public class ViewState {
     }
 
     public final boolean isNodeKeptInMemory(final PageTreeNode node, final RectF pageBounds) {
-        if (this.decodeMode == DecodeMode.NATIVE_RESOLUTION || this.zoom < 1.5) {
+        if (this.zoom < 1.5) {
             return this.isPageKeptInMemory(node.page) || this.isPageVisible(node.page);
         }
         if (this.zoom < 2.5) {
