@@ -120,7 +120,7 @@ public class HScrollController extends AbstractViewController {
         }
         for (Page page : dm.getPages(eventDraw.viewState.firstVisible, eventDraw.viewState.lastVisible + 1)) {
             if (page != null) {
-                eventDraw.process(eventDraw.viewState, page);
+                eventDraw.process(page);
             }
         }
 

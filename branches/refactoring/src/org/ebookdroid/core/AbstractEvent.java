@@ -21,10 +21,13 @@ public abstract class AbstractEvent implements IEvent {
     protected final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
     protected final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
 
+    protected ViewState viewState;
+    
     protected AbstractEvent(final AbstractViewController ctrl) {
         this.ctrl = ctrl;
         this.model = ctrl.getBase().getDocumentModel();
         this.view = ctrl.getView();
+        this.viewState = new ViewState(ctrl);
     }
 
     /**
@@ -34,23 +37,13 @@ public abstract class AbstractEvent implements IEvent {
      */
     @Override
     public ViewState process() {
-        return process(new ViewState(ctrl));
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState)
-     */
-    @Override
-    public final ViewState process(final ViewState initial) {
-        final ViewState viewState = calculatePageVisibility(initial);
+        viewState = calculatePageVisibility(viewState);
 
         ctrl.firstVisiblePage = viewState.firstVisible;
         ctrl.lastVisiblePage = viewState.lastVisible;
 
         for (final Page page : model.getPages()) {
-            process(viewState, page);
+            process(page);
         }
 
         BitmapManager.release(bitmapsToRecycle);
@@ -72,12 +65,12 @@ public abstract class AbstractEvent implements IEvent {
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.Page)
      */
     @Override
-    public final boolean process(final ViewState viewState, final Page page) {
+    public final boolean process(final Page page) {
         if (page.recycled) {
             return false;
         }
         if (viewState.isPageKeptInMemory(page) || viewState.isPageVisible(page)) {
-            return process(viewState, page.nodes);
+            return process(page.nodes);
         }
 
         recyclePage(viewState, page);
@@ -91,13 +84,13 @@ public abstract class AbstractEvent implements IEvent {
      *      org.ebookdroid.core.PageTreeLevel)
      */
     @Override
-    public boolean process(final ViewState viewState, final PageTree nodes, final PageTreeLevel level) {
+    public boolean process(final PageTree nodes, final PageTreeLevel level) {
         boolean res = false;
         for (int nodeIndex = level.start; nodeIndex < level.end; nodeIndex++) {
             if (nodes.nodes[nodeIndex] == null) {
                 nodes.createChildren(nodes.getParent(nodeIndex, true));
             }
-            res |= process(viewState, nodes.nodes[nodeIndex]);
+            res |= process(nodes.nodes[nodeIndex]);
         }
         return res;
     }

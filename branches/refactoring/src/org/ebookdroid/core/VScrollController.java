@@ -27,7 +27,7 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int)
      */
     @Override
@@ -55,7 +55,7 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override
@@ -83,7 +83,7 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#verticalConfigScroll(int)
      */
     @Override
@@ -96,7 +96,7 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#getScrollLimits()
      */
     @Override
@@ -114,30 +114,31 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#drawView(org.ebookdroid.core.EventDraw)
      */
     @Override
     public void drawView(final EventDraw eventDraw) {
-        final DocumentModel dm = getBase().getDocumentModel();
-        if (dm == null) {
+        ViewState viewState = eventDraw.viewState;
+        if (viewState.model == null) {
             return;
         }
-        for (final Page page : dm.getPages(eventDraw.viewState.firstVisible, eventDraw.viewState.lastVisible + 1)) {
+
+        for (final Page page : viewState.model.getPages(viewState.firstVisible, viewState.lastVisible + 1)) {
             if (page != null) {
-                eventDraw.process(eventDraw.viewState, page);
+                eventDraw.process(page);
             }
         }
 
         if (SettingsManager.getAppSettings().getShowAnimIcon()) {
-            DragMark.draw(eventDraw.canvas, eventDraw.viewState);
+            DragMark.draw(eventDraw.canvas, viewState);
         }
         view.continueScroll();
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.AbstractViewController#onLayoutChanged(boolean, boolean, android.graphics.Rect,
      *      android.graphics.Rect)
      */
@@ -164,7 +165,7 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason,
      *      org.ebookdroid.core.Page)
      */
@@ -199,7 +200,7 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.AbstractViewController#isPageVisibleImpl(org.ebookdroid.core.Page,
      *      org.ebookdroid.core.ViewState)
      */
@@ -210,7 +211,7 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#updateAnimationType()
      */
     @Override
@@ -220,7 +221,7 @@ public class VScrollController extends AbstractViewController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#pageUpdated(int)
      */
     @Override

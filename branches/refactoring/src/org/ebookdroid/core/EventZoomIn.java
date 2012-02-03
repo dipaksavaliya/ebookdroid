@@ -19,8 +19,8 @@ public class EventZoomIn extends AbstractEventZoom {
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree)
      */
     @Override
-    public boolean process(final ViewState viewState, final PageTree nodes) {
-        return process(viewState, nodes, newLevel);
+    public boolean process(final PageTree nodes) {
+        return process(nodes, newLevel);
     }
 
     /**
@@ -29,7 +29,7 @@ public class EventZoomIn extends AbstractEventZoom {
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTreeNode)
      */
     @Override
-    public boolean process(final ViewState viewState, final PageTreeNode node) {
+    public boolean process(final PageTreeNode node) {
 
         final RectF pageBounds = viewState.getBounds(node.page);
 

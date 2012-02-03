@@ -33,51 +33,96 @@ public class SinglePageView implements PageAnimator {
         this.view = view;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#init()
+     */
     @Override
     public void init() {
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#getType()
+     */
     @Override
     public final PageAnimationType getType() {
         return type;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.touch.IGestureDetector#enabled()
+     */
     @Override
     public boolean enabled() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.touch.IGestureDetector#onTouchEvent(android.view.MotionEvent)
+     */
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#isPageVisible(org.ebookdroid.core.Page, org.ebookdroid.core.ViewState)
+     */
     @Override
     public boolean isPageVisible(final Page page, final ViewState viewState) {
         final int pageIndex = page.index.viewIndex;
         return pageIndex == view.calculateCurrentPage(viewState);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#draw(org.ebookdroid.core.EventDraw)
+     */
     @Override
     public void draw(EventDraw event) {
         final Page page = view.getBase().getDocumentModel().getCurrentPageObject();
         if (page != null) {
-            event.process(event.viewState, page);
+            event.process(page);
             if (SettingsManager.getAppSettings().getShowAnimIcon()) {
                 DragMark.draw(event.canvas, event.viewState);
             }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#resetPageIndexes(int)
+     */
     @Override
     public final void resetPageIndexes(final int currentIndex) {
         foreIndex = backIndex = currentIndex;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#flipAnimationStep()
+     */
     @Override
-    public void FlipAnimationStep() {
+    public void flipAnimationStep() {
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#setViewDrawn(boolean)
+     */
     @Override
     public final void setViewDrawn(final boolean bViewDrawn) {
         this.bViewDrawn = bViewDrawn;
@@ -87,10 +132,20 @@ public class SinglePageView implements PageAnimator {
         return bViewDrawn;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#pageUpdated(int)
+     */
     @Override
     public void pageUpdated(int viewIndex) {
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.PageAnimator#animate(int)
+     */
     @Override
     public void animate(int direction) {
       view.goToPageImpl(view.getBase().getDocumentModel().getCurrentViewPageIndex() + direction);

@@ -10,16 +10,16 @@ import android.graphics.RectF;
 
 public class SinglePageFader extends AbstractPageSlider {
 
+    private final Paint paint = new Paint(PAINT);
+    
     public SinglePageFader(final SinglePageController singlePageDocumentView) {
         super(PageAnimationType.FADER, singlePageDocumentView);
     }
 
     /**
-     * Draw the foreground
-     * 
-     * @param canvas
-     * @param rect
-     * @param paint
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawForeground(org.ebookdroid.core.EventDraw)
      */
     @Override
     protected void drawForeground(EventDraw event) {
@@ -28,16 +28,14 @@ public class SinglePageFader extends AbstractPageSlider {
             page = view.getBase().getDocumentModel().getCurrentPageObject();
         }
         if (page != null) {
-            event.process(event.viewState, page);
+            event.process(page);
         }
     }
 
     /**
-     * Draw the background image.
-     * 
-     * @param canvas
-     * @param rect
-     * @param paint
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawBackground(org.ebookdroid.core.EventDraw)
      */
     @Override
     protected void drawBackground(EventDraw event) {
@@ -51,15 +49,9 @@ public class SinglePageFader extends AbstractPageSlider {
             final Rect src = new Rect(0, 0, (int) viewRect.width(), (int) viewRect.height());
             final RectF dst = new RectF(0, 0, viewRect.width(), viewRect.height());
 
-            final Paint paint = new Paint();
-            paint.setFilterBitmap(true);
-            paint.setAntiAlias(true);
-            paint.setDither(true);
             paint.setAlpha(255 * (int) mA.x / (int) viewRect.width());
 
             event.canvas.drawBitmap(backBitmap.getBitmap(), src, dst, paint);
         }
-
     }
-
 }

@@ -16,13 +16,20 @@ public class SinglePageDynamicCurler extends AbstractSinglePageCurler {
         super(PageAnimationType.CURLER_DYNAMIC, singlePageDocumentView);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#getInitialXForBackFlip(int)
+     */
     @Override
     protected int getInitialXForBackFlip(final int width) {
         return width << 1;
     }
 
     /**
-     * Do the page curl depending on the methods we are using
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#updateValues()
      */
     @Override
     protected void updateValues() {

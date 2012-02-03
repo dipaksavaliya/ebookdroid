@@ -22,6 +22,7 @@ public class ViewState {
 
     public final IViewController ctrl;
     public final IView view;
+    public final DocumentModel model;
 
     public final int currentIndex;
     public final int firstVisible;
@@ -54,6 +55,7 @@ public class ViewState {
     public ViewState(final IViewController dc, final float zoom) {
         this.ctrl = dc;
         this.view = dc.getView();
+        this.model = dc.getBase().getDocumentModel();
 
         this.firstVisible = dc.getFirstVisiblePage();
         this.lastVisible = dc.getLastVisiblePage();
@@ -62,15 +64,14 @@ public class ViewState {
         this.viewRect = new RectF(view.getViewRect());
         this.zoom = zoom;
 
-        final DocumentModel dm = dc.getBase().getDocumentModel();
-        if (dm != null) {
-            for (final Page page : dm.getPages(firstVisible, lastVisible + 1)) {
+        if (model != null) {
+            for (final Page page : model.getPages(firstVisible, lastVisible + 1)) {
                 pages.append(page.index.viewIndex, page.getBounds(zoom));
             }
             this.currentIndex = dc.calculateCurrentPage(this);
             final int inMemory = (int) Math.ceil(SettingsManager.getAppSettings().getPagesInMemory() / 2.0);
             this.firstCached = Math.max(0, this.currentIndex - inMemory);
-            this.lastCached = Math.min(this.currentIndex + inMemory, dm.getPageCount());
+            this.lastCached = Math.min(this.currentIndex + inMemory, model.getPageCount());
         } else {
             this.currentIndex = 0;
             this.firstCached = 0;
@@ -88,6 +89,7 @@ public class ViewState {
     public ViewState(final ViewState oldState, final IViewController dc) {
         this.ctrl = dc;
         this.view = dc.getView();
+        this.model = dc.getBase().getDocumentModel();
 
         this.firstVisible = dc.getFirstVisiblePage();
         this.lastVisible = dc.getLastVisiblePage();
@@ -98,7 +100,7 @@ public class ViewState {
 
         final int min = Math.min(firstVisible, oldState.firstVisible);
         final int max = Math.max(lastVisible, oldState.lastVisible);
-        for (final Page page : dc.getBase().getDocumentModel().getPages(min, max + 1)) {
+        for (final Page page : model.getPages(min, max + 1)) {
             pages.append(page.index.viewIndex, page.getBounds(zoom));
         }
 
@@ -116,6 +118,7 @@ public class ViewState {
     public ViewState(final ViewState oldState, final int firstVisiblePage, final int lastVisiblePage) {
         this.ctrl = oldState.ctrl;
         this.view = oldState.view;
+        this.model = oldState.model;
 
         this.firstVisible = firstVisiblePage;
         this.lastVisible = lastVisiblePage;
@@ -126,15 +129,14 @@ public class ViewState {
 
         this.currentIndex = ctrl.calculateCurrentPage(this);
 
-        final DocumentModel dm = ctrl.getBase().getDocumentModel();
-        if (dm != null) {
+        if (model != null) {
             final int inMemory = (int) Math.ceil(SettingsManager.getAppSettings().getPagesInMemory() / 2.0);
             this.firstCached = Math.max(0, this.currentIndex - inMemory);
-            this.lastCached = Math.min(this.currentIndex + inMemory, dm.getPageCount());
+            this.lastCached = Math.min(this.currentIndex + inMemory, model.getPageCount());
 
             final int min = MathUtils.min(firstVisible, oldState.firstVisible, this.firstCached);
             final int max = MathUtils.max(lastVisible, oldState.lastVisible, this.lastCached);
-            for (final Page page : dm.getPages(min, max + 1)) {
+            for (final Page page : model.getPages(min, max + 1)) {
                 pages.append(page.index.viewIndex, page.getBounds(zoom));
             }
 
@@ -151,6 +153,7 @@ public class ViewState {
     public ViewState(final ViewState oldState) {
         this.ctrl = oldState.ctrl;
         this.view = oldState.view;
+        this.model = oldState.model;
 
         this.firstVisible = oldState.firstVisible;
         this.lastVisible = oldState.lastVisible;

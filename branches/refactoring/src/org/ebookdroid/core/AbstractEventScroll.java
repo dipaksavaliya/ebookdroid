@@ -8,7 +8,7 @@ public abstract class AbstractEventScroll extends AbstractEvent {
 
     protected AbstractEventScroll(final AbstractViewController ctrl) {
         super(ctrl);
-        level = PageTreeLevel.getLevel(ctrl.base.getZoomModel().getZoom());
+        level = PageTreeLevel.getLevel(viewState.zoom);
     }
 
     /**
@@ -17,11 +17,11 @@ public abstract class AbstractEventScroll extends AbstractEvent {
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree)
      */
     @Override
-    public boolean process(final ViewState viewState, final PageTree nodes) {
+    public boolean process(final PageTree nodes) {
         if (level.next != null) {
             nodes.recycleNodes(level.next, bitmapsToRecycle);
         }
-        return process(viewState, nodes, level);
+        return process(nodes, level);
     }
 
     /**
@@ -30,7 +30,7 @@ public abstract class AbstractEventScroll extends AbstractEvent {
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTreeNode)
      */
     @Override
-    public boolean process(final ViewState viewState, final PageTreeNode node) {
+    public boolean process(final PageTreeNode node) {
 
         final RectF pageBounds = viewState.getBounds(node.page);
 

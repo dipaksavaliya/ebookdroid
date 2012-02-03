@@ -37,17 +37,12 @@ public class EventDraw implements IEvent {
 
     @Override
     public ViewState process() {
-        return process(viewState);
-    }
-
-    @Override
-    public ViewState process(ViewState viewState) {
         viewState.ctrl.drawView(this);
         return viewState;
     }
 
     @Override
-    public boolean process(ViewState viewState, Page page) {
+    public boolean process(Page page) {
         nodesBounds = viewState.getBounds(page);
         pageBounds = viewState.view.getAdjustedPageBounds(viewState, nodesBounds);
 
@@ -60,22 +55,22 @@ public class EventDraw implements IEvent {
                     pageBounds.centerX(), pageBounds.centerY(), textPaint);
         }
 
-        process(viewState, page.nodes);
+        process(page.nodes);
         return true;
     }
 
     @Override
-    public boolean process(ViewState viewState, PageTree nodes) {
-        return process(viewState, nodes, level);
+    public boolean process(PageTree nodes) {
+        return process(nodes, level);
     }
 
     @Override
-    public boolean process(ViewState viewState, PageTree nodes, PageTreeLevel level) {
-        return process(viewState, nodes.nodes[0]);
+    public boolean process(PageTree nodes, PageTreeLevel level) {
+        return process(nodes.nodes[0]);
     }
 
     @Override
-    public boolean process(ViewState viewState, PageTreeNode node) {
+    public boolean process(PageTreeNode node) {
         final RectF tr = node.getTargetRect(viewState, viewState.viewRect, pageBounds);
         if (!viewState.isNodeVisible(node, pageBounds)) {
             return false;
@@ -99,7 +94,7 @@ public class EventDraw implements IEvent {
         for (final int end = Math.min(nodes.nodes.length, childId + PageTree.splitMasks.length); childId < end; childId++) {
             final PageTreeNode child = nodes.nodes[childId];
             if (child != null) {
-                res |= process(viewState, child);
+                res |= process(child);
             }
         }
         return res;

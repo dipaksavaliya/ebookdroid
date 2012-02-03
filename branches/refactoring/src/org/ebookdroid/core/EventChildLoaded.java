@@ -28,7 +28,7 @@ public class EventChildLoaded extends EventScrollTo {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.AbstractEvent#process()
      */
     @Override
@@ -37,33 +37,40 @@ public class EventChildLoaded extends EventScrollTo {
 
         final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
 
-        ViewState viewState = new ViewState(ctrl);
         if (changed) {
             ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-            viewState = super.process(viewState);
+            viewState = super.process();
         }
 
         final RectF bounds = viewState.getBounds(page);
+
         final PageTreeNode parent = child.parent;
         if (parent != null && viewState.zoom > 1.5) {
-            final boolean hiddenByChildren = nodes.isHiddenByChildren(parent, viewState, bounds);
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("Node " + parent.fullId + " is: " + (hiddenByChildren ? "" : "not") + " hidden by children");
-            }
-            if (!viewState.isNodeVisible(parent, bounds) || hiddenByChildren) {
-                final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-                nodes.recycleParents(child, bitmapsToRecycle);
-                BitmapManager.release(bitmapsToRecycle);
-                if (LCTX.isDebugEnabled()) {
-                    LCTX.d("Recycle parent nodes for: " + child.fullId + " " + bitmapsToRecycle.size());
-                }
-            }
+            recycleParent(parent, bounds);
         }
 
         if (viewState.isNodeVisible(child, bounds)) {
             ctrl.redrawView(viewState);
         }
         return viewState;
+    }
+
+    protected void recycleParent(final PageTreeNode parent, final RectF bounds) {
+        final boolean hiddenByChildren = nodes.isHiddenByChildren(parent, viewState, bounds);
+
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Node " + parent.fullId + " is: " + (hiddenByChildren ? "" : "not") + " hidden by children");
+        }
+
+        if (!viewState.isNodeVisible(parent, bounds) || hiddenByChildren) {
+            final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
+            nodes.recycleParents(child, bitmapsToRecycle);
+            BitmapManager.release(bitmapsToRecycle);
+
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Recycle parent nodes for: " + child.fullId + " " + bitmapsToRecycle.size());
+            }
+        }
     }
 
 }

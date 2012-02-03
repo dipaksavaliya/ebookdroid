@@ -55,8 +55,8 @@ public class PageAnimatorProxy implements PageAnimator {
     }
 
     @Override
-    public void FlipAnimationStep() {
-        orig.get().FlipAnimationStep();
+    public void flipAnimationStep() {
+        orig.get().flipAnimationStep();
     }
 
     @Override

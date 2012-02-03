@@ -11,7 +11,6 @@ import org.ebookdroid.core.ViewState;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 
 public abstract class AbstractPageSlider extends AbstractPageAnimator {
 
@@ -20,7 +19,9 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
     }
 
     /**
-     * Initialize specific value for the view
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#init()
      */
     @Override
     public void init() {
@@ -29,9 +30,9 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
     }
 
     /**
-     * Called on the first draw event of the view
-     * 
-     * @param canvas
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#onFirstDrawEvent(android.graphics.Canvas, org.ebookdroid.core.ViewState)
      */
     @Override
     protected void onFirstDrawEvent(final Canvas canvas, final ViewState viewState) {
@@ -45,7 +46,9 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
     }
 
     /**
-     * Reset points to it's initial clip edge state
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#resetClipEdge()
      */
     @Override
     protected void resetClipEdge() {
@@ -60,7 +63,9 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
     }
 
     /**
-     * Do the page curl depending on the methods we are using
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#updateValues()
      */
     @Override
     protected void updateValues() {
@@ -81,19 +86,24 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         return bitmap;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawExtraObjects(org.ebookdroid.core.EventDraw)
+     */
     @Override
     protected void drawExtraObjects(EventDraw event) {
-        final Paint paint = new Paint();
-        paint.setFilterBitmap(true);
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-
         if (SettingsManager.getAppSettings().getShowAnimIcon()) {
             event.canvas.drawBitmap(arrowsBitmap, view.getWidth() - arrowsBitmap.getWidth(), view.getHeight()
-                    - arrowsBitmap.getHeight(), paint);
+                    - arrowsBitmap.getHeight(), PAINT);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#fixMovement(org.ebookdroid.core.curl.Vector2D, boolean)
+     */
     @Override
     protected Vector2D fixMovement(final Vector2D movement, final boolean bMaintainMoveDir) {
         return movement;
@@ -103,7 +113,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         if (foreBitmapIndex != foreIndex || foreBitmap == null) {
             foreBitmap = getBitmap(event.canvas, event.viewState, foreBitmap);
 
-            new EventDraw(event, new Canvas(foreBitmap.getBitmap())).process(event.viewState, page);
+            new EventDraw(event, new Canvas(foreBitmap.getBitmap())).process(page);
             foreBitmapIndex = page.index.viewIndex;
         }
     }
@@ -112,7 +122,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         if (backBitmapIndex != backIndex || backBitmap == null) {
             backBitmap = getBitmap(event.canvas, event.viewState, backBitmap);
 
-            new EventDraw(event, new Canvas(backBitmap.getBitmap())).process(event.viewState, page);
+            new EventDraw(event, new Canvas(backBitmap.getBitmap())).process(page);
             backBitmapIndex = page.index.viewIndex;
         }
     }

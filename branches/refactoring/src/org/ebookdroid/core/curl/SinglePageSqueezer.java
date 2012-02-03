@@ -5,7 +5,6 @@ import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -16,11 +15,9 @@ public class SinglePageSqueezer extends AbstractPageSlider {
     }
 
     /**
-     * Draw the foreground
-     * 
-     * @param canvas
-     * @param rect
-     * @param paint
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawForeground(org.ebookdroid.core.EventDraw)
      */
     @Override
     protected void drawForeground(EventDraw event) {
@@ -37,21 +34,14 @@ public class SinglePageSqueezer extends AbstractPageSlider {
             final Rect src = new Rect(0, 0, (int) viewRect.width(), (int) viewRect.height());
             final RectF dst = new RectF(0, 0, viewRect.width() - mA.x, viewRect.height());
 
-            final Paint paint = new Paint();
-            paint.setFilterBitmap(true);
-            paint.setAntiAlias(true);
-            paint.setDither(true);
-
-            canvas.drawBitmap(foreBitmap.getBitmap(), src, dst, paint);
+            canvas.drawBitmap(foreBitmap.getBitmap(), src, dst, PAINT);
         }
     }
 
     /**
-     * Draw the background image.
-     * 
-     * @param canvas
-     * @param rect
-     * @param paint
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawBackground(org.ebookdroid.core.EventDraw)
      */
     @Override
     protected void drawBackground(EventDraw event) {
@@ -65,12 +55,7 @@ public class SinglePageSqueezer extends AbstractPageSlider {
             final Rect src = new Rect(0, 0, (int) viewRect.width(), (int) viewRect.height());
             final RectF dst = new RectF(viewRect.width() - mA.x, 0, viewRect.width(), viewRect.height());
 
-            final Paint paint = new Paint();
-            paint.setFilterBitmap(true);
-            paint.setAntiAlias(true);
-            paint.setDither(true);
-
-            canvas.drawBitmap(backBitmap.getBitmap(), src, dst, paint);
+            canvas.drawBitmap(backBitmap.getBitmap(), src, dst, PAINT);
         }
 
     }

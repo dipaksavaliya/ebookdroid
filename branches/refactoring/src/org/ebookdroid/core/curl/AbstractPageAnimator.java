@@ -13,11 +13,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.MotionEvent;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class AbstractPageAnimator extends SinglePageView implements PageAnimator {
+
+    protected static final Paint PAINT = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 
     /** Fixed update time used to create a smooth curl animation */
     protected int mUpdateRate;
@@ -57,6 +60,11 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         super(type, singlePageDocumentView);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.core.curl.SinglePageView#init()
+     */
     @Override
     public void init() {
         super.init();
@@ -73,6 +81,12 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         mUpdateRate = 5;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.core.curl.SinglePageView#isPageVisible(org.ebookdroid.core.Page,
+     *      org.ebookdroid.core.ViewState)
+     */
     @Override
     public final boolean isPageVisible(final Page page, final ViewState viewState) {
         final int pageIndex = page.index.viewIndex;
@@ -119,10 +133,12 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
     }
 
     /**
-     * Execute a step of the flip animation
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.core.curl.SinglePageView#flipAnimationStep()
      */
     @Override
-    public synchronized void FlipAnimationStep() {
+    public synchronized void flipAnimationStep() {
         if (!bFlipping) {
             return;
         }
@@ -209,13 +225,15 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
     protected abstract void updateValues();
 
     /**
-     * @see org.ebookdroid.core.curl.PageAnimator#onDraw(android.graphics.Canvas)
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.core.curl.SinglePageView#draw(org.ebookdroid.core.EventDraw)
      */
     @Override
     public final synchronized void draw(EventDraw event) {
         final Canvas canvas = event.canvas;
         final ViewState viewState = event.viewState;
-        
+
         if (!enabled()) {
             BitmapManager.release(foreBitmap);
             BitmapManager.release(backBitmap);
@@ -260,11 +278,21 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
 
     protected abstract void onFirstDrawEvent(Canvas canvas, final ViewState viewState);
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.core.curl.SinglePageView#enabled()
+     */
     @Override
     public boolean enabled() {
         return view.getScrollLimits().width() <= 0;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.core.curl.SinglePageView#onTouchEvent(android.view.MotionEvent)
+     */
     @Override
     public final boolean onTouchEvent(final MotionEvent event) {
         if (!bBlockTouchInput) {
@@ -287,7 +315,7 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
                     if (bUserMoves) {
                         bUserMoves = false;
                         bFlipping = true;
-                        FlipAnimationStep();
+                        flipAnimationStep();
                     } else {
                         return false;
                     }
@@ -365,6 +393,11 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         return width;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.core.curl.SinglePageView#pageUpdated(int)
+     */
     @Override
     public void pageUpdated(int viewIndex) {
         if (foreBitmapIndex == viewIndex) {
@@ -375,6 +408,11 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.core.curl.SinglePageView#animate(int)
+     */
     @Override
     public void animate(int direction) {
         resetClipEdge();
@@ -389,7 +427,7 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         }
 
         bUserMoves = false;
-        FlipAnimationStep();
+        flipAnimationStep();
 
     }
 

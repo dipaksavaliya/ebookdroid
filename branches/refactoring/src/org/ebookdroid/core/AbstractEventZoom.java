@@ -20,27 +20,21 @@ public abstract class AbstractEventZoom extends AbstractEvent {
         this.newLevel = PageTreeLevel.getLevel(newZoom);
 
         this.committed = committed;
+        
+        viewState = new ViewState(ctrl, newZoom);
     }
 
     protected AbstractEventZoom(final AbstractViewController ctrl) {
         super(ctrl);
         this.oldZoom = 0;
-        this.newZoom = ctrl.getBase().getZoomModel().getZoom();
+        this.newZoom = viewState.zoom;
 
         this.oldLevel = PageTreeLevel.ROOT;
         this.newLevel = PageTreeLevel.getLevel(newZoom);
 
         this.committed = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.AbstractEvent#process()
-     */
-    @Override
-    public ViewState process() {
-        return process(new ViewState(ctrl, newZoom));
+        
+        viewState = new ViewState(ctrl, newZoom);
     }
 
     /**

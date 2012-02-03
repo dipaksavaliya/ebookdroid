@@ -17,7 +17,7 @@ public interface PageAnimator extends IGestureDetector {
 
     void setViewDrawn(boolean b);
 
-    void FlipAnimationStep();
+    void flipAnimationStep();
 
     boolean isPageVisible(final Page page, final ViewState viewState);
 

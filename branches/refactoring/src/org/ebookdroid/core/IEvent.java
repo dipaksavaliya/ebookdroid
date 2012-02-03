@@ -4,13 +4,11 @@ public interface IEvent {
 
     ViewState process();
 
-    ViewState process(ViewState viewState);
+    boolean process(Page page);
 
-    boolean process(ViewState viewState, Page page);
+    boolean process(PageTree nodes);
 
-    boolean process(ViewState viewState, PageTree nodes);
+    boolean process(PageTree nodes, PageTreeLevel level);
 
-    boolean process(ViewState viewState, PageTree nodes, PageTreeLevel level);
-
-    boolean process(ViewState viewState, PageTreeNode node);
+    boolean process(PageTreeNode node);
 }
