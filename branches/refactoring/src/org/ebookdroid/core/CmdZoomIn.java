@@ -28,10 +28,6 @@ public class CmdZoomIn extends CmdZoom {
             return false;
         }
 
-        if (oldLevel != newLevel) {
-            node.page.nodes.recycleParents(node);
-        }
-
         if (node.isReDecodingRequired(committed, viewState)) {
             node.stopDecodingThisNode("Zoom changed");
             node.decodePageTreeNode(nodesToDecode, viewState);

@@ -156,7 +156,7 @@ public class BitmapManager {
                 sum += ref.size;
             }
         }
-        LCTX.e(msg + "Bitmaps&NativeHeap : " + sum + "(" + (pool.size() + used.size()) + " instances)/"
+        LCTX.e(msg + "Bitmaps&NativeHeap : " + sum + "(" + used.size() + " used / " + pool.size() + " pooled)/"
                 + Debug.getNativeHeapAllocatedSize() + "/" + Debug.getNativeHeapSize());
     }
 

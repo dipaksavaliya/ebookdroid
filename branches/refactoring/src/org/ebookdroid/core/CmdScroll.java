@@ -34,8 +34,6 @@ public abstract class CmdScroll extends AbstractCommand {
             return false;
         }
 
-        node.page.nodes.recycleParents(node);
-
         if (!node.holder.hasBitmaps()) {
             node.decodePageTreeNode(nodesToDecode, viewState);
         }

@@ -89,14 +89,12 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         if (viewState.zoom > 1.5) {
             boolean hiddenByChildren = page.nodes.isHiddenByChildren(this, viewState, bounds);
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("Node " + fullId + "is: " + (hiddenByChildren ? "" : "not") + " hidden by children");
+                LCTX.d("Node " + fullId + " is: " + (hiddenByChildren ? "" : "not") + " hidden by children");
             }
             if (!viewState.isNodeVisible(this, bounds) || hiddenByChildren) {
                 final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
                 this.recycle(bitmapsToRecycle);
-                for (PageTreeNode parent = this.parent; parent != null; parent = parent.parent) {
-                    parent.recycle(bitmapsToRecycle);
-                }
+                page.nodes.recycleParents(this, bitmapsToRecycle);
                 BitmapManager.release(bitmapsToRecycle);
                 if (LCTX.isDebugEnabled()) {
                     LCTX.d("Recycle parent nodes for: " + child.fullId + " : " + bitmapsToRecycle.size());
@@ -107,10 +105,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
     protected void decodePageTreeNode(final List<PageTreeNode> nodesToDecode, final ViewState viewState) {
         if (this.decodingNow.compareAndSet(false, true)) {
-//            final DecodingProgressModel dpm = page.base.getDecodingProgressModel();
-//            if (dpm != null) {
-//                dpm.increase();
-//            }
             bitmapZoom = viewState.zoom;
             nodesToDecode.add(this);
         }

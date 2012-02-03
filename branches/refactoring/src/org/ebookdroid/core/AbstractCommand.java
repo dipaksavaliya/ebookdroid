@@ -114,11 +114,14 @@ public abstract class AbstractCommand {
 
     protected final void recyclePage(final ViewState viewState, final Page page) {
         final int oldSize = bitmapsToRecycle.size();
-        if (page.nodes.recycleAll(bitmapsToRecycle, true)) {
-            if (LCTX.isDebugEnabled()) {
+        page.nodes.recycleAll(bitmapsToRecycle, true);
+        if (LCTX.isDebugEnabled()) {
+            int nodesCount = page.nodes.getNodesCount();
+            if (nodesCount > 1) {
                 LCTX.d("Recycle page " + page.index + " " + viewState.firstCached + ":" + viewState.lastCached + " = "
-                        + (bitmapsToRecycle.size() - oldSize));
+                        + (bitmapsToRecycle.size() - oldSize) + " " + nodesCount);
             }
         }
+
     }
 }
