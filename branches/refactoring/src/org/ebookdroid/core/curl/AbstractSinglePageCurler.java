@@ -1,5 +1,6 @@
 package org.ebookdroid.core.curl;
 
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PagePaint;
 import org.ebookdroid.core.SinglePageController;
@@ -64,7 +65,7 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
 
     /**
      * Called on the first draw event of the view
-     *
+     * 
      * @param canvas
      */
     @Override
@@ -107,55 +108,55 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
 
     /**
      * Draw the foreground
-     *
+     * 
      * @param canvas
      * @param rect
      * @param paint
      */
     @Override
-    protected void drawForeground(final Canvas canvas, final ViewState viewState) {
+    protected void drawForeground(EventDraw event) {
         Page page = view.getBase().getDocumentModel().getPageObject(foreIndex);
         if (page == null) {
             page = view.getBase().getDocumentModel().getCurrentPageObject();
         }
         if (page != null) {
-            canvas.save();
-            canvas.clipRect(viewState.getBounds(page));
-            page.draw(canvas, viewState, true);
-            canvas.restore();
+            event.canvas.save();
+            event.canvas.clipRect(event.viewState.getBounds(page));
+            event.process(event.viewState, page);
+            event.canvas.restore();
         }
     }
 
     /**
      * Draw the background image.
-     *
+     * 
      * @param canvas
      * @param rect
      * @param paint
      */
     @Override
-    protected void drawBackground(final Canvas canvas, final ViewState viewState) {
+    protected void drawBackground(EventDraw event) {
         final Path mask = createBackgroundPath();
 
         final Page page = view.getBase().getDocumentModel().getPageObject(backIndex);
         if (page != null) {
             // Save current canvas so we do not mess it up
-            canvas.save();
-            canvas.clipPath(mask);
+            event.canvas.save();
+            event.canvas.clipPath(mask);
 
-            final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+            final PagePaint paint = event.viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+            event.canvas.drawRect(event.canvas.getClipBounds(), paint.backgroundFillPaint);
 
-            canvas.drawRect(canvas.getClipBounds(), paint.backgroundFillPaint);
+            event.process(event.viewState, page);
 
-            page.draw(canvas, viewState, true);
-            canvas.restore();
+            event.canvas.restore();
         }
 
     }
 
     /**
      * Create a Path used as a mask to draw the background page
-     *
+     * 
      * @return
      */
     private Path createBackgroundPath() {
@@ -170,7 +171,7 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
 
     /**
      * Creates a path used to draw the curl edge in.
-     *
+     * 
      * @return
      */
     private Path createCurlEdgePath() {
@@ -185,13 +186,13 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
 
     /**
      * Draw the curl page edge
-     *
+     * 
      * @param canvas
      */
     @Override
-    protected void drawExtraObjects(final Canvas canvas, final ViewState viewState) {
+    protected void drawExtraObjects(EventDraw event) {
         final Path path = createCurlEdgePath();
-        canvas.drawPath(path, mCurlEdgePaint);
+        event.canvas.drawPath(path, mCurlEdgePaint);
     }
 
 }

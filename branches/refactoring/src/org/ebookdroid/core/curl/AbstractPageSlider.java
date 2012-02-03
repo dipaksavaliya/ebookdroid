@@ -3,6 +3,7 @@ package org.ebookdroid.core.curl;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PagePaint;
 import org.ebookdroid.core.SinglePageController;
@@ -29,7 +30,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
 
     /**
      * Called on the first draw event of the view
-     *
+     * 
      * @param canvas
      */
     @Override
@@ -72,7 +73,8 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         BitmapRef bitmap = ref;
         if (ref == null || ref.isRecycled() || ref.width != canvas.getWidth() || ref.height != canvas.getHeight()) {
             BitmapManager.release(ref);
-            bitmap = BitmapManager.getBitmap("Curler image", canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
+            bitmap = BitmapManager.getBitmap("Curler image", canvas.getWidth(), canvas.getHeight(),
+                    Bitmap.Config.RGB_565);
         }
         final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
         bitmap.getBitmap().eraseColor(paint.backgroundFillPaint.getColor());
@@ -80,15 +82,15 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
     }
 
     @Override
-    protected void drawExtraObjects(final Canvas canvas, final ViewState viewState) {
+    protected void drawExtraObjects(EventDraw event) {
         final Paint paint = new Paint();
         paint.setFilterBitmap(true);
         paint.setAntiAlias(true);
         paint.setDither(true);
 
         if (SettingsManager.getAppSettings().getShowAnimIcon()) {
-            canvas.drawBitmap(arrowsBitmap, view.getWidth() - arrowsBitmap.getWidth(),
-                    view.getHeight() - arrowsBitmap.getHeight(), paint);
+            event.canvas.drawBitmap(arrowsBitmap, view.getWidth() - arrowsBitmap.getWidth(), view.getHeight()
+                    - arrowsBitmap.getHeight(), paint);
         }
     }
 
@@ -97,30 +99,21 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         return movement;
     }
 
-    protected final void updateForeBitmap(final Canvas canvas, final ViewState viewState, Page page) {
+    protected final void updateForeBitmap(EventDraw event, Page page) {
         if (foreBitmapIndex != foreIndex || foreBitmap == null) {
-            foreBitmap = getBitmap(canvas, viewState, foreBitmap);
+            foreBitmap = getBitmap(event.canvas, event.viewState, foreBitmap);
 
-            // if (LCTX.isDebugEnabled()) {
-            // LCTX.d("updateForeBitmap(): " +page.index.viewIndex);
-            // }
-            final Canvas tmp = new Canvas(foreBitmap.getBitmap());
-            page.draw(tmp, viewState, true);
+            new EventDraw(event, new Canvas(foreBitmap.getBitmap())).process(event.viewState, page);
             foreBitmapIndex = page.index.viewIndex;
         }
     }
 
-    protected final void updateBackBitmap(final Canvas canvas, final ViewState viewState, Page page) {
+    protected final void updateBackBitmap(EventDraw event, Page page) {
         if (backBitmapIndex != backIndex || backBitmap == null) {
-            backBitmap = getBitmap(canvas, viewState, backBitmap);
+            backBitmap = getBitmap(event.canvas, event.viewState, backBitmap);
 
-            // if (LCTX.isDebugEnabled()) {
-            // LCTX.d("updateBackBitmap(): " +page.index.viewIndex);
-            // }
-            final Canvas tmp = new Canvas(backBitmap.getBitmap());
-            page.draw(tmp, viewState, true);
+            new EventDraw(event, new Canvas(backBitmap.getBitmap())).process(event.viewState, page);
             backBitmapIndex = page.index.viewIndex;
         }
     }
-
 }

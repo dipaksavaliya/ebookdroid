@@ -11,6 +11,7 @@ import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DecodeService;
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.ViewState;
@@ -34,7 +35,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -843,10 +843,6 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         }
 
         @Override
-        public void drawView(final Canvas canvas, final ViewState viewState) {
-        }
-
-        @Override
         public boolean onLayoutChanged(final boolean layoutChanged, final boolean layoutLocked, final Rect oldLaout,
                 final Rect newLayout) {
             return false;
@@ -886,6 +882,12 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         @Override
         public ViewState updatePageSize(DocumentModel model, Page page, Rect bitmapBounds) {
             return new ViewState(this);
+        }
+
+        @Override
+        public void drawView(EventDraw eventDraw) {
+            // TODO Auto-generated method stub
+            
         }
     }
 }

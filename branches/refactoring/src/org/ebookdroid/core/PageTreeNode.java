@@ -12,9 +12,7 @@ import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -161,31 +159,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             });
         } finally {
             BitmapManager.release(bitmap);
-        }
-    }
-
-    void draw(final Canvas canvas, final ViewState viewState, final RectF pageBounds, final PagePaint paint) {
-        final RectF tr = getTargetRect(viewState, viewState.viewRect, pageBounds);
-        if (!viewState.isNodeVisible(this, pageBounds)) {
-            return;
-        }
-
-        if (!page.nodes.allChildrenHasBitmap(viewState, this, paint)) {
-            holder.drawBitmap(viewState, canvas, paint, tr);
-
-            drawBrightnessFilter(canvas, tr);
-        }
-
-        page.nodes.drawChildren(canvas, viewState, pageBounds, this, paint);
-    }
-
-    void drawBrightnessFilter(final Canvas canvas, final RectF tr) {
-        final int brightness = SettingsManager.getAppSettings().getBrightness();
-        if (brightness < 100) {
-            final Paint p = new Paint();
-            p.setColor(Color.BLACK);
-            p.setAlpha(255 - brightness * 255 / 100);
-            canvas.drawRect(tr, p);
         }
     }
 

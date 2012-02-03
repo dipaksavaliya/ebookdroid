@@ -13,7 +13,6 @@ import org.ebookdroid.core.touch.IGestureDetector;
 import org.ebookdroid.core.touch.IMultiTouchZoom;
 import org.ebookdroid.ui.viewer.IActivityController;
 
-import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -166,11 +165,11 @@ public class SinglePageController extends AbstractViewController {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IViewController#drawView(android.graphics.Canvas, org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.ui.viewer.IViewController#drawView(org.ebookdroid.core.EventDraw)
      */
     @Override
-    public final void drawView(final Canvas canvas, final ViewState viewState) {
-        curler.draw(canvas, viewState);
+    public void drawView(EventDraw eventDraw) {
+        curler.draw(eventDraw);
     }
 
     public final ViewState invalidatePages(final ViewState oldState, final Page... pages) {

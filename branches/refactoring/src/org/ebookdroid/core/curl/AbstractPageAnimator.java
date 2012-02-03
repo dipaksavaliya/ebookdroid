@@ -3,6 +3,7 @@ package org.ebookdroid.core.curl;
 import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
@@ -196,11 +197,11 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
 
     protected abstract Vector2D fixMovement(Vector2D point, final boolean bMaintainMoveDir);
 
-    protected abstract void drawBackground(final Canvas canvas, final ViewState viewState);
+    protected abstract void drawBackground(EventDraw event);
 
-    protected abstract void drawForeground(final Canvas canvas, final ViewState viewState);
+    protected abstract void drawForeground(EventDraw event);
 
-    protected abstract void drawExtraObjects(final Canvas canvas, final ViewState viewState);
+    protected abstract void drawExtraObjects(EventDraw event);
 
     /**
      * Update points values values.
@@ -211,7 +212,10 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
      * @see org.ebookdroid.core.curl.PageAnimator#onDraw(android.graphics.Canvas)
      */
     @Override
-    public final synchronized void draw(final Canvas canvas, final ViewState viewState) {
+    public final synchronized void draw(EventDraw event) {
+        final Canvas canvas = event.canvas;
+        final ViewState viewState = event.viewState;
+        
         if (!enabled()) {
             BitmapManager.release(foreBitmap);
             BitmapManager.release(backBitmap);
@@ -219,7 +223,7 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
             foreBitmap = null;
             backBitmap = null;
 
-            super.draw(canvas, viewState);
+            super.draw(event);
             return;
         }
 
@@ -234,8 +238,8 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         // Draw our elements
         lock.readLock().lock();
         try {
-            drawInternal(canvas, viewState);
-            drawExtraObjects(canvas, viewState);
+            drawInternal(event);
+            drawExtraObjects(event);
         } finally {
             lock.readLock().unlock();
         }
@@ -247,10 +251,10 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         }
     }
 
-    protected void drawInternal(Canvas canvas, ViewState viewState) {
-        drawForeground(canvas, viewState);
+    protected void drawInternal(EventDraw event) {
+        drawForeground(event);
         if (foreIndex != backIndex) {
-            drawBackground(canvas, viewState);
+            drawBackground(event);
         }
     }
 
@@ -384,11 +388,9 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
             previousView(viewState);
         }
 
-
         bUserMoves = false;
         FlipAnimationStep();
 
     }
-
 
 }

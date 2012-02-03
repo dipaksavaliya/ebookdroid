@@ -1,15 +1,12 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.ui.viewer.IActivityController;
 
-import android.graphics.Canvas;
 import android.graphics.RectF;
-import android.text.TextPaint;
 
 import java.util.List;
 
@@ -47,32 +44,6 @@ public class Page {
     public void recycle(List<Bitmaps> bitmapsToRecycle) {
         recycled = true;
         nodes.recycleAll(bitmapsToRecycle, true);
-    }
-
-    public boolean draw(final Canvas canvas, final ViewState viewState) {
-        return draw(canvas, viewState, false);
-    }
-
-    public boolean draw(final Canvas canvas, final ViewState viewState, final boolean drawInvisible) {
-        if (drawInvisible || viewState.isPageVisible(this)) {
-            final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
-
-            final RectF nodesBounds = viewState.getBounds(this);
-            final RectF bounds = viewState.view.getAdjustedPageBounds(viewState, nodesBounds);
-
-            if (!nodes.nodes[0].holder.hasBitmaps()) {
-                canvas.drawRect(bounds, paint.fillPaint);
-
-                final TextPaint textPaint = paint.textPaint;
-                textPaint.setTextSize(24 * base.getZoomModel().getZoom());
-                canvas.drawText(base.getContext().getString(R.string.text_page) + " " + (index.viewIndex + 1),
-                        bounds.centerX(), bounds.centerY(), textPaint);
-            }
-            nodes.nodes[0].draw(canvas, viewState, nodesBounds, paint);
-
-            return true;
-        }
-        return false;
     }
 
     public float getAspectRatio() {

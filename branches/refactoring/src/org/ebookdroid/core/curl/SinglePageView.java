@@ -2,12 +2,12 @@ package org.ebookdroid.core.curl;
 
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.ui.viewer.views.DragMark;
 
-import android.graphics.Canvas;
 import android.view.MotionEvent;
 
 public class SinglePageView implements PageAnimator {
@@ -59,12 +59,12 @@ public class SinglePageView implements PageAnimator {
     }
 
     @Override
-    public void draw(final Canvas canvas, final ViewState viewState) {
+    public void draw(EventDraw event) {
         final Page page = view.getBase().getDocumentModel().getCurrentPageObject();
         if (page != null) {
-            page.draw(canvas, viewState);
+            event.process(event.viewState, page);
             if (SettingsManager.getAppSettings().getShowAnimIcon()) {
-                DragMark.draw(canvas, viewState);
+                DragMark.draw(event.canvas, event.viewState);
             }
         }
     }

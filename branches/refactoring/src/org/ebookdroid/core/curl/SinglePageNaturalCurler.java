@@ -20,6 +20,7 @@
 package org.ebookdroid.core.curl;
 
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
@@ -74,11 +75,13 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
 
     }
 
-    protected void drawInternal(Canvas canvas, ViewState viewState) {
-        drawBackground(canvas, viewState);
+    protected void drawInternal(EventDraw event) {
+        drawBackground(event);
 
+        final Canvas canvas = event.canvas;
+        
         final Bitmap fgBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
-        drawForeground(new Canvas(fgBitmap), viewState);
+        drawForeground(new EventDraw(event, new Canvas(fgBitmap)));
 
         int myWidth = canvas.getWidth();
         int myHeight = canvas.getHeight();
@@ -144,25 +147,13 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
         edgePath.rewind();
         edgePath.moveTo((int) mA.x, (int) mA.y);
         edgePath.lineTo(((int) mA.x + cornerX) / 2, ((int) mA.y + y1) / 2);
-        edgePath.quadTo(((int) mA.x + 3 * cornerX) / 4, ((int) mA.y + 3 * y1) / 4, ((int) mA.x + 7 * cornerX) / 8, ((int) mA.y + 7 * y1 - 2 * sY) / 8);
+        edgePath.quadTo(((int) mA.x + 3 * cornerX) / 4, ((int) mA.y + 3 * y1) / 4, ((int) mA.x + 7 * cornerX) / 8,
+                ((int) mA.y + 7 * y1 - 2 * sY) / 8);
         edgePath.lineTo(((int) mA.x + 7 * x1 - 2 * sX) / 8, ((int) mA.y + 7 * cornerY) / 8);
-        edgePath.quadTo(((int) mA.x + 3 * x1) / 4, ((int) mA.y + 3 * cornerY) / 4, ((int) mA.x + x1) / 2, ((int) mA.y + cornerY) / 2);
+        edgePath.quadTo(((int) mA.x + 3 * x1) / 4, ((int) mA.y + 3 * cornerY) / 4, ((int) mA.x + x1) / 2,
+                ((int) mA.y + cornerY) / 2);
 
         canvas.drawPath(edgePath, edgePaint);
-//        canvas.save();
-//        canvas.clipPath(edgePath);
-//        final Matrix m = new Matrix();
-//        m.postScale(1, -1);
-//        m.postTranslate((int) mA.x - cornerX, (int) mA.y + cornerY);
-//        final float angle;
-//        if (cornerY == 0) {
-//            angle = -180 / 3.1416f * (float) Math.atan2((int) mA.x - cornerX, (int) mA.y - y1);
-//        } else {
-//            angle = 180 - 180 / 3.1416f * (float) Math.atan2((int) mA.x - cornerX, (int) mA.y - y1);
-//        }
-//        m.postRotate(angle, (int) mA.x, (int) mA.y);
-//        canvas.drawBitmap(fgBitmap, m, backPaint);
-//        canvas.restore();
     }
 
     @Override
@@ -187,7 +178,10 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
     }
 
     @Override
-    protected void drawBackground(Canvas canvas, ViewState viewState) {
+    protected void drawBackground(EventDraw event) {
+        final Canvas canvas = event.canvas;
+        final ViewState viewState = event.viewState;
+
         Page page = view.getBase().getDocumentModel().getPageObject(backIndex);
         if (page == null) {
             page = view.getBase().getDocumentModel().getCurrentPageObject();
@@ -195,13 +189,16 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
         if (page != null) {
             canvas.save();
             canvas.clipRect(viewState.getBounds(page));
-            page.draw(canvas, viewState, true);
+            event.process(event.viewState, page);
             canvas.restore();
         }
     }
 
     @Override
-    protected void drawForeground(Canvas canvas, ViewState viewState) {
+    protected void drawForeground(EventDraw event) {
+        final Canvas canvas = event.canvas;
+        final ViewState viewState = event.viewState;
+
         Page page = view.getBase().getDocumentModel().getPageObject(foreIndex);
         if (page == null) {
             page = view.getBase().getDocumentModel().getCurrentPageObject();
@@ -209,19 +206,20 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
         if (page != null) {
             canvas.save();
             canvas.clipRect(viewState.getBounds(page));
-            page.draw(canvas, viewState, true);
+            event.process(event.viewState, page);
             canvas.restore();
         }
     }
 
     @Override
-    protected void drawExtraObjects(Canvas canvas, ViewState viewState) {
+    protected void drawExtraObjects(EventDraw event) {
         final Paint paint = new Paint();
         paint.setFilterBitmap(true);
         paint.setAntiAlias(true);
         paint.setDither(true);
 
         if (SettingsManager.getAppSettings().getShowAnimIcon()) {
+            final Canvas canvas = event.canvas;
             canvas.drawBitmap(arrowsBitmap, view.getWidth() - arrowsBitmap.getWidth(),
                     view.getHeight() - arrowsBitmap.getHeight(), paint);
         }

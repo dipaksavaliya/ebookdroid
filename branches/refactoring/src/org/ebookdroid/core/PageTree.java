@@ -2,7 +2,6 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.bitmaps.Bitmaps;
 
-import android.graphics.Canvas;
 import android.graphics.RectF;
 
 import java.util.List;
@@ -98,17 +97,6 @@ public class PageTree {
             }
         }
         return true;
-    }
-
-    public void drawChildren(final Canvas canvas, final ViewState viewState, final RectF pageBounds,
-            final PageTreeNode parent, final PagePaint paint) {
-        int childId = getFirstChildId(parent.id);
-        for (final int end = Math.min(nodes.length, childId + splitMasks.length); childId < end; childId++) {
-            final PageTreeNode child = nodes[childId];
-            if (child != null) {
-                child.draw(canvas, viewState, pageBounds, paint);
-            }
-        }
     }
 
     public boolean isHiddenByChildren(final PageTreeNode parent, final ViewState viewState, final RectF pageBounds) {

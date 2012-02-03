@@ -8,7 +8,6 @@ import org.ebookdroid.ui.viewer.views.DragMark;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -116,22 +115,22 @@ public class VScrollController extends AbstractViewController {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractViewController#drawView(android.graphics.Canvas, org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.ui.viewer.IViewController#drawView(org.ebookdroid.core.EventDraw)
      */
     @Override
-    public synchronized final void drawView(final Canvas canvas, final ViewState viewState) {
+    public void drawView(final EventDraw eventDraw) {
         final DocumentModel dm = getBase().getDocumentModel();
         if (dm == null) {
             return;
         }
-        for (int i = viewState.firstVisible; i <= viewState.lastVisible; i++) {
-            final Page page = dm.getPageObject(i);
+        for (final Page page : dm.getPages(eventDraw.viewState.firstVisible, eventDraw.viewState.lastVisible + 1)) {
             if (page != null) {
-                page.draw(canvas, viewState);
+                eventDraw.process(eventDraw.viewState, page);
             }
         }
+
         if (SettingsManager.getAppSettings().getShowAnimIcon()) {
-            DragMark.draw(canvas, viewState);
+            DragMark.draw(eventDraw.canvas, eventDraw.viewState);
         }
         view.continueScroll();
     }
@@ -201,7 +200,8 @@ public class VScrollController extends AbstractViewController {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractViewController#isPageVisibleImpl(org.ebookdroid.core.Page, org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.core.AbstractViewController#isPageVisibleImpl(org.ebookdroid.core.Page,
+     *      org.ebookdroid.core.ViewState)
      */
     @Override
     protected final boolean isPageVisibleImpl(final Page page, final ViewState viewState) {
