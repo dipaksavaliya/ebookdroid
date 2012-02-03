@@ -149,9 +149,7 @@ public class Bitmaps {
     protected void finalize() throws Throwable {
         if (bitmaps != null) {
             for (BitmapRef ref : bitmaps) {
-                if (ref != null) {
-                BitmapManager.releaseImpl(ref);
-                }
+                BitmapManager.release(ref);
             }
             bitmaps = null;
         }
@@ -175,7 +173,8 @@ public class Bitmaps {
                     m.postTranslate(tr.left, tr.top);
 
                     final int index = row * columns + col;
-                    if (this.bitmaps[index] != null && this.bitmaps[index].bitmap != null && !this.bitmaps[index].bitmap.isRecycled()) {
+                    if (this.bitmaps[index] != null && this.bitmaps[index].bitmap != null
+                            && !this.bitmaps[index].bitmap.isRecycled()) {
                         canvas.drawBitmap(this.bitmaps[index].bitmap, m, paint.bitmapPaint);
                     }
                 }
