@@ -1,18 +1,18 @@
-package org.ebookdroid.core;
+package org.ebookdroid.ui.viewer;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageAlign;
+import org.ebookdroid.core.DecodeService;
+import org.ebookdroid.core.DrawThread;
+import org.ebookdroid.core.Page;
+import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.ui.viewer.IActivityController;
-import org.ebookdroid.ui.viewer.IView;
-import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.Scroller;
 
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.emdev.utils.MathUtils;
 import org.emdev.utils.concurrent.Flag;
 
-public final class SurfaceView extends android.view.SurfaceView implements IView, SurfaceHolder.Callback {
+public final class BaseView extends View implements IView {
 
     protected final IActivityController base;
 
@@ -38,7 +38,7 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
 
     protected final Flag layoutFlag = new Flag();
 
-    public SurfaceView(final IActivityController baseActivity) {
+    public BaseView(final IActivityController baseActivity) {
         super(baseActivity.getContext());
         this.base = baseActivity;
         this.scroller = new Scroller(getContext());
@@ -46,7 +46,7 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
         setKeepScreenOn(SettingsManager.getAppSettings().isKeepScreenOn());
         setFocusable(true);
         setFocusableInTouchMode(true);
-        getHolder().addCallback(this);
+        // getHolder().addCallback(this);
         drawThread = new DrawThread(null);
     }
 
@@ -191,8 +191,7 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
                 final DocumentModel dm = base.getDocumentModel();
                 if (dc != null && dm != null) {
                     final Rect l = dc.getScrollLimits();
-                    SurfaceView.super.scrollTo(MathUtils.adjust(x, l.left, l.right),
-                            MathUtils.adjust(y, l.top, l.bottom));
+                    BaseView.super.scrollTo(MathUtils.adjust(x, l.left, l.right), MathUtils.adjust(y, l.top, l.bottom));
                 }
             }
         };
@@ -304,6 +303,11 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
         redrawView(new ViewState(base.getDocumentController()));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.ui.viewer.IView#redrawView(org.ebookdroid.core.ViewState)
+     */
     @Override
     public final void redrawView(final ViewState viewState) {
         if (viewState != null) {
@@ -314,24 +318,8 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
             if (ds != null) {
                 ds.updateViewState(viewState);
             }
-            base.getDecodeService().updateViewState(viewState);
+            postInvalidate();
         }
-    }
-
-    @Override
-    public final void surfaceCreated(final SurfaceHolder holder) {
-        drawThread = new DrawThread(getHolder());
-        drawThread.start();
-    }
-
-    @Override
-    public final void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
-        redrawView();
-    }
-
-    @Override
-    public final void surfaceDestroyed(final SurfaceHolder holder) {
-        drawThread.finish();
     }
 
     /**
@@ -350,13 +338,12 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
 
     @Override
     public RectF getAdjustedPageBounds(ViewState viewState, RectF bounds) {
-        RectF r = new RectF(bounds);
-        r.offset(-viewState.viewRect.left, -viewState.viewRect.top);
-        return r;
+        return bounds;
     }
 
     @Override
     public boolean intersects(RectF viewRect, RectF realRect, RectF bounds) {
-        return RectF.intersects(bounds, realRect);
+        return RectF.intersects(bounds, viewRect);
     }
+
 }

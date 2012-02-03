@@ -10,7 +10,6 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
 import org.ebookdroid.common.settings.types.PageAlign;
-import org.ebookdroid.core.BaseView;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;

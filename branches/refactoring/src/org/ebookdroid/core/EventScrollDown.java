@@ -1,11 +1,16 @@
 package org.ebookdroid.core;
 
-public class CmdScrollDown extends CmdScroll {
+public class EventScrollDown extends AbstractEventScroll {
 
-    public CmdScrollDown(final AbstractViewController ctrl) {
+    public EventScrollDown(final AbstractViewController ctrl) {
         super(ctrl);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.AbstractEvent#calculatePageVisibility(org.ebookdroid.core.ViewState)
+     */
     @Override
     protected ViewState calculatePageVisibility(final ViewState initial) {
 

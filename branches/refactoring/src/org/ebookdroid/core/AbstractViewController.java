@@ -151,7 +151,7 @@ public abstract class AbstractViewController extends AbstractComponentController
             final Page page = pageToGo.getActualPage(base.getDocumentModel(), bs);
             final int toPage = page != null ? page.index.viewIndex : 0;
 
-            new CmdScrollTo(this, toPage).execute();
+            new EventScrollTo(this, toPage).process();
             goToPageImpl(toPage, bs.offsetX, bs.offsetY);
 
         } else {
@@ -207,12 +207,12 @@ public abstract class AbstractViewController extends AbstractComponentController
             return;
         }
 
-        final CmdScroll cmd = direction > 0 ? new CmdScrollDown(AbstractViewController.this) : new CmdScrollUp(this);
+        final AbstractEventScroll cmd = direction > 0 ? new EventScrollDown(AbstractViewController.this) : new EventScrollUp(this);
         final Runnable r = new Runnable() {
 
             @Override
             public void run() {
-                final ViewState viewState = cmd.execute();
+                final ViewState viewState = cmd.process();
                 final DocumentModel dm = getBase().getDocumentModel();
                 final Page page = dm.getPageObject(viewState.currentIndex);
                 if (page != null) {
@@ -239,7 +239,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         ViewState viewState = new ViewState(this);
         if (changed) {
             this.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-            viewState = new CmdScrollTo(this, model.getCurrentViewPageIndex()).execute();
+            viewState = new EventScrollTo(this, model.getCurrentViewPageIndex()).process();
         }
 
         return viewState;
@@ -260,13 +260,13 @@ public abstract class AbstractViewController extends AbstractComponentController
         }
 
         inZoom.set(!committed);
-        final CmdZoom cmd = newZoom > oldZoom ? new CmdZoomIn(this, oldZoom, newZoom, committed) : new CmdZoomOut(this,
+        final AbstractEventZoom cmd = newZoom > oldZoom ? new EventZoomIn(this, oldZoom, newZoom, committed) : new EventZoomOut(this,
                 oldZoom, newZoom, committed);
 
         if (!committed) {
             view.invalidateScroll(newZoom, oldZoom);
         }
-        final ViewState newState = cmd.execute();
+        final ViewState newState = cmd.process();
         if (!committed) {
             redrawView(newState);
         } else {
@@ -282,7 +282,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void updateMemorySettings() {
-        new CmdZoomIn(this).execute();
+        new EventZoomIn(this).process();
     }
 
     /**
@@ -389,7 +389,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                 invalidatePageSizes(InvalidateSizeReason.LAYOUT, null);
                 invalidateScroll();
 
-                new CmdZoomIn(this).execute();
+                new EventZoomIn(this).process();
                 return true;
             }
         }
@@ -404,7 +404,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         }
         BitmapManager.release(bitmapsToRecycle);
 
-        new CmdZoomIn(this).execute();
+        new EventZoomIn(this).process();
     }
 
     protected final void invalidateScroll() {
@@ -424,7 +424,7 @@ public abstract class AbstractViewController extends AbstractComponentController
     public final void setAlign(final PageAlign align) {
         invalidatePageSizes(InvalidateSizeReason.PAGE_ALIGN, null);
         invalidateScroll();
-        new CmdZoomIn(this).execute();
+        new EventZoomIn(this).process();
     }
 
     /**

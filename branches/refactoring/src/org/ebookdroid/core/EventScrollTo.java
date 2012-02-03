@@ -1,16 +1,21 @@
 package org.ebookdroid.core;
 
-public class CmdScrollTo extends CmdScroll {
+public class EventScrollTo extends AbstractEventScroll {
 
     public final int viewIndex;
 
-    public CmdScrollTo(AbstractViewController ctrl, int viewIndex) {
+    public EventScrollTo(final AbstractViewController ctrl, final int viewIndex) {
         super(ctrl);
         this.viewIndex = viewIndex;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.AbstractEvent#calculatePageVisibility(org.ebookdroid.core.ViewState)
+     */
     @Override
-    protected ViewState calculatePageVisibility(ViewState initial) {
+    protected ViewState calculatePageVisibility(final ViewState initial) {
         int firstVisiblePage = viewIndex;
         int lastVisiblePage = viewIndex;
 

@@ -1,11 +1,16 @@
 package org.ebookdroid.core;
 
-public class CmdScrollUp extends CmdScroll {
+public class EventScrollUp extends AbstractEventScroll {
 
-    public CmdScrollUp(final AbstractViewController ctrl) {
+    public EventScrollUp(final AbstractViewController ctrl) {
         super(ctrl);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.AbstractEvent#calculatePageVisibility(org.ebookdroid.core.ViewState)
+     */
     @Override
     protected ViewState calculatePageVisibility(final ViewState initial) {
         int firstVisiblePage = initial.firstVisible;

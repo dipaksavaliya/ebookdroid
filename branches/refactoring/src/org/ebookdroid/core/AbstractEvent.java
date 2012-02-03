@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractCommand {
+public abstract class AbstractEvent implements IEvent {
 
     public final LogContext LCTX = LogContext.ROOT.lctx(getClass().getSimpleName());
 
@@ -21,24 +21,36 @@ public abstract class AbstractCommand {
     protected final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
     protected final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
 
-    protected AbstractCommand(final AbstractViewController ctrl) {
+    protected AbstractEvent(final AbstractViewController ctrl) {
         this.ctrl = ctrl;
         this.model = ctrl.getBase().getDocumentModel();
         this.view = ctrl.getView();
     }
 
-    public ViewState execute() {
-        return execute(new ViewState(ctrl));
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.IEvent#process()
+     */
+    @Override
+    public ViewState process() {
+        return process(new ViewState(ctrl));
     }
 
-    public final ViewState execute(final ViewState initial) {
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState)
+     */
+    @Override
+    public final ViewState process(final ViewState initial) {
         final ViewState viewState = calculatePageVisibility(initial);
 
         ctrl.firstVisiblePage = viewState.firstVisible;
         ctrl.lastVisiblePage = viewState.lastVisible;
 
         for (final Page page : model.getPages()) {
-            execute(viewState, page);
+            process(viewState, page);
         }
 
         BitmapManager.release(bitmapsToRecycle);
@@ -54,32 +66,41 @@ public abstract class AbstractCommand {
         return viewState;
     }
 
-    public final boolean execute(final ViewState viewState, final Page page) {
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.Page)
+     */
+    @Override
+    public final boolean process(final ViewState viewState, final Page page) {
         if (page.recycled) {
             return false;
         }
         if (viewState.isPageKeptInMemory(page) || viewState.isPageVisible(page)) {
-            return execute(viewState, page.nodes);
+            return process(viewState, page.nodes);
         }
 
         recyclePage(viewState, page);
         return false;
     }
 
-    public abstract boolean execute(final ViewState viewState, final PageTree nodes);
-
-    public boolean execute(final ViewState viewState, final PageTree nodes, final PageTreeLevel level) {
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree,
+     *      org.ebookdroid.core.PageTreeLevel)
+     */
+    @Override
+    public boolean process(final ViewState viewState, final PageTree nodes, final PageTreeLevel level) {
         boolean res = false;
         for (int nodeIndex = level.start; nodeIndex < level.end; nodeIndex++) {
             if (nodes.nodes[nodeIndex] == null) {
                 nodes.createChildren(nodes.getParent(nodeIndex, true));
             }
-            res |= execute(viewState, nodes.nodes[nodeIndex]);
+            res |= process(viewState, nodes.nodes[nodeIndex]);
         }
         return res;
     }
-
-    public abstract boolean execute(final ViewState viewState, final PageTreeNode node);
 
     protected ViewState calculatePageVisibility(final ViewState initial) {
         int firstVisiblePage = -1;
@@ -116,7 +137,7 @@ public abstract class AbstractCommand {
         final int oldSize = bitmapsToRecycle.size();
         page.nodes.recycleAll(bitmapsToRecycle, true);
         if (LCTX.isDebugEnabled()) {
-            int nodesCount = page.nodes.getNodesCount();
+            final int nodesCount = page.nodes.getNodesCount();
             if (nodesCount > 1) {
                 LCTX.d("Recycle page " + page.index + " " + viewState.firstCached + ":" + viewState.lastCached + " = "
                         + (bitmapsToRecycle.size() - oldSize) + " " + nodesCount);

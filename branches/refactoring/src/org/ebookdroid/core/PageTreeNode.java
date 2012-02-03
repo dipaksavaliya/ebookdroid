@@ -9,7 +9,6 @@ import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.crop.PageCropper;
 import org.ebookdroid.core.models.DecodingProgressModel;
-import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.Canvas;
@@ -19,7 +18,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -85,24 +83,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return (committed && viewState.zoom != bitmapZoom) || viewState.zoom > 1.2 * bitmapZoom;
     }
 
-    protected void onChildLoaded(final PageTreeNode child, final ViewState viewState, final RectF bounds) {
-        if (viewState.zoom > 1.5) {
-            boolean hiddenByChildren = page.nodes.isHiddenByChildren(this, viewState, bounds);
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("Node " + fullId + " is: " + (hiddenByChildren ? "" : "not") + " hidden by children");
-            }
-            if (!viewState.isNodeVisible(this, bounds) || hiddenByChildren) {
-                final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-                this.recycle(bitmapsToRecycle);
-                page.nodes.recycleParents(this, bitmapsToRecycle);
-                BitmapManager.release(bitmapsToRecycle);
-                if (LCTX.isDebugEnabled()) {
-                    LCTX.d("Recycle parent nodes for: " + child.fullId + " : " + bitmapsToRecycle.size());
-                }
-            }
-        }
-    }
-
     protected void decodePageTreeNode(final List<PageTreeNode> nodesToDecode, final ViewState viewState) {
         if (this.decodingNow.compareAndSet(false, true)) {
             bitmapZoom = viewState.zoom;
@@ -164,19 +144,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                     stopDecodingThisNode(null);
 
                     final IViewController dc = page.base.getDocumentController();
-                    final DocumentModel dm = page.base.getDocumentModel();
-
-                    if (dc != null && dm != null) {
-                        ViewState viewState = dc.updatePageSize(dm, page, bitmapBounds);
-
-                        final RectF bounds = viewState.getBounds(page);
-                        if (parent != null) {
-                            parent.onChildLoaded(PageTreeNode.this, viewState, bounds);
-                        }
-
-                        if (viewState.isNodeVisible(PageTreeNode.this, bounds)) {
-                            dc.redrawView(viewState);
-                        }
+                    if (dc instanceof AbstractViewController) {
+                        new EventChildLoaded((AbstractViewController) dc, PageTreeNode.this, bitmapBounds).process();
                     }
                 }
             });

@@ -55,7 +55,7 @@ public class SinglePageController extends AbstractViewController {
             dm.setCurrentPageIndex(page.index);
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
-            final ViewState viewState = new CmdScrollTo(this, page.index.viewIndex).execute();
+            final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
             view.redrawView(viewState);
         }
     }
@@ -73,7 +73,7 @@ public class SinglePageController extends AbstractViewController {
             dm.setCurrentPageIndex(page.index);
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
-            final ViewState viewState = new CmdScrollTo(this, page.index.viewIndex).execute();
+            final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
             final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
             final float left = bounds.left + offsetX * bounds.width();
             final float top = bounds.top + offsetY * bounds.height();
@@ -94,8 +94,8 @@ public class SinglePageController extends AbstractViewController {
             return;
         }
 
-        CmdScroll cmd = direction > 0 ? new CmdScrollDown(this)  :new CmdScrollUp(this);
-        final ViewState viewState = cmd.execute();
+        AbstractEventScroll cmd = direction > 0 ? new EventScrollDown(this)  :new EventScrollUp(this);
+        final ViewState viewState = cmd.process();
         DocumentModel dm = base.getDocumentModel();
         if (dm != null) {
             updatePosition(dm, dm.getCurrentPageObject(), viewState);
@@ -174,7 +174,7 @@ public class SinglePageController extends AbstractViewController {
     }
 
     public final ViewState invalidatePages(final ViewState oldState, final Page... pages) {
-        return new CmdScrollTo(this, pages[0].index.viewIndex).execute();
+        return new EventScrollTo(this, pages[0].index.viewIndex).process();
     }
 
     /**

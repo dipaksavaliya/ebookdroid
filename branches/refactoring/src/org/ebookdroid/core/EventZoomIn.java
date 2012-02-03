@@ -2,24 +2,34 @@ package org.ebookdroid.core;
 
 import android.graphics.RectF;
 
-public class CmdZoomIn extends CmdZoom {
+public class EventZoomIn extends AbstractEventZoom {
 
-    public CmdZoomIn(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
+    public EventZoomIn(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
             final boolean committed) {
         super(ctrl, oldZoom, newZoom, committed);
     }
 
-    public CmdZoomIn(final AbstractViewController ctrl) {
+    public EventZoomIn(final AbstractViewController ctrl) {
         super(ctrl);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree)
+     */
     @Override
-    public boolean execute(final ViewState viewState, final PageTree nodes) {
-        return execute(viewState, nodes, newLevel);
+    public boolean process(final ViewState viewState, final PageTree nodes) {
+        return process(viewState, nodes, newLevel);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTreeNode)
+     */
     @Override
-    public boolean execute(final ViewState viewState, final PageTreeNode node) {
+    public boolean process(final ViewState viewState, final PageTreeNode node) {
 
         final RectF pageBounds = viewState.getBounds(node.page);
 

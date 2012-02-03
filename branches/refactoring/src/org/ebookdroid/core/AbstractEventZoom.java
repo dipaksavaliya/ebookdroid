@@ -1,6 +1,6 @@
 package org.ebookdroid.core;
 
-public abstract class CmdZoom extends AbstractCommand {
+public abstract class AbstractEventZoom extends AbstractEvent {
 
     public final float oldZoom;
     public final float newZoom;
@@ -10,7 +10,7 @@ public abstract class CmdZoom extends AbstractCommand {
 
     public final boolean committed;
 
-    protected CmdZoom(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
+    protected AbstractEventZoom(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
             final boolean committed) {
         super(ctrl);
         this.oldZoom = oldZoom;
@@ -22,7 +22,7 @@ public abstract class CmdZoom extends AbstractCommand {
         this.committed = committed;
     }
 
-    protected CmdZoom(final AbstractViewController ctrl) {
+    protected AbstractEventZoom(final AbstractViewController ctrl) {
         super(ctrl);
         this.oldZoom = 0;
         this.newZoom = ctrl.getBase().getZoomModel().getZoom();
@@ -33,11 +33,21 @@ public abstract class CmdZoom extends AbstractCommand {
         this.committed = true;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.AbstractEvent#process()
+     */
     @Override
-    public ViewState execute() {
-        return execute(new ViewState(ctrl, newZoom));
+    public ViewState process() {
+        return process(new ViewState(ctrl, newZoom));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.AbstractEvent#calculatePageVisibility(org.ebookdroid.core.ViewState)
+     */
     @Override
     protected ViewState calculatePageVisibility(final ViewState initial) {
         final int viewIndex = model.getCurrentViewPageIndex();
