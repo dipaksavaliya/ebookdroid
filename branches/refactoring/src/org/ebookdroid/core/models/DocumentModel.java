@@ -249,8 +249,8 @@ public class DocumentModel extends ListenerProxy {
             infos[i] = getDecodeService().getPageInfo(i);
         }
 
-        if (CACHE_ENABLED ) {
-            if (!decodeService.isPageSizeCacheable()) {
+        if (CACHE_ENABLED) {
+            if (decodeService.isPageSizeCacheable()) {
                 pagesFile.save(infos);
             }
         }
