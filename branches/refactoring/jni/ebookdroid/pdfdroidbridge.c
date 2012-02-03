@@ -24,7 +24,7 @@ typedef struct renderdocument_s renderdocument_t;
 struct renderdocument_s
 {
     fz_context *ctx;
-    pdf_xref *xref;
+    pdf_document *xref;
     fz_outline *outline;
 };
 
@@ -56,11 +56,11 @@ static void pdf_free_document(renderdocument_t* doc)
     if (doc)
     {
         if (doc->outline)
-            fz_free_outline(doc->outline);
+            fz_free_outline(doc->ctx,doc->outline);
         doc->outline = NULL;
 
         if (doc->xref)
-            pdf_free_xref(doc->xref);
+            pdf_close_document(doc->xref);
         doc->xref = NULL;
         
         fz_flush_warnings(doc->ctx);
@@ -114,7 +114,7 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_open(JNIEnv *env, jclass clazz,
      */
     fz_try(doc->ctx)
     {
-	doc->xref = pdf_open_xref(doc->ctx, filename);
+	doc->xref = pdf_open_document(doc->ctx, filename);
     }
     fz_catch(doc->ctx)
     {
@@ -293,7 +293,7 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_getPageLinks(JNIEnv *env, jclas
         for (link = page->links; link; link = link->next)
         {
 
-            jclass pagelinkClass = (*env)->FindClass(env, "org/ebookdroid/core/codec/PageLink");
+            jclass pagelinkClass = (*env)->FindClass(env, "org/ebookdroid/core/PageLink");
             if (!pagelinkClass)
                 return arrayList;
 
@@ -607,7 +607,7 @@ Java_org_ebookdroid_droids_pdf_codec_PdfOutline_free(JNIEnv *env, jclass clazz, 
     if (doc)
     {
         if (doc->outline)
-            fz_free_outline(doc->outline);
+            fz_free_outline(doc->ctx, doc->outline);
         doc->outline = NULL;
     }
 }
