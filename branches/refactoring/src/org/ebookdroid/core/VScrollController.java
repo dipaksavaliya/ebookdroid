@@ -2,6 +2,7 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.views.DragMark;
@@ -18,7 +19,7 @@ public class VScrollController extends AbstractViewController {
     protected static Bitmap dragBitmap;
 
     public VScrollController(final IActivityController base) {
-        super(base);
+        super(base, DocumentViewMode.VERTICALL_SCROLL);
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
         }
@@ -66,8 +67,7 @@ public class VScrollController extends AbstractViewController {
         final int viewY = Math.round(viewState.viewRect.centerY());
 
         if (viewState.firstVisible != -1) {
-            for (final Page page : getBase().getDocumentModel().getPages(viewState.firstVisible,
-                    viewState.lastVisible + 1)) {
+            for (final Page page : viewState.model.getPages(viewState.firstVisible, viewState.lastVisible + 1)) {
                 final RectF bounds = viewState.getBounds(page);
                 final int pageY = Math.round(bounds.centerY());
                 final long dist = Math.abs(pageY - viewY);

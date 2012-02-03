@@ -57,7 +57,7 @@ public interface IViewController extends ZoomListener {
 
     boolean onTouchEvent(MotionEvent ev);
 
-    void onScrollChanged(final int direction);
+    void onScrollChanged(int dX, final int dY);
 
     boolean dispatchKeyEvent(final KeyEvent event);
 

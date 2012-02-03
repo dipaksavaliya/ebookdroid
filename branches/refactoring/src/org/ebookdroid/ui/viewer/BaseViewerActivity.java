@@ -859,7 +859,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         }
 
         @Override
-        public void onScrollChanged(final int direction) {
+        public void onScrollChanged(int dX, int dY) {
         }
 
         @Override
@@ -886,8 +886,6 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
 
         @Override
         public void drawView(EventDraw eventDraw) {
-            // TODO Auto-generated method stub
-            
         }
     }
 }

@@ -2,6 +2,7 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.curl.PageAnimationType;
 import org.ebookdroid.core.curl.PageAnimator;
@@ -37,7 +38,7 @@ public class SinglePageController extends AbstractViewController {
      *            the base activity
      */
     public SinglePageController(final IActivityController baseActivity) {
-        super(baseActivity);
+        super(baseActivity, DocumentViewMode.SINGLE_PAGE);
         updateAnimationType();
     }
 
@@ -87,13 +88,13 @@ public class SinglePageController extends AbstractViewController {
      * @see org.ebookdroid.ui.viewer.IViewController#onScrollChanged(int, int)
      */
     @Override
-    public void onScrollChanged(final int direction) {
+    public void onScrollChanged(final int dX, final int dY) {
         // bounds could be not updated
         if (inZoom.get()) {
             return;
         }
 
-        AbstractEventScroll cmd = direction > 0 ? new EventScrollDown(this)  :new EventScrollUp(this);
+        AbstractEventScroll cmd = dX > 0 ? new EventScrollDown(this) : new EventScrollUp(this);
         final ViewState viewState = cmd.process();
         DocumentModel dm = base.getDocumentModel();
         if (dm != null) {
@@ -179,7 +180,8 @@ public class SinglePageController extends AbstractViewController {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason, org.ebookdroid.core.Page)
+     * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason,
+     *      org.ebookdroid.core.Page)
      */
     @Override
     public final void invalidatePageSizes(final InvalidateSizeReason reason, final Page changedPage) {

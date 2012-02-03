@@ -159,10 +159,10 @@ public final class BaseView extends View implements IView {
      * @see android.view.View#onScrollChanged(int, int, int, int)
      */
     @Override
-    protected final void onScrollChanged(final int l, final int t, final int oldl, final int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
+    protected final void onScrollChanged(final int curX, final int curY, final int oldX, final int oldY) {
+        super.onScrollChanged(curX, curY, oldX, oldY);
 
-        base.getDocumentController().onScrollChanged(t - oldt);
+        base.getDocumentController().onScrollChanged(curX - oldX, curY - oldY);
     }
 
     /**

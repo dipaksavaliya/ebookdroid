@@ -2,6 +2,7 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.views.DragMark;
@@ -18,7 +19,7 @@ public class HScrollController extends AbstractViewController {
     protected static Bitmap dragBitmap;
 
     public HScrollController(final IActivityController base) {
-        super(base);
+        super(base, DocumentViewMode.HORIZONTAL_SCROLL);
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
         }

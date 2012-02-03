@@ -6,6 +6,7 @@ import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.touch.DefaultGestureDetector;
@@ -52,6 +53,8 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     protected final IView view;
 
+    protected final DocumentViewMode mode;
+
     protected boolean isInitialized = false;
 
     protected boolean isShown = false;
@@ -68,11 +71,12 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     private List<IGestureDetector> detectors;
 
-    public AbstractViewController(final IActivityController baseActivity) {
+    public AbstractViewController(final IActivityController baseActivity, final DocumentViewMode mode) {
         super(baseActivity.getActivity(), baseActivity.getActionController(), baseActivity.getView());
 
         this.base = baseActivity;
         this.view = base.getView();
+        this.mode = mode;
 
         this.firstVisiblePage = -1;
         this.lastVisiblePage = -1;
@@ -202,12 +206,15 @@ public abstract class AbstractViewController extends AbstractComponentController
      * @see org.ebookdroid.ui.viewer.IViewController#onScrollChanged(int, int)
      */
     @Override
-    public void onScrollChanged(final int direction) {
+    public void onScrollChanged(final int dX, final int dY) {
         if (inZoom.get()) {
             return;
         }
 
-        final AbstractEventScroll cmd = direction > 0 ? new EventScrollDown(AbstractViewController.this) : new EventScrollUp(this);
+        final int d = mode == DocumentViewMode.VERTICALL_SCROLL ? dY : dX;
+
+        final AbstractEventScroll cmd = d > 0 ? new EventScrollDown(this) : new EventScrollUp(this);
+
         final Runnable r = new Runnable() {
 
             @Override
@@ -227,11 +234,12 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.ebookdroid.ui.viewer.IViewController#updatePageSize(org.ebookdroid.core.models.DocumentModel, org.ebookdroid.core.Page, android.graphics.Rect)
+     * 
+     * @see org.ebookdroid.ui.viewer.IViewController#updatePageSize(org.ebookdroid.core.models.DocumentModel,
+     *      org.ebookdroid.core.Page, android.graphics.Rect)
      */
     @Override
-    public ViewState updatePageSize(DocumentModel model, Page page, Rect bitmapBounds) {
+    public ViewState updatePageSize(final DocumentModel model, final Page page, final Rect bitmapBounds) {
         this.pageUpdated(page.index.viewIndex);
 
         final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
@@ -245,7 +253,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         return viewState;
     }
 
-    protected void pageUpdated(int viewIndex) {
+    protected void pageUpdated(final int viewIndex) {
     }
 
     /**
@@ -260,8 +268,8 @@ public abstract class AbstractViewController extends AbstractComponentController
         }
 
         inZoom.set(!committed);
-        final AbstractEventZoom cmd = newZoom > oldZoom ? new EventZoomIn(this, oldZoom, newZoom, committed) : new EventZoomOut(this,
-                oldZoom, newZoom, committed);
+        final AbstractEventZoom cmd = newZoom > oldZoom ? new EventZoomIn(this, oldZoom, newZoom, committed)
+                : new EventZoomOut(this, oldZoom, newZoom, committed);
 
         if (!committed) {
             view.invalidateScroll(newZoom, oldZoom);
