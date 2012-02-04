@@ -5,7 +5,6 @@ import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.events.ZoomListener;
-import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
 
 import android.graphics.Rect;
@@ -60,8 +59,6 @@ public interface IViewController extends ZoomListener {
     void onScrollChanged(int dX, final int dY);
 
     boolean dispatchKeyEvent(final KeyEvent event);
-
-    ViewState updatePageSize(DocumentModel model, Page page, Rect bitmapBounds);
 
     void toggleNightMode(boolean nightMode);
 

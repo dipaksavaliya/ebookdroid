@@ -880,11 +880,6 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         }
 
         @Override
-        public ViewState updatePageSize(DocumentModel model, Page page, Rect bitmapBounds) {
-            return new ViewState(this);
-        }
-
-        @Override
         public void drawView(EventDraw eventDraw) {
         }
     }

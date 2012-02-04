@@ -167,7 +167,7 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     protected abstract void goToPageImpl(final int toPage);
 
-    protected void updatePosition(final DocumentModel dm, final Page page, final ViewState viewState) {
+    protected final void updatePosition(final DocumentModel dm, final Page page, final ViewState viewState) {
         final int left = view.getScrollX();
         final int top = view.getScrollY();
 
@@ -232,27 +232,6 @@ public abstract class AbstractViewController extends AbstractComponentController
         base.getActivity().runOnUiThread(r);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.ui.viewer.IViewController#updatePageSize(org.ebookdroid.core.models.DocumentModel,
-     *      org.ebookdroid.core.Page, android.graphics.Rect)
-     */
-    @Override
-    public ViewState updatePageSize(final DocumentModel model, final Page page, final Rect bitmapBounds) {
-        this.pageUpdated(page.index.viewIndex);
-
-        final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
-
-        ViewState viewState = new ViewState(this);
-        if (changed) {
-            this.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-            viewState = new EventScrollTo(this, model.getCurrentViewPageIndex()).process();
-        }
-
-        return viewState;
-    }
-
     protected void pageUpdated(final int viewIndex) {
     }
 
@@ -262,7 +241,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      * @see org.ebookdroid.core.events.ZoomListener#zoomChanged(float, float, boolean)
      */
     @Override
-    public void zoomChanged(final float oldZoom, final float newZoom, final boolean committed) {
+    public final void zoomChanged(final float oldZoom, final float newZoom, final boolean committed) {
         if (!isShown) {
             return;
         }
