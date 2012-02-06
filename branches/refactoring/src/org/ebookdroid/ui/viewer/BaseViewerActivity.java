@@ -102,6 +102,8 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
 
     private static final String E_MAIL_ATTACHMENT = "[E-mail Attachment]";
 
+    private static boolean USE_SURFACE = true;
+
     private static final int DIALOG_GOTO = 0;
 
     public static final DisplayMetrics DM = new DisplayMetrics();
@@ -149,7 +151,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         getWindowManager().getDefaultDisplay().getMetrics(DM);
 
         frameLayout = createMainContainer();
-        view = new BaseView(this);
+        view = createView();
 
         actions.createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
         actions.createAction(R.id.mainmenu_zoom).putValue("view", getZoomControls());
@@ -192,6 +194,10 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         final AppSettings newSettings = SettingsManager.getAppSettings();
         final AppSettings.Diff diff = new AppSettings.Diff(oldSettings, newSettings);
         this.onAppSettingsChanged(oldSettings, newSettings, diff);
+    }
+
+    protected IView createView() {
+        return USE_SURFACE ? new SurfaceView(this) : new BaseView(this);
     }
 
     private void initView() {
