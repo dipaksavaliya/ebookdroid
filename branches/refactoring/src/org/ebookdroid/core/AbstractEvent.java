@@ -99,7 +99,7 @@ public abstract class AbstractEvent implements IEvent {
         int firstVisiblePage = -1;
         int lastVisiblePage = -1;
         for (final Page page : model.getPages()) {
-            if (ctrl.isPageVisibleImpl(page, initial)) {
+            if (ctrl.isPageVisible(page, initial)) {
                 if (firstVisiblePage == -1) {
                     firstVisiblePage = page.index.viewIndex;
                 }

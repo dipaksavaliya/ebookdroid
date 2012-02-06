@@ -338,7 +338,7 @@ public final class BaseView extends View implements IView {
 
     @Override
     public RectF getAdjustedPageBounds(ViewState viewState, RectF bounds) {
-        return bounds;
+        return new RectF(bounds);
     }
 
     @Override

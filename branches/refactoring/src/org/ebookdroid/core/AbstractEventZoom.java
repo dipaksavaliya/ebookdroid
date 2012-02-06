@@ -52,14 +52,14 @@ public abstract class AbstractEventZoom extends AbstractEvent {
 
         while (firstVisiblePage > 0) {
             final int index = firstVisiblePage - 1;
-            if (!ctrl.isPageVisibleImpl(pages[index], initial)) {
+            if (!ctrl.isPageVisible(pages[index], initial)) {
                 break;
             }
             firstVisiblePage = index;
         }
         while (lastVisiblePage < pages.length - 1) {
             final int index = lastVisiblePage + 1;
-            if (!ctrl.isPageVisibleImpl(pages[index], initial)) {
+            if (!ctrl.isPageVisible(pages[index], initial)) {
                 break;
             }
             lastVisiblePage = index;

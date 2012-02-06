@@ -2,6 +2,7 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
+import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 
 import android.graphics.Canvas;
@@ -11,6 +12,8 @@ import android.graphics.RectF;
 import android.text.TextPaint;
 
 public class EventDraw implements IEvent {
+
+    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw");
 
     public final ViewState viewState;
     public final PageTreeLevel level;
@@ -46,6 +49,10 @@ public class EventDraw implements IEvent {
         nodesBounds = viewState.getBounds(page);
         pageBounds = viewState.view.getAdjustedPageBounds(viewState, nodesBounds);
 
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("process(" + page.index + "): view=" + viewState.viewRect +", nodes=" + nodesBounds + ", page=" + pageBounds);
+        }
+
         if (!page.nodes.nodes[0].holder.hasBitmaps()) {
             canvas.drawRect(pageBounds, paint.fillPaint);
 
@@ -71,8 +78,13 @@ public class EventDraw implements IEvent {
 
     @Override
     public boolean process(PageTreeNode node) {
-        final RectF tr = node.getTargetRect(viewState, viewState.viewRect, pageBounds);
-        if (!viewState.isNodeVisible(node, pageBounds)) {
+        final RectF tr = node.getTargetRect(viewState, viewState.viewRect, nodesBounds);
+        
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("process(" + node.fullId + "): view=" + viewState.viewRect +", nodes=" + nodesBounds + ", tr=" + tr);
+        }
+
+        if (!viewState.isNodeVisible(node, nodesBounds)) {
             return false;
         }
 

@@ -19,7 +19,7 @@ public class EventScrollUp extends AbstractEventScroll {
         if (lastVisiblePage != -1) {
             final Page[] pages = model.getPages();
             for (int i = lastVisiblePage; i >= 0; i--) {
-                if (!ctrl.isPageVisibleImpl(pages[i], initial)) {
+                if (!ctrl.isPageVisible(pages[i], initial)) {
                     continue;
                 } else {
                     lastVisiblePage = i;
@@ -29,7 +29,7 @@ public class EventScrollUp extends AbstractEventScroll {
             firstVisiblePage = lastVisiblePage;
             while (firstVisiblePage > 0) {
                 final int index = firstVisiblePage - 1;
-                if (!ctrl.isPageVisibleImpl(pages[index], initial)) {
+                if (!ctrl.isPageVisible(pages[index], initial)) {
                     break;
                 }
                 firstVisiblePage = index;

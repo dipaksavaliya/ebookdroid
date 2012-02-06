@@ -201,11 +201,11 @@ public class VScrollController extends AbstractViewController {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.AbstractViewController#isPageVisibleImpl(org.ebookdroid.core.Page,
+     * @see org.ebookdroid.core.AbstractViewController#isPageVisible(org.ebookdroid.core.Page,
      *      org.ebookdroid.core.ViewState)
      */
     @Override
-    protected final boolean isPageVisibleImpl(final Page page, final ViewState viewState) {
+    public final boolean isPageVisible(final Page page, final ViewState viewState) {
         return RectF.intersects(viewState.viewRect, viewState.getBounds(page));
     }
 

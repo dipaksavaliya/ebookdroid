@@ -215,6 +215,10 @@ public abstract class AbstractViewController extends AbstractComponentController
 
         final AbstractEventScroll cmd = d > 0 ? new EventScrollDown(this) : new EventScrollUp(this);
 
+        // if (LCTX.isDebugEnabled()) {
+        // LCTX.d("onScrollChanged(" + dX + ", " + dY + "): " + cmd);
+        // }
+
         final Runnable r = new Runnable() {
 
             @Override
@@ -422,8 +426,6 @@ public abstract class AbstractViewController extends AbstractComponentController
     protected final boolean isShown() {
         return isShown;
     }
-
-    protected abstract boolean isPageVisibleImpl(final Page page, final ViewState viewState);
 
     /**
      * {@inheritDoc}

@@ -228,10 +228,10 @@ public class SinglePageController extends AbstractViewController {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.AbstractViewController#isPageVisibleImpl(org.ebookdroid.core.Page, org.ebookdroid.core.ViewState)
+     * @see org.ebookdroid.core.AbstractViewController#isPageVisible(org.ebookdroid.core.Page, org.ebookdroid.core.ViewState)
      */
     @Override
-    protected final boolean isPageVisibleImpl(final Page page, final ViewState viewState) {
+    public final boolean isPageVisible(final Page page, final ViewState viewState) {
         return curler.isPageVisible(page, viewState);
     }
 

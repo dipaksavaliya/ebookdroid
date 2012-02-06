@@ -20,7 +20,7 @@ public class EventScrollDown extends AbstractEventScroll {
         if (firstVisiblePage != -1) {
             final Page[] pages = model.getPages();
             for (int i = firstVisiblePage; i < pages.length; i++) {
-                if (!ctrl.isPageVisibleImpl(pages[i], initial)) {
+                if (!ctrl.isPageVisible(pages[i], initial)) {
                     continue;
                 } else {
                     firstVisiblePage = i;
@@ -30,7 +30,7 @@ public class EventScrollDown extends AbstractEventScroll {
             lastVisiblePage = firstVisiblePage;
             while (lastVisiblePage < pages.length - 1) {
                 final int index = lastVisiblePage + 1;
-                if (!ctrl.isPageVisibleImpl(pages[index], initial)) {
+                if (!ctrl.isPageVisible(pages[index], initial)) {
                     break;
                 }
                 lastVisiblePage = index;

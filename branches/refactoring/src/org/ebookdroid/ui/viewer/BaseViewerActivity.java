@@ -888,5 +888,11 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         @Override
         public void drawView(EventDraw eventDraw) {
         }
+
+        @Override
+        public boolean isPageVisible(Page page, ViewState viewState) {
+            // TODO Auto-generated method stub
+            return false;
+        }
     }
 }
