@@ -45,9 +45,11 @@ public class EventChildLoaded extends EventScrollTo {
         final RectF bounds = viewState.getBounds(page);
 
         final PageTreeNode parent = child.parent;
-        if (parent != null && viewState.zoom > 1.5) {
+        if (parent != null) {
             recycleParent(parent, bounds);
         }
+
+        recycleChildren();
 
         if (viewState.isNodeVisible(child, bounds)) {
             ctrl.redrawView(viewState);
@@ -64,13 +66,26 @@ public class EventChildLoaded extends EventScrollTo {
 
         if (!viewState.isNodeVisible(parent, bounds) || hiddenByChildren) {
             final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-            nodes.recycleParents(child, bitmapsToRecycle);
+            final boolean res = nodes.recycleParents(child, bitmapsToRecycle);
             BitmapManager.release(bitmapsToRecycle);
 
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("Recycle parent nodes for: " + child.fullId + " " + bitmapsToRecycle.size());
+            if (res) {
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d("Recycle parent nodes for: " + child.fullId + " " + bitmapsToRecycle.size());
+                }
             }
         }
     }
 
+    protected void recycleChildren() {
+        final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
+        final boolean res = nodes.recycleChildren(child, bitmapsToRecycle);
+        BitmapManager.release(bitmapsToRecycle);
+
+        if (res) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Recycle children nodes for: " + child.fullId + " " + bitmapsToRecycle.size());
+            }
+        }
+    }
 }

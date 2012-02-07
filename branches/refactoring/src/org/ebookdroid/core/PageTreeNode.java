@@ -163,7 +163,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         }
     }
 
-    public RectF getTargetRect(final ViewState viewState, final RectF viewRect, final RectF pageBounds) {
+    public RectF getTargetRect(final ViewState viewState, final RectF pageBounds) {
         final Matrix matrix = new Matrix();
 
         matrix.postScale(pageBounds.width() * page.getTargetRectScale(), pageBounds.height());
@@ -237,10 +237,12 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
         Bitmaps day;
 
-        public synchronized void drawBitmap(final Canvas canvas, final PagePaint paint, final PointF viewBase, final RectF tr) {
+        public synchronized boolean drawBitmap(final Canvas canvas, final PagePaint paint, final PointF viewBase, final RectF tr, final RectF clipRect) {
             if (day != null) {
-                day.draw(canvas, paint, viewBase, tr);
+                day.draw(canvas, paint, viewBase, tr, clipRect);
+                return true;
             }
+            return false;
         }
 
         public synchronized Bitmaps reuse(String nodeId, BitmapRef bitmap, Rect bitmapBounds) {

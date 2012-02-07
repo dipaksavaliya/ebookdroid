@@ -194,7 +194,11 @@ public class ViewState {
     }
 
     public final boolean isNodeVisible(final PageTreeNode node, final RectF pageBounds) {
-        final RectF tr = node.getTargetRect(this, this.viewRect, pageBounds);
+        final RectF tr = node.getTargetRect(this, pageBounds);
+        return isNodeVisible(tr);
+    }
+
+    public final boolean isNodeVisible(final RectF tr) {
         return RectF.intersects(viewRect, tr);
     }
 

@@ -155,10 +155,10 @@ public class Bitmaps {
         }
     }
 
-    public synchronized void draw(final Canvas canvas, final PagePaint paint, final PointF vb, final RectF tr) {
+    public synchronized void draw(final Canvas canvas, final PagePaint paint, final PointF vb, final RectF tr, final RectF cr) {
         if (this.bitmaps != null) {
             final Rect orig = canvas.getClipBounds();
-            canvas.clipRect(tr.left - vb.x, tr.top - vb.y, tr.right - vb.x, tr.bottom - vb.y, Op.INTERSECT);
+            canvas.clipRect(cr.left - vb.x, cr.top - vb.y, cr.right - vb.x, cr.bottom - vb.y, Op.REPLACE);
 
             final float scaleX = tr.width() / bounds.width();
             final float scaleY = tr.height() / bounds.height();

@@ -16,9 +16,6 @@ public class EventZoomOut extends AbstractEventZoom {
      */
     @Override
     public boolean process(final PageTree nodes) {
-        if (newLevel.next != null) {
-            nodes.recycleNodes(newLevel.next, bitmapsToRecycle);
-        }
         return process(nodes, newLevel);
     }
 

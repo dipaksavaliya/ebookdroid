@@ -102,7 +102,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
 
     private static final String E_MAIL_ATTACHMENT = "[E-mail Attachment]";
 
-    private static boolean USE_SURFACE = true;
+    private static boolean USE_SURFACE = !true;
 
     private static final int DIALOG_GOTO = 0;
 

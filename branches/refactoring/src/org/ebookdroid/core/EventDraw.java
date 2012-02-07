@@ -14,7 +14,7 @@ import android.text.TextPaint;
 
 public class EventDraw implements IEvent {
 
-    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", false);
+    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", true);
 
     public final ViewState viewState;
     public final PageTreeLevel level;
@@ -55,12 +55,9 @@ public class EventDraw implements IEvent {
             LCTX.d("process(" + page.index + "): view=" + viewState.viewRect + ", page=" + pageBounds);
         }
 
-        if (!page.nodes.nodes[0].holder.hasBitmaps()) {
-            drawPageBackground(page);
-        }
+        drawPageBackground(page);
 
-        process(page.nodes);
-        return true;
+        return process(page.nodes);
     }
 
     @Override
@@ -70,43 +67,56 @@ public class EventDraw implements IEvent {
 
     @Override
     public boolean process(final PageTree nodes, final PageTreeLevel level) {
-        return process(nodes.nodes[0]);
+        boolean res = false;
+        for (int nodeIndex = level.start; nodeIndex < level.end; nodeIndex++) {
+            final PageTreeNode node = nodes.nodes[nodeIndex];
+            if (node != null) {
+                res |= process(node);
+            }
+        }
+        return res;
     }
 
     @Override
     public boolean process(final PageTreeNode node) {
-        final RectF tr = node.getTargetRect(viewState, viewState.viewRect, pageBounds);
-
+        final RectF nodeRect = node.getTargetRect(viewState, pageBounds);
         if (LCTX.isDebugEnabled()) {
-            LCTX.d("process(" + node.fullId + "): view=" + viewState.viewRect + ", page=" + pageBounds + ", tr=" + tr);
+            LCTX.d("process(" + node.fullId + "): view=" + viewState.viewRect + ", page=" + pageBounds + ", node="
+                    + nodeRect);
         }
 
-        if (!viewState.isNodeVisible(node, pageBounds)) {
+        if (!viewState.isNodeVisible(nodeRect)) {
             return false;
         }
 
-        if (!node.page.nodes.allChildrenHasBitmap(viewState, node, paint)) {
-            node.holder.drawBitmap(canvas, paint, viewBase, tr);
-
-            drawBrightnessFilter(canvas, tr);
-            return true;
-        }
-
-        return drawChildren(viewState, node);
-    }
-
-    protected boolean drawChildren(final ViewState viewState, final PageTreeNode parent) {
-        boolean res = false;
-        final PageTree nodes = parent.page.nodes;
-
-        int childId = PageTree.getFirstChildId(parent.id);
-        for (final int end = Math.min(nodes.nodes.length, childId + PageTree.splitMasks.length); childId < end; childId++) {
-            final PageTreeNode child = nodes.nodes[childId];
-            if (child != null) {
-                res |= process(child);
+        try {
+            if (node.holder.drawBitmap(canvas, paint, viewBase, nodeRect, nodeRect)) {
+                return true;
             }
+
+            if (node.parent != null) {
+                final RectF parentRect = node.parent.getTargetRect(viewState, pageBounds);
+                if (node.parent.holder.drawBitmap(canvas, paint, viewBase, parentRect, nodeRect)) {
+                    return true;
+                }
+            }
+
+            final PageTree nodes = node.page.nodes;
+
+            boolean res = true;
+            int childId = PageTree.getFirstChildId(node.id);
+            for (final int end = Math.min(nodes.nodes.length, childId + PageTree.splitMasks.length); childId < end; childId++) {
+                final PageTreeNode child = nodes.nodes[childId];
+                if (child != null) {
+                    final RectF childRect = child.getTargetRect(viewState, pageBounds);
+                    res &= child.holder.drawBitmap(canvas, paint, viewBase, childRect, nodeRect);
+                }
+            }
+
+            return res;
+        } finally {
+            drawBrightnessFilter(canvas, nodeRect);
         }
-        return res;
     }
 
     protected void drawPageBackground(final Page page) {
