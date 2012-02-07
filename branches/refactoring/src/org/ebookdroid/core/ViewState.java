@@ -31,7 +31,6 @@ public class ViewState {
     public final int firstCached;
     public final int lastCached;
 
-    public final RectF realRect;
     public final RectF viewRect;
 
     public final float zoom;
@@ -60,7 +59,6 @@ public class ViewState {
         this.firstVisible = dc.getFirstVisiblePage();
         this.lastVisible = dc.getLastVisiblePage();
 
-        this.realRect = new RectF(0, 0, view.getWidth(), view.getHeight());
         this.viewRect = new RectF(view.getViewRect());
         this.zoom = zoom;
 
@@ -94,7 +92,6 @@ public class ViewState {
         this.firstVisible = dc.getFirstVisiblePage();
         this.lastVisible = dc.getLastVisiblePage();
 
-        this.realRect = oldState.realRect;
         this.viewRect = oldState.viewRect;
         this.zoom = oldState.zoom;
 
@@ -123,7 +120,6 @@ public class ViewState {
         this.firstVisible = firstVisiblePage;
         this.lastVisible = lastVisiblePage;
 
-        this.realRect = oldState.realRect;
         this.viewRect = oldState.viewRect;
         this.zoom = oldState.zoom;
 
@@ -158,7 +154,6 @@ public class ViewState {
         this.firstVisible = oldState.firstVisible;
         this.lastVisible = oldState.lastVisible;
 
-        this.realRect = oldState.realRect;
         this.viewRect = oldState.viewRect;
         this.zoom = oldState.zoom;
 
@@ -200,7 +195,7 @@ public class ViewState {
 
     public final boolean isNodeVisible(final PageTreeNode node, final RectF pageBounds) {
         final RectF tr = node.getTargetRect(this, this.viewRect, pageBounds);
-        return view.intersects(viewRect, realRect, tr);
+        return RectF.intersects(viewRect, tr);
     }
 
     @Override

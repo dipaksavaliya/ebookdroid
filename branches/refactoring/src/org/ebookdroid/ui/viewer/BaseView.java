@@ -4,12 +4,13 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.DrawThread;
+import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.models.DocumentModel;
 
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
@@ -23,6 +24,8 @@ import org.emdev.utils.MathUtils;
 import org.emdev.utils.concurrent.Flag;
 
 public final class BaseView extends View implements IView {
+
+    private static final PointF BASE_POINT = new PointF(0, 0);
 
     protected final IActivityController base;
 
@@ -336,14 +339,13 @@ public final class BaseView extends View implements IView {
         drawThread.performDrawing(canvas, task);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.ui.viewer.IView#getBase(android.graphics.RectF)
+     */
     @Override
-    public RectF getAdjustedPageBounds(ViewState viewState, RectF bounds) {
-        return new RectF(bounds);
+    public PointF getBase(final RectF viewRect) {
+        return BASE_POINT;
     }
-
-    @Override
-    public boolean intersects(RectF viewRect, RectF realRect, RectF bounds) {
-        return RectF.intersects(bounds, viewRect);
-    }
-
 }

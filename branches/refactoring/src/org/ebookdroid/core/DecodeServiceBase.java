@@ -204,8 +204,8 @@ public class DecodeServiceBase implements DecodeService {
     public Rect getScaledSize(final ViewState viewState, final float pageWidth, final float pageHeight,
             final RectF nodeBounds, final float pageTypeWidthScale, final float levelZoom) {
 
-        final float viewWidth = viewState.realRect.width();
-        final float viewHeight = viewState.realRect.height();
+        final float viewWidth = viewState.viewRect.width();
+        final float viewHeight = viewState.viewRect.height();
 
         final float nodeWidth = pageWidth * nodeBounds.width();
         final float nodeHeight = pageHeight * nodeBounds.height();
@@ -546,7 +546,7 @@ public class DecodeServiceBase implements DecodeService {
             if (obj instanceof DecodeTask) {
                 final DecodeTask that = (DecodeTask) obj;
                 return this.pageNumber == that.pageNumber && this.pageSliceBounds.equals(that.pageSliceBounds)
-                        && this.viewState.realRect.width() == that.viewState.realRect.width()
+                        && this.viewState.viewRect.width() == that.viewState.viewRect.width()
                         && this.viewState.zoom == that.viewState.zoom;
             }
             return false;
@@ -561,7 +561,7 @@ public class DecodeServiceBase implements DecodeService {
             buf.append(", ");
             buf.append("target").append("=").append(node);
             buf.append(", ");
-            buf.append("width").append("=").append((int) viewState.realRect.width());
+            buf.append("width").append("=").append((int) viewState.viewRect.width());
             buf.append(", ");
             buf.append("zoom").append("=").append(viewState.zoom);
             buf.append(", ");

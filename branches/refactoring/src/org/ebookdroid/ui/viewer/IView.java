@@ -3,6 +3,7 @@ package org.ebookdroid.ui.viewer;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.core.ViewState;
 
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
@@ -58,7 +59,5 @@ public interface IView {
 
     int getHeight();
 
-    RectF getAdjustedPageBounds(ViewState viewState, RectF bounds);
-    
-    boolean intersects(RectF viewRect, RectF realRect, RectF bounds);
+    PointF getBase(RectF viewRect);
 }

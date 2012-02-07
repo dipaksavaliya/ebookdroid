@@ -8,12 +8,13 @@ import org.ebookdroid.common.settings.SettingsManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.text.TextPaint;
 
 public class EventDraw implements IEvent {
 
-    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw");
+    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", false);
 
     public final ViewState viewState;
     public final PageTreeLevel level;
@@ -21,21 +22,23 @@ public class EventDraw implements IEvent {
 
     final PagePaint paint;
 
-    RectF nodesBounds;
     RectF pageBounds;
+    PointF viewBase;
 
-    public EventDraw(ViewState viewState, Canvas canvas) {
+    public EventDraw(final ViewState viewState, final Canvas canvas) {
         this.viewState = viewState;
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.canvas = canvas;
         this.paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+        this.viewBase = viewState.view.getBase(viewState.viewRect);
     }
 
-    public EventDraw(EventDraw event, Canvas canvas) {
+    public EventDraw(final EventDraw event, final Canvas canvas) {
         this.viewState = event.viewState;
         this.level = event.level;
         this.canvas = canvas;
         this.paint = event.paint;
+        this.viewBase = event.viewBase;
     }
 
     @Override
@@ -45,21 +48,15 @@ public class EventDraw implements IEvent {
     }
 
     @Override
-    public boolean process(Page page) {
-        nodesBounds = viewState.getBounds(page);
-        pageBounds = viewState.view.getAdjustedPageBounds(viewState, nodesBounds);
+    public boolean process(final Page page) {
+        pageBounds = viewState.getBounds(page);
 
         if (LCTX.isDebugEnabled()) {
-            LCTX.d("process(" + page.index + "): view=" + viewState.viewRect +", nodes=" + nodesBounds + ", page=" + pageBounds);
+            LCTX.d("process(" + page.index + "): view=" + viewState.viewRect + ", page=" + pageBounds);
         }
 
         if (!page.nodes.nodes[0].holder.hasBitmaps()) {
-            canvas.drawRect(pageBounds, paint.fillPaint);
-
-            final TextPaint textPaint = paint.textPaint;
-            textPaint.setTextSize(24 * viewState.zoom);
-            canvas.drawText(EBookDroidApp.context.getString(R.string.text_page) + " " + (page.index.viewIndex + 1),
-                    pageBounds.centerX(), pageBounds.centerY(), textPaint);
+            drawPageBackground(page);
         }
 
         process(page.nodes);
@@ -67,38 +64,38 @@ public class EventDraw implements IEvent {
     }
 
     @Override
-    public boolean process(PageTree nodes) {
+    public boolean process(final PageTree nodes) {
         return process(nodes, level);
     }
 
     @Override
-    public boolean process(PageTree nodes, PageTreeLevel level) {
+    public boolean process(final PageTree nodes, final PageTreeLevel level) {
         return process(nodes.nodes[0]);
     }
 
     @Override
-    public boolean process(PageTreeNode node) {
-        final RectF tr = node.getTargetRect(viewState, viewState.viewRect, nodesBounds);
-        
+    public boolean process(final PageTreeNode node) {
+        final RectF tr = node.getTargetRect(viewState, viewState.viewRect, pageBounds);
+
         if (LCTX.isDebugEnabled()) {
-            LCTX.d("process(" + node.fullId + "): view=" + viewState.viewRect +", nodes=" + nodesBounds + ", tr=" + tr);
+            LCTX.d("process(" + node.fullId + "): view=" + viewState.viewRect + ", page=" + pageBounds + ", tr=" + tr);
         }
 
-        if (!viewState.isNodeVisible(node, nodesBounds)) {
+        if (!viewState.isNodeVisible(node, pageBounds)) {
             return false;
         }
 
         if (!node.page.nodes.allChildrenHasBitmap(viewState, node, paint)) {
-            node.holder.drawBitmap(viewState, canvas, paint, tr);
+            node.holder.drawBitmap(canvas, paint, viewBase, tr);
 
             drawBrightnessFilter(canvas, tr);
             return true;
         }
 
-        return drawChildren(viewState, pageBounds, node);
+        return drawChildren(viewState, node);
     }
 
-    protected boolean drawChildren(final ViewState viewState, final RectF pageBounds, final PageTreeNode parent) {
+    protected boolean drawChildren(final ViewState viewState, final PageTreeNode parent) {
         boolean res = false;
         final PageTree nodes = parent.page.nodes;
 
@@ -110,6 +107,19 @@ public class EventDraw implements IEvent {
             }
         }
         return res;
+    }
+
+    protected void drawPageBackground(final Page page) {
+        final RectF rect = new RectF(pageBounds);
+        rect.offset(-viewBase.x, -viewBase.y);
+
+        canvas.drawRect(rect, paint.fillPaint);
+
+        final TextPaint textPaint = paint.textPaint;
+        textPaint.setTextSize(24 * viewState.zoom);
+
+        final String text = EBookDroidApp.context.getString(R.string.text_page) + " " + (page.index.viewIndex + 1);
+        canvas.drawText(text, rect.centerX(), rect.centerY(), textPaint);
     }
 
     protected void drawBrightnessFilter(final Canvas canvas, final RectF tr) {

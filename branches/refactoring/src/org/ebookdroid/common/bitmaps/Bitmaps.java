@@ -2,13 +2,13 @@ package org.ebookdroid.common.bitmaps;
 
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.core.PagePaint;
-import org.ebookdroid.core.ViewState;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region.Op;
@@ -155,10 +155,10 @@ public class Bitmaps {
         }
     }
 
-    public synchronized void draw(final ViewState viewState, final Canvas canvas, final PagePaint paint, final RectF tr) {
+    public synchronized void draw(final Canvas canvas, final PagePaint paint, final PointF vb, final RectF tr) {
         if (this.bitmaps != null) {
             final Rect orig = canvas.getClipBounds();
-            canvas.clipRect(tr, Op.INTERSECT);
+            canvas.clipRect(tr.left - vb.x, tr.top - vb.y, tr.right - vb.x, tr.bottom - vb.y, Op.INTERSECT);
 
             final float scaleX = tr.width() / bounds.width();
             final float scaleY = tr.height() / bounds.height();
@@ -170,7 +170,7 @@ public class Bitmaps {
                     final Matrix m = new Matrix();
                     m.postTranslate(left, top);
                     m.postScale(scaleX, scaleY);
-                    m.postTranslate(tr.left, tr.top);
+                    m.postTranslate(tr.left - vb.x, tr.top - vb.y);
 
                     final int index = row * columns + col;
                     if (this.bitmaps[index] != null && this.bitmaps[index].bitmap != null

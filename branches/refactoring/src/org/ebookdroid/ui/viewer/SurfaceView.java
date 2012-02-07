@@ -4,12 +4,13 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.DrawThread;
+import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.models.DocumentModel;
 
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
@@ -349,15 +350,13 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
         drawThread.performDrawing(canvas, task);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.ui.viewer.IView#getBase(android.graphics.RectF)
+     */
     @Override
-    public RectF getAdjustedPageBounds(ViewState viewState, RectF bounds) {
-        RectF r = new RectF(bounds);
-        r.offset(-viewState.viewRect.left, -viewState.viewRect.top);
-        return r;
-    }
-
-    @Override
-    public boolean intersects(RectF viewRect, RectF realRect, RectF bounds) {
-        return RectF.intersects(bounds, realRect);
+    public PointF getBase(final RectF viewRect) {
+        return new PointF(viewRect.left, viewRect.top);
     }
 }

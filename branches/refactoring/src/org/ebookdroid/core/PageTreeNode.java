@@ -13,6 +13,7 @@ import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -165,10 +166,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     public RectF getTargetRect(final ViewState viewState, final RectF viewRect, final RectF pageBounds) {
         final Matrix matrix = new Matrix();
 
-        final RectF bounds = viewState.view.getAdjustedPageBounds(viewState, pageBounds);
-
-        matrix.postScale(bounds.width() * page.getTargetRectScale(), bounds.height());
-        matrix.postTranslate(bounds.left - bounds.width() * page.type.getLeftPos(), bounds.top);
+        matrix.postScale(pageBounds.width() * page.getTargetRectScale(), pageBounds.height());
+        matrix.postTranslate(pageBounds.left - pageBounds.width() * page.type.getLeftPos(), pageBounds.top);
 
         final RectF targetRectF = new RectF();
         matrix.mapRect(targetRectF, pageSliceBounds);
@@ -238,11 +237,9 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
         Bitmaps day;
 
-        public synchronized void drawBitmap(final ViewState viewState, final Canvas canvas, final PagePaint paint,
-                final RectF tr) {
-
+        public synchronized void drawBitmap(final Canvas canvas, final PagePaint paint, final PointF viewBase, final RectF tr) {
             if (day != null) {
-                day.draw(viewState, canvas, paint, tr);
+                day.draw(canvas, paint, viewBase, tr);
             }
         }
 
