@@ -33,8 +33,6 @@ public class EventChildLoaded extends EventScrollTo {
      */
     @Override
     public ViewState process() {
-        ctrl.pageUpdated(this.viewIndex);
-
         final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
 
         if (changed) {
@@ -50,6 +48,8 @@ public class EventChildLoaded extends EventScrollTo {
         }
 
         recycleChildren();
+
+        ctrl.pageUpdated(viewState, page);
 
         if (viewState.isNodeVisible(child, bounds)) {
             ctrl.redrawView(viewState);

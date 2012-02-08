@@ -38,7 +38,6 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
     protected void onFirstDrawEvent(final Canvas canvas, final ViewState viewState) {
         lock.writeLock().lock();
         try {
-            resetClipEdge();
             updateValues();
         } finally {
             lock.writeLock().unlock();
@@ -74,12 +73,14 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         mA.y = 0;
     }
 
-    protected BitmapRef getBitmap(final Canvas canvas, final ViewState viewState, final BitmapRef ref) {
+    protected BitmapRef getBitmap(final ViewState viewState, final BitmapRef ref) {
         BitmapRef bitmap = ref;
-        if (ref == null || ref.isRecycled() || ref.width != canvas.getWidth() || ref.height != canvas.getHeight()) {
+        final float width = viewState.viewRect.width();
+        final float height = viewState.viewRect.height();
+
+        if (ref == null || ref.isRecycled() || ref.width != width || ref.height != height) {
             BitmapManager.release(ref);
-            bitmap = BitmapManager.getBitmap("Curler image", canvas.getWidth(), canvas.getHeight(),
-                    Bitmap.Config.RGB_565);
+            bitmap = BitmapManager.getBitmap("Curler image", (int) width, (int) height, Bitmap.Config.RGB_565);
         }
         final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
         bitmap.getBitmap().eraseColor(paint.backgroundFillPaint.getColor());
@@ -111,19 +112,19 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
 
     protected final void updateForeBitmap(EventDraw event, Page page) {
         if (foreBitmapIndex != foreIndex || foreBitmap == null) {
-            foreBitmap = getBitmap(event.canvas, event.viewState, foreBitmap);
+            foreBitmap = getBitmap(event.viewState, foreBitmap);
 
             new EventDraw(event, new Canvas(foreBitmap.getBitmap())).process(page);
-            foreBitmapIndex = page.index.viewIndex;
+            foreBitmapIndex = foreIndex;
         }
     }
 
     protected final void updateBackBitmap(EventDraw event, Page page) {
         if (backBitmapIndex != backIndex || backBitmap == null) {
-            backBitmap = getBitmap(event.canvas, event.viewState, backBitmap);
+            backBitmap = getBitmap(event.viewState, backBitmap);
 
             new EventDraw(event, new Canvas(backBitmap.getBitmap())).process(page);
-            backBitmapIndex = page.index.viewIndex;
+            backBitmapIndex = backIndex;
         }
     }
 }

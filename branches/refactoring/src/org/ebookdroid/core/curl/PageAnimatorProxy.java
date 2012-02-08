@@ -64,8 +64,9 @@ public class PageAnimatorProxy implements PageAnimator {
         return orig.get().isPageVisible(page, viewState);
     }
 
-    public void pageUpdated(int viewIndex) {
-        orig.get().pageUpdated(viewIndex);
+    @Override
+    public void pageUpdated(final ViewState viewState, final Page page) {
+        orig.get().pageUpdated(viewState, page);
     }
 
     @Override

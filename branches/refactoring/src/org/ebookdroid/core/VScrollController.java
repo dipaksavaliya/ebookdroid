@@ -208,23 +208,4 @@ public class VScrollController extends AbstractViewController {
     public final boolean isPageVisible(final Page page, final ViewState viewState) {
         return RectF.intersects(viewState.viewRect, viewState.getBounds(page));
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.ui.viewer.IViewController#updateAnimationType()
-     */
-    @Override
-    public final void updateAnimationType() {
-        // This mode do not use animation
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.ui.viewer.IViewController#pageUpdated(int)
-     */
-    @Override
-    public void pageUpdated(final int viewIndex) {
-    }
 }

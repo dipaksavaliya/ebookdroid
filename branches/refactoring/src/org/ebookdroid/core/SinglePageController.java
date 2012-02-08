@@ -22,7 +22,7 @@ import java.util.List;
 import org.emdev.ui.hwa.IHardwareAcceleration;
 
 /**
- * The Class SinglePageDocumentView.
+ * The Class SinglePageController.
  *
  * Used in single page view mode
  */
@@ -254,10 +254,10 @@ public class SinglePageController extends AbstractViewController {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.ui.viewer.IViewController#pageUpdated(int)
+     * @see org.ebookdroid.core.AbstractViewController#pageUpdated(org.ebookdroid.core.ViewState,  org.ebookdroid.core.Page)
      */
     @Override
-    public void pageUpdated(final int viewIndex) {
-        curler.pageUpdated(viewIndex);
+    public void pageUpdated(final ViewState viewState, final Page page) {
+        curler.pageUpdated(viewState, page);
     }
 }

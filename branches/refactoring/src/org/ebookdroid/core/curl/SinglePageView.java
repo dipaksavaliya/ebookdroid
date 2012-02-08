@@ -135,10 +135,10 @@ public class SinglePageView implements PageAnimator {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.curl.PageAnimator#pageUpdated(int)
+     * @see org.ebookdroid.core.curl.PageAnimator#pageUpdated(org.ebookdroid.core.ViewState, org.ebookdroid.core.Page)
      */
     @Override
-    public void pageUpdated(int viewIndex) {
+    public void pageUpdated(final ViewState viewState, final Page page) {
     }
 
     /**

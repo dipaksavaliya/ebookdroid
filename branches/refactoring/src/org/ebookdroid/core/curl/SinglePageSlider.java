@@ -47,8 +47,9 @@ public class SinglePageSlider extends AbstractPageSlider {
         if (page != null) {
             updateBackBitmap(event, page);
 
-            final Rect src = new Rect(0, 0, (int) mA.x, view.getHeight());
             final RectF viewRect = event.viewState.viewRect;
+
+            final Rect src = new Rect(0, 0, (int) mA.x, view.getHeight());
             final RectF dst = new RectF(viewRect.width() - mA.x, 0, viewRect.width(), viewRect.height());
 
             event.canvas.drawBitmap(backBitmap.getBitmap(), src, dst, PAINT);

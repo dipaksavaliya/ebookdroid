@@ -234,7 +234,16 @@ public abstract class AbstractViewController extends AbstractComponentController
         base.getActivity().runOnUiThread(r);
     }
 
-    protected void pageUpdated(final int viewIndex) {
+    protected void pageUpdated(final ViewState viewState, final Page page) {
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.ui.viewer.IViewController#updateAnimationType()
+     */
+    @Override
+    public void updateAnimationType() {
     }
 
     /**

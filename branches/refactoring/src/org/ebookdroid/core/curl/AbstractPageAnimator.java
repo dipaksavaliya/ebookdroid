@@ -399,11 +399,11 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
      * @see org.ebookdroid.core.curl.SinglePageView#pageUpdated(int)
      */
     @Override
-    public void pageUpdated(int viewIndex) {
-        if (foreBitmapIndex == viewIndex) {
+    public void pageUpdated(final ViewState viewState, final Page page) {
+        if (foreBitmapIndex == page.index.viewIndex) {
             foreBitmapIndex = -1;
         }
-        if (backBitmapIndex == viewIndex) {
+        if (backBitmapIndex == page.index.viewIndex) {
             backBitmapIndex = -1;
         }
     }
