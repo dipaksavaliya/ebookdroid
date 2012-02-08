@@ -9,20 +9,6 @@ public class EventZoomIn extends AbstractEventZoom {
         super(ctrl, oldZoom, newZoom, committed);
     }
 
-    public EventZoomIn(final AbstractViewController ctrl) {
-        super(ctrl);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree)
-     */
-    @Override
-    public boolean process(final PageTree nodes) {
-        return process(nodes, newLevel);
-    }
-
     /**
      * {@inheritDoc}
      *

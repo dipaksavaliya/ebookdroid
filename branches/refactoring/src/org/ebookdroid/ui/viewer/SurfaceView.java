@@ -7,7 +7,6 @@ import org.ebookdroid.core.DrawThread;
 import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.models.DocumentModel;
 
 import android.graphics.Canvas;
 import android.graphics.PointF;
@@ -105,8 +104,16 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
         stopScroller();
 
         final float ratio = newZoom / oldZoom;
-        scrollTo((int) ((getScrollX() + getWidth() / 2) * ratio - getWidth() / 2),
-                (int) ((getScrollY() + getHeight() / 2) * ratio - getHeight() / 2));
+        final float halfWidth = getWidth() / 2.0f;
+        final float halfHeight = getHeight() / 2.0f;
+
+        final int x = (int) ((getScrollX() + halfWidth) * ratio - halfWidth);
+        final int y = (int) ((getScrollY() + halfHeight) * ratio - halfHeight);
+
+        // if (LCTX.isDebugEnabled()) {
+        // LCTX.d("invalidateScroll(" + newZoom + ", " + oldZoom + "): " + x + ", " + y);
+        // }
+        scrollTo(x, y);
     }
 
     /**
@@ -190,12 +197,13 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
             @Override
             public void run() {
                 final IViewController dc = base.getDocumentController();
-                final DocumentModel dm = base.getDocumentModel();
-                if (dc != null && dm != null) {
-                    final Rect l = dc.getScrollLimits();
-                    SurfaceView.super.scrollTo(MathUtils.adjust(x, l.left, l.right),
-                            MathUtils.adjust(y, l.top, l.bottom));
-                }
+                final Rect l = dc.getScrollLimits();
+                final int xx = MathUtils.adjust(x, l.left, l.right);
+                final int yy = MathUtils.adjust(y, l.top, l.bottom);
+                // if (LCTX.isDebugEnabled()) {
+                // LCTX.d("scrollTo(" + x + ", " + y + "): " + xx + ", " + yy);
+                // }
+                SurfaceView.super.scrollTo(xx, yy);
             }
         };
 

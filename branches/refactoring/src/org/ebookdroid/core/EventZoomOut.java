@@ -12,16 +12,6 @@ public class EventZoomOut extends AbstractEventZoom {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree)
-     */
-    @Override
-    public boolean process(final PageTree nodes) {
-        return process(nodes, newLevel);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTreeNode)
      */
     @Override

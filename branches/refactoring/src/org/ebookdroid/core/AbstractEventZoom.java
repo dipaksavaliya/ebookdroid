@@ -40,6 +40,30 @@ public abstract class AbstractEventZoom extends AbstractEvent {
     /**
      * {@inheritDoc}
      *
+     * @see org.ebookdroid.core.AbstractEvent#process()
+     */
+    @Override
+    public ViewState process() {
+        if (!committed) {
+            view.invalidateScroll(newZoom, oldZoom);
+        }
+        viewState = new ViewState(ctrl);
+        return super.process();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree)
+     */
+    @Override
+    public boolean process(final PageTree nodes) {
+        return process(nodes, newLevel);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @see org.ebookdroid.core.AbstractEvent#calculatePageVisibility(org.ebookdroid.core.ViewState)
      */
     @Override

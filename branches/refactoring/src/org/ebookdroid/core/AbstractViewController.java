@@ -1,8 +1,6 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.R;
-import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
@@ -251,13 +249,12 @@ public abstract class AbstractViewController extends AbstractComponentController
         }
 
         inZoom.set(!committed);
+
         final AbstractEventZoom cmd = newZoom > oldZoom ? new EventZoomIn(this, oldZoom, newZoom, committed)
                 : new EventZoomOut(this, oldZoom, newZoom, committed);
 
-        if (!committed) {
-            view.invalidateScroll(newZoom, oldZoom);
-        }
         final ViewState newState = cmd.process();
+
         if (!committed) {
             redrawView(newState);
         } else {
@@ -273,7 +270,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void updateMemorySettings() {
-        new EventZoomIn(this).process();
+        new EventReset(this, null, false).process();
     }
 
     /**
@@ -371,16 +368,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         }
         if (layoutChanged && !layoutLocked) {
             if (isShown) {
-                final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-                for (final Page page : base.getDocumentModel().getPages()) {
-                    page.nodes.recycleAll(bitmapsToRecycle, true);
-                }
-                BitmapManager.release(bitmapsToRecycle);
-
-                invalidatePageSizes(InvalidateSizeReason.LAYOUT, null);
-                invalidateScroll();
-
-                new EventZoomIn(this).process();
+                new EventReset(this, InvalidateSizeReason.LAYOUT, true).process();
                 return true;
             }
         }
@@ -389,13 +377,7 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     @Override
     public void toggleNightMode(final boolean nightMode) {
-        final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-        for (final Page page : base.getDocumentModel().getPages()) {
-            page.nodes.recycleAll(bitmapsToRecycle, true);
-        }
-        BitmapManager.release(bitmapsToRecycle);
-
-        new EventZoomIn(this).process();
+        new EventReset(this, null, true).process();
     }
 
     protected final void invalidateScroll() {
@@ -413,9 +395,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void setAlign(final PageAlign align) {
-        invalidatePageSizes(InvalidateSizeReason.PAGE_ALIGN, null);
-        invalidateScroll();
-        new EventZoomIn(this).process();
+        new EventReset(this, InvalidateSizeReason.PAGE_ALIGN, false).process();
     }
 
     /**
