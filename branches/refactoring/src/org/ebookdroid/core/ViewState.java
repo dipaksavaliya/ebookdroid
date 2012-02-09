@@ -3,7 +3,6 @@ package org.ebookdroid.core;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
-import org.ebookdroid.common.settings.types.DecodeMode;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.models.DocumentModel;
@@ -36,7 +35,6 @@ public class ViewState {
     public final float zoom;
 
     public final PageAlign pageAlign;
-    public final DecodeMode decodeMode;
     public final boolean nightMode;
 
     public final SparseArray<RectF> pages = new SparseArray<RectF>();
@@ -80,7 +78,6 @@ public class ViewState {
         final AppSettings as = SettingsManager.getAppSettings();
 
         this.pageAlign = DocumentViewMode.getPageAlign(bs);
-        this.decodeMode = as.getDecodeMode();
         this.nightMode = as.getNightMode();
     }
 
@@ -108,7 +105,6 @@ public class ViewState {
         this.lastCached = Math.min(this.currentIndex + inMemory, dc.getBase().getDocumentModel().getPageCount());
 
         this.pageAlign = oldState.pageAlign;
-        this.decodeMode = oldState.decodeMode;
         this.nightMode = oldState.nightMode;
     }
 
@@ -142,7 +138,6 @@ public class ViewState {
         }
 
         this.pageAlign = oldState.pageAlign;
-        this.decodeMode = oldState.decodeMode;
         this.nightMode = oldState.nightMode;
     }
 
@@ -162,7 +157,6 @@ public class ViewState {
         this.lastCached = oldState.lastCached;
 
         this.pageAlign = oldState.pageAlign;
-        this.decodeMode = oldState.decodeMode;
         this.nightMode = oldState.nightMode;
     }
 

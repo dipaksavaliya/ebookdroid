@@ -31,8 +31,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.emdev.utils.android.AndroidVersion;
-
 public class DecodeServiceBase implements DecodeService {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding", false);
@@ -319,9 +317,11 @@ public class DecodeServiceBase implements DecodeService {
         Executor() {
             queue = new ArrayList<Runnable>();
             thread = new Thread(this);
-            if (AndroidVersion.lessThan3x) {
-                thread.setPriority(Thread.MIN_PRIORITY);
-            }
+
+            final int decodingThreadPriority = SettingsManager.getAppSettings().getDecodingThreadPriority();
+            LCTX.i("Decoding thread priority: " + decodingThreadPriority);
+            thread.setPriority(decodingThreadPriority);
+
             thread.start();
         }
 

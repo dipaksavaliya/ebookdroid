@@ -2,8 +2,8 @@ package org.ebookdroid.common.settings;
 
 import org.ebookdroid.CodecType;
 import org.ebookdroid.common.settings.books.BookSettings;
-import org.ebookdroid.common.settings.types.DecodeMode;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
+import org.ebookdroid.common.settings.types.DocumentViewType;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.common.settings.types.RotationType;
 import org.ebookdroid.core.curl.PageAnimationType;
@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.emdev.utils.MathUtils;
 import org.emdev.utils.StringUtils;
 import org.emdev.utils.android.AndroidVersion;
 import org.emdev.utils.filesystem.FileExtensionFilter;
@@ -63,11 +64,7 @@ public class AppSettings {
 
     private Boolean loadRecent;
 
-    private Integer maxImageSize;
-
     private Boolean zoomByDoubleTap;
-
-    private DecodeMode decodeMode;
 
     private Boolean useBookcase;
 
@@ -76,6 +73,12 @@ public class AppSettings {
     private Boolean cropPages;
 
     private String touchProfiles;
+
+    private DocumentViewType viewType;
+
+    private Integer decodingThreadPriority;
+
+    private Integer drawThreadPriority;
 
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -246,16 +249,31 @@ public class AppSettings {
         return pagesInMemory.intValue();
     }
 
-    public DecodeMode getDecodeMode() {
-        return DecodeMode.NORMAL;
+    public DocumentViewType getDocumentViewType() {
+        if (viewType == null) {
+            final String typeStr = prefs.getString("docviewtype", DocumentViewType.DEFAULT.getResValue());
+            viewType = DocumentViewType.getByResValue(typeStr);
+            if (viewType == null) {
+                viewType = DocumentViewType.DEFAULT;
+            }
+        }
+        return viewType;
     }
 
-    public int getMaxImageSize() {
-        if (maxImageSize == null) {
-            int value = Math.max(64, getIntValue("maximagesize", 256));
-            maxImageSize = value * 1024;
+    public int getDecodingThreadPriority() {
+        if (decodingThreadPriority == null) {
+            final int value = getIntValue("decodethread_priority", Thread.NORM_PRIORITY);
+            decodingThreadPriority = MathUtils.adjust(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
         }
-        return maxImageSize;
+        return decodingThreadPriority.intValue();
+    }
+
+    public int getDrawThreadPriority() {
+        if (drawThreadPriority == null) {
+            final int value = getIntValue("drawthread_priority", Thread.NORM_PRIORITY);
+            drawThreadPriority = MathUtils.adjust(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+        }
+        return drawThreadPriority.intValue();
     }
 
     public boolean getZoomByDoubleTap() {
@@ -386,12 +404,10 @@ public class AppSettings {
         private static final int D_TapSize = 0x0001 << 6;
         private static final int D_ScrollHeight = 0x0001 << 7;
         private static final int D_PagesInMemory = 0x0001 << 8;
-        private static final int D_DecodeMode = 0x0001 << 9;
         private static final int D_Brightness = 0x0001 << 10;
         private static final int D_BrightnessInNightMode = 0x0001 << 11;
         private static final int D_KeepScreenOn = 0x0001 << 12;
         private static final int D_LoadRecent = 0x0001 << 13;
-        private static final int D_MaxImageSize = 0x0001 << 14;
         private static final int D_UseBookcase = 0x0001 << 15;
         private static final int D_DjvuRenderingMode = 0x0001 << 16;
         private static final int D_AutoScanDirs = 0x0001 << 17;
@@ -430,9 +446,6 @@ public class AppSettings {
                 if (firstTime || olds.getPagesInMemory() != news.getPagesInMemory()) {
                     mask |= D_PagesInMemory;
                 }
-                if (firstTime || olds.getDecodeMode() != news.getDecodeMode()) {
-                    mask |= D_DecodeMode;
-                }
                 if (firstTime || olds.getBrightness() != news.getBrightness()) {
                     mask |= D_Brightness;
                 }
@@ -444,9 +457,6 @@ public class AppSettings {
                 }
                 if (firstTime || olds.isLoadRecentBook() != news.isLoadRecentBook()) {
                     mask |= D_LoadRecent;
-                }
-                if (firstTime || olds.getMaxImageSize() != news.getMaxImageSize()) {
-                    mask |= D_MaxImageSize;
                 }
                 if (firstTime || olds.getUseBookcase() != news.getUseBookcase()) {
                     mask |= D_UseBookcase;
@@ -503,10 +513,6 @@ public class AppSettings {
             return 0 != (mask & D_PagesInMemory);
         }
 
-        public boolean isDecodeModeChanged() {
-            return 0 != (mask & D_DecodeMode);
-        }
-
         public boolean isBrightnessChanged() {
             return 0 != (mask & D_Brightness);
         }
@@ -521,10 +527,6 @@ public class AppSettings {
 
         public boolean isLoadRecentChanged() {
             return 0 != (mask & D_LoadRecent);
-        }
-
-        public boolean isMaxImageSizeChanged() {
-            return 0 != (mask & D_MaxImageSize);
         }
 
         public boolean isUseBookcaseChanged() {

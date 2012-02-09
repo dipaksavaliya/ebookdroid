@@ -1,11 +1,13 @@
-package org.ebookdroid.ui.viewer;
+package org.ebookdroid.ui.viewer.viewers;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DecodeService;
-import org.ebookdroid.core.DrawThread;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
+import org.ebookdroid.ui.viewer.IActivityController;
+import org.ebookdroid.ui.viewer.IView;
+import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -329,6 +331,11 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
     @Override
     public final void surfaceCreated(final SurfaceHolder holder) {
         drawThread = new DrawThread(getHolder());
+
+        int drawThreadPriority = SettingsManager.getAppSettings().getDrawThreadPriority();
+        LCTX.i("Draw thread priority: " + drawThreadPriority);
+        drawThread.setPriority(drawThreadPriority);
+
         drawThread.start();
     }
 

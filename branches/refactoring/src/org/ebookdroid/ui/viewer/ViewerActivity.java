@@ -95,14 +95,12 @@ actions = {
         @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu")
 // finish
 })
-public class BaseViewerActivity extends AbstractActionActivity implements IActivityController,
+public class ViewerActivity extends AbstractActionActivity implements IActivityController,
         DecodingProgressListener, CurrentPageListener, ISettingsChangeListener {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Core");
 
     private static final String E_MAIL_ATTACHMENT = "[E-mail Attachment]";
-
-    private static boolean USE_SURFACE = true;
 
     private static final int DIALOG_GOTO = 0;
 
@@ -137,7 +135,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
     /**
      * Instantiates a new base viewer activity.
      */
-    public BaseViewerActivity() {
+    public ViewerActivity() {
         super();
     }
 
@@ -197,7 +195,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
     }
 
     protected IView createView() {
-        return USE_SURFACE ? new SurfaceView(this) : new BaseView(this);
+        return SettingsManager.getAppSettings().getDocumentViewType().create(this);
     }
 
     private void initView() {
@@ -211,9 +209,9 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         setContentView(frameLayout);
 
         documentModel = new DocumentModel(codecType);
-        documentModel.addListener(BaseViewerActivity.this);
+        documentModel.addListener(ViewerActivity.this);
         progressModel = new DecodingProgressModel();
-        progressModel.addListener(BaseViewerActivity.this);
+        progressModel.addListener(ViewerActivity.this);
 
         final Uri uri = getIntent().getData();
         String fileName = "";
@@ -677,7 +675,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
         }
 
         if (!redrawn && appDiff != null) {
-            if (appDiff.isMaxImageSizeChanged() || appDiff.isPagesInMemoryChanged() || appDiff.isDecodeModeChanged()) {
+            if (appDiff.isPagesInMemoryChanged()) {
                 dc.updateMemorySettings();
             }
         }
@@ -709,7 +707,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
             LCTX.d("onPreExecute(): start");
             try {
                 final String message = getString(R.string.msg_loading);
-                progressDialog = ProgressDialog.show(BaseViewerActivity.this, "", message, true);
+                progressDialog = ProgressDialog.show(ViewerActivity.this, "", message, true);
             } catch (final Throwable th) {
                 LCTX.e("Unexpected error", th);
             } finally {
@@ -832,7 +830,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
 
         @Override
         public IActivityController getBase() {
-            return BaseViewerActivity.this;
+            return ViewerActivity.this;
         }
 
         @Override

@@ -73,18 +73,16 @@
 	</string-array>
 
 	<string-array
-		name="list_decodemode"
+		name="list_docviewtype"
 		translatable="false">
-		<item>@string/list_decodemode_native</item>
-		<item>@string/list_decodemode_normal</item>
-		<item>@string/list_decodemode_low</item>
+		<item>@string/list_docviewtype_base</item>
+		<item>@string/list_docviewtype_surface</item>
 	</string-array>
 	<string-array
-		name="list_decodemode_values"
+		name="list_docviewtype_values"
 		translatable="false">
-		<item>Native</item>
-		<item>Normal</item>
-		<item>Low</item>
+		<item>Base</item>
+		<item>Surface</item>
 	</string-array>
 
 	<string-array
@@ -133,5 +131,24 @@
         <item>Single page</item>
     </string-array>
 
-
+	<string-array
+		name="list_thread_priority"
+		translatable="false">
+		<item>@string/list_thread_priority_lowest</item>
+		<item>@string/list_thread_priority_lower</item>
+		<item>@string/list_thread_priorit_normal</item>
+		<item>@string/list_thread_priority_higher</item>
+		<item>@string/list_thread_priority_highest</item>
+	</string-array>
+	<string-array
+		name="list_thread_priority_values"
+		translatable="false">
+		<item>1</item>
+		<item>3</item>
+		<item>5</item>
+		<item>7</item>
+		<item>10</item>
+	</string-array>
+    
+    
 </resources>

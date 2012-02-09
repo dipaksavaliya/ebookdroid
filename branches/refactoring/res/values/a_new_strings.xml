@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="pref_performance_category">"Performance settings"</string>
+    <string name="pref_performance_category_summary">"Performance settings"</string>
+
+    <string name="pref_lowlevel_category">"Low level application preferences"</string>
+    <string name="pref_lowlevel_category_summary">"Low level application preferences"</string>
+    
+    <string name="pref_docviewtype_title">"Document viewer implementation"</string>
+    <string name="pref_docviewtype_summary">"Applied after document reload"</string>
+    
+    <string name="list_docviewtype_base">"Based on android.view.View"</string>
+    <string name="list_docviewtype_surface">"Based on android.view.SurfaceView"</string>
+
+    <string name="pref_decodethread_priority_title">"Decode thread priority"</string>
+    <string name="pref_decodethread_priority_summary">"Applied after document reload"</string>
+
+    <string name="list_thread_priority_lowest">"Lowest"</string>
+    <string name="list_thread_priority_lower">"Lower"</string>
+    <string name="list_thread_priorit_normal">"Normal"</string>
+    <string name="list_thread_priority_higher">"Higher"</string>
+    <string name="list_thread_priority_highest">"Highest"</string>
+
+    <string name="pref_drawthread_priority_title">"Surface draw thread priority"</string>
+    <string name="pref_drawthread_priority_summary">"Applied after document reload"</string>
+
+    
+</resources>

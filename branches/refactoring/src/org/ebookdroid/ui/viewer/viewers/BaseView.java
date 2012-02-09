@@ -1,12 +1,14 @@
-package org.ebookdroid.ui.viewer;
+package org.ebookdroid.ui.viewer.viewers;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DecodeService;
-import org.ebookdroid.core.DrawThread;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.models.DocumentModel;
+import org.ebookdroid.ui.viewer.IActivityController;
+import org.ebookdroid.ui.viewer.IView;
+import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.Canvas;
 import android.graphics.PointF;
@@ -48,7 +50,7 @@ public final class BaseView extends View implements IView {
         setKeepScreenOn(SettingsManager.getAppSettings().isKeepScreenOn());
         setFocusable(true);
         setFocusableInTouchMode(true);
-        // getHolder().addCallback(this);
+
         drawThread = new DrawThread(null);
     }
 

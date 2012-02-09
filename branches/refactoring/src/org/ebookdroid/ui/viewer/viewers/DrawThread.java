@@ -1,6 +1,9 @@
-package org.ebookdroid.core;
+package org.ebookdroid.ui.viewer.viewers;
 
 import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.core.EventDraw;
+import org.ebookdroid.core.PagePaint;
+import org.ebookdroid.core.ViewState;
 
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
@@ -36,7 +39,6 @@ public class DrawThread extends Thread {
 
     @Override
     public void run() {
-        Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
         while (!stop.get()) {
             draw(false);
         }

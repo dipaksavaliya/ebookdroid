@@ -2,7 +2,6 @@ package org.ebookdroid.ui.settings;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
-import org.ebookdroid.common.settings.types.DecodeMode;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.curl.PageAnimationType;
@@ -67,12 +66,7 @@ public class PreferencesDecorator implements IPreferenceContainer {
     }
 
     public void decorateMemorySettings() {
-        findPreference("maximagesize").setEnabled(false);
-        final ListPreference modes = (ListPreference) findPreference("decodemode");
-        modes.setValue(DecodeMode.NORMAL.getResValue());
-        modes.setEnabled(false);
-
-        decoratePreferences("pagesinmemory", "decodemode", "maximagesize");
+        decoratePreferences("pagesinmemory", "docviewtype", "decodethread_priority", "drawthread_priority");
     }
 
     public void decorateRenderSettings() {

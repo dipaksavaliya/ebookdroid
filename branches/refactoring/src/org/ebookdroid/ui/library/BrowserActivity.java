@@ -5,7 +5,7 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.ui.library.adapters.BrowserAdapter;
 import org.ebookdroid.ui.library.views.FileBrowserView;
 import org.ebookdroid.ui.settings.SettingsUI;
-import org.ebookdroid.ui.viewer.BaseViewerActivity;
+import org.ebookdroid.ui.viewer.ViewerActivity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -129,7 +129,7 @@ public class BrowserActivity extends AbstractActionActivity implements IBrowserA
     @Override
     public void showDocument(final Uri uri) {
         final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.setClass(this, BaseViewerActivity.class);
+        intent.setClass(this, ViewerActivity.class);
         startActivity(intent);
     }
 
