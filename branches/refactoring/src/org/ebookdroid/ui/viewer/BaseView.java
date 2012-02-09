@@ -4,7 +4,6 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.DrawThread;
-import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.models.DocumentModel;
@@ -332,11 +331,11 @@ public final class BaseView extends View implements IView {
      */
     @Override
     protected void onDraw(final Canvas canvas) {
-        DrawTask task = drawThread.takeTask(1, TimeUnit.MILLISECONDS);
-        if (task == null) {
-            task = new DrawTask(new ViewState(base.getDocumentController()));
+        ViewState viewState = drawThread.takeTask(1, TimeUnit.MILLISECONDS, true);
+        if (viewState == null) {
+            viewState = new ViewState(base.getDocumentController());
         }
-        drawThread.performDrawing(canvas, task);
+        drawThread.performDrawing(canvas, viewState);
     }
 
     /**

@@ -10,22 +10,24 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.emdev.utils.concurrent.Flag;
+
 public class DrawThread extends Thread {
 
     private static final LogContext LCTX = LogContext.ROOT.lctx("Imaging");
 
-    private static boolean useLastState = true;
-
     private final SurfaceHolder surfaceHolder;
 
-    private final BlockingQueue<DrawTask> queue = new ArrayBlockingQueue<DrawThread.DrawTask>(16, true);
+    private final BlockingQueue<ViewState> queue = new ArrayBlockingQueue<ViewState>(16, true);
+
+    private final Flag stop = new Flag();
 
     public DrawThread(final SurfaceHolder surfaceHolder) {
         this.surfaceHolder = surfaceHolder;
     }
 
     public void finish() {
-        queue.add(new DrawTask(null));
+        stop.set();
         try {
             this.join();
         } catch (final InterruptedException e) {
@@ -35,37 +37,35 @@ public class DrawThread extends Thread {
     @Override
     public void run() {
         Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
-        while (draw()) {
+        while (!stop.get()) {
+            draw(false);
         }
     }
 
-    public boolean draw() {
-        final DrawTask task = takeTask(1, TimeUnit.SECONDS);
-        if (task != null) {
-            if (task.viewState == null) {
-                return false;
-            }
-            Canvas canvas = null;
-            try {
-                canvas = surfaceHolder.lockCanvas(null);
-                performDrawing(canvas, task);
-            } catch (final Throwable th) {
-                LCTX.e("Unexpected error on drawing: " + th.getMessage(), th);
-            } finally {
-                if (canvas != null) {
-                    surfaceHolder.unlockCanvasAndPost(canvas);
-                }
+    protected void draw(final boolean useLastState) {
+        final ViewState viewState = takeTask(1, TimeUnit.SECONDS, useLastState);
+        if (viewState == null) {
+            return;
+        }
+        Canvas canvas = null;
+        try {
+            canvas = surfaceHolder.lockCanvas(null);
+            performDrawing(canvas, viewState);
+        } catch (final Throwable th) {
+            LCTX.e("Unexpected error on drawing: " + th.getMessage(), th);
+        } finally {
+            if (canvas != null) {
+                surfaceHolder.unlockCanvasAndPost(canvas);
             }
         }
-        return true;
     }
 
-    public DrawTask takeTask(long timeout, TimeUnit unit) {
-        DrawTask task = null;
+    public ViewState takeTask(final long timeout, final TimeUnit unit, final boolean useLastState) {
+        ViewState task = null;
         try {
             task = queue.poll(timeout, unit);
             if (task != null && useLastState) {
-                final ArrayList<DrawTask> list = new ArrayList<DrawTask>();
+                final ArrayList<ViewState> list = new ArrayList<ViewState>();
                 if (queue.drainTo(list) > 0) {
                     task = list.get(list.size() - 1);
                 }
@@ -76,24 +76,15 @@ public class DrawThread extends Thread {
         return task;
     }
 
-    public void performDrawing(final Canvas canvas, final DrawTask task) {
-        final PagePaint paint = task.viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+    public void performDrawing(final Canvas canvas, final ViewState viewState) {
+        final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
         canvas.drawRect(canvas.getClipBounds(), paint.backgroundFillPaint);
-        new EventDraw(task.viewState, canvas).process();
+        new EventDraw(viewState, canvas).process();
     }
 
     public void draw(final ViewState viewState) {
         if (viewState != null) {
-            queue.offer(new DrawTask(viewState));
-        }
-    }
-
-    public static class DrawTask {
-
-        final ViewState viewState;
-
-        public DrawTask(final ViewState viewState) {
-            this.viewState = viewState;
+            queue.offer(viewState);
         }
     }
 }
