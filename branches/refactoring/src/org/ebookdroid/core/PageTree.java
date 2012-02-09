@@ -69,15 +69,16 @@ public class PageTree {
         if (child.id == 0) {
             return false;
         }
+        boolean res = false;
         int childId = child.id;
         for (PageTreeNode p = getParent(childId, false); p != null; p = getParent(childId, false)) {
-            p.recycle(bitmapsToRecycle);
+            res |= p.recycle(bitmapsToRecycle);
             childId = p.id;
             if (child.id == 0) {
-                return true;
+                break;
             }
         }
-        return true;
+        return res;
     }
 
     public boolean recycleChildren(final PageTreeNode node, final List<Bitmaps> bitmapsToRecycle) {

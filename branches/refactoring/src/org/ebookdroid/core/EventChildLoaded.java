@@ -60,9 +60,9 @@ public class EventChildLoaded extends EventScrollTo {
     protected void recycleParent(final PageTreeNode parent, final RectF bounds) {
         final boolean hiddenByChildren = nodes.isHiddenByChildren(parent, viewState, bounds);
 
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("Node " + parent.fullId + " is: " + (hiddenByChildren ? "" : "not") + " hidden by children");
-        }
+        // if (LCTX.isDebugEnabled()) {
+        // LCTX.d("Node " + parent.fullId + " is: " + (hiddenByChildren ? "" : "not") + " hidden by children");
+        // }
 
         if (!viewState.isNodeVisible(parent, bounds) || hiddenByChildren) {
             final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
