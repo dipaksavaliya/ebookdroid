@@ -234,7 +234,13 @@ public abstract class AbstractViewController extends AbstractComponentController
         base.getActivity().runOnUiThread(r);
     }
 
-    protected void pageUpdated(final ViewState viewState, final Page page) {
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.ui.viewer.IViewController#pageUpdated(org.ebookdroid.core.ViewState, org.ebookdroid.core.Page)
+     */
+    @Override
+    public void pageUpdated(final ViewState viewState, final Page page) {
     }
 
     /**
@@ -389,7 +395,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         new EventReset(this, null, true).process();
     }
 
-    protected final void invalidateScroll() {
+    public final void invalidateScroll() {
         if (!isShown) {
             return;
         }

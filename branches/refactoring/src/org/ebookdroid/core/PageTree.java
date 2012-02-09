@@ -101,17 +101,6 @@ public class PageTree {
         }
     }
 
-    public boolean allChildrenHasBitmap(final ViewState viewState, final PageTreeNode parent, final PagePaint paint) {
-        int childId = getFirstChildId(parent.id);
-        for (final int end = Math.min(nodes.length, childId + splitMasks.length); childId < end; childId++) {
-            final PageTreeNode child = nodes[childId];
-            if (child == null || !child.holder.hasBitmaps()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public boolean isHiddenByChildren(final PageTreeNode parent, final ViewState viewState, final RectF pageBounds) {
         int childId = getFirstChildId(parent.id);
         for (final int end = Math.min(nodes.length, childId + splitMasks.length); childId < end; childId++) {
@@ -124,16 +113,6 @@ public class PageTree {
             }
         }
         return true;
-    }
-
-    public boolean isChildrenRequired(final ViewState viewState, final PageTreeNode node) {
-        final PageTreeLevel next = node.level;
-        return next.next != null && next.next.zoom < viewState.zoom;
-    }
-
-    public boolean hasChildren(final PageTreeNode parent) {
-        final int childId = getFirstChildId(parent.id);
-        return childId < nodes.length && null != nodes[childId];
     }
 
     static int getFirstChildId(final long parentId) {

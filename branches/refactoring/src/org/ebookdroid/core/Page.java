@@ -83,6 +83,10 @@ public class Page {
         return zoomedBounds;
     }
 
+    public float getTargetRectScale() {
+        return type.getWidthScale();
+    }
+
     @Override
     public String toString() {
         final StringBuilder buf = new StringBuilder("Page");
@@ -99,7 +103,4 @@ public class Page {
         return buf.toString();
     }
 
-    public float getTargetRectScale() {
-        return type.getWidthScale();
-    }
 }

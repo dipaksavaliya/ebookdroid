@@ -65,4 +65,8 @@ public interface IViewController extends ZoomListener {
     void toggleNightMode(boolean nightMode);
 
     void drawView(EventDraw eventDraw);
+
+    void pageUpdated(ViewState viewState, Page page);
+
+    void invalidateScroll();
 }
