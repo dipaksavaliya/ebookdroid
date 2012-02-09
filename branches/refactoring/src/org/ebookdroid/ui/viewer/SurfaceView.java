@@ -4,11 +4,9 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.DrawThread;
-import org.ebookdroid.core.DrawThread.DrawTask;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
 
-import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -342,20 +340,6 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
     @Override
     public final void surfaceDestroyed(final SurfaceHolder holder) {
         drawThread.finish();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see android.view.View#onDraw(android.graphics.Canvas)
-     */
-    @Override
-    protected void onDraw(final Canvas canvas) {
-        DrawTask task = drawThread.takeTask(1, TimeUnit.MILLISECONDS);
-        if (task == null) {
-            task = new DrawTask(new ViewState(base.getDocumentController()));
-        }
-        drawThread.performDrawing(canvas, task);
     }
 
     /**
