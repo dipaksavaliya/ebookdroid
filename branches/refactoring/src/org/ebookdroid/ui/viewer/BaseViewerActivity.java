@@ -102,7 +102,7 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
 
     private static final String E_MAIL_ATTACHMENT = "[E-mail Attachment]";
 
-    private static boolean USE_SURFACE = !true;
+    private static boolean USE_SURFACE = true;
 
     private static final int DIALOG_GOTO = 0;
 
@@ -891,8 +891,15 @@ public class BaseViewerActivity extends AbstractActionActivity implements IActiv
 
         @Override
         public boolean isPageVisible(Page page, ViewState viewState) {
-            // TODO Auto-generated method stub
             return false;
+        }
+
+        @Override
+        public void pageUpdated(ViewState viewState, Page page) {
+        }
+
+        @Override
+        public void invalidateScroll() {
         }
     }
 }

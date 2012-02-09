@@ -31,6 +31,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.emdev.utils.android.AndroidVersion;
+
 public class DecodeServiceBase implements DecodeService {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding", false);
@@ -197,7 +199,7 @@ public class DecodeServiceBase implements DecodeService {
         final RectF nodeBounds = task.pageSliceBounds;
 
         return getScaledSize(task.viewState, pageWidth, pageHeight, nodeBounds, task.node.page.getTargetRectScale(),
-               task.node.level.zoom);
+                task.node.level.zoom);
     }
 
     @Override
@@ -317,7 +319,9 @@ public class DecodeServiceBase implements DecodeService {
         Executor() {
             queue = new ArrayList<Runnable>();
             thread = new Thread(this);
-            thread.setPriority(Thread.MIN_PRIORITY);
+            if (AndroidVersion.lessThan3x) {
+                thread.setPriority(Thread.MIN_PRIORITY);
+            }
             thread.start();
         }
 
