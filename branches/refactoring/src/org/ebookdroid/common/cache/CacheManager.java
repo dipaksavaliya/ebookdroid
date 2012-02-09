@@ -8,7 +8,7 @@ import android.net.Uri;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -26,7 +26,7 @@ public class CacheManager {
 
     private static Context s_context;
 
-    private static final Map<String, WeakReference<ThumbnailFile>> thumbmails = new HashMap<String, WeakReference<ThumbnailFile>>();
+    private static final Map<String, SoftReference<ThumbnailFile>> thumbmails = new HashMap<String, SoftReference<ThumbnailFile>>();
 
     public static void init(final Context context) {
         s_context = context;
@@ -35,12 +35,12 @@ public class CacheManager {
     public static ThumbnailFile getThumbnailFile(final String path) {
         final String md5 = StringUtils.md5(path);
 
-        final WeakReference<ThumbnailFile> ref = thumbmails.get(md5);
+        final SoftReference<ThumbnailFile> ref = thumbmails.get(md5);
         ThumbnailFile file = ref != null ? ref.get() : null;
         if (file == null) {
             final File cacheDir = s_context.getFilesDir();
             file = new ThumbnailFile(cacheDir, md5 + ".thumbnail");
-            thumbmails.put(md5, new WeakReference<ThumbnailFile>(file));
+            thumbmails.put(md5, new SoftReference<ThumbnailFile>(file));
         }
 
         return file;

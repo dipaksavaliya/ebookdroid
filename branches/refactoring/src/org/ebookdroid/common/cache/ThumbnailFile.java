@@ -2,7 +2,6 @@ package org.ebookdroid.common.cache;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.BitmapRef;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,44 +17,26 @@ public class ThumbnailFile extends File {
 
     private static final long serialVersionUID = 4540533658351961301L;
 
-    private BitmapRef ref;
+    private static Bitmap defaultImage;
+
+    private Bitmap ref;
 
     ThumbnailFile(final File dir, final String name) {
         super(dir, name);
         ref = null;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        if (ref != null) {
-            BitmapManager.release(ref);
-            ref = null;
-        }
-        super.finalize();
-    }
-
     public Bitmap getImage() {
         if (ref == null) {
             try {
-                Bitmap stored = null;
-                try {
-                    stored = load();
-                    ref = paint(stored);
-                } finally {
-                    if (stored != null) {
-                        stored.recycle();
-                    }
-                }
+                ref = load();
             } catch (final OutOfMemoryError ex) {
             }
         }
-        return ref != null ? ref.getBitmap() : null;
+        return ref != null && !ref.isRecycled() ? ref : null;
     }
 
     public void setImage(final Bitmap image) {
-        if (ref != null) {
-            BitmapManager.release(ref);
-        }
         if (image != null) {
             ref = paint(image);
             store(image);
@@ -65,19 +46,13 @@ public class ThumbnailFile extends File {
     }
 
     private Bitmap load() {
-        Bitmap stored = null;
         if (this.exists()) {
-            stored = BitmapFactory.decodeFile(this.getPath());
-            if (stored == null) {
-                this.delete();
-                stored = Bitmap.createBitmap(160, 200, Bitmap.Config.ARGB_8888);
-                stored.eraseColor(Color.WHITE);
+            Bitmap stored = BitmapFactory.decodeFile(this.getPath());
+            if (stored != null) {
+                return paint(stored);
             }
-        } else {
-            stored = Bitmap.createBitmap(160, 200, Bitmap.Config.ARGB_8888);
-            stored.eraseColor(Color.WHITE);
         }
-        return stored;
+        return getDefaultThumbnail();
     }
 
     private void store(final Bitmap image) {
@@ -96,14 +71,13 @@ public class ThumbnailFile extends File {
         }
     }
 
-    private BitmapRef paint(final Bitmap image) {
+    private static Bitmap paint(final Bitmap image) {
         final int left = 15;
         final int top = 10;
         final int width = image.getWidth() + left;
         final int height = image.getHeight() + top;
 
-        final BitmapRef newRef = BitmapManager.getBitmap(getName(), width, height, Bitmap.Config.ARGB_8888);
-        final Bitmap bmp = newRef.getBitmap();
+        final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         bmp.eraseColor(Color.TRANSPARENT);
 
@@ -118,7 +92,16 @@ public class ThumbnailFile extends File {
         c.drawBitmap(leftBmp, null, new Rect(0, top, left, height), null);
         c.drawBitmap(image, null, new Rect(left, top, width, height), null);
 
-        return newRef;
+        return bmp;
+    }
+
+    private static Bitmap getDefaultThumbnail() {
+        if (defaultImage == null) {
+            Bitmap empty = Bitmap.createBitmap(160, 200, Bitmap.Config.ARGB_8888);
+            empty.eraseColor(Color.WHITE);
+            defaultImage = paint(empty);
+        }
+        return defaultImage;
     }
 
 }
