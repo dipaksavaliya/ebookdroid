@@ -47,8 +47,8 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
         setKeepScreenOn(SettingsManager.getAppSettings().isKeepScreenOn());
         setFocusable(true);
         setFocusableInTouchMode(true);
+
         getHolder().addCallback(this);
-        drawThread = new DrawThread(null);
     }
 
     /**

@@ -7,7 +7,7 @@ import org.emdev.utils.android.AndroidVersion;
 
 public interface IHardwareAcceleration {
 
-    public void setMode(View view, boolean accelerated);
+    public void setMode(View view, boolean enabled, boolean accelerated);
 
     public class Factory {
 

@@ -119,14 +119,4 @@ public class PageTree {
     static int getFirstChildId(final long parentId) {
         return (int) (parentId * splitMasks.length + 1);
     }
-
-    public int getNodesCount() {
-        int count = 0;
-        for (int i = 0; i < nodes.length; i++) {
-            if (nodes[i] != null) {
-                count++;
-            }
-        }
-        return count;
-    }
 }

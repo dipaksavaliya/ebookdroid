@@ -25,5 +25,7 @@
     <string name="pref_drawthread_priority_title">"Surface draw thread priority"</string>
     <string name="pref_drawthread_priority_summary">"Applied after document reload"</string>
 
-    
+    <string name="pref_hwa_enabled_title">"Hardware acceleration enabled"</string>
+    <string name="pref_hwa_enabled_summary">"Applied after document reload"</string>
+
 </resources>

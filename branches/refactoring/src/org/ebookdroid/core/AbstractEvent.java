@@ -22,7 +22,7 @@ public abstract class AbstractEvent implements IEvent {
     protected final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
 
     protected ViewState viewState;
-    
+
     protected AbstractEvent(final AbstractViewController ctrl) {
         this.ctrl = ctrl;
         this.model = ctrl.getBase().getDocumentModel();
@@ -128,12 +128,11 @@ public abstract class AbstractEvent implements IEvent {
 
     protected final void recyclePage(final ViewState viewState, final Page page) {
         final int oldSize = bitmapsToRecycle.size();
-        page.nodes.recycleAll(bitmapsToRecycle, true);
-        if (LCTX.isDebugEnabled()) {
-            final int nodesCount = page.nodes.getNodesCount();
-            if (nodesCount > 1) {
+        final boolean res = page.nodes.recycleAll(bitmapsToRecycle, true);
+        if (res) {
+            if (LCTX.isDebugEnabled()) {
                 LCTX.d("Recycle page " + page.index + " " + viewState.firstCached + ":" + viewState.lastCached + " = "
-                        + (bitmapsToRecycle.size() - oldSize) + " " + nodesCount);
+                        + (bitmapsToRecycle.size() - oldSize));
             }
         }
 

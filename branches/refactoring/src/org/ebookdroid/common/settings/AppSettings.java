@@ -80,6 +80,8 @@ public class AppSettings {
 
     private Integer drawThreadPriority;
 
+    private Boolean hwaEnabled;
+    
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -274,6 +276,13 @@ public class AppSettings {
             drawThreadPriority = MathUtils.adjust(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
         }
         return drawThreadPriority.intValue();
+    }
+
+    public boolean isHWAEnabled() {
+        if (hwaEnabled == null) {
+            hwaEnabled = prefs.getBoolean("hwa_enabled", false);
+        }
+        return hwaEnabled.booleanValue();
     }
 
     public boolean getZoomByDoubleTap() {
@@ -545,5 +554,4 @@ public class AppSettings {
             return 0 != (mask & D_AllowedFileTypes);
         }
     }
-
 }

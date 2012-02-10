@@ -134,20 +134,25 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             }
 
             final Bitmaps bitmaps = holder.reuse(fullId, bitmap, bitmapBounds);
+            holder.setBitmap(bitmaps);
+            stopDecodingThisNode(null);
 
-            page.base.getActivity().runOnUiThread(new Runnable() {
+            Runnable r = new Runnable() {
 
                 @Override
                 public void run() {
-                    holder.setBitmap(bitmaps);
-                    stopDecodingThisNode(null);
+                    // long t0 = System.currentTimeMillis();
 
                     final IViewController dc = page.base.getDocumentController();
                     if (dc instanceof AbstractViewController) {
                         new EventChildLoaded((AbstractViewController) dc, PageTreeNode.this, bitmapBounds).process();
                     }
+
+                    // System.out.println("decodeComplete(): " + (System.currentTimeMillis() - t0) + " ms");
                 }
-            });
+            };
+
+            page.base.getActivity().runOnUiThread(r);
         } catch (OutOfMemoryError ex) {
             LCTX.e("No memory: ", ex);
             BitmapManager.clear("PageTreeNode OutOfMemoryError: ");
@@ -237,7 +242,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
         Bitmaps day;
 
-        public synchronized boolean drawBitmap(final Canvas canvas, final PagePaint paint, final PointF viewBase, final RectF tr, final RectF clipRect) {
+        public synchronized boolean drawBitmap(final Canvas canvas, final PagePaint paint, final PointF viewBase,
+                final RectF tr, final RectF clipRect) {
             if (day != null) {
                 day.draw(canvas, paint, viewBase, tr, clipRect);
                 return true;

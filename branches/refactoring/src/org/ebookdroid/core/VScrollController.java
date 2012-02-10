@@ -23,7 +23,8 @@ public class VScrollController extends AbstractViewController {
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
         }
-        IHardwareAcceleration.Factory.getInstance().setMode(getView().getView(), true);
+        IHardwareAcceleration.Factory.getInstance().setMode(getView().getView(),
+                SettingsManager.getAppSettings().isHWAEnabled(), true);
     }
 
     /**

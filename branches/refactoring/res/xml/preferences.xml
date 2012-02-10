@@ -146,6 +146,12 @@
                 android:summary="@string/pref_drawthread_priority_summary"
                 android:title="@string/pref_drawthread_priority_title" />
 
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="hwa_enabled"
+                android:summary="@string/pref_hwa_enabled_summary"
+                android:title="@string/pref_hwa_enabled_title" />
+
             </PreferenceCategory>
     </PreferenceScreen>
 
