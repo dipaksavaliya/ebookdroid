@@ -147,6 +147,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
         super.onCreate(savedInstanceState);
 
         getWindowManager().getDefaultDisplay().getMetrics(DM);
+        LCTX.i("XDPI=" + DM.xdpi+", YDPI=" + DM.ydpi);
 
         frameLayout = createMainContainer();
         view = createView();

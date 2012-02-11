@@ -40,4 +40,16 @@
     <string name="pref_texturereuse_title">"Reuse texture bitmaps"</string>
     <string name="pref_texturereuse_summary">"Reuse old texture bitmaps when page part is decoded again"</string>
 
+    <string name="pref_brfiletypespecificpdf_title">"PDF"</string>
+    <string name="pref_brfiletypespecificpdf_summary">"PDF format specific settings"</string>
+
+    <string name="pref_customdpi_title">"Use custom DPI"</string>
+    <string name="pref_customdpi_summary">"Define custom DPI values below"</string>
+
+    <string name="pref_xdpi_title">X DPI</string>
+    <string name="pref_xdpi_summary">X DPI</string>
+    
+    <string name="pref_ydpi_title">Y DPI</string>
+    <string name="pref_ydpi_summary">Y DPI</string>
+
 </resources>

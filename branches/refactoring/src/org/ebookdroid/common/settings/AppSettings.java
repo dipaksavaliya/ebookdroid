@@ -85,7 +85,13 @@ public class AppSettings {
     private Integer bitmapSize;
 
     private Boolean textureReuseEnabled;
-    
+
+    private Boolean useCustomDpi;
+
+    private Integer xDpi;
+
+    private Integer yDpi;
+
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -97,7 +103,7 @@ public class AppSettings {
         return touchProfiles;
     }
 
-    public void updateTouchProfiles(String profiles) {
+    public void updateTouchProfiles(final String profiles) {
         touchProfiles = profiles;
         final Editor edit = prefs.edit();
         edit.putString("touchprofiles", touchProfiles);
@@ -303,7 +309,7 @@ public class AppSettings {
         }
         return textureReuseEnabled;
     }
-    
+
     public boolean getZoomByDoubleTap() {
         if (zoomByDoubleTap == null) {
             zoomByDoubleTap = prefs.getBoolean("zoomdoubletap", false);
@@ -329,7 +335,7 @@ public class AppSettings {
         if (viewMode == null) {
             viewMode = DocumentViewMode.getByResValue(prefs.getString("viewmode", null));
             if (viewMode == null) {
-                boolean singlePage = prefs.getBoolean("singlepage", false);
+                final boolean singlePage = prefs.getBoolean("singlepage", false);
                 viewMode = singlePage ? DocumentViewMode.SINGLE_PAGE : DocumentViewMode.VERTICALL_SCROLL;
             }
         }
@@ -359,6 +365,37 @@ public class AppSettings {
             djvuRenderingMode = getIntValue("djvu_rendering_mode", 0);
         }
         return djvuRenderingMode;
+    }
+
+    public boolean useCustomDpi() {
+        if (useCustomDpi == null) {
+            useCustomDpi = prefs.getBoolean("customdpi", false);
+        }
+        return useCustomDpi.booleanValue();
+    }
+
+    public float getXDpi(final float def) {
+        if (useCustomDpi()) {
+            if (xDpi == null) {
+                final int value = getIntValue("xdpi", (int) def);
+                xDpi = Integer.valueOf(MathUtils.adjust(value, 0, 720));
+            }
+            return xDpi.floatValue();
+        } else {
+            return def;
+        }
+    }
+
+    public float getYDpi(final float def) {
+        if (useCustomDpi()) {
+            if (yDpi == null) {
+                final int value = getIntValue("ydpi", (int) def);
+                yDpi = Integer.valueOf(MathUtils.adjust(value, 0, 720));
+            }
+            return yDpi.floatValue();
+        } else {
+            return def;
+        }
     }
 
     boolean getCropPages() {
