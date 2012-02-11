@@ -165,8 +165,13 @@ public class HScrollController extends AbstractViewController {
         if (!isInitialized) {
             return;
         }
-
+        
         if (reason == InvalidateSizeReason.PAGE_ALIGN) {
+            return;
+        }
+
+        DocumentModel model = getBase().getDocumentModel();
+        if (model == null) {
             return;
         }
 
@@ -174,7 +179,7 @@ public class HScrollController extends AbstractViewController {
 
         if (changedPage == null) {
             float widthAccum = 0;
-            for (final Page page : getBase().getDocumentModel().getPages()) {
+            for (final Page page : model.getPages()) {
                 final float pageWidth = height * page.getAspectRatio();
                 final float pageHeight = pageWidth / page.getAspectRatio();
                 page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, pageHeight));
@@ -182,7 +187,7 @@ public class HScrollController extends AbstractViewController {
             }
         } else {
             float widthAccum = changedPage.getBounds(1.0f).left;
-            for (final Page page : getBase().getDocumentModel().getPages(changedPage.index.viewIndex)) {
+            for (final Page page : model.getPages(changedPage.index.viewIndex)) {
                 final float pageWidth = height * page.getAspectRatio();
                 final float pageHeight = pageWidth / page.getAspectRatio();
                 page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, pageHeight));

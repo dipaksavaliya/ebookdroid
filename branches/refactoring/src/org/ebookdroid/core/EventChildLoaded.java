@@ -33,6 +33,10 @@ public class EventChildLoaded extends EventScrollTo {
      */
     @Override
     public ViewState process() {
+        if (ctrl == null || model == null || view == null) {
+            return null;
+        }
+
         final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
 
         if (changed) {

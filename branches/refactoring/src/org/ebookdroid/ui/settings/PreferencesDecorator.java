@@ -66,7 +66,7 @@ public class PreferencesDecorator implements IPreferenceContainer {
     }
 
     public void decorateMemorySettings() {
-        decoratePreferences("pagesinmemory", "docviewtype", "decodethread_priority", "drawthread_priority");
+        decoratePreferences("pagesinmemory", "docviewtype", "decodethread_priority", "drawthread_priority", "bitmapsize");
     }
 
     public void decorateRenderSettings() {

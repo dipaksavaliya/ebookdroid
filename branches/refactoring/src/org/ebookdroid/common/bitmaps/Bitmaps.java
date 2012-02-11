@@ -1,6 +1,7 @@
 package org.ebookdroid.common.bitmaps;
 
 import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.PagePaint;
 
 import android.graphics.Bitmap;
@@ -17,13 +18,12 @@ public class Bitmaps {
 
     private static final LogContext LCTX = BitmapManager.LCTX;
 
-    private static final int SIZE = 128;
-
     private static final Config DEF_BITMAP_TYPE = Bitmap.Config.RGB_565;
 
     private static boolean useDefaultBitmapType = true;
 
     public final Bitmap.Config config;
+    public final int partSize;
     public Rect bounds;
     public int columns;
     public int rows;
@@ -33,29 +33,30 @@ public class Bitmaps {
     public Bitmaps(final String nodeId, final BitmapRef orig, final Rect bitmapBounds, final boolean invert) {
         final Bitmap origBitmap = orig.getBitmap();
 
+        this.partSize = SettingsManager.getAppSettings().getBitmapSize();
         this.bounds = bitmapBounds;
-        this.columns = (int) Math.ceil(bounds.width() / (float) SIZE);
-        this.rows = (int) Math.ceil(bounds.height() / (float) SIZE);
+        this.columns = (int) Math.ceil(bounds.width() / (float) partSize);
+        this.rows = (int) Math.ceil(bounds.height() / (float) partSize);
         this.config = useDefaultBitmapType ? DEF_BITMAP_TYPE : origBitmap.getConfig();
         this.bitmaps = new BitmapRef[columns * rows];
 
         int top = 0;
 
-        final RawBitmap rb = new RawBitmap(SIZE, SIZE, origBitmap.hasAlpha());
+        final RawBitmap rb = new RawBitmap(partSize, partSize, origBitmap.hasAlpha());
 
-        for (int row = 0; row < rows; row++, top += SIZE) {
+        for (int row = 0; row < rows; row++, top += partSize) {
             int left = 0;
-            for (int col = 0; col < columns; col++, left += SIZE) {
+            for (int col = 0; col < columns; col++, left += partSize) {
                 final String name = nodeId + ":[" + row + ", " + col + "]";
-                final BitmapRef b = BitmapManager.getBitmap(name, SIZE, SIZE, config);
+                final BitmapRef b = BitmapManager.getBitmap(name, partSize, partSize, config);
                 final Bitmap bmp = b.getBitmap();
 
                 if (row == rows - 1 || col == columns - 1) {
-                    final int right = Math.min(left + SIZE, bounds.width());
-                    final int bottom = Math.min(top + SIZE, bounds.height());
+                    final int right = Math.min(left + partSize, bounds.width());
+                    final int bottom = Math.min(top + partSize, bounds.height());
                     rb.retrieve(origBitmap, left, top, right - left, bottom - top);
                 } else {
-                    rb.retrieve(origBitmap, left, top, SIZE, SIZE);
+                    rb.retrieve(origBitmap, left, top, partSize, partSize);
                 }
                 if (invert) {
                     rb.invert();
@@ -75,12 +76,16 @@ public class Bitmaps {
         if (cfg != this.config) {
             return false;
         }
+        final int size = SettingsManager.getAppSettings().getBitmapSize();
+        if (size != this.partSize) {
+            return false;
+        }
 
         final BitmapRef[] oldBitmaps = this.bitmaps;
 
         this.bounds = bitmapBounds;
-        this.columns = (int) Math.ceil(bitmapBounds.width() / (float) SIZE);
-        this.rows = (int) Math.ceil(bitmapBounds.height() / (float) SIZE);
+        this.columns = (int) Math.ceil(bitmapBounds.width() / (float) partSize);
+        this.rows = (int) Math.ceil(bitmapBounds.height() / (float) partSize);
         this.bitmaps = new BitmapRef[columns * rows];
 
         final int newsize = this.columns * this.rows;
@@ -90,7 +95,7 @@ public class Bitmaps {
             this.bitmaps[i] = i < oldBitmaps.length ? oldBitmaps[i] : null;
             if (this.bitmaps[i] == null || this.bitmaps[i].getBitmap() == null) {
                 BitmapManager.release(this.bitmaps[i]);
-                this.bitmaps[i] = BitmapManager.getBitmap(nodeId + ":reuse:" + i, SIZE, SIZE, config);
+                this.bitmaps[i] = BitmapManager.getBitmap(nodeId + ":reuse:" + i, partSize, partSize, config);
             } else {
                 if (LCTX.isDebugEnabled()) {
                     LCTX.d("Reuse  bitmap: " + this.bitmaps[i]);
@@ -104,21 +109,21 @@ public class Bitmaps {
 
         int top = 0;
 
-        final RawBitmap rb = new RawBitmap(SIZE, SIZE, origBitmap.hasAlpha());
+        final RawBitmap rb = new RawBitmap(partSize, partSize, origBitmap.hasAlpha());
 
-        for (int row = 0; row < rows; row++, top += SIZE) {
+        for (int row = 0; row < rows; row++, top += partSize) {
             int left = 0;
-            for (int col = 0; col < columns; col++, left += SIZE) {
+            for (int col = 0; col < columns; col++, left += partSize) {
                 final int index = row * columns + col;
                 final BitmapRef b = bitmaps[index];
                 final Bitmap bmp = b.getBitmap();
 
                 if (row == rows - 1 || col == columns - 1) {
-                    final int right = Math.min(left + SIZE, bounds.width());
-                    final int bottom = Math.min(top + SIZE, bounds.height());
+                    final int right = Math.min(left + partSize, bounds.width());
+                    final int bottom = Math.min(top + partSize, bounds.height());
                     rb.retrieve(origBitmap, left, top, right - left, bottom - top);
                 } else {
-                    rb.retrieve(origBitmap, left, top, SIZE, SIZE);
+                    rb.retrieve(origBitmap, left, top, partSize, partSize);
                 }
                 if (invert) {
                     rb.invert();
@@ -155,7 +160,8 @@ public class Bitmaps {
         }
     }
 
-    public synchronized void draw(final Canvas canvas, final PagePaint paint, final PointF vb, final RectF tr, final RectF cr) {
+    public synchronized void draw(final Canvas canvas, final PagePaint paint, final PointF vb, final RectF tr,
+            final RectF cr) {
         if (this.bitmaps != null) {
             final Rect orig = canvas.getClipBounds();
             canvas.clipRect(cr.left - vb.x, cr.top - vb.y, cr.right - vb.x, cr.bottom - vb.y, Op.REPLACE);
@@ -164,9 +170,9 @@ public class Bitmaps {
             final float scaleY = tr.height() / bounds.height();
 
             int top = 0;
-            for (int row = 0; row < rows; row++, top += SIZE) {
+            for (int row = 0; row < rows; row++, top += partSize) {
                 int left = 0;
-                for (int col = 0; col < columns; col++, left += SIZE) {
+                for (int col = 0; col < columns; col++, left += partSize) {
                     final Matrix m = new Matrix();
                     m.postTranslate(left, top);
                     m.postScale(scaleX, scaleY);

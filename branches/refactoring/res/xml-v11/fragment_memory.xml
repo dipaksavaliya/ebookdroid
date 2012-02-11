@@ -44,6 +44,20 @@
                 android:summary="@string/pref_hwa_enabled_summary"
                 android:title="@string/pref_hwa_enabled_title" />
 
+            <ListPreference
+                android:defaultValue="7"
+                android:entries="@array/list_bitmapsize"
+                android:entryValues="@array/list_bitmapsize_values"
+                android:key="bitmapsize"
+                android:summary="@string/pref_bitmapsize_summary"
+                android:title="@string/pref_bitmapsize_title" />
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="texturereuse"
+                android:summary="@string/pref_texturereuse_summary"
+                android:title="@string/pref_texturereuse_title" />
+
         </PreferenceCategory>
 
     </PreferenceScreen>

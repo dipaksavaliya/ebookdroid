@@ -10,8 +10,8 @@
             android:summary="@string/pref_scroll_category_summary" />
 
     <header android:fragment="org.ebookdroid.ui.settings.fragments.MemoryFragment"
-            android:title="@string/pref_memory_category"
-            android:summary="@string/pref_memory_category_summary" />
+            android:summary="@string/pref_performance_category_summary"
+            android:title="@string/pref_performance_category" />
 
     <header android:fragment="org.ebookdroid.ui.settings.fragments.RenderFragment"
             android:title="@string/pref_render_category"

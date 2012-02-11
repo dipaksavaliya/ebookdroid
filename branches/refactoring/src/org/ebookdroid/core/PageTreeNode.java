@@ -134,14 +134,14 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             }
 
             final Bitmaps bitmaps = holder.reuse(fullId, bitmap, bitmapBounds);
-            holder.setBitmap(bitmaps);
-            stopDecodingThisNode(null);
 
             Runnable r = new Runnable() {
 
                 @Override
                 public void run() {
                     // long t0 = System.currentTimeMillis();
+                    holder.setBitmap(bitmaps);
+                    stopDecodingThisNode(null);
 
                     final IViewController dc = page.base.getDocumentController();
                     if (dc instanceof AbstractViewController) {
@@ -253,10 +253,9 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
         public synchronized Bitmaps reuse(String nodeId, BitmapRef bitmap, Rect bitmapBounds) {
             boolean invert = SettingsManager.getAppSettings().getNightMode();
-            if (day != null) {
-                if (day.reuse(nodeId, bitmap, bitmapBounds, invert)) {
-                    return day;
-                }
+            boolean enabled = SettingsManager.getAppSettings().getTextureReuseEnabled();
+            if (enabled && day != null && day.reuse(nodeId, bitmap, bitmapBounds, invert)) {
+                return day;
             }
             return new Bitmaps(nodeId, bitmap, bitmapBounds, invert);
         }

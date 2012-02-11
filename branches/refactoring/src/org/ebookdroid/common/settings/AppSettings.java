@@ -81,6 +81,10 @@ public class AppSettings {
     private Integer drawThreadPriority;
 
     private Boolean hwaEnabled;
+
+    private Integer bitmapSize;
+
+    private Boolean textureReuseEnabled;
     
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -285,6 +289,21 @@ public class AppSettings {
         return hwaEnabled.booleanValue();
     }
 
+    public int getBitmapSize() {
+        if (bitmapSize == null) {
+            final int value = getIntValue("bitmapsize", 7);
+            bitmapSize = 1 << MathUtils.adjust(value, 6, 10);
+        }
+        return bitmapSize.intValue();
+    }
+
+    public boolean getTextureReuseEnabled() {
+        if (textureReuseEnabled == null) {
+            textureReuseEnabled = prefs.getBoolean("texturereuse", true);
+        }
+        return textureReuseEnabled;
+    }
+    
     public boolean getZoomByDoubleTap() {
         if (zoomByDoubleTap == null) {
             zoomByDoubleTap = prefs.getBoolean("zoomdoubletap", false);
