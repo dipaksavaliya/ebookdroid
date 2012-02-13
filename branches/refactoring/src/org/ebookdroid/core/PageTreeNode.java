@@ -20,6 +20,7 @@ import android.graphics.RectF;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PageTreeNode implements DecodeService.DecodeCallback {
 
@@ -119,7 +120,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                 return;
             }
 
-            BookSettings bs = SettingsManager.getBookSettings();
+            final BookSettings bs = SettingsManager.getBookSettings();
             if (bs != null && bs.cropPages) {
                 if (id == 0 && croppedBounds == null) {
                     croppedBounds = PageCropper.getCropBounds(bitmap, bitmapBounds, pageSliceBounds);
@@ -135,7 +136,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
             final Bitmaps bitmaps = holder.reuse(fullId, bitmap, bitmapBounds);
 
-            Runnable r = new Runnable() {
+            final Runnable r = new Runnable() {
 
                 @Override
                 public void run() {
@@ -153,7 +154,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             };
 
             page.base.getActivity().runOnUiThread(r);
-        } catch (OutOfMemoryError ex) {
+        } catch (final OutOfMemoryError ex) {
             LCTX.e("No memory: ", ex);
             BitmapManager.clear("PageTreeNode OutOfMemoryError: ");
             page.base.getActivity().runOnUiThread(new Runnable() {
@@ -240,50 +241,53 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
     class BitmapHolder {
 
-        Bitmaps day;
+        final AtomicReference<Bitmaps> ref = new AtomicReference<Bitmaps>();
 
-        public synchronized boolean drawBitmap(final Canvas canvas, final PagePaint paint, final PointF viewBase,
-                final RectF tr, final RectF clipRect) {
-            if (day != null) {
-                day.draw(canvas, paint, viewBase, tr, clipRect);
-                return true;
-            }
-            return false;
+        public boolean drawBitmap(final Canvas canvas, final PagePaint paint, final PointF viewBase,
+                final RectF targetRect, final RectF clipRect) {
+            final Bitmaps bitmaps = ref.get();
+            return bitmaps != null ? bitmaps.draw(canvas, paint, viewBase, targetRect, clipRect) : false;
         }
 
-        public synchronized Bitmaps reuse(String nodeId, BitmapRef bitmap, Rect bitmapBounds) {
-            boolean invert = SettingsManager.getAppSettings().getNightMode();
-            boolean enabled = SettingsManager.getAppSettings().getTextureReuseEnabled();
-            if (enabled && day != null && day.reuse(nodeId, bitmap, bitmapBounds, invert)) {
-                return day;
+        public Bitmaps reuse(final String nodeId, final BitmapRef bitmap, final Rect bitmapBounds) {
+            final boolean invert = SettingsManager.getAppSettings().getNightMode();
+            if (SettingsManager.getAppSettings().getTextureReuseEnabled()) {
+                final Bitmaps bitmaps = ref.get();
+                if (bitmaps != null) {
+                    if (bitmaps.reuse(nodeId, bitmap, bitmapBounds, invert)) {
+                        return bitmaps;
+                    }
+                }
             }
             return new Bitmaps(nodeId, bitmap, bitmapBounds, invert);
         }
 
-        public synchronized boolean hasBitmaps() {
-            return day != null ? day.hasBitmaps() : false;
+        public boolean hasBitmaps() {
+            final Bitmaps bitmaps = ref.get();
+            return bitmaps != null ? bitmaps.hasBitmaps() : false;
         }
 
-        public synchronized boolean recycle(final List<Bitmaps> bitmapsToRecycle) {
-            if (day != null) {
+        public boolean recycle(final List<Bitmaps> bitmapsToRecycle) {
+            final Bitmaps bitmaps = ref.getAndSet(null);
+            if (bitmaps != null) {
                 if (bitmapsToRecycle != null) {
-                    bitmapsToRecycle.add(day);
+                    bitmapsToRecycle.add(bitmaps);
                 } else {
-                    BitmapManager.release(Arrays.asList(day));
+                    BitmapManager.release(Arrays.asList(bitmaps));
                 }
-                day = null;
                 return true;
             }
             return false;
         }
 
-        public synchronized void setBitmap(final Bitmaps bitmaps) {
-            if (bitmaps == null || bitmaps == day) {
+        public void setBitmap(final Bitmaps bitmaps) {
+            if (bitmaps == null) {
                 return;
             }
-            recycle(null);
-            this.day = bitmaps;
+            final Bitmaps oldBitmaps = ref.getAndSet(bitmaps);
+            if (oldBitmaps != null && oldBitmaps != bitmaps) {
+                BitmapManager.release(Arrays.asList(oldBitmaps));
+            }
         }
     }
-
 }
