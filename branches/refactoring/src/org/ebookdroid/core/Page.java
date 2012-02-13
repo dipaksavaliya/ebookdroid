@@ -7,6 +7,7 @@ import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.RectF;
+import android.util.FloatMath;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class Page {
     final PageTree nodes;
 
     RectF bounds;
-    float aspectRatio;
+    int aspectRatio;
     boolean recycled;
     float storedZoom;
     RectF zoomedBounds;
@@ -47,12 +48,13 @@ public class Page {
     }
 
     public float getAspectRatio() {
-        return aspectRatio;
+        return aspectRatio / 128.0f;
     }
 
     private boolean setAspectRatio(final float aspectRatio) {
-        if (this.aspectRatio != aspectRatio) {
-            this.aspectRatio = aspectRatio;
+        int newAspectRatio = (int)FloatMath.floor(aspectRatio * 128);
+        if (this.aspectRatio != newAspectRatio) {
+            this.aspectRatio = newAspectRatio;
             return true;
         }
         return false;

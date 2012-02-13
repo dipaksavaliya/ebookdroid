@@ -231,7 +231,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                 }
             }
         };
-        base.getActivity().runOnUiThread(r);
+        r.run();
     }
 
     /**
