@@ -28,6 +28,8 @@ public class BitmapManager {
 
     private final static long BITMAP_MEMORY_LIMIT = Runtime.getRuntime().maxMemory() / 2;
 
+    private static final int GENERATION_THRESHOLD = 50;
+
     private static Map<Integer, BitmapRef> used = new ConcurrentHashMap<Integer, BitmapRef>();
 
     private static Queue<BitmapRef> pool = new ConcurrentLinkedQueue<BitmapRef>();
@@ -55,7 +57,7 @@ public class BitmapManager {
         }
     }
 
-    public static BitmapRef addBitmap(final String name, Bitmap bitmap) {
+    public static BitmapRef addBitmap(final String name, final Bitmap bitmap) {
         final BitmapRef ref = new BitmapRef(bitmap, generation.get());
         used.put(ref.id, ref);
 
@@ -125,7 +127,7 @@ public class BitmapManager {
     }
 
     public static void clear(final String msg) {
-        generation.addAndGet(1000);
+        generation.addAndGet(GENERATION_THRESHOLD * 2);
         removeOldRefs();
         release();
         shrinkPool(0);
@@ -169,7 +171,7 @@ public class BitmapManager {
             } else if (ref instanceof List) {
                 final List<Bitmaps> list = (List<Bitmaps>) ref;
                 for (final Bitmaps bmp : list) {
-                    BitmapRef[] bitmaps = bmp.clear();
+                    final BitmapRef[] bitmaps = bmp.clear();
                     if (bitmaps != null) {
                         for (final BitmapRef bitmap : bitmaps) {
                             if (bitmap != null) {
@@ -228,20 +230,19 @@ public class BitmapManager {
     private static void removeOldRefs() {
         final long gen = generation.get();
         int recycled = 0;
-        int invalid = 0;
         final Iterator<BitmapRef> it = pool.iterator();
         while (it.hasNext()) {
             final BitmapRef ref = it.next();
-            if (gen - ref.gen > 500) {
+            if (gen - ref.gen > GENERATION_THRESHOLD) {
                 it.remove();
                 ref.recycle();
                 recycled++;
                 memoryPooled.addAndGet(-ref.size);
             }
         }
-        if (recycled + invalid > 0) {
+        if (recycled > 0) {
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("Recycled " + invalid + "/" + recycled + " pooled bitmap(s): " + "memoryUsed=" + used.size()
+                LCTX.d("Recycled " + recycled + " pooled bitmap(s): " + "memoryUsed=" + used.size()
                         + "/" + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool=" + pool.size() + "/"
                         + (memoryPooled.get() / 1024) + "KB");
             }
@@ -262,8 +263,8 @@ public class BitmapManager {
         if (recycled > 0) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Recycled " + recycled + " pooled bitmap(s): " + "memoryUsed=" + used.size() + "/"
-                        + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool=" + pool.size() + "/" + (memoryPooled.get() / 1024)
-                        + "KB");
+                        + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool=" + pool.size() + "/"
+                        + (memoryPooled.get() / 1024) + "KB");
             }
         }
     }
