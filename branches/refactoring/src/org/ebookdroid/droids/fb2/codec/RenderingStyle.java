@@ -12,12 +12,6 @@ class RenderingStyle {
     public static final Typeface ITALIC_TF = Typeface.createFromAsset(EBookDroidApp.context.getAssets(),
             "fonts/academyi.ttf");
 
-    public static final int TEXT_SIZE = 24;
-    public static final int MAIN_TITLE_SIZE = 2 * TEXT_SIZE;
-    public static final int SECTION_TITLE_SIZE = (3 * TEXT_SIZE) / 2;
-    public static final int SUBTITLE_SIZE = (5 * TEXT_SIZE) / 4;
-    public static final int FOOTNOTE_SIZE = (5 * TEXT_SIZE) / 6;
-
     private static final SparseArray<CustomTextPaint> paints = new SparseArray<CustomTextPaint>();
 
     public final CustomTextPaint paint;
@@ -29,18 +23,18 @@ class RenderingStyle {
     final Script script;
     final Strike strike;
 
-    public RenderingStyle(final int textSize) {
-        this.textSize = textSize;
+    public RenderingStyle(final FB2FontStyle font) {
+        this.textSize = font.getFontSize();
         this.jm = JustificationMode.Justify;
         this.bold = false;
         this.face = RenderingStyle.NORMAL_TF;
-        this.paint = getTextPaint(face, textSize, bold);
+        this.paint = getTextPaint(face, this.textSize, bold);
         this.script = null;
         this.strike = null;
     }
 
     public RenderingStyle(final RenderingStyle old, final Script script) {
-        this.textSize = script != null ? old.textSize / 2: old.textSize;
+        this.textSize = script != null ? old.textSize / 2 : old.textSize;
         this.jm = old.jm;
         this.bold = old.bold;
         this.face = old.face;
@@ -59,8 +53,8 @@ class RenderingStyle {
         this.strike = strike;
     }
 
-    public RenderingStyle(final RenderingStyle old, final int textSize, final JustificationMode jm) {
-        this.textSize = textSize;
+    public RenderingStyle(final RenderingStyle old, final FB2FontStyle font, final JustificationMode jm) {
+        this.textSize = font.getFontSize();
         this.jm = jm;
         this.bold = old.bold;
         this.face = old.face;
@@ -69,9 +63,9 @@ class RenderingStyle {
         this.strike = null;
     }
 
-    public RenderingStyle(final RenderingStyle old, final int textSize, final JustificationMode jm, final boolean bold,
-            final Typeface face) {
-        this.textSize = textSize;
+    public RenderingStyle(final RenderingStyle old, final FB2FontStyle font, final JustificationMode jm,
+            final boolean bold, final Typeface face) {
+        this.textSize = font.getFontSize();
         this.jm = jm;
         this.bold = bold;
         this.face = face;

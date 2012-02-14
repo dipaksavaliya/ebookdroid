@@ -86,7 +86,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
                     markup.add(new FB2MarkupEndDocument());
                 }
                 parsingNotes = true;
-                crs = new RenderingStyle(RenderingStyle.FOOTNOTE_SIZE);
+                crs = new RenderingStyle(FB2FontStyle.FOOTNOTE);
             }
         } else if ("section".equals(qName)) {
             if (parsingNotes) {
@@ -105,7 +105,7 @@ public class FB2ContentHandler extends FB2BaseHandler {
             }
         } else if ("title".equals(qName)) {
             if (!parsingNotes) {
-                setTitleStyle(!inSection ? RenderingStyle.MAIN_TITLE_SIZE : RenderingStyle.SECTION_TITLE_SIZE);
+                setTitleStyle(!inSection ? FB2FontStyle.MAIN_TITLE : FB2FontStyle.SECTION_TITLE);
                 markup.add(crs.jm);
                 markup.add(emptyLine(crs.textSize));
                 markup.add(FB2MarkupParagraphEnd.E);

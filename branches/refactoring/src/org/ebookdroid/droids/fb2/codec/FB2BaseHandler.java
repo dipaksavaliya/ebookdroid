@@ -12,7 +12,7 @@ public class FB2BaseHandler extends DefaultHandler {
 
     protected final int[] lengths = new int[10000];
 
-    protected RenderingStyle crs = new RenderingStyle(RenderingStyle.TEXT_SIZE);
+    protected RenderingStyle crs = new RenderingStyle(FB2FontStyle.TEXT);
 
     private final LinkedList<RenderingStyle> renderingStates = new LinkedList<RenderingStyle>();
 
@@ -25,9 +25,9 @@ public class FB2BaseHandler extends DefaultHandler {
         return crs;
     }
 
-    protected final RenderingStyle setTitleStyle(final int textSize) {
+    protected final RenderingStyle setTitleStyle(final FB2FontStyle font) {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(crs, textSize, JustificationMode.Center);
+        crs = new RenderingStyle(crs, font, JustificationMode.Center);
         return crs;
     }
 
@@ -69,21 +69,21 @@ public class FB2BaseHandler extends DefaultHandler {
 
     protected final RenderingStyle setSubtitleStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(crs, RenderingStyle.SUBTITLE_SIZE, JustificationMode.Center, true,
+        crs = new RenderingStyle(crs, FB2FontStyle.SUBTITLE, JustificationMode.Center, true,
                 RenderingStyle.NORMAL_TF);
         return crs;
     }
 
     protected final RenderingStyle setTextAuthorStyle(final boolean italic) {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(crs, RenderingStyle.TEXT_SIZE, JustificationMode.Right, false,
+        crs = new RenderingStyle(crs, FB2FontStyle.TEXT, JustificationMode.Right, false,
                 italic ? RenderingStyle.ITALIC_TF : RenderingStyle.NORMAL_TF);
         return crs;
     }
 
     protected final RenderingStyle setPoemStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(crs, RenderingStyle.TEXT_SIZE, JustificationMode.Left, false, RenderingStyle.ITALIC_TF);
+        crs = new RenderingStyle(crs, FB2FontStyle.TEXT, JustificationMode.Left, false, RenderingStyle.ITALIC_TF);
         return crs;
     }
 }

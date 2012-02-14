@@ -95,6 +95,21 @@
 
             </PreferenceCategory>
 
+            <PreferenceCategory
+                android:key="brfiletypespecificfb2"
+                android:summary="@string/pref_brfiletypespecificfb2_summary"
+                android:title="@string/pref_brfiletypespecificfb2_title" >
+
+                <ListPreference
+                    android:defaultValue="NORMAL"
+                    android:entries="@array/list_fontsize"
+                    android:entryValues="@array/list_fontsize_values"
+                    android:key="fontsize"
+                    android:summary="@string/pref_fontsize_summary"
+                    android:title="@string/pref_fontsize_title" />
+
+            </PreferenceCategory>
+
         </PreferenceScreen>
 
     </PreferenceCategory>

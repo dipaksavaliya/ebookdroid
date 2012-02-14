@@ -168,5 +168,24 @@
         <item>9</item>
         <item>10</item>
     </string-array>
-	
+
+    <string-array
+        name="list_fontsize"
+        translatable="false">
+        <item>@string/list_fontsize_tiny</item>
+        <item>@string/list_fontsize_small</item>
+        <item>@string/list_fontsize_normal</item>
+        <item>@string/list_fontsize_large</item>
+        <item>@string/list_fontsize_huge</item>
+    </string-array>
+    <string-array
+        name="list_fontsize_values"
+        translatable="false">
+        <item>TINY</item>
+        <item>SMALL</item>
+        <item>NORMAL</item>
+        <item>LARGE</item>
+        <item>HUGE</item>
+    </string-array>
+
 </resources>

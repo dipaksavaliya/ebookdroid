@@ -76,7 +76,7 @@ public class PreferencesDecorator implements IPreferenceContainer {
 
         enableSinglePageModeSetting(SettingsManager.getAppSettings().getViewMode(), "align", "animationType");
 
-        decoratePreferences("djvu_rendering_mode", "xdpi", "ydpi");
+        decoratePreferences("djvu_rendering_mode", "xdpi", "ydpi", "fontsize");
     }
 
     public void decorateScrollSettings() {

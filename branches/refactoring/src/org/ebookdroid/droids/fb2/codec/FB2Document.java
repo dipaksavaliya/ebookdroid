@@ -184,7 +184,7 @@ public class FB2Document implements CodecDocument {
                     lastPage = new FB2Page();
                     pages.add(lastPage);
                     final FB2Line ruleLine = new FB2Line();
-                    ruleLine.append(new FB2HorizontalRule(FB2Page.PAGE_WIDTH / 4, RenderingStyle.FOOTNOTE_SIZE));
+                    ruleLine.append(new FB2HorizontalRule(FB2Page.PAGE_WIDTH / 4, FB2FontStyle.FOOTNOTE.getFontSize()));
                     ruleLine.applyJustification(JustificationMode.Left);
                     lastPage.appendNoteLine(ruleLine);
                 }

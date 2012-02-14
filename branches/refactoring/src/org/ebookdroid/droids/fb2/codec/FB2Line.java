@@ -110,7 +110,7 @@ public class FB2Line {
             footnotes = new ArrayList<FB2Line>();
             final FB2Line lastLine = new FB2Line();
             footnotes.add(lastLine);
-            lastLine.append(new FB2HorizontalRule(FB2Page.PAGE_WIDTH / 4, RenderingStyle.FOOTNOTE_SIZE));
+            lastLine.append(new FB2HorizontalRule(FB2Page.PAGE_WIDTH / 4, FB2FontStyle.FOOTNOTE.getFontSize()));
             lastLine.applyJustification(JustificationMode.Left);
         }
         footnotes.addAll(noteLines);

@@ -4,6 +4,7 @@ import org.ebookdroid.CodecType;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.DocumentViewType;
+import org.ebookdroid.common.settings.types.FontSize;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.common.settings.types.RotationType;
 import org.ebookdroid.core.curl.PageAnimationType;
@@ -91,6 +92,8 @@ public class AppSettings {
     private Integer xDpi;
 
     private Integer yDpi;
+
+    private FontSize fontSize;
 
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -396,6 +399,13 @@ public class AppSettings {
         } else {
             return def;
         }
+    }
+
+    public FontSize getFontSize() {
+        if (fontSize == null) {
+            fontSize = FontSize.getByResValue(prefs.getString("fontsize", FontSize.NORMAL.toString()));
+        }
+        return fontSize;
     }
 
     boolean getCropPages() {
