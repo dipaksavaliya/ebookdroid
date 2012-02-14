@@ -30,34 +30,6 @@ public class VScrollController extends AbstractViewController {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int)
-     */
-    @Override
-    protected final void goToPageImpl(final int toPage) {
-        final DocumentModel dm = getBase().getDocumentModel();
-        final int pageCount = dm.getPageCount();
-        if (toPage >= 0 && toPage < pageCount) {
-            final Page page = dm.getPageObject(toPage);
-            if (page != null) {
-                final RectF viewRect = view.getViewRect();
-                final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
-                dm.setCurrentPageIndex(page.index);
-                view.scrollTo(getScrollX(), Math.round(bounds.top - (viewRect.height() - bounds.height()) / 2));
-            } else {
-                if (LCTX.isDebugEnabled()) {
-                    LCTX.d("No page found for index: " + toPage);
-                }
-            }
-        } else {
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("Bad page index: " + toPage + ", page count: " + pageCount);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.ebookdroid.ui.viewer.IViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override

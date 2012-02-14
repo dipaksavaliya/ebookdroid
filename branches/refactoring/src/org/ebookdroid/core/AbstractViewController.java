@@ -162,7 +162,13 @@ public abstract class AbstractViewController extends AbstractComponentController
         }
     }
 
-    protected abstract void goToPageImpl(final int toPage);
+    protected void goToPageImpl(final int toPage) {
+        new EventGotoPage(this, toPage).process();
+    }
+
+    protected void goToPageImpl(final int toPage, final float offsetX, final float offsetY) {
+        new EventGotoPage(this, toPage, offsetX, offsetY).process();
+    }
 
     protected final void updatePosition(final DocumentModel dm, final Page page, final ViewState viewState) {
         final int left = view.getScrollX();
@@ -172,30 +178,6 @@ public abstract class AbstractViewController extends AbstractComponentController
         final float offsetX = (left - cpBounds.left) / cpBounds.width();
         final float offsetY = (top - cpBounds.top) / cpBounds.height();
         SettingsManager.positionChanged(offsetX, offsetY);
-    }
-
-    protected void goToPageImpl(final int toPage, final float offsetX, final float offsetY) {
-        final DocumentModel dm = getBase().getDocumentModel();
-        final int pageCount = dm.getPageCount();
-        if (toPage >= 0 && toPage < pageCount) {
-            final Page page = dm.getPageObject(toPage);
-            if (page != null) {
-                dm.setCurrentPageIndex(page.index);
-                final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
-                final float left = bounds.left + offsetX * bounds.width();
-                final float top = bounds.top + offsetY * bounds.height();
-
-                view.scrollTo((int) left, (int) top);
-            } else {
-                if (LCTX.isDebugEnabled()) {
-                    LCTX.d("goToPageImpl(): No page found for index: " + toPage);
-                }
-            }
-        } else {
-            if (LCTX.isDebugEnabled()) {
-                LCTX.d("goToPageImpl(): Bad page index: " + toPage + ", page count: " + pageCount);
-            }
-        }
     }
 
     /**
@@ -236,8 +218,9 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.ebookdroid.ui.viewer.IViewController#pageUpdated(org.ebookdroid.core.ViewState, org.ebookdroid.core.Page)
+     * 
+     * @see org.ebookdroid.ui.viewer.IViewController#pageUpdated(org.ebookdroid.core.ViewState,
+     *      org.ebookdroid.core.Page)
      */
     @Override
     public void pageUpdated(final ViewState viewState, final Page page) {
@@ -254,7 +237,7 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.events.ZoomListener#zoomChanged(float, float, boolean)
      */
     @Override
