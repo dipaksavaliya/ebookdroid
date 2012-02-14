@@ -16,6 +16,8 @@ class RenderingStyle {
 
     public final CustomTextPaint paint;
 
+    public final FB2TextElement defis;
+
     final int textSize;
     final JustificationMode jm;
     final boolean bold;
@@ -31,6 +33,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, this.textSize, bold);
         this.script = null;
         this.strike = null;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public RenderingStyle(final RenderingStyle old, final Script script) {
@@ -41,6 +45,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
         this.script = script;
         this.strike = null;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public RenderingStyle(final RenderingStyle old, final Strike strike) {
@@ -51,6 +57,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
         this.script = old.script;
         this.strike = strike;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public RenderingStyle(final RenderingStyle old, final FB2FontStyle font, final JustificationMode jm) {
@@ -61,6 +69,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
         this.script = null;
         this.strike = null;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public RenderingStyle(final RenderingStyle old, final FB2FontStyle font, final JustificationMode jm,
@@ -72,6 +82,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
         this.script = null;
         this.strike = null;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public RenderingStyle(final RenderingStyle old, final JustificationMode jm, final Typeface face) {
@@ -82,6 +94,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
         this.script = null;
         this.strike = null;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public RenderingStyle(final RenderingStyle old, final boolean bold) {
@@ -92,6 +106,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
         this.script = null;
         this.strike = null;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public RenderingStyle(final RenderingStyle old, final Typeface face) {
@@ -102,6 +118,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
         this.script = null;
         this.strike = null;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public RenderingStyle(final int textSize, final boolean bold, final boolean italic) {
@@ -112,6 +130,8 @@ class RenderingStyle {
         this.paint = getTextPaint(face, textSize, bold);
         this.script = null;
         this.strike = null;
+
+        this.defis = new FB2TextElement(new char[] { '-' }, 0, 1, this);
     }
 
     public static CustomTextPaint getTextPaint(final int textSize) {

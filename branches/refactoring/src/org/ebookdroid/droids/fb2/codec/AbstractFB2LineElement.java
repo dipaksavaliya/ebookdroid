@@ -20,4 +20,8 @@ public abstract class AbstractFB2LineElement implements FB2LineElement {
     public void publishToDocument(final FB2Document doc) {
         doc.publishElement(this);
     }
+
+    public AbstractFB2LineElement[] split(final float remaining) {
+        return null;
+    }
 }

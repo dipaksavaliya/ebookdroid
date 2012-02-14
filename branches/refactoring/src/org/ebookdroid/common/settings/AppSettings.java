@@ -95,6 +95,8 @@ public class AppSettings {
 
     private FontSize fontSize;
 
+    private Boolean fb2HyphenEnabled;
+
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -408,6 +410,13 @@ public class AppSettings {
         return fontSize;
     }
 
+    public boolean isFb2HyphenEnabled() {
+        if (fb2HyphenEnabled == null) {
+            fb2HyphenEnabled = prefs.getBoolean("fb2hyphen", false);
+        }
+        return fb2HyphenEnabled;
+    }
+    
     boolean getCropPages() {
         if (cropPages == null) {
             cropPages = prefs.getBoolean("croppages", false);

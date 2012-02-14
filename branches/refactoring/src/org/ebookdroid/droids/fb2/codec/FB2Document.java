@@ -108,7 +108,7 @@ public class FB2Document implements CodecDocument {
                     if (len == 0 && (val == 0xEF || val == 0xBB || val == 0xBF)) {
                         continue;
                     }
-                    buffer[len++] = (char)val;
+                    buffer[len++] = (char) val;
                     if (val == '>') {
                         found = true;
                         break;
@@ -288,16 +288,30 @@ public class FB2Document implements CodecDocument {
     public void publishElement(final AbstractFB2LineElement le) {
         FB2Line line = FB2Line.getLastLine(paragraphLines);
         final FB2LineWhiteSpace space = RenderingStyle.getTextPaint(line.getHeight()).space;
-        if (line.width + 2 * FB2Page.MARGIN_X + space.width + le.width < FB2Page.PAGE_WIDTH) {
+        float remaining = FB2Page.PAGE_WIDTH - (line.width + 2 * FB2Page.MARGIN_X + space.width);
+        if (le.width < remaining) {
             if (line.hasNonWhiteSpaces() && insertSpace) {
                 line.append(space);
             }
+            line.append(le);
+            insertSpace = true;
         } else {
+            AbstractFB2LineElement[] splitted = le.split(remaining);
+            if (splitted != null && splitted.length > 1) {
+                if (line.hasNonWhiteSpaces() && insertSpace) {
+                    line.append(space);
+                }
+                for (int i = 0; i < splitted.length - 1; i++) {
+                    line.append(splitted[i]);
+                }
+            }
+
             line = new FB2Line();
             paragraphLines.add(line);
+
+            line.append(splitted  == null ? le : splitted[splitted.length - 1]);
+            insertSpace = true;
         }
-        line.append(le);
-        insertSpace = true;
     }
 
     public void commitParagraph() {
