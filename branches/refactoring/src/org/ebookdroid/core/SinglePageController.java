@@ -55,6 +55,7 @@ public class SinglePageController extends AbstractViewController {
             dm.setCurrentPageIndex(page.index);
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
+
             final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
             view.redrawView(viewState);
         }
@@ -73,11 +74,13 @@ public class SinglePageController extends AbstractViewController {
             dm.setCurrentPageIndex(page.index);
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
-            final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
+
             final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
             final float left = bounds.left + offsetX * bounds.width();
             final float top = bounds.top + offsetY * bounds.height();
             view.scrollTo((int) left, (int) top);
+
+            final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
             view.redrawView(viewState);
         }
     }

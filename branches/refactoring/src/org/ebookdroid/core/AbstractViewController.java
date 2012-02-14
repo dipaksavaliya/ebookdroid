@@ -153,7 +153,6 @@ public abstract class AbstractViewController extends AbstractComponentController
             final Page page = pageToGo.getActualPage(base.getDocumentModel(), bs);
             final int toPage = page != null ? page.index.viewIndex : 0;
 
-            new EventScrollTo(this, toPage).process();
             goToPageImpl(toPage, bs.offsetX, bs.offsetY);
 
         } else {
@@ -185,6 +184,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                 final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
                 final float left = bounds.left + offsetX * bounds.width();
                 final float top = bounds.top + offsetY * bounds.height();
+
                 view.scrollTo((int) left, (int) top);
             } else {
                 if (LCTX.isDebugEnabled()) {

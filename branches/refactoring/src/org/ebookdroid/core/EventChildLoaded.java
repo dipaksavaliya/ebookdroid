@@ -2,6 +2,8 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Rect;
@@ -37,27 +39,29 @@ public class EventChildLoaded extends EventScrollTo {
             return null;
         }
 
+        BookSettings bs = SettingsManager.getBookSettings();
+        PageIndex currentPage = bs.getCurrentPage();
+        float offsetX = bs.offsetX;
+        float offsetY = bs.offsetY;
+
         final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
 
         if (changed) {
             ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-            viewState = super.process();
+            ctrl.goToPageImpl(currentPage.viewIndex, offsetX, offsetY);
+        } else {
+            final RectF bounds = viewState.getBounds(page);
+            final PageTreeNode parent = child.parent;
+            if (parent != null) {
+                recycleParent(parent, bounds);
+            }
+            recycleChildren();
+            ctrl.pageUpdated(viewState, page);
+            if (viewState.isNodeVisible(child, bounds)) {
+                ctrl.redrawView(viewState);
+            }
         }
 
-        final RectF bounds = viewState.getBounds(page);
-
-        final PageTreeNode parent = child.parent;
-        if (parent != null) {
-            recycleParent(parent, bounds);
-        }
-
-        recycleChildren();
-
-        ctrl.pageUpdated(viewState, page);
-
-        if (viewState.isNodeVisible(child, bounds)) {
-            ctrl.redrawView(viewState);
-        }
         return viewState;
     }
 
