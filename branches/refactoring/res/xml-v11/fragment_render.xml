@@ -109,7 +109,7 @@
                     android:title="@string/pref_fontsize_title" />
                 
                 <CheckBoxPreference
-                    android:defaultValue="true"
+                    android:defaultValue="false"
                     android:key="fb2hyphen"
                     android:summary="@string/pref_fb2hyphen_summary"
                     android:title="@string/pref_fb2hyphen_title" />
