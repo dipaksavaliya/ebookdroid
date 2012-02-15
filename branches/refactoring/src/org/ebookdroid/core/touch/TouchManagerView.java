@@ -1,5 +1,6 @@
 package org.ebookdroid.core.touch;
 
+import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.core.touch.TouchManager.Region;
 import org.ebookdroid.core.touch.TouchManager.TouchProfile;
@@ -18,7 +19,6 @@ import android.view.View;
 import java.util.ListIterator;
 
 import org.emdev.ui.actions.ActionController;
-import org.emdev.ui.actions.ActionEx;
 import org.emdev.utils.MathUtils;
 
 public class TouchManagerView extends View {
@@ -62,7 +62,7 @@ public class TouchManagerView extends View {
     }
 
     @Override
-    public void setVisibility(int visibility) {
+    public void setVisibility(final int visibility) {
         if (visibility == View.VISIBLE) {
             profile = TouchManager.pushProfile(TMV_PROFILE);
         } else if (profile != null) {
@@ -151,6 +151,36 @@ public class TouchManagerView extends View {
     private PointF endPoint;
     private Region current;
 
+    protected void processRegion() {
+        LCTX.e("processRegion(): ", new Exception());
+
+        if (profile != null) {
+            if (startPoint != null && endPoint != null) {
+                current = getOrCreareRegion(startPoint, endPoint);
+            }
+            LCTX.e("processRegion(): " + current);
+            if (current != null) {
+                final TouchConfigDialog dlg = new TouchConfigDialog(base, profile, current);
+                dlg.show();
+            }
+        }
+
+        startPoint = null;
+        endPoint = null;
+        current = null;
+    }
+
+    protected Region getOrCreareRegion(final PointF startPoint, final PointF endPoint) {
+        final Region selected = getRegion(startPoint, endPoint);
+        for (final Region r : profile.regions) {
+            if (r.getRect().equals(selected.getRect())) {
+                return r;
+            }
+        }
+        profile.addRegion(selected);
+        return selected;
+    }
+
     @Override
     public final boolean onTouchEvent(final MotionEvent ev) {
         try {
@@ -159,19 +189,20 @@ public class TouchManagerView extends View {
             Thread.interrupted();
         }
 
-        if ((ev.getAction() & MotionEvent.ACTION_UP) == MotionEvent.ACTION_UP) {
-            endPoint = new PointF(ev.getX(), ev.getY());
-            current = getRegion(startPoint, endPoint);
+        LCTX.e("onTouchEvent(): " + ev);
+        boolean res = detector.onTouchEvent(ev);
 
-            processRegion(current);
-
-            startPoint = null;
-            endPoint = null;
-            current = null;
+        int action = ev.getAction();
+        if (!res && (action == MotionEvent.ACTION_UP)) {
+            if (startPoint != null) {
+                endPoint = new PointF(ev.getX(), ev.getY());
+                current = getRegion(startPoint, endPoint);
+                processRegion();
+            }
             invalidate();
+            return true;
         }
-
-        return detector.onTouchEvent(ev);
+        return res;
     }
 
     protected Region getRegion(final PointF startPoint, final PointF endPoint) {
@@ -196,59 +227,51 @@ public class TouchManagerView extends View {
         return new Region(MathUtils.rect(left, top, right, bottom));
     }
 
-    protected void processRegion(final Region current) {
-        if (profile != null) {
-            LCTX.d("processRegion(" + current + ")");
-            profile.addRegion(current);
-        }
-    }
-
-    protected boolean processTap(final TouchManager.Touch type, final MotionEvent e) {
-        final Integer actionId = TouchManager.getAction(type, e.getX(), e.getY(), getWidth(), getHeight());
-        final ActionEx action = actionId != null ? actions.getOrCreateAction(actionId) : null;
-        if (action != null) {
-            LCTX.d("Touch action: " + action.name + ", " + action.getMethod().toString());
-            action.run();
-            return true;
-        } else {
-            LCTX.d("Touch action not found");
-        }
-        return false;
-    }
-
     protected class GestureListener extends SimpleOnGestureListener {
 
         @Override
         public boolean onDoubleTap(final MotionEvent e) {
-            return processTap(TouchManager.Touch.DoubleTap, e);
+            actions.getOrCreateAction(R.id.actions_toggleTouchManagerView).run();
+            return true;
         }
 
         @Override
         public boolean onDown(final MotionEvent e) {
-            LCTX.d("onDown(" + e + ")");
             startPoint = new PointF(e.getX(), e.getY());
+            endPoint = startPoint;
+            current = getRegion(startPoint, endPoint);
+            LCTX.e("onDown(): " + current);
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            LCTX.e("onSingleTapUp(): " + current);
             return true;
         }
 
         @Override
         public boolean onScroll(final MotionEvent e1, final MotionEvent e2, final float distanceX, final float distanceY) {
             final float x = e2.getX(), y = e2.getY();
-
             endPoint = new PointF(x, y);
             current = getRegion(startPoint, endPoint);
-            LCTX.d("onScroll(" + x + ", " + y + "): " + current);
+            LCTX.e("onScroll(): " + current);
             invalidate();
             return true;
         }
 
         @Override
         public boolean onSingleTapConfirmed(final MotionEvent e) {
-            return processTap(TouchManager.Touch.SingleTap, e);
+            if (profile != null) {
+                current = profile.getRegion(e.getX(), e.getY(), getWidth(), getHeight());
+                LCTX.e("onSingleTapConfirmed(): " + current);
+                processRegion();
+            }
+            return true;
         }
 
         @Override
         public void onLongPress(final MotionEvent e) {
-            processTap(TouchManager.Touch.LongTap, e);
         }
     }
 

@@ -26,12 +26,12 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.emdev.ui.actions.ActionController;
 import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.ActionMethodDef;
 import org.emdev.ui.actions.ActionTarget;
+import org.emdev.ui.actions.DialogController;
 import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.actions.params.EditableValue;
@@ -54,12 +54,12 @@ public class GoToPageDialog extends Dialog {
 
     final IActivityController base;
     BookmarkAdapter adapter;
-    ActionController<GoToPageDialog> actions;
+    DialogController<GoToPageDialog> actions;
 
     public GoToPageDialog(final IActivityController base) {
         super(base.getContext());
         this.base = base;
-        this.actions = new ActionController<GoToPageDialog>(base.getActivity(), this);
+        this.actions = new DialogController<GoToPageDialog>(base.getActivity(), this);
 
         setTitle(R.string.dialog_title_goto_page);
         setContentView(R.layout.gotopage);
@@ -68,12 +68,9 @@ public class GoToPageDialog extends Dialog {
         final SeekBar seekbar = (SeekBar) findViewById(R.id.seekbar);
         final EditText editText = (EditText) findViewById(R.id.pageNumberTextEdit);
 
-        final View bookmarksHeader = findViewById(R.id.bookmarkHeader);
-        bookmarksHeader.setOnClickListener(actions.getOrCreateAction(R.id.mainmenu_bookmark));
-        bookmarksHeader.setOnLongClickListener(actions.getOrCreateAction(R.id.actions_showDeleteAllBookmarksDlg));
-
-        button.setOnClickListener(actions.getOrCreateAction(R.id.actions_gotoPage));
-        editText.setOnEditorActionListener(actions.getOrCreateAction(R.id.actions_gotoPage));
+        actions.connectViewToActions(R.id.bookmarkHeader, R.id.mainmenu_bookmark, R.id.actions_showDeleteAllBookmarksDlg);
+        actions.connectViewToAction(button, R.id.actions_gotoPage);
+        actions.connectEditorToAction(editText, R.id.actions_gotoPage);
 
         seekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 

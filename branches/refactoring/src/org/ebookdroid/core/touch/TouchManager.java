@@ -202,6 +202,18 @@ public class TouchManager {
             return null;
         }
 
+        public Region getRegion(final float x, final float y, final float width, final float height) {
+            LCTX.d("getRegion(" + x + ", " + y + ", " + width + ", " + height + ")");
+            for (final Region r : regions) {
+                final RectF rect = r.getActualRect(width, height);
+                LCTX.d("Region: " + rect);
+                if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
+                    return r;
+                }
+            }
+            return null;
+        }
+
         public Region addRegion(final int left, final int top, final int right, final int bottom) {
             final Region r = new Region(new Rect(left, top, right, bottom));
             return addRegion(r);
@@ -265,6 +277,10 @@ public class TouchManager {
 
         public Region(final Rect r) {
             rect = r;
+        }
+
+        public Rect getRect() {
+            return rect;
         }
 
         public ActionRef getAction(final Touch type) {
