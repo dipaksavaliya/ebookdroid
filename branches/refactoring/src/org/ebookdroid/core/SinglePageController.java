@@ -48,7 +48,7 @@ public class SinglePageController extends AbstractViewController {
      * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int)
      */
     @Override
-    public final void goToPageImpl(final int toPage) {
+    public final void goToPage(final int toPage) {
         final DocumentModel dm = getBase().getDocumentModel();
         if (toPage >= 0 && toPage < dm.getPageCount()) {
             final Page page = dm.getPageObject(toPage);
@@ -67,7 +67,7 @@ public class SinglePageController extends AbstractViewController {
      * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int, float, float)
      */
     @Override
-    protected void goToPageImpl(final int toPage, final float offsetX, final float offsetY) {
+    public void goToPage(final int toPage, final float offsetX, final float offsetY) {
         final DocumentModel dm = getBase().getDocumentModel();
         if (toPage >= 0 && toPage < dm.getPageCount()) {
             final Page page = dm.getPageObject(toPage);
@@ -99,9 +99,12 @@ public class SinglePageController extends AbstractViewController {
 
         AbstractEventScroll cmd = dX > 0 ? new EventScrollDown(this) : new EventScrollUp(this);
         final ViewState viewState = cmd.process();
-        DocumentModel dm = base.getDocumentModel();
-        if (dm != null) {
-            updatePosition(dm, dm.getCurrentPageObject(), viewState);
+
+        if (cmd.model != null) {
+            final Page page = cmd.model.getCurrentPageObject();
+            if (page != null) {
+                updatePosition(cmd.model, page, viewState);
+            }
         }
         view.redrawView(viewState);
     }

@@ -95,8 +95,8 @@ actions = {
         @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu")
 // finish
 })
-public class ViewerActivity extends AbstractActionActivity implements IActivityController,
-        DecodingProgressListener, CurrentPageListener, ISettingsChangeListener {
+public class ViewerActivity extends AbstractActionActivity implements IActivityController, DecodingProgressListener,
+        CurrentPageListener, ISettingsChangeListener {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Core");
 
@@ -147,7 +147,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
         super.onCreate(savedInstanceState);
 
         getWindowManager().getDefaultDisplay().getMetrics(DM);
-        LCTX.i("XDPI=" + DM.xdpi+", YDPI=" + DM.ydpi);
+        LCTX.i("XDPI=" + DM.xdpi + ", YDPI=" + DM.ydpi);
 
         frameLayout = createMainContainer();
         view = createView();
@@ -792,6 +792,10 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
 
         @Override
         public void goToPage(final int page) {
+        }
+
+        @Override
+        public void goToPage(int page, float offsetX, float offsetY) {
         }
 
         @Override

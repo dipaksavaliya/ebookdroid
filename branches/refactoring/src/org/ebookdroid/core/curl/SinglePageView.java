@@ -148,7 +148,7 @@ public class SinglePageView implements PageAnimator {
      */
     @Override
     public void animate(int direction) {
-      view.goToPageImpl(view.getBase().getDocumentModel().getCurrentViewPageIndex() + direction);
+      view.goToPage(view.getBase().getDocumentModel().getCurrentViewPageIndex() + direction);
     }
 
 }

@@ -1,30 +1,17 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.R;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
-import org.ebookdroid.ui.viewer.views.DragMark;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import org.emdev.ui.hwa.IHardwareAcceleration;
-
-public class HScrollController extends AbstractViewController {
-
-    protected static Bitmap dragBitmap;
+public class HScrollController extends AbstractScrollController {
 
     public HScrollController(final IActivityController base) {
         super(base, DocumentViewMode.HORIZONTAL_SCROLL);
-        if (dragBitmap == null) {
-            dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
-        }
-        IHardwareAcceleration.Factory.getInstance().setMode(getView().getView(),
-                SettingsManager.getAppSettings().isHWAEnabled(), true);
     }
 
     /**
@@ -86,46 +73,6 @@ public class HScrollController extends AbstractViewController {
         return new Rect(0, 0, right, bottom);
     }
 
-    @Override
-    public void drawView(EventDraw eventDraw) {
-        final DocumentModel dm = getBase().getDocumentModel();
-        if (dm == null) {
-            return;
-        }
-        for (Page page : dm.getPages(eventDraw.viewState.firstVisible, eventDraw.viewState.lastVisible + 1)) {
-            if (page != null) {
-                eventDraw.process(page);
-            }
-        }
-
-        if (SettingsManager.getAppSettings().getShowAnimIcon()) {
-            DragMark.draw(eventDraw.canvas, eventDraw.viewState);
-        }
-        view.continueScroll();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.core.AbstractViewController#onLayoutChanged(boolean, boolean, android.graphics.Rect,
-     *      android.graphics.Rect)
-     */
-    @Override
-    public final boolean onLayoutChanged(final boolean layoutChanged, final boolean layoutLocked, final Rect oldLaout,
-            final Rect newLayout) {
-        int page = -1;
-        if (isShown && layoutChanged) {
-            page = base.getDocumentModel().getCurrentViewPageIndex();
-        }
-        if (super.onLayoutChanged(layoutChanged, layoutLocked, oldLaout, newLayout)) {
-            if (page > 0) {
-                goToPage(page);
-            }
-            return true;
-        }
-        return false;
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -166,16 +113,5 @@ public class HScrollController extends AbstractViewController {
                 widthAccum += pageWidth + 1;
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.core.AbstractViewController#isPageVisible(org.ebookdroid.core.Page,
-     *      org.ebookdroid.core.ViewState)
-     */
-    @Override
-    public final boolean isPageVisible(final Page page, final ViewState viewState) {
-        return RectF.intersects(viewState.viewRect, viewState.getBounds(page));
     }
 }

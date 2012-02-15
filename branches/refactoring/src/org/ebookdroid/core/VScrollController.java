@@ -1,30 +1,17 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.R;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
-import org.ebookdroid.ui.viewer.views.DragMark;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import org.emdev.ui.hwa.IHardwareAcceleration;
-
-public class VScrollController extends AbstractViewController {
-
-    protected static Bitmap dragBitmap;
+public class VScrollController extends AbstractScrollController {
 
     public VScrollController(final IActivityController base) {
         super(base, DocumentViewMode.VERTICALL_SCROLL);
-        if (dragBitmap == null) {
-            dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
-        }
-        IHardwareAcceleration.Factory.getInstance().setMode(getView().getView(),
-                SettingsManager.getAppSettings().isHWAEnabled(), true);
     }
 
     /**
@@ -88,57 +75,6 @@ public class VScrollController extends AbstractViewController {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IViewController#drawView(org.ebookdroid.core.EventDraw)
-     */
-    @Override
-    public void drawView(final EventDraw eventDraw) {
-        ViewState viewState = eventDraw.viewState;
-        if (viewState.model == null) {
-            return;
-        }
-
-        for (final Page page : viewState.model.getPages(viewState.firstVisible, viewState.lastVisible + 1)) {
-            if (page != null) {
-                eventDraw.process(page);
-            }
-        }
-
-        if (SettingsManager.getAppSettings().getShowAnimIcon()) {
-            DragMark.draw(eventDraw.canvas, viewState);
-        }
-        view.continueScroll();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.core.AbstractViewController#onLayoutChanged(boolean, boolean, android.graphics.Rect,
-     *      android.graphics.Rect)
-     */
-    @Override
-    public final boolean onLayoutChanged(final boolean layoutChanged, final boolean layoutLocked, final Rect oldLaout,
-            final Rect newLayout) {
-        int page = -1;
-        final DocumentModel dm = base.getDocumentModel();
-        if (dm == null) {
-            return false;
-        }
-
-        if (isShown && layoutChanged) {
-            page = dm.getCurrentViewPageIndex();
-        }
-        if (super.onLayoutChanged(layoutChanged, layoutLocked, oldLaout, newLayout)) {
-            if (page > 0) {
-                goToPage(page);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason,
      *      org.ebookdroid.core.Page)
      */
@@ -152,33 +88,27 @@ public class VScrollController extends AbstractViewController {
             return;
         }
 
+        DocumentModel model = getBase().getDocumentModel();
+        if (model == null) {
+            return;
+        }
+
         final int width = getWidth();
 
         if (changedPage == null) {
             float heightAccum = 0;
-            for (final Page page : getBase().getDocumentModel().getPages()) {
+            for (final Page page : model.getPages()) {
                 final float pageHeight = width / page.getAspectRatio();
                 page.setBounds(new RectF(0, heightAccum, width, heightAccum + pageHeight));
                 heightAccum += pageHeight + 1;
             }
         } else {
             float heightAccum = changedPage.getBounds(1.0f).top;
-            for (final Page page : getBase().getDocumentModel().getPages(changedPage.index.viewIndex)) {
+            for (final Page page : model.getPages(changedPage.index.viewIndex)) {
                 final float pageHeight = width / page.getAspectRatio();
                 page.setBounds(new RectF(0, heightAccum, width, heightAccum + pageHeight));
                 heightAccum += pageHeight + 1;
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.core.AbstractViewController#isPageVisible(org.ebookdroid.core.Page,
-     *      org.ebookdroid.core.ViewState)
-     */
-    @Override
-    public final boolean isPageVisible(final Page page, final ViewState viewState) {
-        return RectF.intersects(viewState.viewRect, viewState.getBounds(page));
     }
 }

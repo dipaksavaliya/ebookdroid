@@ -180,10 +180,10 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
             bFlipping = false;
             // System.out.println("FAS end");
             if (bFlipRight) {
-                view.goToPageImpl(backIndex);
+                view.goToPage(backIndex);
                 foreIndex = backIndex;
             } else {
-                view.goToPageImpl(foreIndex);
+                view.goToPage(foreIndex);
             }
 
             // Create values

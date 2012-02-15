@@ -48,7 +48,7 @@ public class EventChildLoaded extends EventScrollTo {
 
         if (changed) {
             ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-            ctrl.goToPageImpl(currentPage.viewIndex, offsetX, offsetY);
+            ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
         } else {
             final RectF bounds = viewState.getBounds(page);
             final PageTreeNode parent = child.parent;

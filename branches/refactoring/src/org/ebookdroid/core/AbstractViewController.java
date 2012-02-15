@@ -153,21 +153,13 @@ public abstract class AbstractViewController extends AbstractComponentController
             final Page page = pageToGo.getActualPage(base.getDocumentModel(), bs);
             final int toPage = page != null ? page.index.viewIndex : 0;
 
-            goToPageImpl(toPage, bs.offsetX, bs.offsetY);
+            goToPage(toPage, bs.offsetX, bs.offsetY);
 
         } else {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("View is not initialized yet");
             }
         }
-    }
-
-    protected void goToPageImpl(final int toPage) {
-        new EventGotoPage(this, toPage).process();
-    }
-
-    protected void goToPageImpl(final int toPage, final float offsetX, final float offsetY) {
-        new EventGotoPage(this, toPage, offsetX, offsetY).process();
     }
 
     protected final void updatePosition(final DocumentModel dm, final Page page, final ViewState viewState) {
@@ -178,61 +170,6 @@ public abstract class AbstractViewController extends AbstractComponentController
         final float offsetX = (left - cpBounds.left) / cpBounds.width();
         final float offsetY = (top - cpBounds.top) / cpBounds.height();
         SettingsManager.positionChanged(offsetX, offsetY);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.ui.viewer.IViewController#onScrollChanged(int, int)
-     */
-    @Override
-    public void onScrollChanged(final int dX, final int dY) {
-        if (inZoom.get()) {
-            return;
-        }
-
-        final int d = mode == DocumentViewMode.VERTICALL_SCROLL ? dY : dX;
-
-        final AbstractEventScroll cmd = d > 0 ? new EventScrollDown(this) : new EventScrollUp(this);
-
-        // if (LCTX.isDebugEnabled()) {
-        // LCTX.d("onScrollChanged(" + dX + ", " + dY + "): " + cmd);
-        // }
-
-        final Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-                final ViewState viewState = cmd.process();
-                final DocumentModel dm = getBase().getDocumentModel();
-                final Page page = dm.getPageObject(viewState.currentIndex);
-                if (page != null) {
-                    dm.setCurrentPageIndex(page.index);
-                    updatePosition(dm, page, viewState);
-                    view.redrawView(viewState);
-                }
-            }
-        };
-        r.run();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.ui.viewer.IViewController#pageUpdated(org.ebookdroid.core.ViewState,
-     *      org.ebookdroid.core.Page)
-     */
-    @Override
-    public void pageUpdated(final ViewState viewState, final Page page) {
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.ui.viewer.IViewController#updateAnimationType()
-     */
-    @Override
-    public void updateAnimationType() {
     }
 
     /**
@@ -271,31 +208,19 @@ public abstract class AbstractViewController extends AbstractComponentController
         new EventReset(this, null, false).process();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.ui.viewer.IViewController#goToPage(int)
-     */
-    @Override
-    public final void goToPage(final int toPage) {
-        if (isShown) {
-            goToPageImpl(toPage);
-        }
-    }
-
-    public int getScrollX() {
+    public final int getScrollX() {
         return view.getScrollX();
     }
 
-    public int getWidth() {
+    public final int getWidth() {
         return view.getWidth();
     }
 
-    public int getScrollY() {
+    public final int getScrollY() {
         return view.getScrollY();
     }
 
-    public int getHeight() {
+    public final int getHeight() {
         return view.getHeight();
     }
 
@@ -305,7 +230,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      * @see org.ebookdroid.ui.viewer.IViewController#dispatchKeyEvent(android.view.KeyEvent)
      */
     @Override
-    public boolean dispatchKeyEvent(final KeyEvent event) {
+    public final boolean dispatchKeyEvent(final KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (event.getKeyCode()) {
                 case KeyEvent.KEYCODE_DPAD_UP:
@@ -373,11 +298,21 @@ public abstract class AbstractViewController extends AbstractComponentController
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.ui.viewer.IViewController#toggleNightMode(boolean)
+     */
     @Override
-    public void toggleNightMode(final boolean nightMode) {
+    public final void toggleNightMode(final boolean nightMode) {
         new EventReset(this, null, true).process();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.ui.viewer.IViewController#invalidateScroll()
+     */
     public final void invalidateScroll() {
         if (!isShown) {
             return;
@@ -446,12 +381,12 @@ public abstract class AbstractViewController extends AbstractComponentController
     }
 
     @ActionMethod(ids = { R.id.actions_verticalConfigScrollUp, R.id.actions_verticalConfigScrollDown })
-    public void verticalConfigScroll(final ActionEx action) {
+    public final void verticalConfigScroll(final ActionEx action) {
         final Integer direction = action.getParameter("direction");
         verticalConfigScroll(direction);
     }
 
-    protected boolean processTap(final TouchManager.Touch type, final MotionEvent e) {
+    protected final boolean processTap(final TouchManager.Touch type, final MotionEvent e) {
         final Integer actionId = TouchManager.getAction(type, e.getX(), e.getY(), getWidth(), getHeight());
         final ActionEx action = actionId != null ? getOrCreateAction(actionId) : null;
         if (action != null) {
