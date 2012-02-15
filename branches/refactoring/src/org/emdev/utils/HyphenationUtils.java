@@ -26,17 +26,17 @@ public class HyphenationUtils {
             classes.append(c, Symbol.S);
         }
 
-        ROOT.addRule(new HyphenRule(1, Symbol.X, Symbol.G, Symbol.G));
-        ROOT.addRule(new HyphenRule(1, Symbol.X, Symbol.G, Symbol.S));
-        ROOT.addRule(new HyphenRule(1, Symbol.X, Symbol.S, Symbol.G));
-        ROOT.addRule(new HyphenRule(1, Symbol.X, Symbol.S, Symbol.S));
-        ROOT.addRule(new HyphenRule(2, Symbol.G, Symbol.S, Symbol.S, Symbol.G));
-        ROOT.addRule(new HyphenRule(2, Symbol.G, Symbol.S, Symbol.S, Symbol.S, Symbol.G));
-        ROOT.addRule(new HyphenRule(3, Symbol.G, Symbol.S, Symbol.S, Symbol.S, Symbol.G));
-        ROOT.addRule(new HyphenRule(3, Symbol.G, Symbol.S, Symbol.S, Symbol.S, Symbol.S, Symbol.G));
-        ROOT.addRule(new HyphenRule(2, Symbol.S, Symbol.G, Symbol.G, Symbol.G));
-        ROOT.addRule(new HyphenRule(2, Symbol.S, Symbol.G, Symbol.G, Symbol.S));
-        ROOT.addRule(new HyphenRule(2, Symbol.S, Symbol.G, Symbol.S, Symbol.G));
+        ROOT.addRule(1, Symbol.X, Symbol.G, Symbol.G);
+        ROOT.addRule(1, Symbol.X, Symbol.G, Symbol.S);
+        ROOT.addRule(1, Symbol.X, Symbol.S, Symbol.G);
+        ROOT.addRule(1, Symbol.X, Symbol.S, Symbol.S);
+        ROOT.addRule(2, Symbol.G, Symbol.S, Symbol.S, Symbol.G);
+        ROOT.addRule(2, Symbol.G, Symbol.S, Symbol.S, Symbol.S, Symbol.G);
+        ROOT.addRule(3, Symbol.G, Symbol.S, Symbol.S, Symbol.S, Symbol.G);
+        ROOT.addRule(3, Symbol.G, Symbol.S, Symbol.S, Symbol.S, Symbol.S, Symbol.G);
+        ROOT.addRule(2, Symbol.S, Symbol.G, Symbol.G, Symbol.G);
+        ROOT.addRule(2, Symbol.S, Symbol.G, Symbol.G, Symbol.S);
+        ROOT.addRule(2, Symbol.S, Symbol.G, Symbol.S, Symbol.G);
     }
 
     private HyphenationUtils() {
@@ -64,22 +64,29 @@ public class HyphenationUtils {
         for (int i = begin, end = begin + len; i < end; i++) {
             final char c = str[i];
             final Symbol clazz = classes.get(c, Symbol.N);
+            if (clazz == Symbol.N) {
+                bufcount = 0;
+                bufstart = 0;
+                continue;
+            }
 
-            buffer[(bufstart + bufcount) % buffer.length] = clazz;
+            final int index = (bufstart + bufcount) % buffer.length;
+            buffer[index] = clazz;
             bufcount++;
 
+            HyphenRuleNode current = null;
             while (bufcount > 0) {
-                final HyphenRuleNode node = ROOT.match(buffer, bufstart, bufcount);
-                if (node != null) {
-                    if (!node.rulez.isEmpty()) {
+                current = match(current, bufstart, index, bufcount);
+                if (current != null) {
+                    if (!current.rulez.isEmpty()) {
                         // Set hyphens from roots
                         int prevRulePosition = 0;
                         int totalUsed = 0;
-                        for (final HyphenRule r : node.rulez) {
-                            int thisStart = nextStart;
-                            int ruleStart = prevRulePosition == 0 ? i - bufcount + 1 : nextStart;
-                            int headLen = ruleStart - thisStart;
-                            int used = r.position - prevRulePosition;
+                        for (final HyphenRule r : current.rulez) {
+                            final int thisStart = nextStart;
+                            final int ruleStart = prevRulePosition == 0 ? i - bufcount + 1 : nextStart;
+                            final int headLen = ruleStart - thisStart;
+                            final int used = r.position - prevRulePosition;
 
                             outStart[partcount] = thisStart;
                             outLength[partcount] = headLen + used;
@@ -95,6 +102,7 @@ public class HyphenationUtils {
                         // Clear buffer
                         bufcount = bufcount - totalUsed;
                         bufstart = (bufstart + totalUsed) % buffer.length;
+                        current = null;
                     } else {
                         // Partial match - do nothing
                         break;
@@ -103,15 +111,16 @@ public class HyphenationUtils {
                     // No matches - remove first symbol from buffer
                     bufcount = bufcount - 1;
                     bufstart = bufcount == 0 ? 0 : (bufstart + 1) % buffer.length;
+                    current = null;
                 }
             }
         }
 
         if (partcount > 0) {
-            int lastStart = outStart[partcount - 1];
-            int lastLen = outLength[partcount - 1];
-            int tailStart = lastStart + lastLen;
-            int tailLen = begin + len - tailStart;
+            final int lastStart = outStart[partcount - 1];
+            final int lastLen = outLength[partcount - 1];
+            final int tailStart = lastStart + lastLen;
+            final int tailLen = begin + len - tailStart;
             if (tailLen > 0) {
                 outStart[partcount] = tailStart;
                 outLength[partcount] = tailLen;
@@ -121,6 +130,22 @@ public class HyphenationUtils {
         }
 
         return partcount;
+    }
+
+    private static HyphenRuleNode match(final HyphenRuleNode current, final int bufstart, final int index,
+            final int bufcount) {
+        if (current != null) {
+            return current.children[buffer[index].ordinal()];
+        }
+        if (bufcount == 1) {
+            return ROOT.children[buffer[index].ordinal()];
+        }
+        HyphenRuleNode c = ROOT;
+        for (int symIndex = 0; symIndex < bufcount && c != null; symIndex++) {
+            final int ordinal = buffer[(bufstart + symIndex) % buffer.length].ordinal();
+            c = c.children[ordinal];
+        }
+        return c;
     }
 
     private static enum Symbol {
@@ -134,7 +159,7 @@ public class HyphenationUtils {
         public final Symbol[] pattern;
         public final int position;
 
-        public HyphenRule(final int position, Symbol... pattern) {
+        public HyphenRule(final int position, final Symbol... pattern) {
             this.pattern = pattern;
             this.position = position;
         }
@@ -155,17 +180,8 @@ public class HyphenationUtils {
             this.symbol = symbol;
         }
 
-        public HyphenRuleNode match(final Symbol[] buffer, final int start, final int length) {
-            if (length == 0) {
-                return this;
-            }
-            final Symbol key = buffer[start];
-            final HyphenRuleNode child = children[key.ordinal()];
-            return child != null ? child.match(buffer, (start + 1) % buffer.length, length - 1) : null;
-        }
-
-        void addRule(final HyphenRule rule) {
-            addRule(rule, 0);
+        void addRule(final int position, final Symbol... pattern) {
+            addRule(new HyphenRule(position, pattern), 0);
         }
 
         void addRule(final HyphenRule rule, final int level) {
