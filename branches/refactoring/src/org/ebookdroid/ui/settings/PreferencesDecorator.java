@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.emdev.utils.LengthUtils;
-import org.emdev.utils.android.AndroidVersion;
 
 /**
  * @author whippet
@@ -85,7 +84,7 @@ public class PreferencesDecorator implements IPreferenceContainer {
 
     public void decorateUISettings() {
         decoratePreferences("rotation", "brightness");
-        findPreference("fullscreen").setEnabled(!AndroidVersion.is3x);
+        //findPreference("fullscreen").setEnabled(!AndroidVersion.is3x);
     }
 
     public void setPageAlign(final PageAnimationType type, final String alignPrefKey) {

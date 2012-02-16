@@ -96,8 +96,10 @@ public class SystemUtils {
             final char ac[] = new char[8192];
             int i = 0;
             do {
-                i = r.read(ac, 0, 8192);
-                w.write(ac, 0, i);
+                i = r.read(ac);
+                if (i > 0) {
+                    w.write(ac, 0, i);
+                }
             } while (i != -1);
             r.close();
             process.waitFor();
