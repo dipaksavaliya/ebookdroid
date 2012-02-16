@@ -25,8 +25,6 @@ public class TouchManagerView extends View {
 
     private static final LogContext LCTX = LogContext.ROOT.lctx("TouchManagerView");
 
-    public static final String TMV_PROFILE = "TouchManagerView.Default";
-
     private static final float GRID_X = 10;
     private static final float GRID_Y = 10;
 
@@ -64,9 +62,8 @@ public class TouchManagerView extends View {
     @Override
     public void setVisibility(final int visibility) {
         if (visibility == View.VISIBLE) {
-            profile = TouchManager.pushProfile(TMV_PROFILE);
-        } else if (profile != null) {
-            TouchManager.popProfile();
+            profile = TouchManager.topProfile();
+        } else {
             profile = null;
         }
         super.setVisibility(visibility);

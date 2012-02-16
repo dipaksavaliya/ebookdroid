@@ -103,7 +103,7 @@ public class AppSettings {
 
     public String getTouchProfiles() {
         if (touchProfiles == null) {
-            touchProfiles = prefs.getString("touchprofiles", "");
+            touchProfiles = prefs.getString("tapprofiles", "");
         }
         return touchProfiles;
     }

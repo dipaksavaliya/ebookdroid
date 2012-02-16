@@ -47,21 +47,22 @@ public class TouchManager {
             } catch (final Throwable ex) {
                 ex.printStackTrace();
             }
-            fromJSON = profiles.containsKey(DEFAULT_PROFILE) && profiles.containsKey(TouchManagerView.TMV_PROFILE);
+            fromJSON = profiles.containsKey(DEFAULT_PROFILE);
         }
 
         if (!fromJSON) {
-            final TouchProfile tp = addProfile(TouchManagerView.TMV_PROFILE);
-            {
-                final Region r = tp.addRegion(0, 0, 100, 100);
-                r.setAction(Touch.DoubleTap, R.id.actions_toggleTouchManagerView, true);
-            }
-
             final TouchProfile def = addProfile(DEFAULT_PROFILE);
             {
                 final Region r = def.addRegion(0, 0, 100, 100);
                 r.setAction(Touch.DoubleTap, R.id.mainmenu_zoom, newSettings.getZoomByDoubleTap());
-                r.setAction(Touch.LongTap, R.id.actions_openOptionsMenu, true);
+            }
+            {
+                final Region r = def.addRegion(40, 40, 60, 60);
+                r.setAction(Touch.DoubleTap, R.id.actions_openOptionsMenu, true);
+            }
+            {
+                final Region r = def.addRegion(80, 0, 100, 20);
+                r.setAction(Touch.DoubleTap, R.id.mainmenu_close, true);
             }
             {
                 final Region r = def.addRegion(0, 0, 100, newSettings.getTapSize());
@@ -126,6 +127,10 @@ public class TouchManager {
         final TouchProfile tp = new TouchProfile(name);
         profiles.put(tp.name, tp);
         return tp;
+    }
+
+    public static TouchProfile topProfile() {
+        return stack.isEmpty() ? null : stack.peek();
     }
 
     public static TouchProfile pushProfile(final String name) {
