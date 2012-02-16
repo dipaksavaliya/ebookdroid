@@ -49,7 +49,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -69,9 +68,9 @@ import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.actions.params.EditableValue;
+import org.emdev.ui.fullscreen.IFullScreenManager;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.StringUtils;
-import org.emdev.utils.android.AndroidVersion;
 import org.emdev.utils.filesystem.PathFromUri;
 
 @ActionTarget(
@@ -169,9 +168,15 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        IFullScreenManager.instance.onResume();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
-
+        IFullScreenManager.instance.onPause();
         SettingsManager.storeBookSettings();
     }
 
@@ -372,7 +377,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
     @Override
     public boolean onMenuOpened(final int featureId, final Menu menu) {
         getView().changeLayoutLock(true);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        IFullScreenManager.instance.onMenuOpened(getWindow());
         return super.onMenuOpened(featureId, menu);
     }
 
@@ -388,12 +393,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
     @Override
     public void onOptionsMenuClosed(final Menu menu) {
         menuClosedCalled = true;
-        final Window w = getWindow();
-        if (SettingsManager.getAppSettings().getFullScreen()) {
-            w.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        } else {
-            w.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
+        IFullScreenManager.instance.onMenuClosed(getWindow());
         view.changeLayoutLock(false);
     }
 
@@ -614,13 +614,8 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
             setRequestedOrientation(newSettings.getRotation().getOrientation());
         }
 
-        if (diff.isFullScreenChanged() && !AndroidVersion.is3x) {
-            final Window window = getWindow();
-            if (newSettings.getFullScreen()) {
-                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            } else {
-                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            }
+        if (diff.isFullScreenChanged()) {
+            IFullScreenManager.instance.setFullScreenMode(getWindow(), newSettings.getFullScreen());
         }
 
         if (diff.isShowTitleChanged() && diff.isFirstTime()) {
