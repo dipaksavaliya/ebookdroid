@@ -25,7 +25,7 @@ public class ZoomModel extends ListenerProxy {
         isCommited = true;
     }
 
-    public void setZoom(float zoom) {
+    public void setZoom(final float zoom) {
         final float newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
         final float oldZoom = this.currentZoom;
         if (newZoom != oldZoom) {
@@ -33,6 +33,10 @@ public class ZoomModel extends ListenerProxy {
             this.currentZoom = newZoom;
             this.<ZoomListener> getListener().zoomChanged(oldZoom, newZoom, false);
         }
+    }
+
+    public void scaleZoom(final float factor) {
+        setZoom(currentZoom * factor);
     }
 
     public float getZoom() {

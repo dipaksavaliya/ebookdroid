@@ -11,7 +11,7 @@ import org.ebookdroid.core.curl.SinglePageView;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.touch.DefaultGestureDetector;
 import org.ebookdroid.core.touch.IGestureDetector;
-import org.ebookdroid.core.touch.IMultiTouchZoom;
+import org.ebookdroid.core.touch.MultiTouchGestureDetectorFactory;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Rect;
@@ -167,9 +167,10 @@ public class SinglePageController extends AbstractViewController {
      */
     @Override
     protected List<IGestureDetector> initGestureDetectors(final List<IGestureDetector> list) {
-        list.add(IMultiTouchZoom.Factory.createImpl(base.getZoomModel()));
+        final GestureListener listener = new GestureListener();
+        list.add(MultiTouchGestureDetectorFactory.create(listener));
         list.add(curler);
-        list.add(new DefaultGestureDetector(base.getContext(), new GestureListener()));
+        list.add(new DefaultGestureDetector(base.getContext(), listener));
         return list;
     }
 

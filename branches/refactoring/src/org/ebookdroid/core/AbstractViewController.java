@@ -8,7 +8,8 @@ import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.touch.DefaultGestureDetector;
 import org.ebookdroid.core.touch.IGestureDetector;
-import org.ebookdroid.core.touch.IMultiTouchZoom;
+import org.ebookdroid.core.touch.IMultiTouchListener;
+import org.ebookdroid.core.touch.MultiTouchGestureDetectorFactory;
 import org.ebookdroid.core.touch.TouchManager;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
@@ -92,8 +93,9 @@ public abstract class AbstractViewController extends AbstractComponentController
     }
 
     protected List<IGestureDetector> initGestureDetectors(final List<IGestureDetector> list) {
-        list.add(IMultiTouchZoom.Factory.createImpl(base.getZoomModel()));
-        list.add(new DefaultGestureDetector(base.getContext(), new GestureListener()));
+        final GestureListener listener = new GestureListener();
+        list.add(MultiTouchGestureDetectorFactory.create(listener));
+        list.add(new DefaultGestureDetector(base.getContext(), listener));
         return list;
     }
 
@@ -273,7 +275,6 @@ public abstract class AbstractViewController extends AbstractComponentController
             }
         }
         return false;
-
     }
 
     /**
@@ -402,7 +403,9 @@ public abstract class AbstractViewController extends AbstractComponentController
         return false;
     }
 
-    protected class GestureListener extends SimpleOnGestureListener {
+    protected class GestureListener extends SimpleOnGestureListener implements IMultiTouchListener {
+
+        protected final LogContext LCTX = LogContext.ROOT.lctx("Gesture", true);
 
         /**
          * {@inheritDoc}
@@ -411,7 +414,9 @@ public abstract class AbstractViewController extends AbstractComponentController
          */
         @Override
         public boolean onDoubleTap(final MotionEvent e) {
-            // LCTX.d("onDoubleTap(" + e + ")");
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onDoubleTap(" + e + ")");
+            }
             return processTap(TouchManager.Touch.DoubleTap, e);
         }
 
@@ -423,7 +428,9 @@ public abstract class AbstractViewController extends AbstractComponentController
         @Override
         public boolean onDown(final MotionEvent e) {
             view.forceFinishScroll();
-            // LCTX.d("onDown(" + e + ")");
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onDown(" + e + ")");
+            }
             return true;
         }
 
@@ -443,7 +450,9 @@ public abstract class AbstractViewController extends AbstractComponentController
             if (Math.abs(vY / vX) < 0.5) {
                 y = 0;
             }
-            // LCTX.d("onFling(" + x + ", " + y + ")");
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onFling(" + x + ", " + y + ")");
+            }
             view.startFling(x, y, l);
             view.redrawView();
             return true;
@@ -464,8 +473,23 @@ public abstract class AbstractViewController extends AbstractComponentController
             if (Math.abs(distanceY / distanceX) < 0.5) {
                 y = 0;
             }
-            // LCTX.d("onScroll(" + x + ", " + y + ")");
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onScroll(" + x + ", " + y + ")");
+            }
             view.scrollBy((int) x, (int) y);
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapUp(android.view.MotionEvent)
+         */
+        @Override
+        public boolean onSingleTapUp(final MotionEvent e) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onSingleTapUp(" + e + ")");
+            }
             return true;
         }
 
@@ -476,7 +500,9 @@ public abstract class AbstractViewController extends AbstractComponentController
          */
         @Override
         public boolean onSingleTapConfirmed(final MotionEvent e) {
-            // LCTX.d("onSingleTapConfirmed(" + e + ")");
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onSingleTapConfirmed(" + e + ")");
+            }
             return processTap(TouchManager.Touch.SingleTap, e);
         }
 
@@ -489,6 +515,45 @@ public abstract class AbstractViewController extends AbstractComponentController
         public void onLongPress(final MotionEvent e) {
             // LongTap operation cause side-effects
             // processTap(TouchManager.Touch.LongTap, e);
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.ebookdroid.core.touch.IMultiTouchListener#onTwoFingerPinch(float, float)
+         */
+        @Override
+        public void onTwoFingerPinch(final MotionEvent e, final float oldDistance, final float newDistance) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onTwoFingerPinch(" + e + ", " + oldDistance + ", " + newDistance + ")");
+            }
+            base.getZoomModel().scaleZoom(newDistance / oldDistance);
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.ebookdroid.core.touch.IMultiTouchListener#onTwoFingerPinchEnd()
+         */
+        @Override
+        public void onTwoFingerPinchEnd(final MotionEvent e) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onTwoFingerPinch(" + e + ")");
+            }
+            base.getZoomModel().commit();
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.ebookdroid.core.touch.IMultiTouchListener#onTwoFingerTap()
+         */
+        @Override
+        public void onTwoFingerTap(final MotionEvent e) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onTwoFingerTap(" + e + ")");
+            }
+            processTap(TouchManager.Touch.TwoFingerTap, e);
         }
     }
 }

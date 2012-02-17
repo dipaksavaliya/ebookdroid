@@ -55,10 +55,7 @@ public class TouchManager {
             {
                 final Region r = def.addRegion(0, 0, 100, 100);
                 r.setAction(Touch.DoubleTap, R.id.mainmenu_zoom, newSettings.getZoomByDoubleTap());
-            }
-            {
-                final Region r = def.addRegion(40, 40, 60, 60);
-                r.setAction(Touch.DoubleTap, R.id.actions_openOptionsMenu, true);
+                r.setAction(Touch.TwoFingerTap, R.id.actions_openOptionsMenu, true);
             }
             {
                 final Region r = def.addRegion(80, 0, 100, 20);
@@ -272,7 +269,7 @@ public class TouchManager {
     }
 
     public static enum Touch {
-        SingleTap, DoubleTap, LongTap;
+        SingleTap, DoubleTap, LongTap, TwoFingerTap;
     }
 
     public static class Region {
