@@ -214,10 +214,7 @@ public class FB2Document implements CodecDocument {
 
     @Override
     public CodecPageInfo getPageInfo(final int pageNuber) {
-        final CodecPageInfo codecPageInfo = new CodecPageInfo();
-        codecPageInfo.width = FB2Page.PAGE_WIDTH;
-        codecPageInfo.height = FB2Page.PAGE_HEIGHT;
-        return codecPageInfo;
+        return FB2Page.CPI;
     }
 
     @Override

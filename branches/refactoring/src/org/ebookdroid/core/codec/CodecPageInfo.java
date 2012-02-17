@@ -8,4 +8,11 @@ public class CodecPageInfo {
     public int rotation; /* initial page orientation */
     public int version; /* page version */
 
+    public CodecPageInfo() {
+    }
+
+    public CodecPageInfo(final int width, final int height) {
+        this.width = width;
+        this.height = height;
+    }
 }

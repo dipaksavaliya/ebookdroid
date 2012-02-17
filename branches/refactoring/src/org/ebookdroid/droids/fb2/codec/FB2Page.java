@@ -3,6 +3,7 @@ package org.ebookdroid.droids.fb2.codec;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPage;
+import org.ebookdroid.core.codec.CodecPageInfo;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -19,6 +20,8 @@ public class FB2Page implements CodecPage {
 
     public static final int PAGE_HEIGHT = 1176;
 
+    public static final CodecPageInfo CPI = new CodecPageInfo(PAGE_WIDTH, PAGE_HEIGHT);
+    
     public static final int MARGIN_X = 20;
 
     public static final int MARGIN_Y = 20;
