@@ -20,7 +20,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
     protected static Bitmap dragBitmap;
 
     protected AbstractScrollController(final IActivityController base, DocumentViewMode mode) {
-        super(base, DocumentViewMode.VERTICALL_SCROLL);
+        super(base, mode);
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
         }
@@ -33,8 +33,8 @@ public abstract class AbstractScrollController extends AbstractViewController {
      * 
      * @see org.ebookdroid.ui.viewer.IViewController#goToPage(int)
      */
-    public final void goToPage(final int toPage) {
-        new EventGotoPage(this, toPage).process();
+    public final ViewState goToPage(final int toPage) {
+        return new EventGotoPage(this, toPage).process();
     }
 
     /**
@@ -42,8 +42,8 @@ public abstract class AbstractScrollController extends AbstractViewController {
      * 
      * @see org.ebookdroid.ui.viewer.IViewController#goToPage(int, float, float)
      */
-    public final void goToPage(final int toPage, final float offsetX, final float offsetY) {
-        new EventGotoPage(this, toPage, offsetX, offsetY).process();
+    public final ViewState goToPage(final int toPage, final float offsetX, final float offsetY) {
+        return new EventGotoPage(this, toPage, offsetX, offsetY).process();
     }
 
     /**
@@ -58,7 +58,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
             return;
         }
 
-        for (final Page page : viewState.model.getPages(viewState.firstVisible, viewState.lastVisible + 1)) {
+        for (final Page page : viewState.pages.getVisiblePages()) {
             if (page != null) {
                 eventDraw.process(page);
             }
@@ -115,10 +115,10 @@ public abstract class AbstractScrollController extends AbstractViewController {
 
         final ViewState viewState = cmd.process();
         if (cmd.model != null) {
-            final Page page = cmd.model.getPageObject(viewState.currentIndex);
+            final Page page = viewState.pages.getCurrentPage();
             if (page != null) {
                 cmd.model.setCurrentPageIndex(page.index);
-                updatePosition(cmd.model, page, viewState);
+                updatePosition(page, viewState);
             }
         }
         view.redrawView(viewState);

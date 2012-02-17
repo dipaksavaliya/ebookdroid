@@ -23,9 +23,9 @@ public class SinglePageFader extends AbstractPageSlider {
      */
     @Override
     protected void drawForeground(EventDraw event) {
-        Page page = view.getBase().getDocumentModel().getPageObject(foreIndex);
+        Page page = event.viewState.model.getPageObject(foreIndex);
         if (page == null) {
-            page = view.getBase().getDocumentModel().getCurrentPageObject();
+            page = event.viewState.model.getCurrentPageObject();
         }
         if (page != null) {
             event.process(page);
@@ -39,7 +39,7 @@ public class SinglePageFader extends AbstractPageSlider {
      */
     @Override
     protected void drawBackground(EventDraw event) {
-        final Page page = view.getBase().getDocumentModel().getPageObject(backIndex);
+        final Page page = event.viewState.model.getPageObject(backIndex);
         if (page != null) {
 
             updateBackBitmap(event, page);

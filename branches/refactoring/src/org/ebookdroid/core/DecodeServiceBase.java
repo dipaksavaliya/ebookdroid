@@ -214,7 +214,7 @@ public class DecodeServiceBase implements DecodeService {
         final int scaledHeight;
         // &&
 
-        PageAlign effectiveAlign = viewState.pageAlign;
+        PageAlign effectiveAlign = viewState.book.pageAlign;
         if (effectiveAlign == PageAlign.AUTO) {
             final float viewAspect = viewWidth / viewHeight;
             final float nodeAspect = nodeWidth / nodeHeight;
@@ -300,7 +300,7 @@ public class DecodeServiceBase implements DecodeService {
         final ViewState vs = viewState.get();
         int minSize = 3;
         if (vs != null) {
-            minSize = vs.lastVisible - vs.firstVisible + 1;
+            minSize = vs.pages.lastVisible - vs.pages.firstVisible + 1;
         }
         return Math.max(minSize, SettingsManager.getAppSettings().getPagesInMemory() + 1);
     }

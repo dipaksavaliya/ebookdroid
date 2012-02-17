@@ -79,7 +79,7 @@ public class DrawThread extends Thread {
     }
 
     public void performDrawing(final Canvas canvas, final ViewState viewState) {
-        final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+        final PagePaint paint = viewState.app.getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
         canvas.drawRect(canvas.getClipBounds(), paint.backgroundFillPaint);
         new EventDraw(viewState, canvas).process();
     }

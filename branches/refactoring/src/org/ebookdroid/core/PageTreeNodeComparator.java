@@ -17,7 +17,7 @@ public class PageTreeNodeComparator implements Comparator<PageTreeNode> {
 
     @Override
     public int compare(final PageTreeNode node1, final PageTreeNode node2) {
-        final int cp = viewState.currentIndex;
+        final int cp = viewState.pages.currentIndex;
         final int viewIndex1 = node1.page.index.viewIndex;
         final int viewIndex2 = node2.page.index.viewIndex;
 

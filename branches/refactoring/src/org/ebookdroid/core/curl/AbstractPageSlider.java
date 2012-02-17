@@ -2,7 +2,6 @@ package org.ebookdroid.core.curl;
 
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
-import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PagePaint;
@@ -73,7 +72,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         mA.y = 0;
     }
 
-    protected BitmapRef getBitmap(final ViewState viewState, final BitmapRef ref) {
+    protected final BitmapRef getBitmap(final ViewState viewState, final BitmapRef ref) {
         BitmapRef bitmap = ref;
         final float width = viewState.viewRect.width();
         final float height = viewState.viewRect.height();
@@ -82,7 +81,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
             BitmapManager.release(ref);
             bitmap = BitmapManager.getBitmap("Curler image", (int) width, (int) height, Bitmap.Config.RGB_565);
         }
-        final PagePaint paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+        final PagePaint paint = viewState.app.getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
         bitmap.getBitmap().eraseColor(paint.backgroundFillPaint.getColor());
         return bitmap;
     }
@@ -93,10 +92,11 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
      * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawExtraObjects(org.ebookdroid.core.EventDraw)
      */
     @Override
-    protected void drawExtraObjects(EventDraw event) {
-        if (SettingsManager.getAppSettings().getShowAnimIcon()) {
-            event.canvas.drawBitmap(arrowsBitmap, view.getWidth() - arrowsBitmap.getWidth(), view.getHeight()
-                    - arrowsBitmap.getHeight(), PAINT);
+    protected final void drawExtraObjects(final EventDraw event) {
+        if (event.viewState.app.getShowAnimIcon()) {
+            final int x = view.getWidth() - arrowsBitmap.getWidth();
+            final int y = view.getHeight() - arrowsBitmap.getHeight();
+            event.canvas.drawBitmap(arrowsBitmap, x, y, PAINT);
         }
     }
 
@@ -110,7 +110,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         return movement;
     }
 
-    protected final void updateForeBitmap(EventDraw event, Page page) {
+    protected final void updateForeBitmap(final EventDraw event, final Page page) {
         if (foreBitmapIndex != foreIndex || foreBitmap == null) {
             foreBitmap = getBitmap(event.viewState, foreBitmap);
 
@@ -119,7 +119,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         }
     }
 
-    protected final void updateBackBitmap(EventDraw event, Page page) {
+    protected final void updateBackBitmap(final EventDraw event, final Page page) {
         if (backBitmapIndex != backIndex || backBitmap == null) {
             backBitmap = getBitmap(event.viewState, backBitmap);
 

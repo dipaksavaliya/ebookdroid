@@ -184,7 +184,6 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
     protected void onDestroy() {
         if (documentModel != null) {
             documentModel.recycle();
-            documentModel = null;
         }
         if (temporaryBook) {
             CacheManager.clear(E_MAIL_ATTACHMENT);
@@ -596,7 +595,6 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
     public void closeActivity(final ActionEx action) {
         if (documentModel != null) {
             documentModel.recycle();
-            documentModel = null;
         }
         if (temporaryBook) {
             CacheManager.clear(E_MAIL_ATTACHMENT);
@@ -786,11 +784,13 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
         }
 
         @Override
-        public void goToPage(final int page) {
+        public ViewState goToPage(final int page) {
+            return null;
         }
 
         @Override
-        public void goToPage(int page, float offsetX, float offsetY) {
+        public ViewState goToPage(int page, float offsetX, float offsetY) {
+            return null;
         }
 
         @Override
@@ -803,7 +803,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
         }
 
         @Override
-        public int calculateCurrentPage(final ViewState viewState) {
+        public int calculateCurrentPage(final ViewState viewState, final int firstVisible, final int lastVisible) {
             return 0;
         }
 

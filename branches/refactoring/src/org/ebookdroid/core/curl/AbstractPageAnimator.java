@@ -7,7 +7,6 @@ import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.models.DocumentModel;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -97,39 +96,37 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
      * Swap to next view
      */
     protected ViewState nextView(final ViewState viewState) {
-        final DocumentModel dm = view.getBase().getDocumentModel();
-        if (dm == null) {
+        if (viewState.model == null) {
             return viewState;
         }
 
-        foreIndex = viewState.currentIndex;
-        if (foreIndex >= dm.getPageCount()) {
+        foreIndex = viewState.pages.currentIndex;
+        if (foreIndex >= viewState.model.getPageCount()) {
             foreIndex = 0;
         }
         backIndex = foreIndex + 1;
-        if (backIndex >= dm.getPageCount()) {
+        if (backIndex >= viewState.model.getPageCount()) {
             backIndex = 0;
         }
 
-        return view.invalidatePages(viewState, dm.getPageObject(foreIndex), dm.getPageObject(backIndex));
+        return view.invalidatePages(viewState, viewState.model.getPageObject(foreIndex), viewState.model.getPageObject(backIndex));
     }
 
     /**
      * Swap to previous view
      */
     protected ViewState previousView(final ViewState viewState) {
-        final DocumentModel dm = view.getBase().getDocumentModel();
-        if (dm == null) {
+        if (viewState.model == null) {
             return viewState;
         }
 
-        backIndex = viewState.currentIndex;
+        backIndex = viewState.pages.currentIndex;
         foreIndex = backIndex - 1;
         if (foreIndex < 0) {
-            foreIndex = dm.getPageCount() - 1;
+            foreIndex = viewState.model.getPageCount() - 1;
         }
 
-        return view.invalidatePages(viewState, dm.getPageObject(foreIndex), dm.getPageObject(backIndex));
+        return view.invalidatePages(viewState, viewState.model.getPageObject(foreIndex), viewState.model.getPageObject(backIndex));
     }
 
     /**

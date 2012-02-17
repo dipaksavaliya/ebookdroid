@@ -14,7 +14,7 @@ import android.text.TextPaint;
 
 public class EventDraw implements IEvent {
 
-    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", false);
+    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", true);
 
     public final ViewState viewState;
     public final PageTreeLevel level;
@@ -29,7 +29,7 @@ public class EventDraw implements IEvent {
         this.viewState = viewState;
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.canvas = canvas;
-        this.paint = viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+        this.paint = viewState.app.getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
         this.viewBase = viewState.view.getBase(viewState.viewRect);
     }
 

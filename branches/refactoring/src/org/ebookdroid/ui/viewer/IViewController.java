@@ -18,15 +18,15 @@ public interface IViewController extends ZoomListener {
     void show();
 
     /* Page related methods */
-    void goToPage(int page);
+    ViewState goToPage(int page);
 
-    void goToPage(int page, float offsetX, float offsetY);
+    ViewState goToPage(int page, float offsetX, float offsetY);
 
     void invalidatePageSizes(InvalidateSizeReason reason, Page changedPage);
 
     int getFirstVisiblePage();
 
-    int calculateCurrentPage(ViewState viewState);
+    int calculateCurrentPage(ViewState viewState, int firstVisible, int lastVisible);
 
     int getLastVisiblePage();
 

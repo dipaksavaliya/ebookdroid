@@ -20,22 +20,22 @@ public class HScrollController extends AbstractScrollController {
      * @see org.ebookdroid.ui.viewer.IViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override
-    public final int calculateCurrentPage(final ViewState viewState) {
+    public final int calculateCurrentPage(final ViewState viewState, final int firstVisible, final int lastVisible) {
         int result = 0;
         long bestDistance = Long.MAX_VALUE;
 
         final int viewX = Math.round(viewState.viewRect.centerX());
 
-        if (viewState.firstVisible != -1) {
-            for (final Page page : getBase().getDocumentModel().getPages(viewState.firstVisible,
-                    viewState.lastVisible + 1)) {
-                final RectF bounds = viewState.getBounds(page);
-                final int pageX = Math.round(bounds.centerX());
-                final long dist = Math.abs(pageX - viewX);
-                if (dist < bestDistance) {
-                    bestDistance = dist;
-                    result = page.index.viewIndex;
-                }
+        final Iterable<Page> pages = firstVisible != -1 ? viewState.model.getPages(firstVisible, lastVisible + 1)
+                : viewState.model.getPages(0);
+
+        for (final Page page : pages) {
+            final RectF bounds = viewState.getBounds(page);
+            final int pageX = Math.round(bounds.centerX());
+            final long dist = Math.abs(pageX - viewX);
+            if (dist < bestDistance) {
+                bestDistance = dist;
+                result = page.index.viewIndex;
             }
         }
 
@@ -62,15 +62,19 @@ public class HScrollController extends AbstractScrollController {
      */
     @Override
     public final Rect getScrollLimits() {
-        final int width = getWidth();
-        final int height = getHeight();
-        final Page lpo = getBase().getDocumentModel().getLastPageObject();
-        final float zoom = getBase().getZoomModel().getZoom();
+        final DocumentModel dm = getBase().getDocumentModel();
+        if (dm != null) {
+            final int width = getWidth();
+            final int height = getHeight();
+            final Page lpo = dm.getLastPageObject();
+            final float zoom = getBase().getZoomModel().getZoom();
 
-        final int right = lpo != null ? (int) lpo.getBounds(zoom).right - width : 0;
-        final int bottom = (int) (height * zoom) - height;
+            final int right = lpo != null ? (int) lpo.getBounds(zoom).right - width : 0;
+            final int bottom = (int) (height * zoom) - height;
 
-        return new Rect(0, 0, right, bottom);
+            return new Rect(0, 0, right, bottom);
+        }
+        return new Rect(0, 0, 0, 0);
     }
 
     /**
@@ -89,7 +93,7 @@ public class HScrollController extends AbstractScrollController {
             return;
         }
 
-        DocumentModel model = getBase().getDocumentModel();
+        final DocumentModel model = getBase().getDocumentModel();
         if (model == null) {
             return;
         }
@@ -100,16 +104,14 @@ public class HScrollController extends AbstractScrollController {
             float widthAccum = 0;
             for (final Page page : model.getPages()) {
                 final float pageWidth = height * page.getAspectRatio();
-                final float pageHeight = pageWidth / page.getAspectRatio();
-                page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, pageHeight));
+                page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, height));
                 widthAccum += pageWidth + 1;
             }
         } else {
             float widthAccum = changedPage.getBounds(1.0f).left;
             for (final Page page : model.getPages(changedPage.index.viewIndex)) {
                 final float pageWidth = height * page.getAspectRatio();
-                final float pageHeight = pageWidth / page.getAspectRatio();
-                page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, pageHeight));
+                page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, height));
                 widthAccum += pageWidth + 1;
             }
         }

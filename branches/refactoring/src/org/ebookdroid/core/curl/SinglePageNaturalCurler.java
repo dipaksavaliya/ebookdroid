@@ -234,9 +234,9 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
         final Canvas canvas = event.canvas;
         final ViewState viewState = event.viewState;
 
-        Page page = view.getBase().getDocumentModel().getPageObject(backIndex);
+        Page page = event.viewState.model.getPageObject(backIndex);
         if (page == null) {
-            page = view.getBase().getDocumentModel().getCurrentPageObject();
+            page = event.viewState.model.getCurrentPageObject();
         }
         if (page != null) {
             canvas.save();
@@ -256,9 +256,9 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
         final Canvas canvas = event.canvas;
         final ViewState viewState = event.viewState;
 
-        Page page = view.getBase().getDocumentModel().getPageObject(foreIndex);
+        Page page = event.viewState.model.getPageObject(foreIndex);
         if (page == null) {
-            page = view.getBase().getDocumentModel().getCurrentPageObject();
+            page = event.viewState.model.getCurrentPageObject();
         }
         if (page != null) {
             canvas.save();

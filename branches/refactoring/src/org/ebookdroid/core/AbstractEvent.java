@@ -25,9 +25,9 @@ public abstract class AbstractEvent implements IEvent {
 
     protected AbstractEvent(final AbstractViewController ctrl) {
         this.ctrl = ctrl;
-        this.model = ctrl.getBase().getDocumentModel();
-        this.view = ctrl.getView();
         this.viewState = new ViewState(ctrl);
+        this.model = viewState.model;
+        this.view = viewState.view;
     }
 
     /**
@@ -39,8 +39,8 @@ public abstract class AbstractEvent implements IEvent {
     public ViewState process() {
         viewState = calculatePageVisibility(viewState);
 
-        ctrl.firstVisiblePage = viewState.firstVisible;
-        ctrl.lastVisiblePage = viewState.lastVisible;
+        ctrl.firstVisiblePage = viewState.pages.firstVisible;
+        ctrl.lastVisiblePage = viewState.pages.lastVisible;
 
         for (final Page page : model.getPages()) {
             process(page);
@@ -131,8 +131,7 @@ public abstract class AbstractEvent implements IEvent {
         final boolean res = page.nodes.recycleAll(bitmapsToRecycle, true);
         if (res) {
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("Recycle page " + page.index + " " + viewState.firstCached + ":" + viewState.lastCached + " = "
-                        + (bitmapsToRecycle.size() - oldSize));
+                LCTX.d("Recycle page " + page.index + " " + viewState.pages + " = " + (bitmapsToRecycle.size() - oldSize));
             }
         }
 

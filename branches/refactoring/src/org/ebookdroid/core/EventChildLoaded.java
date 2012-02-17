@@ -48,7 +48,7 @@ public class EventChildLoaded extends EventScrollTo {
 
         if (changed) {
             ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-            ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
+            viewState = ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
         } else {
             final RectF bounds = viewState.getBounds(page);
             final PageTreeNode parent = child.parent;
@@ -56,10 +56,11 @@ public class EventChildLoaded extends EventScrollTo {
                 recycleParent(parent, bounds);
             }
             recycleChildren();
+        }
+
+        if (viewState != null) {
             ctrl.pageUpdated(viewState, page);
-            if (viewState.isNodeVisible(child, bounds)) {
-                ctrl.redrawView(viewState);
-            }
+            ctrl.redrawView(viewState);
         }
 
         return viewState;

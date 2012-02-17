@@ -14,8 +14,8 @@ public class EventScrollDown extends AbstractEventScroll {
     @Override
     protected ViewState calculatePageVisibility(final ViewState initial) {
 
-        int firstVisiblePage = initial.firstVisible;
-        int lastVisiblePage = initial.lastVisible;
+        int firstVisiblePage = initial.pages.firstVisible;
+        int lastVisiblePage = initial.pages.lastVisible;
 
         if (firstVisiblePage != -1) {
             final Page[] pages = model.getPages();

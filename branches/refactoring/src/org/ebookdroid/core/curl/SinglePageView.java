@@ -13,7 +13,7 @@ import android.view.MotionEvent;
 public class SinglePageView implements PageAnimator {
 
     protected static final LogContext LCTX = LogContext.ROOT.lctx("View", true);
-    
+
     protected final PageAnimationType type;
 
     protected final SinglePageController view;
@@ -80,7 +80,7 @@ public class SinglePageView implements PageAnimator {
     @Override
     public boolean isPageVisible(final Page page, final ViewState viewState) {
         final int pageIndex = page.index.viewIndex;
-        return pageIndex == view.calculateCurrentPage(viewState);
+        return pageIndex == viewState.model.getCurrentViewPageIndex();
     }
 
     /**
@@ -90,7 +90,7 @@ public class SinglePageView implements PageAnimator {
      */
     @Override
     public void draw(EventDraw event) {
-        final Page page = view.getBase().getDocumentModel().getCurrentPageObject();
+        final Page page = event.viewState.model.getCurrentPageObject();
         if (page != null) {
             event.process(page);
             if (SettingsManager.getAppSettings().getShowAnimIcon()) {
@@ -106,7 +106,9 @@ public class SinglePageView implements PageAnimator {
      */
     @Override
     public final void resetPageIndexes(final int currentIndex) {
-        foreIndex = backIndex = currentIndex;
+        if (foreIndex != currentIndex) {
+            foreIndex = backIndex = currentIndex;
+        }
     }
 
     /**
@@ -148,7 +150,7 @@ public class SinglePageView implements PageAnimator {
      */
     @Override
     public void animate(int direction) {
-      view.goToPage(view.getBase().getDocumentModel().getCurrentViewPageIndex() + direction);
+        view.goToPage(view.getBase().getDocumentModel().getCurrentViewPageIndex() + direction);
     }
 
 }

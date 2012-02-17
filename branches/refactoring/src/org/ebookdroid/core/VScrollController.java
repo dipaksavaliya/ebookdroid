@@ -20,24 +20,24 @@ public class VScrollController extends AbstractScrollController {
      * @see org.ebookdroid.ui.viewer.IViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override
-    public final int calculateCurrentPage(final ViewState viewState) {
+    public final int calculateCurrentPage(final ViewState viewState, final int firstVisible, final int lastVisible) {
         int result = 0;
         long bestDistance = Long.MAX_VALUE;
 
         final int viewY = Math.round(viewState.viewRect.centerY());
 
-        if (viewState.firstVisible != -1) {
-            for (final Page page : viewState.model.getPages(viewState.firstVisible, viewState.lastVisible + 1)) {
-                final RectF bounds = viewState.getBounds(page);
-                final int pageY = Math.round(bounds.centerY());
-                final long dist = Math.abs(pageY - viewY);
-                if (dist < bestDistance) {
-                    bestDistance = dist;
-                    result = page.index.viewIndex;
-                }
+        final Iterable<Page> pages = firstVisible != -1 ? viewState.model.getPages(firstVisible, lastVisible + 1)
+                : viewState.model.getPages(0);
+
+        for (final Page page : pages) {
+            final RectF bounds = viewState.getBounds(page);
+            final int pageY = Math.round(bounds.centerY());
+            final long dist = Math.abs(pageY - viewY);
+            if (dist < bestDistance) {
+                bestDistance = dist;
+                result = page.index.viewIndex;
             }
         }
-
         return result;
     }
 
@@ -61,15 +61,19 @@ public class VScrollController extends AbstractScrollController {
      */
     @Override
     public final Rect getScrollLimits() {
-        final int width = getWidth();
-        final int height = getHeight();
-        final Page lpo = getBase().getDocumentModel().getLastPageObject();
-        final float zoom = getBase().getZoomModel().getZoom();
+        final DocumentModel dm = getBase().getDocumentModel();
+        if (dm != null) {
+            final int width = getWidth();
+            final int height = getHeight();
+            final Page lpo = dm.getLastPageObject();
+            final float zoom = getBase().getZoomModel().getZoom();
 
-        final int bottom = lpo != null ? (int) lpo.getBounds(zoom).bottom - height : 0;
-        final int right = (int) (width * zoom) - width;
+            final int bottom = lpo != null ? (int) lpo.getBounds(zoom).bottom - height : 0;
+            final int right = (int) (width * zoom) - width;
 
-        return new Rect(0, 0, right, bottom);
+            return new Rect(0, 0, right, bottom);
+        }
+        return new Rect(0, 0, 0, 0);
     }
 
     /**
@@ -88,7 +92,7 @@ public class VScrollController extends AbstractScrollController {
             return;
         }
 
-        DocumentModel model = getBase().getDocumentModel();
+        final DocumentModel model = getBase().getDocumentModel();
         if (model == null) {
             return;
         }

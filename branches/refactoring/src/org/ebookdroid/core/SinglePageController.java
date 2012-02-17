@@ -48,7 +48,7 @@ public class SinglePageController extends AbstractViewController {
      * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int)
      */
     @Override
-    public final void goToPage(final int toPage) {
+    public final ViewState goToPage(final int toPage) {
         final DocumentModel dm = getBase().getDocumentModel();
         if (toPage >= 0 && toPage < dm.getPageCount()) {
             final Page page = dm.getPageObject(toPage);
@@ -58,7 +58,9 @@ public class SinglePageController extends AbstractViewController {
 
             final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
             view.redrawView(viewState);
+            return viewState;
         }
+        return null;
     }
 
     /**
@@ -67,7 +69,7 @@ public class SinglePageController extends AbstractViewController {
      * @see org.ebookdroid.core.AbstractViewController#goToPageImpl(int, float, float)
      */
     @Override
-    public void goToPage(final int toPage, final float offsetX, final float offsetY) {
+    public ViewState goToPage(final int toPage, final float offsetX, final float offsetY) {
         final DocumentModel dm = getBase().getDocumentModel();
         if (toPage >= 0 && toPage < dm.getPageCount()) {
             final Page page = dm.getPageObject(toPage);
@@ -82,7 +84,9 @@ public class SinglePageController extends AbstractViewController {
 
             final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
             view.redrawView(viewState);
+            return viewState;
         }
+        return null;
     }
 
     /**
@@ -103,7 +107,7 @@ public class SinglePageController extends AbstractViewController {
         if (cmd.model != null) {
             final Page page = cmd.model.getCurrentPageObject();
             if (page != null) {
-                updatePosition(cmd.model, page, viewState);
+                updatePosition(page, viewState);
             }
         }
         view.redrawView(viewState);
@@ -115,8 +119,8 @@ public class SinglePageController extends AbstractViewController {
      * @see org.ebookdroid.ui.viewer.IViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override
-    public final int calculateCurrentPage(final ViewState viewState) {
-        return getBase().getDocumentModel().getCurrentViewPageIndex();
+    public final int calculateCurrentPage(final ViewState viewState, final int firstVisible, final int lastVisible) {
+        return viewState.model.getCurrentViewPageIndex();
     }
 
     /**

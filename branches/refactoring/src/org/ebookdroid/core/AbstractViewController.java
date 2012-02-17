@@ -6,7 +6,6 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
-import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.touch.DefaultGestureDetector;
 import org.ebookdroid.core.touch.IGestureDetector;
 import org.ebookdroid.core.touch.IMultiTouchZoom;
@@ -162,7 +161,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         }
     }
 
-    protected final void updatePosition(final DocumentModel dm, final Page page, final ViewState viewState) {
+    protected final void updatePosition(final Page page, final ViewState viewState) {
         final int left = view.getScrollX();
         final int top = view.getScrollY();
 
@@ -194,7 +193,7 @@ public abstract class AbstractViewController extends AbstractComponentController
             redrawView(newState);
         } else {
             SettingsManager.zoomChanged(newZoom, true);
-            updatePosition(cmd.model, cmd.model.getCurrentPageObject(), newState);
+            updatePosition(cmd.model.getCurrentPageObject(), newState);
         }
     }
 

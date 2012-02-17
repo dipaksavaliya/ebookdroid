@@ -122,9 +122,9 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
      */
     @Override
     protected void drawForeground(EventDraw event) {
-        Page page = view.getBase().getDocumentModel().getPageObject(foreIndex);
+        Page page = event.viewState.model.getPageObject(foreIndex);
         if (page == null) {
-            page = view.getBase().getDocumentModel().getCurrentPageObject();
+            page = event.viewState.model.getCurrentPageObject();
         }
         if (page != null) {
             event.canvas.save();
@@ -143,13 +143,13 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
     protected void drawBackground(EventDraw event) {
         final Path mask = createBackgroundPath();
 
-        final Page page = view.getBase().getDocumentModel().getPageObject(backIndex);
+        final Page page = event.viewState.model.getPageObject(backIndex);
         if (page != null) {
             // Save current canvas so we do not mess it up
             event.canvas.save();
             event.canvas.clipPath(mask);
 
-            final PagePaint paint = event.viewState.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+            final PagePaint paint = event.viewState.app.getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
             event.canvas.drawRect(event.canvas.getClipBounds(), paint.backgroundFillPaint);
 
             event.process(page);
