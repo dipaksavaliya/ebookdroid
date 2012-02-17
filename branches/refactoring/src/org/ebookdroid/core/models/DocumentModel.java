@@ -38,8 +38,6 @@ public class DocumentModel extends ListenerProxy {
 
     protected PageIndex currentIndex = PageIndex.FIRST;
 
-    private static final boolean CACHE_ENABLED = true;
-
     private static final Page[] EMPTY_PAGES = {};
 
     private final CodecContext context;
@@ -215,7 +213,7 @@ public class DocumentModel extends ListenerProxy {
         }
 
         BitmapRef image = decodeService.createThumbnail(width, height, page.index.docIndex, page.type.getInitialRect());
-        thumbnailFile.setImage(image != null ? image.getBitmap() : null) ;
+        thumbnailFile.setImage(image != null ? image.getBitmap() : null);
         BitmapManager.release(image);
     }
 
@@ -223,21 +221,10 @@ public class DocumentModel extends ListenerProxy {
             final IActivityController.IBookLoadTask task) {
         final PageCacheFile pagesFile = CacheManager.getPageFile(bs.fileName);
 
-        if (CACHE_ENABLED) {
-            if (pagesFile.exists()) {
-                final CodecPageInfo[] infos = pagesFile.load();
-                if (infos != null) {
-                    boolean nullInfoFound = false;
-                    for (final CodecPageInfo info : infos) {
-                        if (info == null) {
-                            nullInfoFound = true;
-                            break;
-                        }
-                    }
-                    if (!nullInfoFound) {
-                        return infos;
-                    }
-                }
+        if (decodeService.isPageSizeCacheable() && pagesFile.exists()) {
+            final CodecPageInfo[] infos = pagesFile.load();
+            if (infos != null) {
+                return infos;
             }
         }
 
@@ -249,10 +236,8 @@ public class DocumentModel extends ListenerProxy {
             infos[i] = getDecodeService().getPageInfo(i);
         }
 
-        if (CACHE_ENABLED) {
-            if (decodeService.isPageSizeCacheable()) {
-                pagesFile.save(infos);
-            }
+        if (decodeService.isPageSizeCacheable()) {
+            pagesFile.save(infos);
         }
         return infos;
     }
