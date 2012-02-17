@@ -14,7 +14,7 @@ import android.text.TextPaint;
 
 public class EventDraw implements IEvent {
 
-    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", true);
+    public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", false);
 
     public final ViewState viewState;
     public final PageTreeLevel level;
