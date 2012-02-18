@@ -80,6 +80,7 @@
 
         <delete dir="libs/armeabi" />
         <delete dir="libs/armeabi-v7a" />
+        <delete dir="libs/mips" />
 
         <echo>${mk}</echo>
         <exec executable="${ndk.dir}/ndk-build" failonerror="true">
