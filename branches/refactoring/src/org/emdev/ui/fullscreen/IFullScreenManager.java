@@ -8,14 +8,14 @@ public interface IFullScreenManager {
 
     IFullScreenManager instance = AndroidVersion.lessThan3x ? new FullScreenManagerOld() : new FullScreenManagerNew();
 
-    boolean setFullScreenMode(Window w, boolean fullScreen);
+    void setFullScreenMode(Window w, boolean fullScreen);
 
-    boolean onMenuOpened(Window w);
+    void onMenuOpened(Window w);
 
-    boolean onMenuClosed(Window w);
+    void onMenuClosed(Window w);
 
-    boolean onPause();
+    void onPause(Window w);
 
-    boolean onResume();
+    void onResume(Window w);
 
 }

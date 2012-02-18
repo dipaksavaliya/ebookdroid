@@ -170,13 +170,13 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
     @Override
     protected void onResume() {
         super.onResume();
-        IFullScreenManager.instance.onResume();
+        IFullScreenManager.instance.onResume(getWindow());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        IFullScreenManager.instance.onPause();
+        IFullScreenManager.instance.onPause(getWindow());
         SettingsManager.storeBookSettings();
     }
 

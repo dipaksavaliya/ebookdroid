@@ -3,71 +3,65 @@ package org.emdev.ui.fullscreen;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 class FullScreenManagerOld implements IFullScreenManager {
 
     private static final int FLAG_FULLSCREEN = WindowManager.LayoutParams.FLAG_FULLSCREEN;
 
-    protected boolean state;
+    protected final AtomicBoolean fullScreen = new AtomicBoolean();
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.emdev.ui.fullscreen.IFullScreenManager#setFullScreenMode(android.view.Window, boolean)
      */
     @Override
-    public boolean setFullScreenMode(final Window w, final boolean fullScreen) {
-        if (fullScreen) {
-            w.setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN);
-        } else {
-            w.clearFlags(FLAG_FULLSCREEN);
+    public void setFullScreenMode(final Window w, final boolean fullScreen) {
+        if (this.fullScreen.compareAndSet(!fullScreen, fullScreen)) {
+            if (fullScreen) {
+                w.setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN);
+            } else {
+                w.clearFlags(FLAG_FULLSCREEN);
+            }
         }
-        state = fullScreen;
-        return true;
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.emdev.ui.fullscreen.IFullScreenManager#onMenuOpened(android.view.Window)
      */
     @Override
-    public boolean onMenuOpened(final Window w) {
-        if (state) {
-            return setFullScreenMode(w, false);
-        }
-        return false;
+    public void onMenuOpened(final Window w) {
+        setFullScreenMode(w, false);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.emdev.ui.fullscreen.IFullScreenManager#onMenuClosed(android.view.Window)
      */
     @Override
-    public boolean onMenuClosed(final Window w) {
-        if (state) {
-            return setFullScreenMode(w, true);
-        }
-        return false;
+    public void onMenuClosed(final Window w) {
+        setFullScreenMode(w, true);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.emdev.ui.fullscreen.IFullScreenManager#onPause()
      */
     @Override
-    public boolean onPause() {
-        return false;
+    public void onPause(final Window w) {
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.emdev.ui.fullscreen.IFullScreenManager#onResume()
      */
     @Override
-    public boolean onResume() {
-        return false;
+    public void onResume(final Window w) {
     }
 }
