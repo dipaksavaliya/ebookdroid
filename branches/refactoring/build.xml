@@ -35,13 +35,13 @@
     <property name="out.debug.file" location="${out.absolute.dir}/${ant.project.name}-${debug.version}.apk" />
     <property name="out.release.file" location="${out.absolute.dir}/${ant.project.name}-release.apk" />
 
-
     <property name="arm.mk" location="jni/Application.mk" />
     <property name="cortex.a8.mk" location="jni/Application.arm7.a8.mk" />
     <property name="cortex.a9.mk" location="jni/Application.arm7.a9.mk" />
     <property name="cortex.a8.neon.mk" location="jni/Application.arm7.a8.neon.mk" />
     <property name="cortex.a9.neon.mk" location="jni/Application.arm7.a9.neon.mk" />
     <property name="wexler.mk" location="jni/Application.wexler.t7007.mk" />
+    <property name="mips.mk" location="jni/Application.mips.mk" />
 
     <property name="arm.apk" location="apk/${package.name}-${manifest.version}.apk" />
     <property name="arm.svn.apk" location="apk/${package.name}-${manifest.version}.apk" />
@@ -50,6 +50,7 @@
     <property name="cortex.a8.neon.apk" value="apk/${package.name}-arm7-cortex-a8-neon-${manifest.version}.apk" />
     <property name="cortex.a9.neon.apk" value="apk/${package.name}-arm7-cortex-a9-neon-${manifest.version}.apk" />
     <property name="wexler.apk" value="apk/${package.name}-wexler.t7007-${manifest.version}.apk" />
+    <property name="mips.apk" value="apk/${package.name}-mips-${manifest.version}.apk" />
 
     <path id="project.libraries">
         <pathelement path="thirdparty/junrar" />
@@ -81,7 +82,11 @@
         <delete dir="libs/armeabi-v7a" />
 
         <echo>${mk}</echo>
-        <exec command="${ndk.dir}/ndk-build NDK_DEBUG=0 NDK_APPLICATION_MK=${mk} -j32" />
+        <exec executable="${ndk.dir}/ndk-build" failonerror="true">
+            <arg value="NDK_DEBUG=0" />
+            <arg value="NDK_APPLICATION_MK=${mk}" />
+            <arg value="-j32" />
+        </exec>
 
         <antcall target="release" />
 
@@ -99,26 +104,37 @@
         <antcall target="--make-release" inheritall="true">
             <param name="mk" value="${arm.mk}" />
             <param name="apk" value="${arm.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
         <antcall target="--make-release" inheritall="true">
             <param name="mk" value="${cortex.a8.mk}" />
             <param name="apk" value="${cortex.a8.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
         <antcall target="--make-release" inheritall="true">
             <param name="mk" value="${cortex.a8.neon.mk}" />
             <param name="apk" value="${cortex.a8.neon.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
         <antcall target="--make-release">
             <param name="mk" value="${cortex.a9.mk}" />
             <param name="apk" value="${cortex.a9.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
         <antcall target="--make-release">
             <param name="mk" value="${cortex.a9.neon.mk}" />
             <param name="apk" value="${cortex.a9.neon.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
         <antcall target="--make-release">
             <param name="mk" value="${wexler.mk}" />
             <param name="apk" value="${wexler.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
+        </antcall>
+        <antcall target="--make-release">
+            <param name="mk" value="${mips.mk}" />
+            <param name="apk" value="${mips.apk}" />
+            <param name="ndk.dir" value="${mips.ndk.dir}" />
         </antcall>
 
     </target>
@@ -132,6 +148,7 @@
         <antcall target="--make-release">
             <param name="mk" value="${wexler.mk}" />
             <param name="apk" value="${wexler.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
 
     </target>
@@ -152,6 +169,7 @@
         <antcall target="--make-release">
             <param name="mk" value="${arm.mk}" />
             <param name="apk" value="${target.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
     </target>
 
@@ -171,6 +189,7 @@
         <antcall target="--make-release">
             <param name="mk" value="${cortex.a9.mk}" />
             <param name="apk" value="${target.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
     </target>
 
@@ -190,6 +209,7 @@
         <antcall target="--make-release">
             <param name="mk" value="${cortex.a9.neon.mk}" />
             <param name="apk" value="${target.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
         </antcall>
     </target>
 
@@ -209,6 +229,27 @@
         <antcall target="--make-release">
             <param name="mk" value="${wexler.mk}" />
             <param name="apk" value="${target.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
+        </antcall>
+    </target>
+
+    <target name="EBookDroid-MIPS-dev">
+        <svn javahl="false">
+            <info target="." />
+        </svn>
+        <echo>Revision: ${svn.info.rev}</echo>
+
+        <property name="target.apk" location="apk/${package.name}-mips-${manifest.version}-r${svn.info.rev}.apk" />
+        <echo>Target: ${target.apk}</echo>
+
+        <svn javahl="false">
+            <export srcurl="http://ebookdroid.googlecode.com/svn/wiki/ChangeLog.wiki" destpath="assets/about_changelog.wiki" />
+        </svn>
+
+        <antcall target="--make-release">
+            <param name="mk" value="${mips.mk}" />
+            <param name="apk" value="${target.apk}" />
+            <param name="ndk.dir" value="${mips.ndk.dir}" />
         </antcall>
     </target>
 
