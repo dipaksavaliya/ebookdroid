@@ -6,7 +6,7 @@ import org.emdev.utils.android.AndroidVersion;
 
 public interface IFullScreenManager {
 
-    IFullScreenManager instance = AndroidVersion.lessThan3x ? new FullScreenManagerOld() : new FullScreenManagerNew();
+    IFullScreenManager instance = /* AndroidVersion.lessThan3x ? */ new FullScreenManagerOld() /* : new FullScreenManagerNew() */;
 
     void setFullScreenMode(Window w, boolean fullScreen);
 
