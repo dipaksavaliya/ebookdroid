@@ -3,6 +3,8 @@ package org.ebookdroid.core;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.types.DocumentViewMode;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IView;
 import org.ebookdroid.ui.viewer.IViewController;
@@ -20,6 +22,9 @@ public class ViewState {
 
     public final RectF viewRect;
     public final float zoom;
+    public final PageAlign pageAlign;
+    public final boolean nightMode;
+    public final PagePaint paint;
 
     public final Pages pages;
 
@@ -42,6 +47,9 @@ public class ViewState {
 
         this.viewRect = new RectF(view.getViewRect());
         this.zoom = zoom;
+        this.pageAlign = DocumentViewMode.getPageAlign(book);
+        this.nightMode = app.getNightMode();
+        this.paint = this.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
 
         this.pages = new Pages();
     }
@@ -55,6 +63,9 @@ public class ViewState {
 
         this.viewRect = oldState.viewRect;
         this.zoom = oldState.zoom;
+        this.pageAlign = oldState.pageAlign;
+        this.nightMode = oldState.nightMode;
+        this.paint = oldState.paint;
 
         this.pages = new Pages();
     }
@@ -68,21 +79,11 @@ public class ViewState {
 
         this.viewRect = oldState.viewRect;
         this.zoom = oldState.zoom;
+        this.pageAlign = oldState.pageAlign;
+        this.nightMode = oldState.nightMode;
+        this.paint = oldState.paint;
 
         this.pages = new Pages(firstVisiblePage, lastVisiblePage);
-    }
-
-    public ViewState(final ViewState oldState) {
-        this.app = SettingsManager.getAppSettings();
-        this.book = SettingsManager.getBookSettings();
-        this.ctrl = oldState.ctrl;
-        this.view = oldState.view;
-        this.model = oldState.model;
-
-        this.viewRect = oldState.viewRect;
-        this.zoom = oldState.zoom;
-
-        this.pages = new Pages();
     }
 
     public RectF getBounds(final Page page) {

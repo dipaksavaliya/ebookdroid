@@ -2,7 +2,6 @@ package org.ebookdroid.ui.viewer.viewers;
 
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.core.EventDraw;
-import org.ebookdroid.core.PagePaint;
 import org.ebookdroid.core.ViewState;
 
 import android.graphics.Canvas;
@@ -52,7 +51,7 @@ public class DrawThread extends Thread {
         Canvas canvas = null;
         try {
             canvas = surfaceHolder.lockCanvas(null);
-            performDrawing(canvas, viewState);
+            new EventDraw(viewState, canvas).process();
         } catch (final Throwable th) {
             LCTX.e("Unexpected error on drawing: " + th.getMessage(), th);
         } finally {
@@ -76,12 +75,6 @@ public class DrawThread extends Thread {
             Thread.interrupted();
         }
         return task;
-    }
-
-    public void performDrawing(final Canvas canvas, final ViewState viewState) {
-        final PagePaint paint = viewState.app.getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
-        canvas.drawRect(canvas.getClipBounds(), paint.backgroundFillPaint);
-        new EventDraw(viewState, canvas).process();
     }
 
     public void draw(final ViewState viewState) {

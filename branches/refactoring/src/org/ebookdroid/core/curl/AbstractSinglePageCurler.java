@@ -2,7 +2,6 @@ package org.ebookdroid.core.curl;
 
 import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
-import org.ebookdroid.core.PagePaint;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 
@@ -149,8 +148,7 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
             event.canvas.save();
             event.canvas.clipPath(mask);
 
-            final PagePaint paint = event.viewState.app.getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
-            event.canvas.drawRect(event.canvas.getClipBounds(), paint.backgroundFillPaint);
+            event.canvas.drawRect(event.canvas.getClipBounds(), event.viewState.paint.backgroundFillPaint);
 
             event.process(page);
 

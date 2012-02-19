@@ -214,7 +214,7 @@ public class DecodeServiceBase implements DecodeService {
         final int scaledHeight;
         // &&
 
-        PageAlign effectiveAlign = viewState.book.pageAlign;
+        PageAlign effectiveAlign = viewState.pageAlign;
         if (effectiveAlign == PageAlign.AUTO) {
             final float viewAspect = viewWidth / viewHeight;
             final float nodeAspect = nodeWidth / nodeHeight;

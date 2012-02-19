@@ -4,7 +4,6 @@ import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
-import org.ebookdroid.core.PagePaint;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 
@@ -81,8 +80,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
             BitmapManager.release(ref);
             bitmap = BitmapManager.getBitmap("Curler image", (int) width, (int) height, Bitmap.Config.RGB_565);
         }
-        final PagePaint paint = viewState.app.getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
-        bitmap.getBitmap().eraseColor(paint.backgroundFillPaint.getColor());
+        bitmap.getBitmap().eraseColor(viewState.paint.backgroundFillPaint.getColor());
         return bitmap;
     }
 

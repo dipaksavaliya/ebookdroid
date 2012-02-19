@@ -20,8 +20,6 @@ public class EventDraw implements IEvent {
     public final PageTreeLevel level;
     public final Canvas canvas;
 
-    final PagePaint paint;
-
     RectF pageBounds;
     PointF viewBase;
 
@@ -29,7 +27,6 @@ public class EventDraw implements IEvent {
         this.viewState = viewState;
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.canvas = canvas;
-        this.paint = viewState.app.getNightMode() ? PagePaint.NIGHT : PagePaint.DAY;
         this.viewBase = viewState.view.getBase(viewState.viewRect);
     }
 
@@ -37,12 +34,12 @@ public class EventDraw implements IEvent {
         this.viewState = event.viewState;
         this.level = event.level;
         this.canvas = canvas;
-        this.paint = event.paint;
         this.viewBase = event.viewBase;
     }
 
     @Override
     public ViewState process() {
+        canvas.drawRect(canvas.getClipBounds(), viewState.paint.backgroundFillPaint);
         viewState.ctrl.drawView(this);
         return viewState;
     }
@@ -90,13 +87,13 @@ public class EventDraw implements IEvent {
         }
 
         try {
-            if (node.holder.drawBitmap(canvas, paint, viewBase, nodeRect, nodeRect)) {
+            if (node.holder.drawBitmap(canvas, viewState.paint, viewBase, nodeRect, nodeRect)) {
                 return true;
             }
 
             if (node.parent != null) {
                 final RectF parentRect = node.parent.getTargetRect(viewState, pageBounds);
-                if (node.parent.holder.drawBitmap(canvas, paint, viewBase, parentRect, nodeRect)) {
+                if (node.parent.holder.drawBitmap(canvas, viewState.paint, viewBase, parentRect, nodeRect)) {
                     return true;
                 }
             }
@@ -109,7 +106,7 @@ public class EventDraw implements IEvent {
                 final PageTreeNode child = nodes.nodes[childId];
                 if (child != null) {
                     final RectF childRect = child.getTargetRect(viewState, pageBounds);
-                    res &= child.holder.drawBitmap(canvas, paint, viewBase, childRect, nodeRect);
+                    res &= child.holder.drawBitmap(canvas, viewState.paint, viewBase, childRect, nodeRect);
                 }
             }
 
@@ -123,9 +120,9 @@ public class EventDraw implements IEvent {
         final RectF rect = new RectF(pageBounds);
         rect.offset(-viewBase.x, -viewBase.y);
 
-        canvas.drawRect(rect, paint.fillPaint);
+        canvas.drawRect(rect, viewState.paint.fillPaint);
 
-        final TextPaint textPaint = paint.textPaint;
+        final TextPaint textPaint = viewState.paint.textPaint;
         textPaint.setTextSize(24 * viewState.zoom);
 
         final String text = EBookDroidApp.context.getString(R.string.text_page) + " " + (page.index.viewIndex + 1);

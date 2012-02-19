@@ -3,6 +3,7 @@ package org.ebookdroid.ui.viewer.viewers;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.DecodeService;
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.models.DocumentModel;
@@ -337,7 +338,7 @@ public final class BaseView extends View implements IView {
         if (viewState == null) {
             viewState = new ViewState(base.getDocumentController());
         }
-        drawThread.performDrawing(canvas, viewState);
+        new EventDraw(viewState, canvas).process();
     }
 
     /**
