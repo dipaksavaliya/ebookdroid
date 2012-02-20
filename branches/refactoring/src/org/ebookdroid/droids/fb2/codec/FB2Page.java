@@ -18,7 +18,7 @@ public class FB2Page implements CodecPage {
 
     public static final int PAGE_WIDTH = 800;
 
-    public static final int PAGE_HEIGHT = 1176;
+    public static final int PAGE_HEIGHT = 1280;
 
     public static final CodecPageInfo CPI = new CodecPageInfo(PAGE_WIDTH, PAGE_HEIGHT);
     
