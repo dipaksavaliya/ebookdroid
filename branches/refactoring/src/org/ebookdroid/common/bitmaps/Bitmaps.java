@@ -212,8 +212,7 @@ public class Bitmaps {
                     m.postTranslate(tr.left - vb.x, tr.top - vb.y);
 
                     final int index = row * columns + col;
-                    if (this.bitmaps[index] != null && this.bitmaps[index].bitmap != null
-                            && !this.bitmaps[index].bitmap.isRecycled()) {
+                    if (this.bitmaps[index] != null) {
                         canvas.drawBitmap(this.bitmaps[index].bitmap, m, paint.bitmapPaint);
                     } else {
                         res = false;
