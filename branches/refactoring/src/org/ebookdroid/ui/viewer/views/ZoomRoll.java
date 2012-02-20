@@ -2,6 +2,7 @@ package org.ebookdroid.ui.viewer.views;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.core.events.ZoomListener;
 import org.ebookdroid.core.models.ZoomModel;
 
 import android.content.Context;
@@ -17,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Scroller;
 
-public class ZoomRoll extends View {
+public class ZoomRoll extends View implements ZoomListener {
 
     private static final float MULTIPLIER = 400.0f;
     private static final float MAX_VALUE = (1 + ZoomModel.MAX_ZOOM)* MULTIPLIER;
@@ -35,6 +36,8 @@ public class ZoomRoll extends View {
     public ZoomRoll(final Context context, final ZoomModel zoomModel) {
         super(context);
         this.zoomModel = zoomModel;
+        this.zoomModel.addListener(this);
+
         left = BitmapManager.getResource(R.drawable.left);
         right = BitmapManager.getResource(R.drawable.right);
         center = BitmapManager.getResource(R.drawable.center);
@@ -115,6 +118,11 @@ public class ZoomRoll extends View {
         }
         final float zoom = 1.0f + currentValue / MULTIPLIER;
         zoomModel.setZoom(zoom);
+    }
+
+    @Override
+    public void zoomChanged(float oldZoom, float newZoom, boolean committed) {
+        postInvalidate();
     }
 
     protected class GestureListener extends SimpleOnGestureListener {
