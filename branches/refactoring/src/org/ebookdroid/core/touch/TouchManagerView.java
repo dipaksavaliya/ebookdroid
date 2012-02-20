@@ -149,15 +149,13 @@ public class TouchManagerView extends View {
     private Region current;
 
     protected void processRegion() {
-        LCTX.e("processRegion(): ", new Exception());
-
         if (profile != null) {
             if (startPoint != null && endPoint != null) {
                 current = getOrCreareRegion(startPoint, endPoint);
             }
             LCTX.e("processRegion(): " + current);
             if (current != null) {
-                final TouchConfigDialog dlg = new TouchConfigDialog(base, profile, current);
+                final TouchConfigDialog dlg = new TouchConfigDialog(base, this, profile, current);
                 dlg.show();
             }
         }
@@ -244,6 +242,7 @@ public class TouchManagerView extends View {
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             LCTX.e("onSingleTapUp(): " + current);
+            endPoint = null;
             return true;
         }
 

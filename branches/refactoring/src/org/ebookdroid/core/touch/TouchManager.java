@@ -281,6 +281,13 @@ public class TouchManager {
             rect = r;
         }
 
+        public Region(final Region r) {
+            this.rect = new Rect(r.rect);
+            for (int i = 0; i < actions.length; i++) {
+                this.actions[i] = r.actions[i];
+            }
+        }
+
         public Rect getRect() {
             return rect;
         }
@@ -298,6 +305,16 @@ public class TouchManager {
         public RectF getActualRect(final float width, final float height) {
             return new RectF(width * rect.left / 100.0f, height * rect.top / 100.0f, width * rect.right / 100.0f,
                     height * rect.bottom / 100.0f);
+        }
+
+        public void clear(Touch type) {
+            this.actions[type.ordinal()] = null;
+        }
+
+        public void clear() {
+            for (int i = 0; i < actions.length; i++) {
+                this.actions[i] = null;
+            }
         }
 
         @Override
@@ -362,25 +379,27 @@ public class TouchManager {
 
         public final Touch type;
         public final int id;
+        public final String name;
         public boolean enabled;
 
         public ActionRef(final Touch type, final int id, final boolean enabled) {
             this.type = type;
             this.id = id;
+            this.name = ActionEx.getActionName(id);
             this.enabled = enabled;
         }
 
         public JSONObject toJSON() throws JSONException {
             final JSONObject object = new JSONObject();
             object.put("type", type.name());
-            object.put("name", ActionEx.getActionName(id));
+            object.put("name", name);
             object.put("enabled", enabled);
             return object;
         }
 
         @Override
         public String toString() {
-            return "(" + type + ", " + ActionEx.getActionName(id) + ", " + enabled + ")";
+            return "(" + type + ", " + name + ", " + enabled + ")";
         }
     }
 }

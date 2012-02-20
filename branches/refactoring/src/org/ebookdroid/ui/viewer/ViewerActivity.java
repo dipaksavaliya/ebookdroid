@@ -580,15 +580,22 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
             return true;
         }
 
-        switch (event.getKeyCode()) {
-            case KeyEvent.KEYCODE_BACK:
-                if (event.getRepeatCount() == 0) {
-                    closeActivity(null);
-                }
-                return true;
-            default:
-                return super.dispatchKeyEvent(event);
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+            switch (event.getKeyCode()) {
+                case KeyEvent.KEYCODE_BACK:
+                    if (event.getRepeatCount() == 0) {
+                        if (touchView.isShown()) {
+                            ViewEffects.toggleControls(touchView);
+                        } else {
+                            closeActivity(null);
+                        }
+                    }
+                    return true;
+                default:
+                    return super.dispatchKeyEvent(event);
+            }
         }
+        return true;
     }
 
     @ActionMethod(ids = R.id.mainmenu_close)
