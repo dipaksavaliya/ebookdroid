@@ -18,6 +18,7 @@ import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.FloatMath;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -524,10 +525,11 @@ public abstract class AbstractViewController extends AbstractComponentController
          */
         @Override
         public void onTwoFingerPinch(final MotionEvent e, final float oldDistance, final float newDistance) {
+            final float factor = FloatMath.sqrt(newDistance / oldDistance);
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("onTwoFingerPinch(" + e + ", " + oldDistance + ", " + newDistance + ")");
+                LCTX.d("onTwoFingerPinch(" + oldDistance + ", " + newDistance + "): " + factor);
             }
-            base.getZoomModel().scaleZoom(newDistance / oldDistance);
+            base.getZoomModel().scaleZoom(factor);
         }
 
         /**

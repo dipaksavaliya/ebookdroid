@@ -2,6 +2,7 @@ package org.ebookdroid.core.models;
 
 import org.ebookdroid.core.events.ZoomListener;
 
+import org.emdev.utils.MathUtils;
 import org.emdev.utils.listeners.ListenerProxy;
 
 public class ZoomModel extends ListenerProxy {
@@ -9,7 +10,7 @@ public class ZoomModel extends ListenerProxy {
     public static final float MIN_ZOOM = 1.0f;
     public static final float MAX_ZOOM = 32.0f;
 
-    private static final float INCREMENT_DELTA = 0.05f;
+    private static final float ZOOM_ROUND_FACTOR = 32.0f;
 
     private float initialZoom = MIN_ZOOM;
     private float currentZoom = MIN_ZOOM;
@@ -21,12 +22,13 @@ public class ZoomModel extends ListenerProxy {
     }
 
     public void initZoom(final float zoom) {
-        this.initialZoom = this.currentZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
+        this.initialZoom = this.currentZoom = MathUtils.adjust(MathUtils.round(zoom, ZOOM_ROUND_FACTOR), MIN_ZOOM,
+                MAX_ZOOM);
         isCommited = true;
     }
 
     public void setZoom(final float zoom) {
-        final float newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
+        final float newZoom = MathUtils.adjust(MathUtils.round(zoom, ZOOM_ROUND_FACTOR), MIN_ZOOM, MAX_ZOOM);
         final float oldZoom = this.currentZoom;
         if (newZoom != oldZoom) {
             isCommited = false;
@@ -41,14 +43,6 @@ public class ZoomModel extends ListenerProxy {
 
     public float getZoom() {
         return currentZoom;
-    }
-
-    public void increaseZoom() {
-        setZoom(currentZoom + INCREMENT_DELTA);
-    }
-
-    public void decreaseZoom() {
-        setZoom(currentZoom - INCREMENT_DELTA);
     }
 
     public void commit() {

@@ -10,6 +10,10 @@ public class MathUtils {
         return Math.min(Math.max(min, value), max);
     }
 
+    public static float adjust(final float value, final float min, final float max) {
+        return Math.min(Math.max(min, value), max);
+    }
+
     public static Rect rect(final RectF rect) {
         return new Rect((int) rect.left, (int) rect.top, (int) rect.right, (int) rect.bottom);
     }
