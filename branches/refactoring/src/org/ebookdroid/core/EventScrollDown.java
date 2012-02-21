@@ -1,5 +1,7 @@
 package org.ebookdroid.core;
 
+import org.emdev.utils.LengthUtils;
+
 public class EventScrollDown extends AbstractEventScroll {
 
     public EventScrollDown(final AbstractViewController ctrl) {
@@ -13,12 +15,12 @@ public class EventScrollDown extends AbstractEventScroll {
      */
     @Override
     protected ViewState calculatePageVisibility(final ViewState initial) {
+        final Page[] pages = model.getPages();
 
         int firstVisiblePage = initial.pages.firstVisible;
         int lastVisiblePage = initial.pages.lastVisible;
 
-        if (firstVisiblePage != -1) {
-            final Page[] pages = model.getPages();
+        if (LengthUtils.isNotEmpty(pages) && firstVisiblePage != -1) {
             for (int i = firstVisiblePage; i < pages.length; i++) {
                 if (!ctrl.isPageVisible(pages[i], initial)) {
                     continue;
