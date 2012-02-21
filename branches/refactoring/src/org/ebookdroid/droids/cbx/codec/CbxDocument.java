@@ -86,7 +86,9 @@ public class CbxDocument<ArchiveEntryType extends ArchiveEntry> extends Abstract
     protected void freeDocument() {
         try {
             pages.clear();
-            archive.close();
+            if (archive != null) {
+                archive.close();
+            }
         } catch (final IOException e) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("IO error: " + e.getMessage());
