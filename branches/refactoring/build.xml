@@ -114,7 +114,7 @@
 			<param name="mk" value="${cortex.a8.mk}" />
 			<param name="apk" value="${cortex.a8.apk}" />
 			<param name="ndk.dir" value="${arm.ndk.dir}" />
-			<param name="unrar.arch" value="arm7.8" />
+			<param name="unrar.arch" value="arm7.a8" />
 		</antcall>
 		<antcall target="--make-release" inheritall="true">
 			<param name="mk" value="${cortex.a8.neon.mk}" />
