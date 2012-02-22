@@ -70,12 +70,7 @@ public class TouchManager {
                 r.setAction(Touch.SingleTap, R.id.actions_verticalConfigScrollDown, newSettings.getTapScroll());
             }
 
-            try {
-                final JSONObject json = toJSON();
-                SettingsManager.getAppSettings().updateTouchProfiles(json.toString());
-            } catch (final JSONException ex) {
-                ex.printStackTrace();
-            }
+            persist();
         } else {
             setActionEnabled(DEFAULT_PROFILE, R.id.mainmenu_zoom, newSettings.getZoomByDoubleTap());
             setActionEnabled(DEFAULT_PROFILE, R.id.actions_verticalConfigScrollUp, newSettings.getTapScroll(), 0, 0,
@@ -85,6 +80,15 @@ public class TouchManager {
         }
 
         stack.addFirst(profiles.get(DEFAULT_PROFILE));
+    }
+
+    public static void persist() {
+        try {
+            final JSONObject json = toJSON();
+            SettingsManager.getAppSettings().updateTouchProfiles(json.toString());
+        } catch (final JSONException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public static void setActionEnabled(final String profile, final int id, final boolean enabled) {

@@ -83,6 +83,14 @@ public class TouchConfigDialog extends Dialog {
         actions.connectViewToAction(R.id.tapZonesConfigClear);
         actions.connectViewToAction(R.id.tapZonesConfigDelete);
         actions.connectViewToAction(R.id.tapZonesConfigReset);
+
+        print();
+    }
+
+    public void print() {
+//        for (Region r : this.profile.regions) {
+//            System.out.println(r);
+//        }
     }
 
     @Override
@@ -93,6 +101,10 @@ public class TouchConfigDialog extends Dialog {
         for (int i = 0; i < adapter.getCount(); i++) {
             profile.regions.add(adapter.getItem(i).r);
         }
+
+        print();
+
+        TouchManager.persist();
 
         view.invalidate();
     }

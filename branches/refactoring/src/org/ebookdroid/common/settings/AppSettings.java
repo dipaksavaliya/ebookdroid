@@ -111,7 +111,7 @@ public class AppSettings {
     public void updateTouchProfiles(final String profiles) {
         touchProfiles = profiles;
         final Editor edit = prefs.edit();
-        edit.putString("touchprofiles", touchProfiles);
+        edit.putString("tapprofiles", touchProfiles);
         edit.commit();
     }
 

@@ -28,7 +28,7 @@ public class TouchManagerView extends View {
     private static final float GRID_X = 10;
     private static final float GRID_Y = 10;
 
-    private static final int[] COLORS = { Color.BLUE, Color.CYAN, Color.GRAY, Color.MAGENTA, Color.RED, Color.YELLOW };
+    private static final int[] COLORS = { Color.BLUE, Color.GRAY, Color.RED, Color.YELLOW };
 
     private final IActivityController base;
 
