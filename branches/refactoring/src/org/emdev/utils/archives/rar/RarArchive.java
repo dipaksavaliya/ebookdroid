@@ -1,53 +1,70 @@
 package org.emdev.utils.archives.rar;
 
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
+import org.emdev.utils.LengthUtils;
 import org.emdev.utils.archives.ArchiveFile;
-
-import de.innosystec.unrar.Archive;
-import de.innosystec.unrar.exception.RarException;
-import de.innosystec.unrar.rarfile.FileHeader;
 
 public class RarArchive implements ArchiveFile<RarArchiveEntry> {
 
-    final Archive rarfile;
+    final File rarfile;
+    final List<RarArchiveEntry> entries = new LinkedList<RarArchiveEntry>();
 
     /**
      * Constructor.
-     *
+     * 
      * @param file
      *            archive file
      * @throws IOException
      *             thrown on error
      */
     public RarArchive(final File file) throws IOException {
+        rarfile = file;
+
+        final Set<String> dirs = new HashSet<String>();
+
+        final Process process = UnrarBridge.exec("vb", rarfile.getAbsolutePath());
+        final BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        for (String s = in.readLine(); s != null; s = in.readLine()) {
+            if (dirs.contains(s)) {
+                continue;
+            }
+            final File f = new File(s);
+            entries.add(new RarArchiveEntry(this, s, f.getName()));
+
+            String dir = f.getParent();
+            while (LengthUtils.isNotEmpty(dir)) {
+                dirs.add(dir);
+                dir = new File(dir).getParent();
+            }
+
+        }
         try {
-            rarfile = new Archive(file);
-        } catch (final RarException ex) {
-            final IOException exx = new IOException(ex.getMessage());
-            exx.initCause(ex);
-            throw exx;
+            process.waitFor();
+        } catch (final InterruptedException ex) {
+            Thread.interrupted();
+            throw new IOException(ex.getMessage());
         }
     }
 
     @Override
     protected void finalize() throws Throwable {
-        try {
-            rarfile.close();
-        } catch (Exception e) {
-        }
         super.finalize();
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.emdev.utils.archives.ArchiveFile#randomAccessAllowed()
      */
     @Override
@@ -57,61 +74,15 @@ public class RarArchive implements ArchiveFile<RarArchiveEntry> {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.emdev.utils.archives.ArchiveFile#entries()
      */
     @Override
     public Enumeration<RarArchiveEntry> entries() {
-        return new Enumeration<RarArchiveEntry>() {
-
-            private RarArchiveEntry entry;
-
-            @Override
-            public boolean hasMoreElements() {
-                if (entry == null) {
-                    FileHeader nextFileHeader = rarfile.nextFileHeader();
-                    if (nextFileHeader != null) {
-                        entry = new RarArchiveEntry(RarArchive.this, nextFileHeader);
-                    }
-                }
-                return entry != null;
-            }
-
-            @Override
-            public RarArchiveEntry nextElement() {
-                final RarArchiveEntry res = entry;
-                entry = null;
-                return res;
-            }
-        };
+        return Collections.enumeration(entries);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.emdev.utils.archives.ArchiveFile#open(org.ebookdroid.core.utils.archives.ArchiveEntry)
-     */
-    @Override
-    public InputStream open(final RarArchiveEntry entry) throws IOException {
-        try {
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            rarfile.extractFile(entry.fileHeader, baos);
-            baos.close();
-            return new ByteArrayInputStream(baos.toByteArray());
-        } catch (final RarException ex) {
-            final IOException exx = new IOException(ex.getMessage());
-            exx.initCause(ex);
-            throw exx;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.emdev.utils.archives.ArchiveFile#close()
-     */
     @Override
     public void close() throws IOException {
-        rarfile.close();
     }
 }

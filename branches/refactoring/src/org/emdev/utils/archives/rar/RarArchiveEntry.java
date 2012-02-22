@@ -1,21 +1,20 @@
 package org.emdev.utils.archives.rar;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.emdev.utils.archives.ArchiveEntry;
 
-import de.innosystec.unrar.rarfile.FileHeader;
-
 public class RarArchiveEntry implements ArchiveEntry {
 
     final RarArchive archive;
-    final FileHeader fileHeader;
+    final String path;
+    final String name;
 
-    RarArchiveEntry(final RarArchive archive, final FileHeader fh) {
+    RarArchiveEntry(final RarArchive archive, final String path, final String name) {
         this.archive = archive;
-        this.fileHeader = fh;
+        this.path = path;
+        this.name = name;
     }
 
     /**
@@ -25,7 +24,7 @@ public class RarArchiveEntry implements ArchiveEntry {
      */
     @Override
     public String getName() {
-        return fileHeader.getFileNameString();
+        return name;
     }
 
     /**
@@ -35,7 +34,7 @@ public class RarArchiveEntry implements ArchiveEntry {
      */
     @Override
     public boolean isDirectory() {
-        return fileHeader.isDirectory();
+        return false;
     }
 
     /**
@@ -45,6 +44,7 @@ public class RarArchiveEntry implements ArchiveEntry {
      */
     @Override
     public InputStream open() throws IOException {
-        return archive.open(this);
+        final Process process = UnrarBridge.exec("p", "-inul", archive.rarfile.getAbsolutePath(), path);
+        return process.getInputStream();
     }
 }

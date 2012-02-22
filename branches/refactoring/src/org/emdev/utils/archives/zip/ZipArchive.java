@@ -67,13 +67,7 @@ public class ZipArchive implements ArchiveFile<ZipArchiveEntry> {
         };
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.emdev.utils.archives.ArchiveFile#open(org.ebookdroid.core.utils.archives.ArchiveEntry)
-     */
-    @Override
-    public InputStream open(final ZipArchiveEntry entry) throws IOException {
+    InputStream open(final ZipArchiveEntry entry) throws IOException {
         return zipfile.getInputStream(entry.entry);
     }
 
