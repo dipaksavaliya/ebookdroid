@@ -16,8 +16,6 @@ public class PageViewZoomControls extends LinearLayout {
         setOrientation(LinearLayout.HORIZONTAL);
         setGravity(Gravity.BOTTOM);
         addView(new ZoomRoll(context, zoomModel));
-
-        zoomModel.addListener(this);
     }
 
     @Override
