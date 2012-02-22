@@ -580,7 +580,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
             return true;
         }
 
-        if (event.getAction() == KeyEvent.ACTION_UP) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (event.getKeyCode()) {
                 case KeyEvent.KEYCODE_BACK:
                     if (event.getRepeatCount() == 0) {
@@ -595,7 +595,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
                     return super.dispatchKeyEvent(event);
             }
         }
-        return true;
+        return false;
     }
 
     @ActionMethod(ids = R.id.mainmenu_close)
