@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 
 public class MultiTouchGestureDetector implements IGestureDetector {
 
-    protected static final LogContext LCTX = LogContext.ROOT.lctx("Gesture", true);
+    protected static final LogContext LCTX = LogContext.ROOT.lctx("Gesture", false);
 
     private final IMultiTouchListener listener;
     private float twoFingerDistance;
