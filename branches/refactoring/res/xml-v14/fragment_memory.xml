@@ -1,0 +1,63 @@
+    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:summary="@string/pref_performance_category_summary"
+        android:title="@string/pref_performance_category" >
+
+        <EditTextPreference
+            android:defaultValue="0"
+            android:key="pagesinmemory"
+            android:maxLength="3"
+            android:numeric="integer"
+            android:summary="@string/pref_pagesinmemory_summary"
+            android:title="@string/pref_pagesinmemory_title" />
+
+        <PreferenceCategory
+            android:summary="@string/pref_lowlevel_category_summary"
+            android:title="@string/pref_lowlevel_category" >
+
+            <ListPreference
+                android:defaultValue="Surface"
+                android:entries="@array/list_docviewtype"
+                android:entryValues="@array/list_docviewtype_values"
+                android:key="docviewtype"
+                android:summary="@string/pref_docviewtype_summary"
+                android:title="@string/pref_docviewtype_title" />
+        
+            <ListPreference
+                android:defaultValue="5"
+                android:entries="@array/list_thread_priority"
+                android:entryValues="@array/list_thread_priority_values"
+                android:key="decodethread_priority"
+                android:summary="@string/pref_decodethread_priority_summary"
+                android:title="@string/pref_decodethread_priority_title" />
+
+            <ListPreference
+                android:defaultValue="5"
+                android:entries="@array/list_thread_priority"
+                android:entryValues="@array/list_thread_priority_values"
+                android:key="drawthread_priority"
+                android:summary="@string/pref_drawthread_priority_summary"
+                android:title="@string/pref_drawthread_priority_title" />
+
+            <SwitchPreference
+                android:defaultValue="false"
+                android:key="hwa_enabled"
+                android:summary="@string/pref_hwa_enabled_summary"
+                android:title="@string/pref_hwa_enabled_title" />
+
+            <ListPreference
+                android:defaultValue="7"
+                android:entries="@array/list_bitmapsize"
+                android:entryValues="@array/list_bitmapsize_values"
+                android:key="bitmapsize"
+                android:summary="@string/pref_bitmapsize_summary"
+                android:title="@string/pref_bitmapsize_title" />
+
+            <SwitchPreference
+                android:defaultValue="true"
+                android:key="texturereuse"
+                android:summary="@string/pref_texturereuse_summary"
+                android:title="@string/pref_texturereuse_title" />
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
