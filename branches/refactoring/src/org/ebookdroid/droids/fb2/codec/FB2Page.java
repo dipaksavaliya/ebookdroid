@@ -14,6 +14,8 @@ import android.graphics.RectF;
 
 import java.util.ArrayList;
 
+import org.emdev.utils.MatrixUtils;
+
 public class FB2Page implements CodecPage {
 
     public static final int PAGE_WIDTH = 800;
@@ -50,7 +52,7 @@ public class FB2Page implements CodecPage {
 
     @Override
     public BitmapRef renderBitmap(final int width, final int height, final RectF pageSliceBounds) {
-        final Matrix matrix = new Matrix();
+        final Matrix matrix = MatrixUtils.get();
         matrix.postScale((float) width / PAGE_WIDTH, (float) height / PAGE_HEIGHT);
         matrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height);
         matrix.postScale(1 / pageSliceBounds.width(), 1 / pageSliceBounds.height());

@@ -10,6 +10,8 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import org.emdev.utils.MatrixUtils;
+
 public class XpsPage implements CodecPage {
 
     private long pageHandle;
@@ -40,7 +42,7 @@ public class XpsPage implements CodecPage {
 
     @Override
     public BitmapRef renderBitmap(final int width, final int height, final RectF pageSliceBounds) {
-        final Matrix matrix = new Matrix();
+        final Matrix matrix = MatrixUtils.get();
         matrix.postScale(width / (float) pageBounds.width(), height / (float) pageBounds.height());
         matrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height);
         matrix.postScale(1 / pageSliceBounds.width(), 1 / pageSliceBounds.height());

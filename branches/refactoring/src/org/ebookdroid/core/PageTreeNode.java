@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.emdev.utils.MatrixUtils;
+
 public class PageTreeNode implements DecodeService.DecodeCallback {
 
     private static final LogContext LCTX = Page.LCTX;
@@ -40,8 +42,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
     float bitmapZoom = 1;
     RectF croppedBounds = null;
-
-    private static final Matrix tmpMatrix = new Matrix();
 
     PageTreeNode(final Page page) {
         assert page != null;
@@ -172,7 +172,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     public RectF getTargetRect(final ViewState viewState, final RectF pageBounds) {
-        tmpMatrix.reset();
+        final Matrix tmpMatrix = MatrixUtils.get();
+
         tmpMatrix.postScale(pageBounds.width() * page.getTargetRectScale(), pageBounds.height());
         tmpMatrix.postTranslate(pageBounds.left - pageBounds.width() * page.type.getLeftPos(), pageBounds.top);
 
@@ -182,7 +183,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     private static RectF evaluatePageSliceBounds(final RectF localPageSliceBounds, final PageTreeNode parent) {
-        tmpMatrix.reset();
+        final Matrix tmpMatrix = MatrixUtils.get();
+
         tmpMatrix.postScale(parent.pageSliceBounds.width(), parent.pageSliceBounds.height());
         tmpMatrix.postTranslate(parent.pageSliceBounds.left, parent.pageSliceBounds.top);
         final RectF sliceBounds = new RectF();
@@ -194,7 +196,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         if (parent.croppedBounds == null) {
             return null;
         }
-        tmpMatrix.reset();
+        final Matrix tmpMatrix = MatrixUtils.get();
+
         tmpMatrix.postScale(parent.croppedBounds.width(), parent.croppedBounds.height());
         tmpMatrix.postTranslate(parent.croppedBounds.left, parent.croppedBounds.top);
         final RectF sliceBounds = new RectF();

@@ -16,6 +16,8 @@ import android.graphics.Region.Op;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.emdev.utils.MatrixUtils;
+
 public class Bitmaps {
 
     private static final LogContext LCTX = BitmapManager.LCTX;
@@ -32,8 +34,6 @@ public class Bitmaps {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private BitmapRef[] bitmaps;
-
-    private static final Matrix M = new Matrix();
 
     public Bitmaps(final String nodeId, final BitmapRef orig, final Rect bitmapBounds, final boolean invert) {
         final Bitmap origBitmap = orig.getBitmap();
@@ -203,19 +203,21 @@ public class Bitmaps {
             final float scaleX = tr.width() / bounds.width();
             final float scaleY = tr.height() / bounds.height();
 
+            final Matrix m = MatrixUtils.get();
+
             int top = 0;
             boolean res = true;
             for (int row = 0; row < rows; row++, top += partSize) {
                 int left = 0;
                 for (int col = 0; col < columns; col++, left += partSize) {
-                    M.reset();
-                    M.postTranslate(left, top);
-                    M.postScale(scaleX, scaleY);
-                    M.postTranslate(tr.left - vb.x, tr.top - vb.y);
+                    m.reset();
+                    m.postTranslate(left, top);
+                    m.postScale(scaleX, scaleY);
+                    m.postTranslate(tr.left - vb.x, tr.top - vb.y);
 
                     final int index = row * columns + col;
                     if (this.bitmaps[index] != null) {
-                        canvas.drawBitmap(this.bitmaps[index].bitmap, M, paint.bitmapPaint);
+                        canvas.drawBitmap(this.bitmaps[index].bitmap, m, paint.bitmapPaint);
                     } else {
                         res = false;
                     }
