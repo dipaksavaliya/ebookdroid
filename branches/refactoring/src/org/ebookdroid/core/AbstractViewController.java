@@ -207,7 +207,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void updateMemorySettings() {
-        new EventReset(this, null, false).process();
+        EventPool.newEventReset(this, null, false).process();
     }
 
     public final int getScrollX() {
@@ -292,7 +292,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         }
         if (layoutChanged && !layoutLocked) {
             if (isShown) {
-                new EventReset(this, InvalidateSizeReason.LAYOUT, true).process();
+                EventPool.newEventReset(this, InvalidateSizeReason.LAYOUT, true).process();
                 return true;
             }
         }
@@ -306,7 +306,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void toggleNightMode(final boolean nightMode) {
-        new EventReset(this, null, true).process();
+        EventPool.newEventReset(this, null, true).process();
     }
 
     /**
@@ -329,7 +329,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void setAlign(final PageAlign align) {
-        new EventReset(this, InvalidateSizeReason.PAGE_ALIGN, false).process();
+        EventPool.newEventReset(this, InvalidateSizeReason.PAGE_ALIGN, false).process();
     }
 
     /**
@@ -406,7 +406,7 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     protected class GestureListener extends SimpleOnGestureListener implements IMultiTouchListener {
 
-        protected final LogContext LCTX = LogContext.ROOT.lctx("Gesture", true);
+        protected final LogContext LCTX = LogContext.ROOT.lctx("Gesture", false);
 
         /**
          * {@inheritDoc}

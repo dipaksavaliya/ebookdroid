@@ -8,9 +8,17 @@ public abstract class AbstractEventScroll extends AbstractEvent {
 
     protected AbstractEventScroll(final AbstractViewController ctrl) {
         super(ctrl);
+        reuseImpl(null);
+    }
+
+    void reuseImpl(final AbstractViewController ctrl) {
+        if (ctrl != null) {
+            super.reuseImpl(ctrl);
+        }
         level = PageTreeLevel.getLevel(viewState.zoom);
     }
 
+    
     /**
      * {@inheritDoc}
      *

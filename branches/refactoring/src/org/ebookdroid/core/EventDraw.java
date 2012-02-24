@@ -16,32 +16,30 @@ public class EventDraw implements IEvent {
 
     public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", false);
 
-    public final ViewState viewState;
-    public final PageTreeLevel level;
-    public final Canvas canvas;
+    public ViewState viewState;
+    public PageTreeLevel level;
+    public Canvas canvas;
 
     RectF pageBounds;
     PointF viewBase;
 
     public EventDraw(final ViewState viewState, final Canvas canvas) {
-        this.viewState = viewState;
-        this.level = PageTreeLevel.getLevel(viewState.zoom);
-        this.canvas = canvas;
-        this.viewBase = viewState.view.getBase(viewState.viewRect);
+        reuse(viewState, canvas);
     }
 
     public EventDraw(final EventDraw event, final Canvas canvas) {
-        this.viewState = event.viewState;
-        this.level = event.level;
-        this.canvas = canvas;
-        this.viewBase = event.viewBase;
+        reuse(event, canvas);
     }
 
     @Override
     public ViewState process() {
-        canvas.drawRect(canvas.getClipBounds(), viewState.paint.backgroundFillPaint);
-        viewState.ctrl.drawView(this);
-        return viewState;
+        try {
+            canvas.drawRect(canvas.getClipBounds(), viewState.paint.backgroundFillPaint);
+            viewState.ctrl.drawView(this);
+            return viewState;
+        } finally {
+            EventPool.release(this);
+        }
     }
 
     @Override
@@ -139,4 +137,19 @@ public class EventDraw implements IEvent {
         }
     }
 
+    EventDraw reuse(final ViewState viewState, final Canvas canvas) {
+        this.viewState = viewState;
+        this.level = PageTreeLevel.getLevel(viewState.zoom);
+        this.canvas = canvas;
+        this.viewBase = viewState.view.getBase(viewState.viewRect);
+        return this;
+    }
+
+    EventDraw reuse(final EventDraw event, final Canvas canvas) {
+        this.viewState = event.viewState;
+        this.level = event.level;
+        this.canvas = canvas;
+        this.viewBase = event.viewBase;
+        return this;
+    }
 }

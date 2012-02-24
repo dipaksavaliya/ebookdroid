@@ -1,7 +1,7 @@
 package org.ebookdroid.ui.viewer.viewers;
 
 import org.ebookdroid.common.log.LogContext;
-import org.ebookdroid.core.EventDraw;
+import org.ebookdroid.core.EventPool;
 import org.ebookdroid.core.ViewState;
 
 import android.graphics.Canvas;
@@ -51,7 +51,7 @@ public class DrawThread extends Thread {
         Canvas canvas = null;
         try {
             canvas = surfaceHolder.lockCanvas(null);
-            new EventDraw(viewState, canvas).process();
+            EventPool.newEventDraw(viewState, canvas).process();
         } catch (final Throwable th) {
             LCTX.e("Unexpected error on drawing: " + th.getMessage(), th);
         } finally {

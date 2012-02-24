@@ -11,15 +11,23 @@ import java.util.List;
 
 public class EventReset extends AbstractEvent {
 
-    protected final PageTreeLevel level;
-    protected final InvalidateSizeReason reason;
-    protected final boolean clearPages;
+    protected PageTreeLevel level;
+    protected InvalidateSizeReason reason;
+    protected boolean clearPages;
 
     public EventReset(final AbstractViewController ctrl, final InvalidateSizeReason reason, final boolean clearPages) {
         super(ctrl);
+        reuse(null, reason, clearPages);
+    }
+
+    EventReset reuse(final AbstractViewController ctrl, final InvalidateSizeReason reason, final boolean clearPages) {
+        if (ctrl != null) {
+            super.reuseImpl(ctrl);
+        }
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.reason = reason;
         this.clearPages = clearPages;
+        return this;
     }
 
     /**
@@ -29,20 +37,23 @@ public class EventReset extends AbstractEvent {
      */
     @Override
     public ViewState process() {
-        if (clearPages) {
-            final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-            for (final Page page : model.getPages()) {
-                page.nodes.recycleAll(bitmapsToRecycle, true);
+        try {
+            if (clearPages) {
+                final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
+                for (final Page page : model.getPages()) {
+                    page.nodes.recycleAll(bitmapsToRecycle, true);
+                }
+                BitmapManager.release(bitmapsToRecycle);
             }
-            BitmapManager.release(bitmapsToRecycle);
+            if (reason != null) {
+                ctrl.invalidatePageSizes(InvalidateSizeReason.LAYOUT, null);
+                ctrl.invalidateScroll();
+                viewState = new ViewState(ctrl);
+            }
+            return super.process();
+        } finally {
+            EventPool.release(this);
         }
-        if (reason != null) {
-            ctrl.invalidatePageSizes(InvalidateSizeReason.LAYOUT, null);
-            ctrl.invalidateScroll();
-            viewState = new ViewState(ctrl);
-        }
-
-        return super.process();
     }
 
     /**

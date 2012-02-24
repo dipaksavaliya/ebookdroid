@@ -109,9 +109,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
             return;
         }
 
-        final int d = mode == DocumentViewMode.VERTICALL_SCROLL ? dY : dX;
-
-        final AbstractEventScroll cmd = d > 0 ? new EventScrollDown(this) : new EventScrollUp(this);
+        final AbstractEventScroll cmd = EventPool.newEventScroll(this, mode == DocumentViewMode.VERTICALL_SCROLL ? dY : dX);
 
         final ViewState viewState = cmd.process();
         if (cmd.model != null) {

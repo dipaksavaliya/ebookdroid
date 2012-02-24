@@ -8,6 +8,20 @@ public class EventScrollUp extends AbstractEventScroll {
         super(ctrl);
     }
 
+    EventScrollUp reuse(final AbstractViewController ctrl) {
+        super.reuseImpl(ctrl);
+        return this;
+    }
+
+    @Override
+    public ViewState process() {
+        try {
+            return super.process();
+        } finally {
+            EventPool.release(this);
+        }
+    }
+
     /**
      * {@inheritDoc}
      *

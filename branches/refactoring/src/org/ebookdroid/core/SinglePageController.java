@@ -101,7 +101,7 @@ public class SinglePageController extends AbstractViewController {
             return;
         }
 
-        AbstractEventScroll cmd = dX > 0 ? new EventScrollDown(this) : new EventScrollUp(this);
+        final AbstractEventScroll cmd = EventPool.newEventScroll(this, dX);
         final ViewState viewState = cmd.process();
 
         if (cmd.model != null) {

@@ -8,9 +8,23 @@ public class EventScrollDown extends AbstractEventScroll {
         super(ctrl);
     }
 
+    EventScrollDown reuse(final AbstractViewController ctrl) {
+        super.reuseImpl(ctrl);
+        return this;
+    }
+
+    @Override
+    public ViewState process() {
+        try {
+            return super.process();
+        } finally {
+            EventPool.release(this);
+        }
+    }
+
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.AbstractEvent#calculatePageVisibility(org.ebookdroid.core.ViewState)
      */
     @Override
