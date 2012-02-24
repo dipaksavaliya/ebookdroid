@@ -35,6 +35,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.FloatMath;
 
+import org.emdev.utils.MatrixUtils;
+
 /**
  * The Class SinglePageNaturalCurler.
  * 
@@ -170,7 +172,7 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
 
             canvas.save();
             canvas.clipPath(edgePath);
-            final Matrix m = new Matrix();
+            final Matrix m = MatrixUtils.get();
             m.postScale(1, -1);
             m.postTranslate((int) mA.x - cornerX, (int) mA.y + cornerY);
             final float angle;
