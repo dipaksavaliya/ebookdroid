@@ -33,6 +33,8 @@ public class Bitmaps {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private BitmapRef[] bitmaps;
 
+    private static final Matrix M = new Matrix();
+
     public Bitmaps(final String nodeId, final BitmapRef orig, final Rect bitmapBounds, final boolean invert) {
         final Bitmap origBitmap = orig.getBitmap();
 
@@ -206,14 +208,14 @@ public class Bitmaps {
             for (int row = 0; row < rows; row++, top += partSize) {
                 int left = 0;
                 for (int col = 0; col < columns; col++, left += partSize) {
-                    final Matrix m = new Matrix();
-                    m.postTranslate(left, top);
-                    m.postScale(scaleX, scaleY);
-                    m.postTranslate(tr.left - vb.x, tr.top - vb.y);
+                    M.reset();
+                    M.postTranslate(left, top);
+                    M.postScale(scaleX, scaleY);
+                    M.postTranslate(tr.left - vb.x, tr.top - vb.y);
 
                     final int index = row * columns + col;
                     if (this.bitmaps[index] != null) {
-                        canvas.drawBitmap(this.bitmaps[index].bitmap, m, paint.bitmapPaint);
+                        canvas.drawBitmap(this.bitmaps[index].bitmap, M, paint.bitmapPaint);
                     } else {
                         res = false;
                     }

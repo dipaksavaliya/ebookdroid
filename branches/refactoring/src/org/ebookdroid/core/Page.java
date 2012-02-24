@@ -77,6 +77,14 @@ public class Page {
         bounds = pageBounds;
     }
 
+    public void setBounds(final float l, final float t, final float r, final float b) {
+        if (bounds == null) {
+            bounds = new RectF(l, t, r, b);
+        } else {
+            bounds.set(l, t, r, b);
+        }
+    }
+
     public RectF getBounds(final float zoom) {
         if (zoom != storedZoom) {
             storedZoom = zoom;

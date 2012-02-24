@@ -16,7 +16,7 @@ public class VScrollController extends AbstractScrollController {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.ebookdroid.ui.viewer.IViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override
@@ -43,7 +43,7 @@ public class VScrollController extends AbstractScrollController {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.ebookdroid.ui.viewer.IViewController#verticalConfigScroll(int)
      */
     @Override
@@ -56,7 +56,7 @@ public class VScrollController extends AbstractScrollController {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.ebookdroid.ui.viewer.IViewController#getScrollLimits()
      */
     @Override
@@ -78,7 +78,7 @@ public class VScrollController extends AbstractScrollController {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason,
      *      org.ebookdroid.core.Page)
      */
@@ -103,14 +103,14 @@ public class VScrollController extends AbstractScrollController {
             float heightAccum = 0;
             for (final Page page : model.getPages()) {
                 final float pageHeight = width / page.getAspectRatio();
-                page.setBounds(new RectF(0, heightAccum, width, heightAccum + pageHeight));
+                page.setBounds(0, heightAccum, width, heightAccum + pageHeight);
                 heightAccum += pageHeight + 1;
             }
         } else {
             float heightAccum = changedPage.getBounds(1.0f).top;
             for (final Page page : model.getPages(changedPage.index.viewIndex)) {
                 final float pageHeight = width / page.getAspectRatio();
-                page.setBounds(new RectF(0, heightAccum, width, heightAccum + pageHeight));
+                page.setBounds(0, heightAccum, width, heightAccum + pageHeight);
                 heightAccum += pageHeight + 1;
             }
         }

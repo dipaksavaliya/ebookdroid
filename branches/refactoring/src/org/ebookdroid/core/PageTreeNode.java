@@ -41,6 +41,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     float bitmapZoom = 1;
     RectF croppedBounds = null;
 
+    private static final Matrix tmpMatrix = new Matrix();
+
     PageTreeNode(final Page page) {
         assert page != null;
 
@@ -170,22 +172,21 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     public RectF getTargetRect(final ViewState viewState, final RectF pageBounds) {
-        final Matrix matrix = new Matrix();
-
-        matrix.postScale(pageBounds.width() * page.getTargetRectScale(), pageBounds.height());
-        matrix.postTranslate(pageBounds.left - pageBounds.width() * page.type.getLeftPos(), pageBounds.top);
+        tmpMatrix.reset();
+        tmpMatrix.postScale(pageBounds.width() * page.getTargetRectScale(), pageBounds.height());
+        tmpMatrix.postTranslate(pageBounds.left - pageBounds.width() * page.type.getLeftPos(), pageBounds.top);
 
         final RectF targetRectF = new RectF();
-        matrix.mapRect(targetRectF, pageSliceBounds);
-        return new RectF(targetRectF);
+        tmpMatrix.mapRect(targetRectF, pageSliceBounds);
+        return targetRectF;
     }
 
     private static RectF evaluatePageSliceBounds(final RectF localPageSliceBounds, final PageTreeNode parent) {
-        final Matrix matrix = new Matrix();
-        matrix.postScale(parent.pageSliceBounds.width(), parent.pageSliceBounds.height());
-        matrix.postTranslate(parent.pageSliceBounds.left, parent.pageSliceBounds.top);
+        tmpMatrix.reset();
+        tmpMatrix.postScale(parent.pageSliceBounds.width(), parent.pageSliceBounds.height());
+        tmpMatrix.postTranslate(parent.pageSliceBounds.left, parent.pageSliceBounds.top);
         final RectF sliceBounds = new RectF();
-        matrix.mapRect(sliceBounds, localPageSliceBounds);
+        tmpMatrix.mapRect(sliceBounds, localPageSliceBounds);
         return sliceBounds;
     }
 
@@ -193,11 +194,11 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         if (parent.croppedBounds == null) {
             return null;
         }
-        final Matrix matrix = new Matrix();
-        matrix.postScale(parent.croppedBounds.width(), parent.croppedBounds.height());
-        matrix.postTranslate(parent.croppedBounds.left, parent.croppedBounds.top);
+        tmpMatrix.reset();
+        tmpMatrix.postScale(parent.croppedBounds.width(), parent.croppedBounds.height());
+        tmpMatrix.postTranslate(parent.croppedBounds.left, parent.croppedBounds.top);
         final RectF sliceBounds = new RectF();
-        matrix.mapRect(sliceBounds, localPageSliceBounds);
+        tmpMatrix.mapRect(sliceBounds, localPageSliceBounds);
         return sliceBounds;
     }
 
