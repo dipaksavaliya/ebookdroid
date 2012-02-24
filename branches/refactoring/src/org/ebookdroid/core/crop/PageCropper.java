@@ -9,7 +9,13 @@ import android.graphics.RectF;
 
 public class PageCropper {
 
-    private final static int LINE_SIZE = 10;
+    private final static int V_LINE_SIZE = 10;
+
+    private final static int H_LINE_SIZE = 10;
+    
+    private static final int LINE_MARGIN = 20;
+
+    private static final double WHITE_THRESHOLD = 0.005;
 
     private PageCropper() {
     }
@@ -36,20 +42,20 @@ public class PageCropper {
         final int w = bmp.getWidth() / 3;
         int whiteCount = 0;
         int x = 0;
-        for (x = bitmapBounds.left; x < bitmapBounds.left + w; x += LINE_SIZE) {
-            final boolean white = isRectWhite(bmp, x, bitmapBounds.top + 20, x + LINE_SIZE, bitmapBounds.bottom - 20,
-                    avgLum);
+        for (x = bitmapBounds.left; x < bitmapBounds.left + w; x += V_LINE_SIZE) {
+            final boolean white = isRectWhite(bmp, x, bitmapBounds.top + LINE_MARGIN, x + V_LINE_SIZE,
+                    bitmapBounds.bottom - LINE_MARGIN, avgLum);
             if (white) {
                 whiteCount++;
             } else {
                 if (whiteCount >= 1) {
-                    return (float) (Math.max(bitmapBounds.left, x - LINE_SIZE) - bitmapBounds.left)
+                    return (float) (Math.max(bitmapBounds.left, x - V_LINE_SIZE) - bitmapBounds.left)
                             / bitmapBounds.width();
                 }
                 whiteCount = 0;
             }
         }
-        return whiteCount > 0 ? (float) (Math.max(bitmapBounds.left, x - LINE_SIZE) - bitmapBounds.left)
+        return whiteCount > 0 ? (float) (Math.max(bitmapBounds.left, x - V_LINE_SIZE) - bitmapBounds.left)
                 / bitmapBounds.width() : 0;
     }
 
@@ -58,20 +64,20 @@ public class PageCropper {
         final int h = bmp.getHeight() / 3;
         int whiteCount = 0;
         int y = 0;
-        for (y = bitmapBounds.top; y < bitmapBounds.top + h; y += LINE_SIZE) {
-            final boolean white = isRectWhite(bmp, bitmapBounds.left + 20, y, bitmapBounds.right - 20, y + LINE_SIZE,
-                    avgLum);
+        for (y = bitmapBounds.top; y < bitmapBounds.top + h; y += H_LINE_SIZE) {
+            final boolean white = isRectWhite(bmp, bitmapBounds.left + LINE_MARGIN, y,
+                    bitmapBounds.right - LINE_MARGIN, y + H_LINE_SIZE, avgLum);
             if (white) {
                 whiteCount++;
             } else {
                 if (whiteCount >= 1) {
-                    return (float) (Math.max(bitmapBounds.top, y - LINE_SIZE) - bitmapBounds.top)
+                    return (float) (Math.max(bitmapBounds.top, y - H_LINE_SIZE) - bitmapBounds.top)
                             / bitmapBounds.height();
                 }
                 whiteCount = 0;
             }
         }
-        return whiteCount > 0 ? (float) (Math.max(bitmapBounds.top, y - LINE_SIZE) - bitmapBounds.top)
+        return whiteCount > 0 ? (float) (Math.max(bitmapBounds.top, y - H_LINE_SIZE) - bitmapBounds.top)
                 / bitmapBounds.height() : 0;
     }
 
@@ -80,20 +86,20 @@ public class PageCropper {
         final int w = bmp.getWidth() / 3;
         int whiteCount = 0;
         int x = 0;
-        for (x = bitmapBounds.right - LINE_SIZE; x > bitmapBounds.right - w; x -= LINE_SIZE) {
-            final boolean white = isRectWhite(bmp, x, bitmapBounds.top + 20, x + LINE_SIZE, bitmapBounds.bottom - 20,
-                    avgLum);
+        for (x = bitmapBounds.right - V_LINE_SIZE; x > bitmapBounds.right - w; x -= V_LINE_SIZE) {
+            final boolean white = isRectWhite(bmp, x, bitmapBounds.top + LINE_MARGIN, x + V_LINE_SIZE,
+                    bitmapBounds.bottom - LINE_MARGIN, avgLum);
             if (white) {
                 whiteCount++;
             } else {
                 if (whiteCount >= 1) {
-                    return (float) (Math.min(bitmapBounds.right, x + 2 * LINE_SIZE) - bitmapBounds.left)
+                    return (float) (Math.min(bitmapBounds.right, x + 2 * V_LINE_SIZE) - bitmapBounds.left)
                             / bitmapBounds.width();
                 }
                 whiteCount = 0;
             }
         }
-        return whiteCount > 0 ? (float) (Math.min(bitmapBounds.right, x + 2 * LINE_SIZE) - bitmapBounds.left)
+        return whiteCount > 0 ? (float) (Math.min(bitmapBounds.right, x + 2 * V_LINE_SIZE) - bitmapBounds.left)
                 / bitmapBounds.width() : 1;
     }
 
@@ -102,28 +108,28 @@ public class PageCropper {
         final int h = bmp.getHeight() / 3;
         int whiteCount = 0;
         int y = 0;
-        for (y = bitmapBounds.bottom - LINE_SIZE; y > bitmapBounds.bottom - h; y -= LINE_SIZE) {
-            final boolean white = isRectWhite(bmp, bitmapBounds.left + 20, y, bitmapBounds.right - 20, y + LINE_SIZE,
-                    avgLum);
+        for (y = bitmapBounds.bottom - H_LINE_SIZE; y > bitmapBounds.bottom - h; y -= H_LINE_SIZE) {
+            final boolean white = isRectWhite(bmp, bitmapBounds.left + LINE_MARGIN, y,
+                    bitmapBounds.right - LINE_MARGIN, y + H_LINE_SIZE, avgLum);
             if (white) {
                 whiteCount++;
             } else {
                 if (whiteCount >= 1) {
-                    return (float) (Math.min(bitmapBounds.bottom, y + 2 * LINE_SIZE) - bitmapBounds.top)
+                    return (float) (Math.min(bitmapBounds.bottom, y + 2 * H_LINE_SIZE) - bitmapBounds.top)
                             / bitmapBounds.height();
                 }
                 whiteCount = 0;
             }
         }
-        return whiteCount > 0 ? (float) (Math.min(bitmapBounds.bottom, y + 2 * LINE_SIZE) - bitmapBounds.top)
+        return whiteCount > 0 ? (float) (Math.min(bitmapBounds.bottom, y + 2 * H_LINE_SIZE) - bitmapBounds.top)
                 / bitmapBounds.height() : 1;
     }
 
-    private static boolean isRectWhite(final Bitmap bmp, final int l, final int t, final int r, final int b,
-            final float avgLum) {
+    private static boolean isRectWhite(final Bitmap bmp, final int left, final int top, final int right,
+            final int bottom, final float avgLum) {
         int count = 0;
 
-        final RawBitmap rb = new RawBitmap(bmp, new Rect(l, t, r, b));
+        final RawBitmap rb = new RawBitmap(bmp, new Rect(left, top, right, bottom));
         final int[] pixels = rb.getPixels();
         for (final int c : pixels) {
             final float lum = getLum(c);
@@ -131,7 +137,7 @@ public class PageCropper {
                 count++;
             }
         }
-        return ((float) count / pixels.length) < 0.005;
+        return ((float) count / pixels.length) < WHITE_THRESHOLD;
     }
 
     private static float calculateAvgLum(final BitmapRef bitmap, final Rect bitmapBounds) {
