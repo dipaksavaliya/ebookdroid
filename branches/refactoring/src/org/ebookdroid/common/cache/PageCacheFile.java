@@ -30,10 +30,8 @@ public class PageCacheFile extends File {
                 final CodecPageInfo[] infos = new CodecPageInfo[pages];
 
                 for (int i = 0; i < infos.length; i++) {
-                    final CodecPageInfo cpi = new CodecPageInfo();
-                    cpi.width = (in.readInt());
-                    cpi.height = (in.readInt());
-                    if (cpi.width == -1 || cpi.height == -1) {
+                    infos[i] = new CodecPageInfo(in.readInt(), in.readInt());
+                    if (infos[i].width == -1 || infos[i].height == -1) {
                         return null;
                     }
                 }

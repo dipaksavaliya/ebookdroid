@@ -15,4 +15,9 @@ public class CodecPageInfo {
         this.width = width;
         this.height = height;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("[").append(width).append(", ").append(height).append("]").toString();
+    }
 }
