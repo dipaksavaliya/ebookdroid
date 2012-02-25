@@ -1,18 +1,27 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.settings.SettingsManager;
+
 public abstract class AbstractEventZoom extends AbstractEvent {
 
-    public final float oldZoom;
-    public final float newZoom;
+    public float oldZoom;
+    public float newZoom;
 
-    public final PageTreeLevel oldLevel;
-    public final PageTreeLevel newLevel;
+    public PageTreeLevel oldLevel;
+    public PageTreeLevel newLevel;
 
-    public final boolean committed;
+    public boolean committed;
 
     protected AbstractEventZoom(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
             final boolean committed) {
         super(ctrl);
+        reuseImpl(null, oldZoom, newZoom, committed);
+    }
+
+    void reuseImpl(final AbstractViewController ctrl, final float oldZoom, final float newZoom, final boolean committed) {
+        if (ctrl != null) {
+            super.reuseImpl(ctrl);
+        }
         this.oldZoom = oldZoom;
         this.newZoom = newZoom;
 
@@ -20,21 +29,8 @@ public abstract class AbstractEventZoom extends AbstractEvent {
         this.newLevel = PageTreeLevel.getLevel(newZoom);
 
         this.committed = committed;
-        
-        viewState = new ViewState(ctrl, newZoom);
-    }
 
-    protected AbstractEventZoom(final AbstractViewController ctrl) {
-        super(ctrl);
-        this.oldZoom = 0;
-        this.newZoom = viewState.zoom;
-
-        this.oldLevel = PageTreeLevel.ROOT;
-        this.newLevel = PageTreeLevel.getLevel(newZoom);
-
-        this.committed = true;
-        
-        viewState = new ViewState(ctrl, newZoom);
+        viewState = new ViewState(this.ctrl, newZoom);
     }
 
     /**
@@ -48,7 +44,15 @@ public abstract class AbstractEventZoom extends AbstractEvent {
             view.invalidateScroll(newZoom, oldZoom);
         }
         viewState = new ViewState(ctrl);
-        return super.process();
+        viewState = super.process();
+        
+        if (!committed) {
+            ctrl.redrawView(viewState);
+        } else {
+            SettingsManager.zoomChanged(newZoom, true);
+            ctrl.updatePosition(model.getCurrentPageObject(), viewState);
+        }
+        return viewState;
     }
 
     /**

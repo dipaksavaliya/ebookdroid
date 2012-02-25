@@ -81,10 +81,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return holder.recycle(bitmapsToRecycle);
     }
 
-    protected boolean isReDecodingRequired(final boolean committed, final ViewState viewState) {
-        return (committed && viewState.zoom != bitmapZoom) || viewState.zoom > 1.2 * bitmapZoom;
-    }
-
     protected void decodePageTreeNode(final List<PageTreeNode> nodesToDecode, final ViewState viewState) {
         if (this.decodingNow.compareAndSet(false, true)) {
             bitmapZoom = viewState.zoom;
@@ -148,7 +144,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
                     final IViewController dc = page.base.getDocumentController();
                     if (dc instanceof AbstractViewController) {
-                        new EventChildLoaded((AbstractViewController) dc, PageTreeNode.this, bitmapBounds).process();
+                        EventPool.newEventChildLoaded((AbstractViewController) dc, PageTreeNode.this, bitmapBounds).process();
                     }
 
                     // System.out.println("decodeComplete(): " + (System.currentTimeMillis() - t0) + " ms");

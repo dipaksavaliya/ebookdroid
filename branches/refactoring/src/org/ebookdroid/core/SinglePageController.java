@@ -56,7 +56,7 @@ public class SinglePageController extends AbstractViewController {
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
 
-            final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
+            final ViewState viewState = EventPool.newEventScrollTo(this, page.index.viewIndex).process();
             view.redrawView(viewState);
             return viewState;
         }
@@ -82,7 +82,7 @@ public class SinglePageController extends AbstractViewController {
             final float top = bounds.top + offsetY * bounds.height();
             view.scrollTo((int) left, (int) top);
 
-            final ViewState viewState = new EventScrollTo(this, page.index.viewIndex).process();
+            final ViewState viewState = EventPool.newEventScrollTo(this, page.index.viewIndex).process();
             view.redrawView(viewState);
             return viewState;
         }
@@ -185,7 +185,7 @@ public class SinglePageController extends AbstractViewController {
     }
 
     public final ViewState invalidatePages(final ViewState oldState, final Page... pages) {
-        return new EventScrollTo(this, pages[0].index.viewIndex).process();
+        return EventPool.newEventScrollTo(this, pages[0].index.viewIndex).process();
     }
 
     /**

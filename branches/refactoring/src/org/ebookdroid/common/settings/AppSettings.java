@@ -87,6 +87,8 @@ public class AppSettings {
 
     private Boolean textureReuseEnabled;
 
+    private Boolean reloadDuringZoom;
+
     private Boolean useCustomDpi;
 
     private Integer xDpi;
@@ -313,6 +315,14 @@ public class AppSettings {
             textureReuseEnabled = prefs.getBoolean("texturereuse", true);
         }
         return textureReuseEnabled;
+    }
+
+    
+    public boolean getReloadDuringZoom() {
+        if (reloadDuringZoom == null) {
+            reloadDuringZoom = prefs.getBoolean("reloadduringzoom", true);
+        }
+        return reloadDuringZoom;
     }
 
     public boolean getZoomByDoubleTap() {

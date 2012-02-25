@@ -2,8 +2,6 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.Bitmaps;
-import org.ebookdroid.common.settings.SettingsManager;
-import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Rect;
@@ -14,18 +12,27 @@ import java.util.List;
 
 public class EventChildLoaded extends EventScrollTo {
 
-    public final Page page;
-    public final PageTree nodes;
-    public final PageTreeNode child;
+    public Page page;
+    public PageTree nodes;
+    public PageTreeNode child;
 
-    public final Rect bitmapBounds;
+    public Rect bitmapBounds;
 
     public EventChildLoaded(final AbstractViewController ctrl, final PageTreeNode child, final Rect bitmapBounds) {
         super(ctrl, child.page.index.viewIndex);
+        reuse(null, child, bitmapBounds);
+    }
+
+    EventChildLoaded reuse(final AbstractViewController ctrl, final PageTreeNode child, final Rect bitmapBounds) {
+        if (ctrl != null) {
+            reuseImpl(ctrl);
+        }
+        this.viewIndex = child.page.index.viewIndex;
         this.page = child.page;
         this.nodes = page.nodes;
         this.child = child;
         this.bitmapBounds = bitmapBounds;
+        return this;
     }
 
     /**
@@ -35,35 +42,38 @@ public class EventChildLoaded extends EventScrollTo {
      */
     @Override
     public ViewState process() {
-        if (ctrl == null || model == null || view == null) {
-            return null;
-        }
-
-        BookSettings bs = SettingsManager.getBookSettings();
-        PageIndex currentPage = bs.getCurrentPage();
-        float offsetX = bs.offsetX;
-        float offsetY = bs.offsetY;
-
-        final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
-
-        if (changed) {
-            ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-            viewState = ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
-        } else {
-            final RectF bounds = viewState.getBounds(page);
-            final PageTreeNode parent = child.parent;
-            if (parent != null) {
-                recycleParent(parent, bounds);
+        try {
+            if (ctrl == null || model == null || view == null) {
+                return null;
             }
-            recycleChildren();
-        }
 
-        if (viewState != null) {
-            ctrl.pageUpdated(viewState, page);
-            ctrl.redrawView(viewState);
-        }
+            final PageIndex currentPage = viewState.book.getCurrentPage();
+            final float offsetX = viewState.book.offsetX;
+            final float offsetY = viewState.book.offsetY;
 
-        return viewState;
+            final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
+
+            if (changed) {
+                ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
+                viewState = ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
+            } else {
+                final RectF bounds = viewState.getBounds(page);
+                final PageTreeNode parent = child.parent;
+                if (parent != null) {
+                    recycleParent(parent, bounds);
+                }
+                recycleChildren();
+            }
+
+            if (viewState != null) {
+                ctrl.pageUpdated(viewState, page);
+                ctrl.redrawView(viewState);
+            }
+
+            return viewState;
+        } finally {
+            EventPool.release(this);
+        }
     }
 
     protected void recycleParent(final PageTreeNode parent, final RectF bounds) {

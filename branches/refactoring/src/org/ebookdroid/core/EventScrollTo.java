@@ -2,16 +2,38 @@ package org.ebookdroid.core;
 
 public class EventScrollTo extends AbstractEventScroll {
 
-    public final int viewIndex;
+    public int viewIndex;
 
     public EventScrollTo(final AbstractViewController ctrl, final int viewIndex) {
         super(ctrl);
+        reuse(null, viewIndex);
+    }
+
+    EventScrollTo reuse(final AbstractViewController ctrl, final int viewIndex) {
+        if (ctrl != null) {
+            reuseImpl(ctrl);
+        }
         this.viewIndex = viewIndex;
+        return this;
     }
 
     /**
      * {@inheritDoc}
      *
+     * @see org.ebookdroid.core.AbstractEvent#process()
+     */
+    @Override
+    public ViewState process() {
+        try {
+            return super.process();
+        } finally {
+            EventPool.release(this);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ebookdroid.core.AbstractEvent#calculatePageVisibility(org.ebookdroid.core.ViewState)
      */
     @Override

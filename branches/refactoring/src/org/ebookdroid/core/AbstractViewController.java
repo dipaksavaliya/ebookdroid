@@ -187,17 +187,7 @@ public abstract class AbstractViewController extends AbstractComponentController
 
         inZoom.set(!committed);
 
-        final AbstractEventZoom cmd = newZoom > oldZoom ? new EventZoomIn(this, oldZoom, newZoom, committed)
-                : new EventZoomOut(this, oldZoom, newZoom, committed);
-
-        final ViewState newState = cmd.process();
-
-        if (!committed) {
-            redrawView(newState);
-        } else {
-            SettingsManager.zoomChanged(newZoom, true);
-            updatePosition(cmd.model.getCurrentPageObject(), newState);
-        }
+        EventPool.newEventZoom(this, oldZoom, newZoom, committed).process();
     }
 
     /**

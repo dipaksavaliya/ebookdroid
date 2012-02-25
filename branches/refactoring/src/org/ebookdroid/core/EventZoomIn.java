@@ -9,9 +9,24 @@ public class EventZoomIn extends AbstractEventZoom {
         super(ctrl, oldZoom, newZoom, committed);
     }
 
+    EventZoomIn reuse(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
+            final boolean committed) {
+        reuseImpl(ctrl, oldZoom, newZoom, committed);
+        return this;
+    }
+
+    @Override
+    public ViewState process() {
+        try {
+            return super.process();
+        } finally {
+            EventPool.release(this);
+        }
+    }
+
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTreeNode)
      */
     @Override
@@ -24,7 +39,7 @@ public class EventZoomIn extends AbstractEventZoom {
             return false;
         }
 
-        if (node.isReDecodingRequired(committed, viewState)) {
+        if (isReDecodingRequired(viewState, node, committed)) {
             node.stopDecodingThisNode("Zoom changed");
             node.decodePageTreeNode(nodesToDecode, viewState);
         } else if (!node.holder.hasBitmaps()) {
@@ -33,4 +48,10 @@ public class EventZoomIn extends AbstractEventZoom {
         return true;
     }
 
+    protected boolean isReDecodingRequired(final ViewState viewState, final PageTreeNode node, final boolean committed) {
+        if (committed) {
+            return viewState.zoom != node.bitmapZoom;
+        }
+        return (viewState.app.getReloadDuringZoom() && viewState.zoom > 1.2 * node.bitmapZoom);
+    }
 }

@@ -9,9 +9,24 @@ public class EventZoomOut extends AbstractEventZoom {
         super(ctrl, oldZoom, newZoom, committed);
     }
 
+    EventZoomOut reuse(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
+            final boolean committed) {
+        reuseImpl(ctrl, oldZoom, newZoom, committed);
+        return this;
+    }
+
+    @Override
+    public ViewState process() {
+        try {
+            return super.process();
+        } finally {
+            EventPool.release(this);
+        }
+    }
+
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTreeNode)
      */
     @Override

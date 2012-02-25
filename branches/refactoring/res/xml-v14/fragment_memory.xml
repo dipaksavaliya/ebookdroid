@@ -58,6 +58,12 @@
                 android:summary="@string/pref_texturereuse_summary"
                 android:title="@string/pref_texturereuse_title" />
 
+            <SwitchPreference
+                android:defaultValue="true"
+                android:key="reloadduringzoom"
+                android:summary="@string/pref_reloadduringzoom_summary"
+                android:title="@string/pref_reloadduringzoom_title" />
+
         </PreferenceCategory>
 
     </PreferenceScreen>

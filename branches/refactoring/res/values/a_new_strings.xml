@@ -40,6 +40,9 @@
     <string name="pref_texturereuse_title">"Reuse texture bitmaps"</string>
     <string name="pref_texturereuse_summary">"Reuse old texture bitmaps when page part is decoded again"</string>
 
+    <string name="pref_reloadduringzoom_title">Reload page during zoom</string>
+    <string name="pref_reloadduringzoom_summary">Reload page during zoom if zoom changed more than 20%</string>
+    
     <string name="pref_brfiletypespecificpdf_title">"PDF"</string>
     <string name="pref_brfiletypespecificpdf_summary">"PDF format specific settings"</string>
 
