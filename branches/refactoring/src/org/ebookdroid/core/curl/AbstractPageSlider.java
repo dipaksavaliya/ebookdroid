@@ -3,6 +3,7 @@ package org.ebookdroid.core.curl;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.core.EventDraw;
+import org.ebookdroid.core.EventPool;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
@@ -112,7 +113,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         if (foreBitmapIndex != foreIndex || foreBitmap == null) {
             foreBitmap = getBitmap(event.viewState, foreBitmap);
 
-            new EventDraw(event, new Canvas(foreBitmap.getBitmap())).process(page);
+            EventPool.newEventDraw(event, new Canvas(foreBitmap.getBitmap())).process(page);
             foreBitmapIndex = foreIndex;
         }
     }
@@ -121,7 +122,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
         if (backBitmapIndex != backIndex || backBitmap == null) {
             backBitmap = getBitmap(event.viewState, backBitmap);
 
-            new EventDraw(event, new Canvas(backBitmap.getBitmap())).process(page);
+            EventPool.newEventDraw(event, new Canvas(backBitmap.getBitmap())).process(page);
             backBitmapIndex = backIndex;
         }
     }

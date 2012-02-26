@@ -9,8 +9,11 @@ import android.graphics.RectF;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
-public class EventChildLoaded extends EventScrollTo {
+public class EventChildLoaded extends AbstractEvent {
+
+    private final Queue<EventChildLoaded> eventQueue;
 
     public Page page;
     public PageTree nodes;
@@ -18,21 +21,31 @@ public class EventChildLoaded extends EventScrollTo {
 
     public Rect bitmapBounds;
 
-    public EventChildLoaded(final AbstractViewController ctrl, final PageTreeNode child, final Rect bitmapBounds) {
-        super(ctrl, child.page.index.viewIndex);
-        reuse(null, child, bitmapBounds);
+    public EventChildLoaded(final Queue<EventChildLoaded> eventQueue) {
+        this.eventQueue = eventQueue;
     }
 
-    EventChildLoaded reuse(final AbstractViewController ctrl, final PageTreeNode child, final Rect bitmapBounds) {
-        if (ctrl != null) {
-            reuseImpl(ctrl);
-        }
-        this.viewIndex = child.page.index.viewIndex;
+    final void init(final AbstractViewController ctrl, final PageTreeNode child, final Rect bitmapBounds) {
+        this.viewState = new ViewState(ctrl);
+        this.ctrl = ctrl;
+        this.model = viewState.model;
+        this.view = viewState.view;
         this.page = child.page;
         this.nodes = page.nodes;
         this.child = child;
         this.bitmapBounds = bitmapBounds;
-        return this;
+    }
+
+    final void release() {
+        this.ctrl = null;
+        this.model = null;
+        this.viewState = null;
+        this.child = null;
+        this.nodes = null;
+        this.page = null;
+        this.bitmapsToRecycle.clear();
+        this.nodesToDecode.clear();
+        eventQueue.offer(this);
     }
 
     /**
@@ -41,7 +54,7 @@ public class EventChildLoaded extends EventScrollTo {
      * @see org.ebookdroid.core.AbstractEvent#process()
      */
     @Override
-    public ViewState process() {
+    public final ViewState process() {
         try {
             if (ctrl == null || model == null || view == null) {
                 return null;
@@ -72,7 +85,7 @@ public class EventChildLoaded extends EventScrollTo {
 
             return viewState;
         } finally {
-            EventPool.release(this);
+            release();
         }
     }
 
@@ -97,7 +110,6 @@ public class EventChildLoaded extends EventScrollTo {
     }
 
     protected void recycleChildren() {
-        final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
         final boolean res = nodes.recycleChildren(child, bitmapsToRecycle);
         BitmapManager.release(bitmapsToRecycle);
 
@@ -106,5 +118,15 @@ public class EventChildLoaded extends EventScrollTo {
                 LCTX.d("Recycle children nodes for: " + child.fullId + " " + bitmapsToRecycle.size());
             }
         }
+    }
+
+    @Override
+    public boolean process(final PageTree nodes) {
+        return false;
+    }
+
+    @Override
+    public boolean process(final PageTreeNode node) {
+        return false;
     }
 }

@@ -1,27 +1,68 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.settings.types.DocumentViewMode;
+
 import android.graphics.RectF;
 
-public abstract class AbstractEventScroll extends AbstractEvent {
+import java.util.Queue;
+
+public abstract class AbstractEventScroll<E extends AbstractEventScroll<E>> extends AbstractEvent {
+
+    private final Queue<E> eventQueue;
 
     protected PageTreeLevel level;
 
-    protected AbstractEventScroll(final AbstractViewController ctrl) {
-        super(ctrl);
-        reuseImpl(null);
+    protected AbstractEventScroll(final Queue<E> eventQueue) {
+        this.eventQueue = eventQueue;
     }
 
-    void reuseImpl(final AbstractViewController ctrl) {
-        if (ctrl != null) {
-            super.reuseImpl(ctrl);
-        }
-        level = PageTreeLevel.getLevel(viewState.zoom);
+    final void init(final AbstractViewController ctrl) {
+        this.viewState = new ViewState(ctrl);
+        this.ctrl = ctrl;
+        this.model = viewState.model;
+        this.view = viewState.view;
+        this.level = PageTreeLevel.getLevel(viewState.zoom);
     }
 
-    
+    @SuppressWarnings("unchecked")
+    final void release() {
+        this.ctrl = null;
+        this.model = null;
+        this.viewState = null;
+        this.level = null;
+        this.bitmapsToRecycle.clear();
+        this.nodesToDecode.clear();
+        eventQueue.offer((E) this);
+    }
+
     /**
      * {@inheritDoc}
-     *
+     * 
+     * @see org.ebookdroid.core.AbstractEvent#process()
+     */
+    @Override
+    public final ViewState process() {
+        try {
+            viewState = super.process();
+            if (model != null) {
+                final Page page = viewState.pages.getCurrentPage();
+                if (page != null) {
+                    if (ctrl.mode != DocumentViewMode.SINGLE_PAGE) {
+                        model.setCurrentPageIndex(page.index);
+                    }
+                    ctrl.updatePosition(page, viewState);
+                }
+            }
+            view.redrawView(viewState);
+            return viewState;
+        } finally {
+            release();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree)
      */
     @Override
@@ -34,7 +75,7 @@ public abstract class AbstractEventScroll extends AbstractEvent {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTreeNode)
      */
     @Override

@@ -23,6 +23,7 @@ import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.EventDraw;
+import org.ebookdroid.core.EventPool;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
@@ -96,7 +97,7 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
         try {
             final Bitmap bmp = fgBitmap.getBitmap();
             bmp.eraseColor(Color.BLACK);
-            drawForeground(new EventDraw(event, new Canvas(bmp)));
+            drawForeground(EventPool.newEventDraw(event, new Canvas(bmp)));
 
             final int myWidth = canvas.getWidth();
             final int myHeight = canvas.getHeight();

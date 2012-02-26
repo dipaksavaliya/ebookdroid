@@ -2,26 +2,12 @@ package org.ebookdroid.core;
 
 import android.graphics.RectF;
 
-public class EventZoomOut extends AbstractEventZoom {
+import java.util.Queue;
 
-    public EventZoomOut(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
-            final boolean committed) {
-        super(ctrl, oldZoom, newZoom, committed);
-    }
+public class EventZoomOut extends AbstractEventZoom<EventZoomOut> {
 
-    EventZoomOut reuse(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
-            final boolean committed) {
-        reuseImpl(ctrl, oldZoom, newZoom, committed);
-        return this;
-    }
-
-    @Override
-    public ViewState process() {
-        try {
-            return super.process();
-        } finally {
-            EventPool.release(this);
-        }
+    EventZoomOut(final Queue<EventZoomOut> eventQueue) {
+        super(eventQueue);
     }
 
     /**

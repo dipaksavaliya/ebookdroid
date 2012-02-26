@@ -14,26 +14,15 @@ public abstract class AbstractEvent implements IEvent {
 
     public final LogContext LCTX = LogContext.ROOT.lctx(getClass().getSimpleName());
 
-    public AbstractViewController ctrl;
-    public DocumentModel model;
-    public IView view;
-
     protected final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
     protected final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
 
-    protected ViewState viewState;
+    public AbstractViewController ctrl;
+    public DocumentModel model;
+    public IView view;
+    public ViewState viewState;
 
-    protected AbstractEvent(final AbstractViewController ctrl) {
-        reuseImpl(ctrl);
-    }
-
-    void reuseImpl(final AbstractViewController ctrl) {
-        this.ctrl = ctrl;
-        this.viewState = new ViewState(ctrl);
-        this.model = viewState.model;
-        this.view = viewState.view;
-        this.nodesToDecode.clear();
-        this.bitmapsToRecycle.clear();
+    protected AbstractEvent() {
     }
 
     /**

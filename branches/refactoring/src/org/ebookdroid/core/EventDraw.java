@@ -12,9 +12,13 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.text.TextPaint;
 
+import java.util.Queue;
+
 public class EventDraw implements IEvent {
 
     public final static LogContext LCTX = LogContext.ROOT.lctx("EventDraw", false);
+
+    private final Queue<EventDraw> eventQueue;
 
     public ViewState viewState;
     public PageTreeLevel level;
@@ -23,12 +27,31 @@ public class EventDraw implements IEvent {
     RectF pageBounds;
     PointF viewBase;
 
-    public EventDraw(final ViewState viewState, final Canvas canvas) {
-        reuse(viewState, canvas);
+    EventDraw(final Queue<EventDraw> eventQueue) {
+        this.eventQueue = eventQueue;
     }
 
-    public EventDraw(final EventDraw event, final Canvas canvas) {
-        reuse(event, canvas);
+    void init(final ViewState viewState, final Canvas canvas) {
+        this.viewState = viewState;
+        this.level = PageTreeLevel.getLevel(viewState.zoom);
+        this.canvas = canvas;
+        this.viewBase = viewState.view.getBase(viewState.viewRect);
+    }
+
+    void init(final EventDraw event, final Canvas canvas) {
+        this.viewState = event.viewState;
+        this.level = event.level;
+        this.canvas = canvas;
+        this.viewBase = event.viewBase;
+    }
+
+    void release() {
+        this.canvas = null;
+        this.level = null;
+        this.pageBounds = null;
+        this.viewBase = null;
+        this.viewState = null;
+        eventQueue.offer(this);
     }
 
     @Override
@@ -38,7 +61,7 @@ public class EventDraw implements IEvent {
             viewState.ctrl.drawView(this);
             return viewState;
         } finally {
-            EventPool.release(this);
+            release();
         }
     }
 
@@ -135,21 +158,5 @@ public class EventDraw implements IEvent {
             p.setAlpha(255 - brightness * 255 / 100);
             canvas.drawRect(tr, p);
         }
-    }
-
-    EventDraw reuse(final ViewState viewState, final Canvas canvas) {
-        this.viewState = viewState;
-        this.level = PageTreeLevel.getLevel(viewState.zoom);
-        this.canvas = canvas;
-        this.viewBase = viewState.view.getBase(viewState.viewRect);
-        return this;
-    }
-
-    EventDraw reuse(final EventDraw event, final Canvas canvas) {
-        this.viewState = event.viewState;
-        this.level = event.level;
-        this.canvas = canvas;
-        this.viewBase = event.viewBase;
-        return this;
     }
 }

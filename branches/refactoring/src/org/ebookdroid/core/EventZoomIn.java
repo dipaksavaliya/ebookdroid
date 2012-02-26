@@ -2,26 +2,12 @@ package org.ebookdroid.core;
 
 import android.graphics.RectF;
 
-public class EventZoomIn extends AbstractEventZoom {
+import java.util.Queue;
 
-    public EventZoomIn(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
-            final boolean committed) {
-        super(ctrl, oldZoom, newZoom, committed);
-    }
+public class EventZoomIn extends AbstractEventZoom<EventZoomIn> {
 
-    EventZoomIn reuse(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
-            final boolean committed) {
-        reuseImpl(ctrl, oldZoom, newZoom, committed);
-        return this;
-    }
-
-    @Override
-    public ViewState process() {
-        try {
-            return super.process();
-        } finally {
-            EventPool.release(this);
-        }
+    EventZoomIn(final Queue<EventZoomIn> eventQueue) {
+        super(eventQueue);
     }
 
     /**
@@ -30,7 +16,7 @@ public class EventZoomIn extends AbstractEventZoom {
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTreeNode)
      */
     @Override
-    public boolean process(final PageTreeNode node) {
+    public final boolean process(final PageTreeNode node) {
 
         final RectF pageBounds = viewState.getBounds(node.page);
 
@@ -48,7 +34,7 @@ public class EventZoomIn extends AbstractEventZoom {
         return true;
     }
 
-    protected boolean isReDecodingRequired(final ViewState viewState, final PageTreeNode node, final boolean committed) {
+    protected final boolean isReDecodingRequired(final ViewState viewState, final PageTreeNode node, final boolean committed) {
         if (committed) {
             return viewState.zoom != node.bitmapZoom;
         }

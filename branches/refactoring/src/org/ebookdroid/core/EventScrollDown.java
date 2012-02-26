@@ -1,25 +1,13 @@
 package org.ebookdroid.core;
 
+import java.util.Queue;
+
 import org.emdev.utils.LengthUtils;
 
-public class EventScrollDown extends AbstractEventScroll {
+public class EventScrollDown extends AbstractEventScroll<EventScrollDown> {
 
-    public EventScrollDown(final AbstractViewController ctrl) {
-        super(ctrl);
-    }
-
-    EventScrollDown reuse(final AbstractViewController ctrl) {
-        super.reuseImpl(ctrl);
-        return this;
-    }
-
-    @Override
-    public ViewState process() {
-        try {
-            return super.process();
-        } finally {
-            EventPool.release(this);
-        }
+    public EventScrollDown(final Queue<EventScrollDown> eventQueue) {
+        super(eventQueue);
     }
 
     /**

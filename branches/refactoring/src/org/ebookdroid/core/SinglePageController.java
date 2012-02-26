@@ -101,16 +101,7 @@ public class SinglePageController extends AbstractViewController {
             return;
         }
 
-        final AbstractEventScroll cmd = EventPool.newEventScroll(this, dX);
-        final ViewState viewState = cmd.process();
-
-        if (cmd.model != null) {
-            final Page page = cmd.model.getCurrentPageObject();
-            if (page != null) {
-                updatePosition(page, viewState);
-            }
-        }
-        view.redrawView(viewState);
+        EventPool.newEventScroll(this, dX).process();
     }
 
     /**

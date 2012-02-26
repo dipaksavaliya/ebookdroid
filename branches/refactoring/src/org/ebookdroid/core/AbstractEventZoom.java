@@ -2,7 +2,11 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.settings.SettingsManager;
 
-public abstract class AbstractEventZoom extends AbstractEvent {
+import java.util.Queue;
+
+public abstract class AbstractEventZoom<E extends AbstractEventZoom<E>> extends AbstractEvent {
+
+    private final Queue<E> eventQueue;
 
     public float oldZoom;
     public float newZoom;
@@ -12,16 +16,16 @@ public abstract class AbstractEventZoom extends AbstractEvent {
 
     public boolean committed;
 
-    protected AbstractEventZoom(final AbstractViewController ctrl, final float oldZoom, final float newZoom,
-            final boolean committed) {
-        super(ctrl);
-        reuseImpl(null, oldZoom, newZoom, committed);
+    protected AbstractEventZoom(Queue<E> eventQueue) {
+        this.eventQueue = eventQueue;
     }
 
-    void reuseImpl(final AbstractViewController ctrl, final float oldZoom, final float newZoom, final boolean committed) {
-        if (ctrl != null) {
-            super.reuseImpl(ctrl);
-        }
+    final void init(final AbstractViewController ctrl, final float oldZoom, final float newZoom, final boolean committed) {
+        this.viewState = new ViewState(ctrl, newZoom);
+        this.ctrl = ctrl;
+        this.model = viewState.model;
+        this.view = viewState.view;
+
         this.oldZoom = oldZoom;
         this.newZoom = newZoom;
 
@@ -30,48 +34,64 @@ public abstract class AbstractEventZoom extends AbstractEvent {
 
         this.committed = committed;
 
-        viewState = new ViewState(this.ctrl, newZoom);
+    }
+
+    @SuppressWarnings("unchecked")
+    final void release() {
+        this.ctrl = null;
+        this.model = null;
+        this.viewState = null;
+        this.oldLevel = null;
+        this.newLevel = null;
+        this.bitmapsToRecycle.clear();
+        this.nodesToDecode.clear();
+        eventQueue.offer((E) this);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.AbstractEvent#process()
      */
     @Override
-    public ViewState process() {
-        if (!committed) {
-            view.invalidateScroll(newZoom, oldZoom);
+    public final ViewState process() {
+        try {
+            if (!committed) {
+                view.invalidateScroll(newZoom, oldZoom);
+                viewState = new ViewState(ctrl);
+            }
+
+            viewState = super.process();
+
+            if (!committed) {
+                ctrl.redrawView(viewState);
+            } else {
+                SettingsManager.zoomChanged(newZoom, true);
+                ctrl.updatePosition(model.getCurrentPageObject(), viewState);
+            }
+            return viewState;
+        } finally {
+            release();
         }
-        viewState = new ViewState(ctrl);
-        viewState = super.process();
-        
-        if (!committed) {
-            ctrl.redrawView(viewState);
-        } else {
-            SettingsManager.zoomChanged(newZoom, true);
-            ctrl.updatePosition(model.getCurrentPageObject(), viewState);
-        }
-        return viewState;
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.IEvent#process(org.ebookdroid.core.ViewState, org.ebookdroid.core.PageTree)
      */
     @Override
-    public boolean process(final PageTree nodes) {
+    public final boolean process(final PageTree nodes) {
         return process(nodes, newLevel);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.core.AbstractEvent#calculatePageVisibility(org.ebookdroid.core.ViewState)
      */
     @Override
-    protected ViewState calculatePageVisibility(final ViewState initial) {
+    protected final ViewState calculatePageVisibility(final ViewState initial) {
         final int viewIndex = model.getCurrentViewPageIndex();
         int firstVisiblePage = viewIndex;
         int lastVisiblePage = viewIndex;

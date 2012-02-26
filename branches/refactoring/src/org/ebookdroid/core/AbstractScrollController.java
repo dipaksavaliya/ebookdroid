@@ -109,17 +109,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
             return;
         }
 
-        final AbstractEventScroll cmd = EventPool.newEventScroll(this, mode == DocumentViewMode.VERTICALL_SCROLL ? dY : dX);
-
-        final ViewState viewState = cmd.process();
-        if (cmd.model != null) {
-            final Page page = viewState.pages.getCurrentPage();
-            if (page != null) {
-                cmd.model.setCurrentPageIndex(page.index);
-                updatePosition(page, viewState);
-            }
-        }
-        view.redrawView(viewState);
+        EventPool.newEventScroll(this, mode == DocumentViewMode.VERTICALL_SCROLL ? dY : dX).process();
     }
 
     /**

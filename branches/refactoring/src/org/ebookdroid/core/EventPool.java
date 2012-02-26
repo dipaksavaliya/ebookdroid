@@ -21,136 +21,84 @@ public class EventPool {
     private static final ConcurrentLinkedQueue<EventZoomOut> zoomOutEvents = new ConcurrentLinkedQueue<EventZoomOut>();
 
     public static EventDraw newEventDraw(final ViewState viewState, final Canvas canvas) {
-        final EventDraw event = drawEvents.poll();
-        return event != null ? event.reuse(viewState, canvas) : new EventDraw(viewState, canvas);
+        EventDraw event = drawEvents.poll();
+        if (event == null) {
+            event = new EventDraw(drawEvents);
+        }
+        event.init(viewState, canvas);
+        return event;
     }
 
     public static EventDraw newEventDraw(final EventDraw parentEvent, final Canvas canvas) {
-        final EventDraw event = drawEvents.poll();
-        return event != null ? event.reuse(parentEvent, canvas) : new EventDraw(parentEvent, canvas);
+        EventDraw event = drawEvents.poll();
+        if (event == null) {
+            event = new EventDraw(drawEvents);
+        }
+        event.init(parentEvent, canvas);
+        return event;
     }
 
     public static EventReset newEventReset(final AbstractViewController ctrl, final InvalidateSizeReason reason,
             final boolean clearPages) {
-        final EventReset event = resetEvents.poll();
-        return event != null ? event.reuse(ctrl, reason, clearPages) : new EventReset(ctrl, reason, clearPages);
+        EventReset event = resetEvents.poll();
+        if (event == null) {
+            event = new EventReset(resetEvents);
+        }
+        event.init(ctrl, reason, clearPages);
+        return event;
     }
 
-    public static AbstractEventScroll newEventScroll(final AbstractViewController ctrl, int delta) {
+    public static AbstractEventScroll<?> newEventScroll(final AbstractViewController ctrl, final int delta) {
+        AbstractEventScroll<?> event = null;
         if (delta > 0) {
-            final EventScrollDown event = scrollDownEvents.poll();
-            return event != null ? event.reuse(ctrl) : new EventScrollDown(ctrl);
+            event = scrollDownEvents.poll();
+            if (event == null) {
+                event = new EventScrollDown(scrollDownEvents);
+            }
         } else {
-            final EventScrollUp event = scrollUpEvents.poll();
-            return event != null ? event.reuse(ctrl) : new EventScrollUp(ctrl);
+            event = scrollUpEvents.poll();
+            if (event == null) {
+                event = new EventScrollUp(scrollUpEvents);
+            }
         }
+        event.init(ctrl);
+        return event;
     }
 
     public static EventScrollTo newEventScrollTo(final AbstractViewController ctrl, final int viewIndex) {
-        final EventScrollTo event = scrollToEvents.poll();
-        return event != null ? event.reuse(ctrl, viewIndex) : new EventScrollTo(ctrl, viewIndex);
+        EventScrollTo event = scrollToEvents.poll();
+        if (event == null) {
+            event = new EventScrollTo(scrollToEvents);
+        }
+        event.init(ctrl, viewIndex);
+        return event;
     }
 
     public static EventChildLoaded newEventChildLoaded(final AbstractViewController ctrl, final PageTreeNode child,
             final Rect bitmapBounds) {
-        final EventChildLoaded event = childLoadedEvents.poll();
-        return event != null ? event.reuse(ctrl, child, bitmapBounds) : new EventChildLoaded(ctrl, child, bitmapBounds);
-    }
-
-    public static AbstractEventZoom newEventZoom(final AbstractViewController ctrl, final float oldZoom,
-            final float newZoom, final boolean committed) {
-        if (newZoom > oldZoom) {
-            final EventZoomIn event = zoomInEvents.poll();
-            return event != null ? event.reuse(ctrl, oldZoom, newZoom, committed) : new EventZoomIn(ctrl, oldZoom, newZoom, committed);
-        } else {
-            final EventZoomOut event = zoomOutEvents.poll();
-            return event != null ? event.reuse(ctrl, oldZoom, newZoom, committed) : new EventZoomOut(ctrl, oldZoom, newZoom, committed);
+        EventChildLoaded event = childLoadedEvents.poll();
+        if (event == null) {
+            event = new EventChildLoaded(childLoadedEvents);
         }
+        event.init(ctrl, child, bitmapBounds);
+        return event;
     }
 
-    public static void release(final EventDraw event) {
-        event.canvas = null;
-        event.level = null;
-        event.pageBounds = null;
-        event.viewBase = null;
-        event.viewState = null;
-        drawEvents.offer(event);
+    public static AbstractEventZoom<?> newEventZoom(final AbstractViewController ctrl, final float oldZoom,
+            final float newZoom, final boolean committed) {
+        AbstractEventZoom<?> event = null;
+        if (newZoom > oldZoom) {
+            event = zoomInEvents.poll();
+            if (event == null) {
+                event = new EventZoomIn(zoomInEvents);
+            }
+        } else {
+            event = zoomOutEvents.poll();
+            if (event == null) {
+                event = new EventZoomOut(zoomOutEvents);
+            }
+        }
+        event.init(ctrl, oldZoom, newZoom, committed);
+        return event;
     }
-
-    public static void release(final EventReset event) {
-        event.ctrl = null;
-        event.model = null;
-        event.viewState = null;
-        event.bitmapsToRecycle.clear();
-        event.nodesToDecode.clear();
-        event.level = null;
-        event.reason = null;
-        resetEvents.offer(event);
-    }
-
-    public static void release(final EventScrollUp event) {
-        event.ctrl = null;
-        event.model = null;
-        event.viewState = null;
-        event.bitmapsToRecycle.clear();
-        event.nodesToDecode.clear();
-        event.level = null;
-        scrollUpEvents.offer(event);
-    }
-
-    public static void release(final EventScrollDown event) {
-        event.ctrl = null;
-        event.model = null;
-        event.viewState = null;
-        event.bitmapsToRecycle.clear();
-        event.nodesToDecode.clear();
-        event.level = null;
-        scrollDownEvents.offer(event);
-    }
-
-    public static void release(final EventScrollTo event) {
-        event.ctrl = null;
-        event.model = null;
-        event.viewState = null;
-        event.bitmapsToRecycle.clear();
-        event.nodesToDecode.clear();
-        event.level = null;
-        scrollToEvents.offer(event);
-    }
-
-    public static void release(final EventChildLoaded event) {
-        event.ctrl = null;
-        event.model = null;
-        event.viewState = null;
-        event.bitmapsToRecycle.clear();
-        event.nodesToDecode.clear();
-        event.level = null;
-        event.child = null;
-        event.nodes = null;
-        event.page = null;
-        childLoadedEvents.offer(event);
-    }
-
-    public static void release(final EventZoomIn event) {
-        event.ctrl = null;
-        event.model = null;
-        event.viewState = null;
-        event.bitmapsToRecycle.clear();
-        event.nodesToDecode.clear();
-        event.oldLevel = null;
-        event.newLevel = null;
-        zoomInEvents.offer(event);
-    }
-
-    public static void release(final EventZoomOut event) {
-        event.ctrl = null;
-        event.model = null;
-        event.viewState = null;
-        event.bitmapsToRecycle.clear();
-        event.nodesToDecode.clear();
-        event.oldLevel = null;
-        event.newLevel = null;
-        zoomOutEvents.offer(event);
-    }
-
 }

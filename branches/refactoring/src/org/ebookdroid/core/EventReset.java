@@ -8,26 +8,39 @@ import android.graphics.RectF;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class EventReset extends AbstractEvent {
+
+    private final Queue<EventReset> eventQueue;
 
     protected PageTreeLevel level;
     protected InvalidateSizeReason reason;
     protected boolean clearPages;
 
-    public EventReset(final AbstractViewController ctrl, final InvalidateSizeReason reason, final boolean clearPages) {
-        super(ctrl);
-        reuse(null, reason, clearPages);
+    EventReset(final Queue<EventReset> eventQueue) {
+        this.eventQueue = eventQueue;
     }
 
-    EventReset reuse(final AbstractViewController ctrl, final InvalidateSizeReason reason, final boolean clearPages) {
-        if (ctrl != null) {
-            super.reuseImpl(ctrl);
-        }
+    void init(final AbstractViewController ctrl, final InvalidateSizeReason reason, final boolean clearPages) {
+        this.viewState = new ViewState(ctrl);
+        this.ctrl = ctrl;
+        this.model = viewState.model;
+        this.view = viewState.view;
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.reason = reason;
         this.clearPages = clearPages;
-        return this;
+    }
+
+    void release() {
+        this.ctrl = null;
+        this.model = null;
+        this.viewState = null;
+        this.level = null;
+        this.reason = null;
+        this.bitmapsToRecycle.clear();
+        this.nodesToDecode.clear();
+        eventQueue.offer(this);
     }
 
     /**
@@ -52,7 +65,7 @@ public class EventReset extends AbstractEvent {
             }
             return super.process();
         } finally {
-            EventPool.release(this);
+            release();
         }
     }
 

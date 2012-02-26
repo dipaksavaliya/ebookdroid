@@ -1,34 +1,18 @@
 package org.ebookdroid.core;
 
-public class EventScrollTo extends AbstractEventScroll {
+import java.util.Queue;
+
+public class EventScrollTo extends AbstractEventScroll<EventScrollTo> {
 
     public int viewIndex;
 
-    public EventScrollTo(final AbstractViewController ctrl, final int viewIndex) {
-        super(ctrl);
-        reuse(null, viewIndex);
+    public EventScrollTo(final Queue<EventScrollTo> eventQueue) {
+        super(eventQueue);
     }
 
-    EventScrollTo reuse(final AbstractViewController ctrl, final int viewIndex) {
-        if (ctrl != null) {
-            reuseImpl(ctrl);
-        }
+    final void init(final AbstractViewController ctrl, final int viewIndex) {
+        super.init(ctrl);
         this.viewIndex = viewIndex;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.AbstractEvent#process()
-     */
-    @Override
-    public ViewState process() {
-        try {
-            return super.process();
-        } finally {
-            EventPool.release(this);
-        }
     }
 
     /**
