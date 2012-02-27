@@ -13,6 +13,8 @@ import android.graphics.Rect;
 
 public class DragMark {
 
+    private static final Paint PAINT = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+
     private static Bitmap dragBitmap;
 
     public synchronized static void draw(final Canvas canvas, final ViewState viewState) {
@@ -22,16 +24,11 @@ public class DragMark {
 
         final Rect l = viewState.ctrl.getScrollLimits();
         if (l.width() + l.height() > 0) {
-            final Paint paint = new Paint();
-            paint.setFilterBitmap(true);
-            paint.setAntiAlias(true);
-            paint.setDither(true);
-
             final IView view = viewState.view;
             final float x = view.getScrollX() + view.getWidth() - dragBitmap.getWidth() - 1;
             final float y = view.getScrollY() + view.getHeight() - dragBitmap.getHeight() - 1;
 
-            canvas.drawBitmap(dragBitmap, x, y, paint);
+            canvas.drawBitmap(dragBitmap, x, y, PAINT);
         }
     }
 }

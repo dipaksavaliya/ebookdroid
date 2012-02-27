@@ -75,7 +75,7 @@ public class BitmapManager {
     }
 
     public static BitmapRef getBitmap(final String name, final int width, final int height, final Bitmap.Config config) {
-        if (used.size() == 0 && pool.size() == 0) {
+        if (used.isEmpty() && pool.isEmpty()) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("!!! Bitmap pool size: " + (BITMAP_MEMORY_LIMIT / 1024) + "KB");
             }
@@ -152,8 +152,15 @@ public class BitmapManager {
                 sum += ref.size;
             }
         }
-        LCTX.e(msg + "Bitmaps&NativeHeap : " + sum + "(" + used.size() + " used / " + pool.size() + " pooled)/"
-                + Debug.getNativeHeapAllocatedSize() + "/" + Debug.getNativeHeapSize());
+        if (showRefs) {
+            LCTX.e(msg + "Bitmaps&NativeHeap : " + sum + "(" + used.size() + " used / " + pool.size() + " pooled)/"
+                    + Debug.getNativeHeapAllocatedSize() + "/" + Debug.getNativeHeapSize());
+        } else {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d(msg + "Bitmaps&NativeHeap : " + sum + "(" + used.size() + " used / " + pool.size() + " pooled)/"
+                        + Debug.getNativeHeapAllocatedSize() + "/" + Debug.getNativeHeapSize());
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -162,7 +169,7 @@ public class BitmapManager {
         removeOldRefs();
 
         int count = 0;
-        final int queueBefore = releasing.size();
+        final int queueBefore = LCTX.isDebugEnabled() ? releasing.size() : 0;
         while (!releasing.isEmpty()) {
             final Object ref = releasing.poll();
             if (ref instanceof BitmapRef) {
@@ -242,8 +249,8 @@ public class BitmapManager {
         }
         if (recycled > 0) {
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("Recycled " + recycled + " pooled bitmap(s): " + "memoryUsed=" + used.size()
-                        + "/" + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool=" + pool.size() + "/"
+                LCTX.d("Recycled " + recycled + " pooled bitmap(s): " + "memoryUsed=" + used.size() + "/"
+                        + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool=" + pool.size() + "/"
                         + (memoryPooled.get() / 1024) + "KB");
             }
         }

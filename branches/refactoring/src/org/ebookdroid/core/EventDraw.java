@@ -26,6 +26,7 @@ public class EventDraw implements IEvent {
 
     RectF pageBounds;
     PointF viewBase;
+    final RectF fixedPageBounds = new RectF();
 
     EventDraw(final Queue<EventDraw> eventQueue) {
         this.eventQueue = eventQueue;
@@ -138,16 +139,16 @@ public class EventDraw implements IEvent {
     }
 
     protected void drawPageBackground(final Page page) {
-        final RectF rect = new RectF(pageBounds);
-        rect.offset(-viewBase.x, -viewBase.y);
+        fixedPageBounds.set(pageBounds);
+        fixedPageBounds.offset(-viewBase.x, -viewBase.y);
 
-        canvas.drawRect(rect, viewState.paint.fillPaint);
+        canvas.drawRect(fixedPageBounds, viewState.paint.fillPaint);
 
         final TextPaint textPaint = viewState.paint.textPaint;
         textPaint.setTextSize(24 * viewState.zoom);
 
         final String text = EBookDroidApp.context.getString(R.string.text_page) + " " + (page.index.viewIndex + 1);
-        canvas.drawText(text, rect.centerX(), rect.centerY(), textPaint);
+        canvas.drawText(text, fixedPageBounds.centerX(), fixedPageBounds.centerY(), textPaint);
     }
 
     protected void drawBrightnessFilter(final Canvas canvas, final RectF tr) {

@@ -7,10 +7,10 @@ import android.graphics.Rect;
 
 public final class RawBitmap {
 
-    private final int[] pixels;
-    private int width;
-    private int height;
-    private final boolean hasAlpha;
+    final int[] pixels;
+    int width;
+    int height;
+    final boolean hasAlpha;
 
     public RawBitmap(int width, int height, boolean hasAlpha) {
         this.width = width;

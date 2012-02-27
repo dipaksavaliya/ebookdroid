@@ -1,6 +1,5 @@
 package org.ebookdroid.droids.fb2.codec;
 
-
 import android.graphics.Canvas;
 
 import java.util.ArrayList;
@@ -52,7 +51,8 @@ public class FB2Line {
     public void render(final Canvas c, final int y, float left, float right) {
         applyJustification();
         float x = FB2Page.MARGIN_X;
-        for (final AbstractFB2LineElement e : elements) {
+        for (int i = 0, n = elements.size(); i < n; i++) {
+            final AbstractFB2LineElement e = elements.get(i);
             x += e.render(c, y, (int) x, spaceWidth, left, right);
         }
     }

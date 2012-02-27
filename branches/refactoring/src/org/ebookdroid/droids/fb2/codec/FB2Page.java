@@ -23,7 +23,7 @@ public class FB2Page implements CodecPage {
     public static final int PAGE_HEIGHT = 1280;
 
     public static final CodecPageInfo CPI = new CodecPageInfo(PAGE_WIDTH, PAGE_HEIGHT);
-    
+
     public static final int MARGIN_X = 20;
 
     public static final int MARGIN_Y = 20;
@@ -70,7 +70,8 @@ public class FB2Page implements CodecPage {
                 pageSliceBounds.right * PAGE_WIDTH, pageSliceBounds.bottom * PAGE_HEIGHT);
 
         int y = MARGIN_Y;
-        for (final FB2Line line : lines) {
+        for (int i = 0, n = lines.size(); i < n; i++) {
+            final FB2Line line = lines.get(i);
             int top = y;
             int bottom = y + line.getHeight();
             if (bounds.top < bottom && top < bounds.bottom) {
@@ -78,7 +79,8 @@ public class FB2Page implements CodecPage {
             }
             y = bottom;
         }
-        for (final FB2Line line : noteLines) {
+        for (int i = 0, n = noteLines.size(); i < n; i++) {
+            final FB2Line line = noteLines.get(i);
             int top = y;
             int bottom = y + line.getHeight();
             if (bounds.top < bottom && top < bounds.bottom) {

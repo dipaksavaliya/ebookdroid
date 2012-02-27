@@ -26,6 +26,8 @@ public class Bitmaps {
 
     private static boolean useDefaultBitmapType = true;
 
+    private static RawBitmap slice;
+
     public final Bitmap.Config config;
     public final int partSize;
     public Rect bounds;
@@ -45,10 +47,12 @@ public class Bitmaps {
         this.config = useDefaultBitmapType ? DEF_BITMAP_TYPE : origBitmap.getConfig();
         this.bitmaps = new BitmapRef[columns * rows];
 
+        final boolean hasAlpha = origBitmap.hasAlpha();
+        if (slice == null || slice.pixels.length >  partSize * partSize || slice.hasAlpha != hasAlpha) {
+            slice = new RawBitmap(partSize, partSize, hasAlpha);
+        }
+
         int top = 0;
-
-        final RawBitmap rb = new RawBitmap(partSize, partSize, origBitmap.hasAlpha());
-
         for (int row = 0; row < rows; row++, top += partSize) {
             int left = 0;
             for (int col = 0; col < columns; col++, left += partSize) {
@@ -59,14 +63,14 @@ public class Bitmaps {
                 if (row == rows - 1 || col == columns - 1) {
                     final int right = Math.min(left + partSize, bounds.width());
                     final int bottom = Math.min(top + partSize, bounds.height());
-                    rb.retrieve(origBitmap, left, top, right - left, bottom - top);
+                    slice.retrieve(origBitmap, left, top, right - left, bottom - top);
                 } else {
-                    rb.retrieve(origBitmap, left, top, partSize, partSize);
+                    slice.retrieve(origBitmap, left, top, partSize, partSize);
                 }
                 if (invert) {
-                    rb.invert();
+                    slice.invert();
                 }
-                rb.toBitmap(bmp);
+                slice.toBitmap(bmp);
 
                 final int index = row * columns + col;
                 bitmaps[index] = b;
@@ -98,9 +102,14 @@ public class Bitmaps {
 
             int i = 0;
             for (; i < newsize; i++) {
-                this.bitmaps[i] = i < oldBitmaps.length ? oldBitmaps[i] : null;
-                if (this.bitmaps[i] == null || this.bitmaps[i].getBitmap() == null) {
-                    BitmapManager.release(this.bitmaps[i]);
+                if (i < oldBitmaps.length) {
+                    this.bitmaps[i] = oldBitmaps[i];
+                    if (this.bitmaps[i] != null && this.bitmaps[i].isRecycled()) {
+                        BitmapManager.release(this.bitmaps[i]);
+                        this.bitmaps[i] = null;
+                    }
+                }
+                if (this.bitmaps[i] == null) {
                     this.bitmaps[i] = BitmapManager.getBitmap(nodeId + ":reuse:" + i, partSize, partSize, config);
                 } else {
                     if (LCTX.isDebugEnabled()) {
@@ -113,10 +122,12 @@ public class Bitmaps {
                 BitmapManager.release(oldBitmaps[i]);
             }
 
+            final boolean hasAlpha = origBitmap.hasAlpha();
+            if (slice == null || slice.pixels.length >  partSize * partSize || slice.hasAlpha != hasAlpha) {
+                slice = new RawBitmap(partSize, partSize, hasAlpha);
+            }
+
             int top = 0;
-
-            final RawBitmap rb = new RawBitmap(partSize, partSize, origBitmap.hasAlpha());
-
             for (int row = 0; row < rows; row++, top += partSize) {
                 int left = 0;
                 for (int col = 0; col < columns; col++, left += partSize) {
@@ -127,14 +138,14 @@ public class Bitmaps {
                     if (row == rows - 1 || col == columns - 1) {
                         final int right = Math.min(left + partSize, bounds.width());
                         final int bottom = Math.min(top + partSize, bounds.height());
-                        rb.retrieve(origBitmap, left, top, right - left, bottom - top);
+                        slice.retrieve(origBitmap, left, top, right - left, bottom - top);
                     } else {
-                        rb.retrieve(origBitmap, left, top, partSize, partSize);
+                        slice.retrieve(origBitmap, left, top, partSize, partSize);
                     }
                     if (invert) {
-                        rb.invert();
+                        slice.invert();
                     }
-                    rb.toBitmap(bmp);
+                    slice.toBitmap(bmp);
                 }
             }
 
