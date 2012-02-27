@@ -32,7 +32,7 @@ public class TouchManager {
 
     private static final LinkedList<TouchProfile> stack = new LinkedList<TouchProfile>();
 
-    public static void applyOldStyleSettings(final AppSettings newSettings) {
+    public static void loadFromSettings(final AppSettings newSettings) {
         profiles.clear();
         stack.clear();
 
@@ -45,7 +45,7 @@ public class TouchManager {
                     profiles.put(p.name, p);
                 }
             } catch (final Throwable ex) {
-                ex.printStackTrace();
+                LCTX.e("Error on tap configuration load: ", ex);
             }
             fromJSON = profiles.containsKey(DEFAULT_PROFILE);
         }
@@ -54,7 +54,7 @@ public class TouchManager {
             final TouchProfile def = addProfile(DEFAULT_PROFILE);
             {
                 final Region r = def.addRegion(0, 0, 100, 100);
-                r.setAction(Touch.DoubleTap, R.id.mainmenu_zoom, newSettings.getZoomByDoubleTap());
+                r.setAction(Touch.DoubleTap, R.id.mainmenu_zoom, true);
                 r.setAction(Touch.TwoFingerTap, R.id.actions_openOptionsMenu, true);
             }
             {
@@ -62,21 +62,15 @@ public class TouchManager {
                 r.setAction(Touch.DoubleTap, R.id.mainmenu_close, true);
             }
             {
-                final Region r = def.addRegion(0, 0, 100, newSettings.getTapSize());
-                r.setAction(Touch.SingleTap, R.id.actions_verticalConfigScrollUp, newSettings.getTapScroll());
+                final Region r = def.addRegion(0, 0, 100, 10);
+                r.setAction(Touch.SingleTap, R.id.actions_verticalConfigScrollUp, true);
             }
             {
-                final Region r = def.addRegion(0, 100 - newSettings.getTapSize(), 100, 100);
-                r.setAction(Touch.SingleTap, R.id.actions_verticalConfigScrollDown, newSettings.getTapScroll());
+                final Region r = def.addRegion(0, 90, 100, 100);
+                r.setAction(Touch.SingleTap, R.id.actions_verticalConfigScrollDown, true);
             }
 
             persist();
-        } else {
-            setActionEnabled(DEFAULT_PROFILE, R.id.mainmenu_zoom, newSettings.getZoomByDoubleTap());
-            setActionEnabled(DEFAULT_PROFILE, R.id.actions_verticalConfigScrollUp, newSettings.getTapScroll(), 0, 0,
-                    100, newSettings.getTapSize());
-            setActionEnabled(DEFAULT_PROFILE, R.id.actions_verticalConfigScrollDown, newSettings.getTapScroll(), 0,
-                    100 - newSettings.getTapSize(), 100, 100);
         }
 
         stack.addFirst(profiles.get(DEFAULT_PROFILE));
@@ -121,7 +115,7 @@ public class TouchManager {
 
     public static Integer getAction(final Touch type, final float x, final float y, final float width,
             final float height) {
-        return stack.peek().getAction(type, x, y, width, height);
+        return SettingsManager.getAppSettings().getTapsEnabled() ? stack.peek().getAction(type, x, y, width, height) : null;
     }
 
     public static TouchProfile addProfile(final String name) {

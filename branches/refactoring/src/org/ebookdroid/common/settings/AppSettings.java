@@ -27,9 +27,7 @@ public class AppSettings {
 
     private final SharedPreferences prefs;
 
-    private Boolean tapScroll;
-
-    private Integer tapSize;
+    private Boolean tapsEnabled;
 
     private DocumentViewMode viewMode;
 
@@ -64,8 +62,6 @@ public class AppSettings {
     private Set<String> autoScanDirs;
 
     private Boolean loadRecent;
-
-    private Boolean zoomByDoubleTap;
 
     private Boolean useBookcase;
 
@@ -103,20 +99,6 @@ public class AppSettings {
 
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    }
-
-    public String getTouchProfiles() {
-        if (touchProfiles == null) {
-            touchProfiles = prefs.getString("tapprofiles", "");
-        }
-        return touchProfiles;
-    }
-
-    public void updateTouchProfiles(final String profiles) {
-        touchProfiles = profiles;
-        final Editor edit = prefs.edit();
-        edit.putString("tapprofiles", touchProfiles);
-        edit.commit();
     }
 
     public boolean isLoadRecentBook() {
@@ -242,18 +224,25 @@ public class AppSettings {
         return pageInTitle;
     }
 
-    public boolean getTapScroll() {
-        if (tapScroll == null) {
-            tapScroll = prefs.getBoolean("tapscroll", false);
+    public String getTouchProfiles() {
+        if (touchProfiles == null) {
+            touchProfiles = prefs.getString("tap_profiles", "");
         }
-        return tapScroll;
+        return touchProfiles;
     }
 
-    public int getTapSize() {
-        if (tapSize == null) {
-            tapSize = getIntValue("tapsize", 10);
+    public void updateTouchProfiles(final String profiles) {
+        touchProfiles = profiles;
+        final Editor edit = prefs.edit();
+        edit.putString("tap_profiles", touchProfiles);
+        edit.commit();
+    }
+
+    public boolean getTapsEnabled() {
+        if (tapsEnabled == null) {
+            tapsEnabled = prefs.getBoolean("tapsenabled", true);
         }
-        return tapSize.intValue();
+        return tapsEnabled;
     }
 
     public int getScrollHeight() {
@@ -331,13 +320,6 @@ public class AppSettings {
             reloadDuringZoom = prefs.getBoolean("reloadduringzoom", true);
         }
         return reloadDuringZoom;
-    }
-
-    public boolean getZoomByDoubleTap() {
-        if (zoomByDoubleTap == null) {
-            zoomByDoubleTap = prefs.getBoolean("zoomdoubletap", false);
-        }
-        return zoomByDoubleTap;
     }
 
     public boolean getUseBookcase() {
@@ -502,8 +484,7 @@ public class AppSettings {
         private static final int D_FullScreen = 0x0001 << 2;
         private static final int D_ShowTitle = 0x0001 << 3;
         private static final int D_PageInTitle = 0x0001 << 4;
-        private static final int D_TapScroll = 0x0001 << 5;
-        private static final int D_TapSize = 0x0001 << 6;
+        private static final int D_TapsEnabled = 0x0001 << 5;
         private static final int D_ScrollHeight = 0x0001 << 7;
         private static final int D_PagesInMemory = 0x0001 << 8;
         private static final int D_Brightness = 0x0001 << 10;
@@ -536,11 +517,8 @@ public class AppSettings {
                 if (firstTime || olds.getPageInTitle() != news.getPageInTitle()) {
                     mask |= D_PageInTitle;
                 }
-                if (firstTime || olds.getTapScroll() != news.getTapScroll()) {
-                    mask |= D_TapScroll;
-                }
-                if (firstTime || olds.getTapSize() != news.getTapSize()) {
-                    mask |= D_TapSize;
+                if (firstTime || olds.getTapsEnabled() != news.getTapsEnabled()) {
+                    mask |= D_TapsEnabled;
                 }
                 if (firstTime || olds.getScrollHeight() != news.getScrollHeight()) {
                     mask |= D_ScrollHeight;
@@ -599,12 +577,8 @@ public class AppSettings {
             return 0 != (mask & D_PageInTitle);
         }
 
-        public boolean isTapScrollChanged() {
-            return 0 != (mask & D_TapScroll);
-        }
-
-        public boolean isTapSizeChanged() {
-            return 0 != (mask & D_TapSize);
+        public boolean isTapsEnabledChanged() {
+            return 0 != (mask & D_TapsEnabled);
         }
 
         public boolean isScrollHeightChanged() {

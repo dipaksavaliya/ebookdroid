@@ -647,7 +647,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
             getDocumentController().toggleNightMode(newSettings.getNightMode());
         }
 
-        TouchManager.applyOldStyleSettings(newSettings);
+        TouchManager.loadFromSettings(newSettings);
 
         BitmapManager.setPartSize(newSettings.getBitmapSize());
         BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());
