@@ -43,9 +43,8 @@ public class BitmapRef {
     }
 
     void recycle() {
-        final Bitmap bmp = bitmap;
-        if (bmp != null) {
-            bmp.recycle();
+        if (BitmapManager.useEarlyRecycling && bitmap != null) {
+            bitmap.recycle();
         }
         bitmap = null;
     }

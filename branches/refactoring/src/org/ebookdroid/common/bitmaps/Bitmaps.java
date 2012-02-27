@@ -1,7 +1,6 @@
 package org.ebookdroid.common.bitmaps;
 
 import org.ebookdroid.common.log.LogContext;
-import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.PagePaint;
 
 import android.graphics.Bitmap;
@@ -40,7 +39,7 @@ public class Bitmaps {
     public Bitmaps(final String nodeId, final BitmapRef orig, final Rect bitmapBounds, final boolean invert) {
         final Bitmap origBitmap = orig.getBitmap();
 
-        this.partSize = SettingsManager.getAppSettings().getBitmapSize();
+        this.partSize = BitmapManager.partSize;
         this.bounds = bitmapBounds;
         this.columns = (int) Math.ceil(bounds.width() / (float) partSize);
         this.rows = (int) Math.ceil(bounds.height() / (float) partSize);
@@ -48,7 +47,7 @@ public class Bitmaps {
         this.bitmaps = new BitmapRef[columns * rows];
 
         final boolean hasAlpha = origBitmap.hasAlpha();
-        if (slice == null || slice.pixels.length >  partSize * partSize || slice.hasAlpha != hasAlpha) {
+        if (slice == null || slice.pixels.length < partSize * partSize || slice.hasAlpha != hasAlpha) {
             slice = new RawBitmap(partSize, partSize, hasAlpha);
         }
 
@@ -86,8 +85,7 @@ public class Bitmaps {
             if (cfg != this.config) {
                 return false;
             }
-            final int size = SettingsManager.getAppSettings().getBitmapSize();
-            if (size != this.partSize) {
+            if (BitmapManager.partSize != this.partSize) {
                 return false;
             }
 
@@ -123,7 +121,7 @@ public class Bitmaps {
             }
 
             final boolean hasAlpha = origBitmap.hasAlpha();
-            if (slice == null || slice.pixels.length >  partSize * partSize || slice.hasAlpha != hasAlpha) {
+            if (slice == null || slice.pixels.length < partSize * partSize || slice.hasAlpha != hasAlpha) {
                 slice = new RawBitmap(partSize, partSize, hasAlpha);
             }
 

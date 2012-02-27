@@ -99,6 +99,8 @@ public class AppSettings {
 
     private Boolean fb2HyphenEnabled;
 
+    private Boolean useEarlyRecycling;
+
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -317,7 +319,13 @@ public class AppSettings {
         return textureReuseEnabled;
     }
 
-    
+    public boolean getUseEarlyRecycling() {
+        if (useEarlyRecycling == null) {
+            useEarlyRecycling = prefs.getBoolean("earlyrecycling", false);
+        }
+        return useEarlyRecycling;
+    }
+
     public boolean getReloadDuringZoom() {
         if (reloadDuringZoom == null) {
             reloadDuringZoom = prefs.getBoolean("reloadduringzoom", true);

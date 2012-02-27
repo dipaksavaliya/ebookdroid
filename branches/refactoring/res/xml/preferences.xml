@@ -167,6 +167,12 @@
                 android:title="@string/pref_texturereuse_title" />
 
             <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="earlyrecycling"
+                android:summary="@string/pref_earlyrecycling_summary"
+                android:title="@string/pref_earlyrecycling_title" />
+
+            <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="reloadduringzoom"
                 android:summary="@string/pref_reloadduringzoom_summary"

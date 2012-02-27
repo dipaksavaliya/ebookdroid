@@ -2,6 +2,7 @@ package org.ebookdroid.ui.viewer;
 
 import org.ebookdroid.CodecType;
 import org.ebookdroid.R;
+import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.AppSettings;
@@ -645,7 +646,11 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
         if (diff.isNightModeChanged() && !diff.isFirstTime()) {
             getDocumentController().toggleNightMode(newSettings.getNightMode());
         }
+
         TouchManager.applyOldStyleSettings(newSettings);
+
+        BitmapManager.setPartSize(newSettings.getBitmapSize());
+        BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());
     }
 
     @Override

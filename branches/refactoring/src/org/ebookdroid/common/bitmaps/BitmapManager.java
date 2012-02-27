@@ -28,7 +28,7 @@ public class BitmapManager {
 
     private final static long BITMAP_MEMORY_LIMIT = Runtime.getRuntime().maxMemory() / 2;
 
-    private static final int GENERATION_THRESHOLD = 50;
+    private static final int GENERATION_THRESHOLD = 10;
 
     private static Map<Integer, BitmapRef> used = new ConcurrentHashMap<Integer, BitmapRef>();
 
@@ -45,6 +45,10 @@ public class BitmapManager {
     private static final AtomicLong memoryPooled = new AtomicLong();
 
     private static AtomicLong generation = new AtomicLong();
+
+    static int partSize = 1 << 7;
+
+    static boolean useEarlyRecycling = false;
 
     public static Bitmap getResource(final int resourceId) {
         synchronized (resources) {
@@ -86,7 +90,7 @@ public class BitmapManager {
             final BitmapRef ref = it.next();
             final Bitmap bmp = ref.bitmap;
 
-            if (bmp != null && bmp.getConfig() == config && bmp.getWidth() == width && bmp.getHeight() >= height) {
+            if (bmp != null && bmp.getConfig() == config && ref.width == width && ref.height >= height) {
                 it.remove();
 
                 ref.gen = generation.get();
@@ -286,6 +290,22 @@ public class BitmapManager {
             bytes = BitmapManager.getPixelSizeInBytes(parentBitmap.getConfig());
         }
         return bytes * childSize.width() * childSize.height();
+    }
+
+    public static int getPartSize() {
+        return partSize;
+    }
+
+    public static void setPartSize(final int partSize) {
+        BitmapManager.partSize = partSize;
+    }
+
+    public static boolean isUseEarlyRecycling() {
+        return useEarlyRecycling;
+    }
+
+    public static void setUseEarlyRecycling(final boolean useEarlyRecycling) {
+        BitmapManager.useEarlyRecycling = useEarlyRecycling;
     }
 
     public static int getPixelSizeInBytes(final Bitmap.Config config) {
