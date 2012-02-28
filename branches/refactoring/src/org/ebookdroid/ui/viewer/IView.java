@@ -43,6 +43,8 @@ public interface IView {
 
     void waitForInitialization();
 
+    void onDestroy();
+
     float getScrollScaleRatio();
 
     void stopScroller();

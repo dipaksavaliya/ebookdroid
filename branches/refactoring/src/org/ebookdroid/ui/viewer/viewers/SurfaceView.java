@@ -278,6 +278,16 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.ebookdroid.ui.viewer.IView#onDestroy()
+     */
+    @Override
+    public void onDestroy() {
+        layoutFlag.set();
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see org.ebookdroid.ui.viewer.IView#getScrollScaleRatio()
      */

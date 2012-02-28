@@ -272,6 +272,16 @@ public final class BaseView extends View implements IView {
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.ebookdroid.ui.viewer.IView#onDestroy()
+     */
+    @Override
+    public void onDestroy() {
+        layoutFlag.set();
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see org.ebookdroid.ui.viewer.IView#getScrollScaleRatio()
      */

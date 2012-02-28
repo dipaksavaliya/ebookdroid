@@ -58,6 +58,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.emdev.ui.AbstractActionActivity;
@@ -98,13 +100,15 @@ actions = {
 public class ViewerActivity extends AbstractActionActivity implements IActivityController, DecodingProgressListener,
         CurrentPageListener, ISettingsChangeListener {
 
-    public static final LogContext LCTX = LogContext.ROOT.lctx("Core");
-
     private static final String E_MAIL_ATTACHMENT = "[E-mail Attachment]";
 
     private static final int DIALOG_GOTO = 0;
 
     public static final DisplayMetrics DM = new DisplayMetrics();
+
+    private static final AtomicLong SEQ = new AtomicLong();
+
+    private final LogContext LCTX;
 
     private IView view;
 
@@ -132,11 +136,14 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
 
     private CodecType codecType;
 
+    private final AtomicBoolean destroyed = new AtomicBoolean();
+
     /**
      * Instantiates a new base viewer activity.
      */
     public ViewerActivity() {
         super();
+        LCTX= LogContext.ROOT.lctx("Core", true).lctx("" + SEQ.getAndIncrement());
     }
 
     /**
@@ -183,6 +190,8 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
 
     @Override
     protected void onDestroy() {
+        destroyed.set(true);
+        view.onDestroy();
         if (documentModel != null) {
             documentModel.recycle();
         }
@@ -730,7 +739,15 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
                     m_fileName = tempFile.getAbsolutePath();
                 }
                 getView().waitForInitialization();
+                if (destroyed.get()) {
+                    LCTX.d("doInBackground(): activity is finishing - about execution");
+                    return null;
+                }
                 documentModel.open(m_fileName, m_password);
+                if (destroyed.get()) {
+                    LCTX.d("doInBackground(): activity is finishing - about execution");
+                    return null;
+                }
                 getDocumentController().init(this);
                 return null;
             } catch (final Exception e) {
@@ -746,6 +763,14 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
 
         @Override
         protected void onPostExecute(final Exception result) {
+            if (destroyed.get()) {
+                LCTX.d("onPostExecute(): activity is finishing - about execution");
+                try {
+                    progressDialog.dismiss();
+                } catch (Exception ex) {
+                }
+                return;
+            }
             LCTX.d("onPostExecute(): start");
             try {
                 if (result == null) {
