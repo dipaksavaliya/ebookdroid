@@ -71,6 +71,8 @@ public class AppSettings {
 
     private String touchProfiles;
 
+    private String keysBinding;
+
     private DocumentViewType viewType;
 
     private Integer decodingThreadPriority;
@@ -235,6 +237,20 @@ public class AppSettings {
         touchProfiles = profiles;
         final Editor edit = prefs.edit();
         edit.putString("tap_profiles", touchProfiles);
+        edit.commit();
+    }
+
+    public String getKeysBinding() {
+        if (keysBinding == null) {
+            keysBinding = prefs.getString("keys_binding", "");
+        }
+        return keysBinding;
+    }
+
+    public void updateKeysBinding(String json) {
+        keysBinding = json;
+        final Editor edit = prefs.edit();
+        edit.putString("keys_binding", keysBinding);
         edit.commit();
     }
 
@@ -416,7 +432,7 @@ public class AppSettings {
         }
         return fb2HyphenEnabled;
     }
-    
+
     boolean getCropPages() {
         if (cropPages == null) {
             cropPages = prefs.getBoolean("croppages", false);

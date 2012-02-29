@@ -19,6 +19,7 @@ import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.codec.OutlineLink;
 import org.ebookdroid.core.events.CurrentPageListener;
 import org.ebookdroid.core.events.DecodingProgressListener;
+import org.ebookdroid.core.keysbinding.KeysBindingManager;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.models.ZoomModel;
@@ -657,6 +658,7 @@ public class ViewerActivity extends AbstractActionActivity implements IActivityC
         }
 
         TouchManager.loadFromSettings(newSettings);
+        KeysBindingManager.loadFromSettings(newSettings);
 
         BitmapManager.setPartSize(newSettings.getBitmapSize());
         BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());

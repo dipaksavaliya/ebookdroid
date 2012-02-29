@@ -6,6 +6,7 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
+import org.ebookdroid.core.keysbinding.KeysBindingManager;
 import org.ebookdroid.core.touch.DefaultGestureDetector;
 import org.ebookdroid.core.touch.IGestureDetector;
 import org.ebookdroid.core.touch.IMultiTouchListener;
@@ -224,23 +225,23 @@ public abstract class AbstractViewController extends AbstractComponentController
     @Override
     public final boolean dispatchKeyEvent(final KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_DPAD_UP:
-                case KeyEvent.KEYCODE_VOLUME_UP:
-                    verticalConfigScroll(-1);
-                    return true;
-                case KeyEvent.KEYCODE_DPAD_DOWN:
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-                    verticalConfigScroll(1);
-                    return true;
+            final Integer actionId = KeysBindingManager.getAction(event);
+            final ActionEx action = actionId != null ? getOrCreateAction(actionId) : null;
+            if (action != null) {
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d("Key action: " + action.name + ", " + action.getMethod().toString());
+                }
+                action.run();
+                return true;
+            } else {
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d("Key action not found: " + event);
+                }
             }
-        }
-        // Avoid sound
-        if (event.getAction() == KeyEvent.ACTION_UP) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-                case KeyEvent.KEYCODE_VOLUME_UP:
-                    return true;
+        } else if (event.getAction() == KeyEvent.ACTION_UP) {
+            Integer id = KeysBindingManager.getAction(event);
+            if (id != null) {
+                return true;
             }
         }
 
@@ -291,7 +292,7 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#toggleNightMode(boolean)
      */
     @Override
@@ -301,7 +302,7 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#invalidateScroll()
      */
     public final void invalidateScroll() {
