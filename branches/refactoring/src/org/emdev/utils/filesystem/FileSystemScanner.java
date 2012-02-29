@@ -67,9 +67,10 @@ public class FileSystemScanner {
     }
 
     public FileObserver getObserver(final File dir) {
-        final String path = dir.getAbsolutePath();
+        //final String path = dir.getAbsolutePath();
         synchronized (observers) {
-            FileObserver fo = observers.get(path);
+            //FileObserver fo = observers.get(path);
+            FileObserver fo = observers.get(dir);
             if (fo == null) {
                 fo = new FileObserverImpl(dir);
                 observers.put(dir, fo);
