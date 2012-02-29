@@ -99,16 +99,10 @@ public class KeysBindingManager {
         }
 
         public static ActionRef fromJSON(final JSONObject json) throws JSONException {
-            try {
-                final int code = json.getInt("code");
-                final String name = json.getString("name");
-                final Integer id = ActionEx.getActionId(name);
-
-                return new ActionRef(code, id, true);
-            } catch (final Throwable ex) {
-                throw new JSONException("Old perssitent format found. Touch action are returned to default ones: "
-                        + ex.getMessage());
-            }
+            final int code = json.getInt("code");
+            final String name = json.getString("name");
+            final Integer id = ActionEx.getActionId(name);
+            return new ActionRef(code, id, true);
         }
 
         public JSONObject toJSON() throws JSONException {
