@@ -1,4 +1,4 @@
-package org.ebookdroid.core.touch;
+package org.ebookdroid.common.touch;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;

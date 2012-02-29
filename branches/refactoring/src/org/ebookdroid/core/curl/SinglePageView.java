@@ -55,7 +55,7 @@ public class SinglePageView implements PageAnimator {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.touch.IGestureDetector#enabled()
+     * @see org.ebookdroid.common.touch.IGestureDetector#enabled()
      */
     @Override
     public boolean enabled() {
@@ -65,7 +65,7 @@ public class SinglePageView implements PageAnimator {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.touch.IGestureDetector#onTouchEvent(android.view.MotionEvent)
+     * @see org.ebookdroid.common.touch.IGestureDetector#onTouchEvent(android.view.MotionEvent)
      */
     @Override
     public boolean onTouchEvent(final MotionEvent event) {

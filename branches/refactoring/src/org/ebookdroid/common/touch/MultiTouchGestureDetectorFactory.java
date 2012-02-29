@@ -1,4 +1,4 @@
-package org.ebookdroid.core.touch;
+package org.ebookdroid.common.touch;
 
 import java.lang.reflect.Constructor;
 

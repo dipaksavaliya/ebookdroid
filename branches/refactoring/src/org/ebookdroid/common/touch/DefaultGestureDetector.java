@@ -1,4 +1,4 @@
-package org.ebookdroid.core.touch;
+package org.ebookdroid.common.touch;
 
 import android.content.Context;
 import android.view.GestureDetector;

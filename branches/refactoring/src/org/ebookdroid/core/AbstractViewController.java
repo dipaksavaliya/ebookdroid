@@ -1,17 +1,17 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.R;
+import org.ebookdroid.common.keysbinding.KeysBindingManager;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
-import org.ebookdroid.core.keysbinding.KeysBindingManager;
-import org.ebookdroid.core.touch.DefaultGestureDetector;
-import org.ebookdroid.core.touch.IGestureDetector;
-import org.ebookdroid.core.touch.IMultiTouchListener;
-import org.ebookdroid.core.touch.MultiTouchGestureDetectorFactory;
-import org.ebookdroid.core.touch.TouchManager;
+import org.ebookdroid.common.touch.DefaultGestureDetector;
+import org.ebookdroid.common.touch.IGestureDetector;
+import org.ebookdroid.common.touch.IMultiTouchListener;
+import org.ebookdroid.common.touch.MultiTouchGestureDetectorFactory;
+import org.ebookdroid.common.touch.TouchManager;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
 import org.ebookdroid.ui.viewer.IView;
@@ -512,7 +512,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         /**
          * {@inheritDoc}
          * 
-         * @see org.ebookdroid.core.touch.IMultiTouchListener#onTwoFingerPinch(float, float)
+         * @see org.ebookdroid.common.touch.IMultiTouchListener#onTwoFingerPinch(float, float)
          */
         @Override
         public void onTwoFingerPinch(final MotionEvent e, final float oldDistance, final float newDistance) {
@@ -526,7 +526,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         /**
          * {@inheritDoc}
          * 
-         * @see org.ebookdroid.core.touch.IMultiTouchListener#onTwoFingerPinchEnd()
+         * @see org.ebookdroid.common.touch.IMultiTouchListener#onTwoFingerPinchEnd()
          */
         @Override
         public void onTwoFingerPinchEnd(final MotionEvent e) {
@@ -539,7 +539,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         /**
          * {@inheritDoc}
          * 
-         * @see org.ebookdroid.core.touch.IMultiTouchListener#onTwoFingerTap()
+         * @see org.ebookdroid.common.touch.IMultiTouchListener#onTwoFingerTap()
          */
         @Override
         public void onTwoFingerTap(final MotionEvent e) {

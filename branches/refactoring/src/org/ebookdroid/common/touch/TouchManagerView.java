@@ -1,9 +1,9 @@
-package org.ebookdroid.core.touch;
+package org.ebookdroid.common.touch;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;
-import org.ebookdroid.core.touch.TouchManager.Region;
-import org.ebookdroid.core.touch.TouchManager.TouchProfile;
+import org.ebookdroid.common.touch.TouchManager.Region;
+import org.ebookdroid.common.touch.TouchManager.TouchProfile;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Canvas;

@@ -4,14 +4,14 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
+import org.ebookdroid.common.touch.DefaultGestureDetector;
+import org.ebookdroid.common.touch.IGestureDetector;
+import org.ebookdroid.common.touch.MultiTouchGestureDetectorFactory;
 import org.ebookdroid.core.curl.PageAnimationType;
 import org.ebookdroid.core.curl.PageAnimator;
 import org.ebookdroid.core.curl.PageAnimatorProxy;
 import org.ebookdroid.core.curl.SinglePageView;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.core.touch.DefaultGestureDetector;
-import org.ebookdroid.core.touch.IGestureDetector;
-import org.ebookdroid.core.touch.MultiTouchGestureDetectorFactory;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Rect;

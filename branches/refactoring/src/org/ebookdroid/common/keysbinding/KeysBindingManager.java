@@ -1,4 +1,4 @@
-package org.ebookdroid.core.keysbinding;
+package org.ebookdroid.common.keysbinding;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;

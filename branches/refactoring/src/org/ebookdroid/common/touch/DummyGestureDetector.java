@@ -1,4 +1,4 @@
-package org.ebookdroid.core.touch;
+package org.ebookdroid.common.touch;
 
 import android.view.MotionEvent;
 
@@ -8,7 +8,7 @@ public class DummyGestureDetector implements IGestureDetector {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.touch.IGestureDetector#enabled()
+     * @see org.ebookdroid.common.touch.IGestureDetector#enabled()
      */
     @Override
     public boolean enabled() {
@@ -18,7 +18,7 @@ public class DummyGestureDetector implements IGestureDetector {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.touch.IGestureDetector#onTouchEvent(android.view.MotionEvent)
+     * @see org.ebookdroid.common.touch.IGestureDetector#onTouchEvent(android.view.MotionEvent)
      */
     @Override
     public boolean onTouchEvent(MotionEvent ev) {

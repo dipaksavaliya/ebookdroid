@@ -1,10 +1,10 @@
-package org.ebookdroid.core.touch;
+package org.ebookdroid.common.touch;
 
 import org.ebookdroid.R;
-import org.ebookdroid.core.touch.TouchManager.ActionRef;
-import org.ebookdroid.core.touch.TouchManager.Region;
-import org.ebookdroid.core.touch.TouchManager.Touch;
-import org.ebookdroid.core.touch.TouchManager.TouchProfile;
+import org.ebookdroid.common.touch.TouchManager.ActionRef;
+import org.ebookdroid.common.touch.TouchManager.Region;
+import org.ebookdroid.common.touch.TouchManager.Touch;
+import org.ebookdroid.common.touch.TouchManager.TouchProfile;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.app.Dialog;

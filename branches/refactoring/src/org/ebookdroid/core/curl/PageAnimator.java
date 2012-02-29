@@ -1,9 +1,9 @@
 package org.ebookdroid.core.curl;
 
+import org.ebookdroid.common.touch.IGestureDetector;
 import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
-import org.ebookdroid.core.touch.IGestureDetector;
 
 public interface PageAnimator extends IGestureDetector {
 
