@@ -25,8 +25,6 @@ public class EventReset extends AbstractEvent {
     void init(final AbstractViewController ctrl, final InvalidateSizeReason reason, final boolean clearPages) {
         this.viewState = new ViewState(ctrl);
         this.ctrl = ctrl;
-        this.model = viewState.model;
-        this.view = viewState.view;
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.reason = reason;
         this.clearPages = clearPages;
@@ -34,7 +32,6 @@ public class EventReset extends AbstractEvent {
 
     void release() {
         this.ctrl = null;
-        this.model = null;
         this.viewState = null;
         this.level = null;
         this.reason = null;
@@ -53,7 +50,7 @@ public class EventReset extends AbstractEvent {
         try {
             if (clearPages) {
                 final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
-                for (final Page page : model.getPages()) {
+                for (final Page page : ctrl.model.getPages()) {
                     page.nodes.recycleAll(bitmapsToRecycle, true);
                 }
                 BitmapManager.release(bitmapsToRecycle);

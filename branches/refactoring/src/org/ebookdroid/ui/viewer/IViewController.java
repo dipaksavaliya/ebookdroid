@@ -71,4 +71,6 @@ public interface IViewController extends ZoomListener {
     void pageUpdated(ViewState viewState, Page page);
 
     void invalidateScroll();
+
+    void onDestroy();
 }

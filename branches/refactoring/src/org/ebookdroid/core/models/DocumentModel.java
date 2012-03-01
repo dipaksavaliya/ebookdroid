@@ -47,16 +47,23 @@ public class DocumentModel extends ListenerProxy {
 
     public DocumentModel(final CodecType activityType) {
         super(CurrentPageListener.class);
-        try {
-            context = activityType.getContextClass().newInstance();
-            decodeService = new DecodeServiceBase(context);
-        } catch (final Throwable th) {
-            throw new RuntimeException(th);
+        if (activityType != null) {
+            try {
+                context = activityType.getContextClass().newInstance();
+                decodeService = new DecodeServiceBase(context);
+            } catch (final Throwable th) {
+                throw new RuntimeException(th);
+            }
+        } else {
+            context = null;
+            decodeService = null;
         }
     }
 
     public void open(String fileName, String password) {
-        decodeService.open(fileName, password);
+        if (decodeService != null) {
+            decodeService.open(fileName, password);
+        }
     }
 
     public DecodeService getDecodeService() {
@@ -155,7 +162,7 @@ public class DocumentModel extends ListenerProxy {
 
         final BookSettings bs = SettingsManager.getBookSettings();
 
-        if (base == null || bs == null) {
+        if (base == null || bs == null || context == null || decodeService == null) {
             return;
         }
 

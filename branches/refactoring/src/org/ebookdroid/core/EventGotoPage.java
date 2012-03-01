@@ -16,7 +16,6 @@ public class EventGotoPage implements IEvent {
     protected AbstractViewController ctrl;
     protected ViewState viewState;
     protected DocumentModel model;
-    protected IView view;
     protected int viewIndex;
     protected final float offsetX;
     protected final float offsetY;
@@ -25,7 +24,6 @@ public class EventGotoPage implements IEvent {
         this.viewState = new ViewState(ctrl);
         this.ctrl = ctrl;
         this.model = viewState.model;
-        this.view = viewState.view;
         this.centerPage = true;
         this.viewIndex = viewIndex;
         this.offsetX = 0;
@@ -37,7 +35,6 @@ public class EventGotoPage implements IEvent {
         this.viewState = new ViewState(ctrl);
         this.ctrl = ctrl;
         this.model = viewState.model;
-        this.view = viewState.view;
         this.centerPage = false;
         this.viewIndex = viewIndex;
         this.offsetX = offsetX;
@@ -68,6 +65,8 @@ public class EventGotoPage implements IEvent {
 
         model.setCurrentPageIndex(page.index);
 
+        final IView view = ctrl.getView();
+
         final int scrollX = view.getScrollX();
         final int scrollY = view.getScrollY();
 
@@ -84,7 +83,7 @@ public class EventGotoPage implements IEvent {
     }
 
     protected PointF calculateScroll(final Page page, final int scrollX, final int scrollY) {
-        final RectF viewRect = view.getViewRect();
+        final RectF viewRect = ctrl.getView().getViewRect();
         final RectF bounds = page.getBounds(viewState.zoom);
         final float width = bounds.width();
         final float height = bounds.height();

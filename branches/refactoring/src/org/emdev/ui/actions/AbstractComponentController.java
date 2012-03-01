@@ -3,9 +3,6 @@ package org.emdev.ui.actions;
 import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;
 
-import android.app.Activity;
-import android.content.Context;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -21,24 +18,22 @@ public abstract class AbstractComponentController<ManagedComponent> implements I
 
     protected static final LogContext LCTX = LogContext.ROOT.lctx("Actions");
 
-    private final Map<Integer, ActionEx> m_actions = new LinkedHashMap<Integer, ActionEx>();
+    protected final Map<Integer, ActionEx> m_actions = new LinkedHashMap<Integer, ActionEx>();
 
-    private final ReentrantReadWriteLock m_actionsLock = new ReentrantReadWriteLock();
+    protected final ReentrantReadWriteLock m_actionsLock = new ReentrantReadWriteLock();
 
-    private final ManagedComponent m_managedComponent;
+    protected final IActionController<?> m_parent;
 
-    private final IActionController<?> m_parent;
-
-    private final ActionDispatcher m_dispatcher;
+    protected ManagedComponent m_managedComponent;
 
     /**
      * Constructor
-     *
+     * 
      * @param managedComponent
      *            managed component
      */
-    protected AbstractComponentController(final Activity base, final ManagedComponent managedComponent) {
-        this(base, null, managedComponent);
+    protected AbstractComponentController(final ManagedComponent managedComponent) {
+        this(null, managedComponent);
     }
 
     /**
@@ -49,21 +44,9 @@ public abstract class AbstractComponentController<ManagedComponent> implements I
      * @param managedComponent
      *            managed component
      */
-    protected AbstractComponentController(final Activity base, final IActionController<?> parent,
-            final ManagedComponent managedComponent) {
+    protected AbstractComponentController(final IActionController<?> parent, final ManagedComponent managedComponent) {
         m_parent = parent;
         m_managedComponent = managedComponent;
-        m_dispatcher = new ActionDispatcher(base, this);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.emdev.ui.actions.IActionController#getBase()
-     */
-    @Override
-    public Context getContext() {
-        return m_dispatcher.m_base;
     }
 
     /**
@@ -85,17 +68,26 @@ public abstract class AbstractComponentController<ManagedComponent> implements I
     }
 
     /**
-     * @return the action dispatcher
-     * @see IActionController#getDispatcher()
+     * {@inheritDoc}
+     * 
+     * @see org.emdev.ui.actions.IActionController#setManagedComponent(java.lang.Object)
      */
     @Override
-    public ActionDispatcher getDispatcher() {
-        return m_dispatcher;
+    public void setManagedComponent(final ManagedComponent component) {
+        m_actionsLock.writeLock().lock();
+        try {
+            m_managedComponent = component;
+            for (final ActionEx action : m_actions.values()) {
+                action.putValue(MANAGED_COMPONENT_PROPERTY, component);
+            }
+        } finally {
+            m_actionsLock.writeLock().unlock();
+        }
     }
 
     /**
      * Searches for an action by the given id
-     *
+     * 
      * @param id
      *            action id
      * @return an instance of {@link ActionEx} object or <code>null</code>
@@ -123,7 +115,7 @@ public abstract class AbstractComponentController<ManagedComponent> implements I
 
     /**
      * Creates and register a global action
-     *
+     * 
      * @param id
      *            action id
      * @return an instance of {@link ActionEx} object
@@ -147,7 +139,7 @@ public abstract class AbstractComponentController<ManagedComponent> implements I
 
     /**
      * Creates an action
-     *
+     * 
      * @param id
      *            action id
      * @param parameters

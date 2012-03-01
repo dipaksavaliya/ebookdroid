@@ -11,7 +11,6 @@ import org.ebookdroid.core.curl.PageAnimationType;
 import org.ebookdroid.core.curl.PageAnimator;
 import org.ebookdroid.core.curl.PageAnimatorProxy;
 import org.ebookdroid.core.curl.SinglePageView;
-import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Rect;
@@ -49,15 +48,14 @@ public class SinglePageController extends AbstractViewController {
      */
     @Override
     public final ViewState goToPage(final int toPage) {
-        final DocumentModel dm = getBase().getDocumentModel();
-        if (toPage >= 0 && toPage < dm.getPageCount()) {
-            final Page page = dm.getPageObject(toPage);
-            dm.setCurrentPageIndex(page.index);
+        if (toPage >= 0 && toPage < model.getPageCount()) {
+            final Page page = model.getPageObject(toPage);
+            model.setCurrentPageIndex(page.index);
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
 
             final ViewState viewState = EventPool.newEventScrollTo(this, page.index.viewIndex).process();
-            view.redrawView(viewState);
+            getView().redrawView(viewState);
             return viewState;
         }
         return null;
@@ -70,20 +68,19 @@ public class SinglePageController extends AbstractViewController {
      */
     @Override
     public ViewState goToPage(final int toPage, final float offsetX, final float offsetY) {
-        final DocumentModel dm = getBase().getDocumentModel();
-        if (toPage >= 0 && toPage < dm.getPageCount()) {
-            final Page page = dm.getPageObject(toPage);
-            dm.setCurrentPageIndex(page.index);
+        if (toPage >= 0 && toPage < model.getPageCount()) {
+            final Page page = model.getPageObject(toPage);
+            model.setCurrentPageIndex(page.index);
             curler.setViewDrawn(false);
             curler.resetPageIndexes(page.index.viewIndex);
 
             final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
             final float left = bounds.left + offsetX * bounds.width();
             final float top = bounds.top + offsetY * bounds.height();
-            view.scrollTo((int) left, (int) top);
+            getView().scrollTo((int) left, (int) top);
 
             final ViewState viewState = EventPool.newEventScrollTo(this, page.index.viewIndex).process();
-            view.redrawView(viewState);
+            getView().redrawView(viewState);
             return viewState;
         }
         return null;
@@ -135,8 +132,7 @@ public class SinglePageController extends AbstractViewController {
         final int height = getHeight();
         final float zoom = getBase().getZoomModel().getZoom();
 
-        final DocumentModel dm = getBase().getDocumentModel();
-        final Page page = dm != null ? dm.getCurrentPageObject() : null;
+        final Page page = model.getCurrentPageObject();
 
         if (page != null) {
             final RectF bounds = page.getBounds(zoom);
@@ -194,7 +190,7 @@ public class SinglePageController extends AbstractViewController {
         final int height = getHeight();
 
         if (changedPage == null) {
-            for (final Page page : getBase().getDocumentModel().getPages()) {
+            for (final Page page : model.getPages()) {
                 invalidatePageSize(page, width, height);
             }
         } else {

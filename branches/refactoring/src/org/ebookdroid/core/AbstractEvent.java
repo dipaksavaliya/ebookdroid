@@ -3,8 +3,6 @@ package org.ebookdroid.core;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
-import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.ui.viewer.IView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,8 +16,6 @@ public abstract class AbstractEvent implements IEvent {
     protected final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
 
     public AbstractViewController ctrl;
-    public DocumentModel model;
-    public IView view;
     public ViewState viewState;
 
     protected AbstractEvent() {
@@ -37,7 +33,7 @@ public abstract class AbstractEvent implements IEvent {
         ctrl.firstVisiblePage = viewState.pages.firstVisible;
         ctrl.lastVisiblePage = viewState.pages.lastVisible;
 
-        for (final Page page : model.getPages()) {
+        for (final Page page : ctrl.model.getPages()) {
             process(page);
         }
 
@@ -93,7 +89,7 @@ public abstract class AbstractEvent implements IEvent {
     protected ViewState calculatePageVisibility(final ViewState initial) {
         int firstVisiblePage = -1;
         int lastVisiblePage = -1;
-        for (final Page page : model.getPages()) {
+        for (final Page page : ctrl.model.getPages()) {
             if (ctrl.isPageVisible(page, initial)) {
                 if (firstVisiblePage == -1) {
                     firstVisiblePage = page.index.viewIndex;

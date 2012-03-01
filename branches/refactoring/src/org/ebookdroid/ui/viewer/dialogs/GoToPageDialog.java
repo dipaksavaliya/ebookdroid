@@ -59,7 +59,7 @@ public class GoToPageDialog extends Dialog {
     public GoToPageDialog(final IActivityController base) {
         super(base.getContext());
         this.base = base;
-        this.actions = new DialogController<GoToPageDialog>(base.getActivity(), this);
+        this.actions = new DialogController<GoToPageDialog>(this);
 
         setTitle(R.string.dialog_title_goto_page);
         setContentView(R.layout.gotopage);
@@ -144,7 +144,7 @@ public class GoToPageDialog extends Dialog {
             return;
         }
 
-        final ActionDialogBuilder builder = new ActionDialogBuilder(actions);
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getContext(), actions);
         builder.setTitle(R.string.del_bookmark_title);
         builder.setMessage(R.string.del_bookmark_text);
         builder.setPositiveButton(R.id.actions_removeBookmark, new Constant("bookmark", bookmark));
@@ -168,7 +168,7 @@ public class GoToPageDialog extends Dialog {
         input.setText(context.getString(R.string.text_page) + " " + (viewIndex + 1));
         input.selectAll();
 
-        final ActionDialogBuilder builder = new ActionDialogBuilder(actions);
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getContext(), actions);
         builder.setTitle(R.string.menu_add_bookmark);
         builder.setMessage(R.string.add_bookmark_name);
         builder.setView(input);
@@ -192,7 +192,7 @@ public class GoToPageDialog extends Dialog {
             return;
         }
 
-        final ActionDialogBuilder builder = new ActionDialogBuilder(actions);
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getContext(), actions);
         builder.setTitle(R.string.clear_bookmarks_title);
         builder.setMessage(R.string.clear_bookmarks_text);
         builder.setPositiveButton(R.id.actions_deleteAllBookmarks);

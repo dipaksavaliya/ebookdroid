@@ -25,7 +25,7 @@ public class EventScrollTo extends AbstractEventScroll<EventScrollTo> {
         int firstVisiblePage = viewIndex;
         int lastVisiblePage = viewIndex;
 
-        final Page[] pages = model.getPages();
+        final Page[] pages = ctrl.model.getPages();
 
         while (firstVisiblePage > 0) {
             final int index = firstVisiblePage - 1;

@@ -164,7 +164,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
 
     @ActionMethod(ids = R.id.recentmenu_cleanrecent)
     public void showClearRecentDialog(final ActionEx action) {
-        final ActionDialogBuilder builder = new ActionDialogBuilder(actions);
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getContext(), getController());
 
         builder.setTitle(R.string.clear_recent_title);
         builder.setMultiChoiceItems(R.array.list_clear_recent_mode, R.id.actions_clearRecent);
@@ -258,10 +258,10 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
         final List<String> names = bookshelfAdapter.getListNames();
 
         if (LengthUtils.isNotEmpty(names)) {
-            final ActionDialogBuilder builder = new ActionDialogBuilder(actions);
+            final ActionDialogBuilder builder = new ActionDialogBuilder(getContext(), getController());
             builder.setTitle(R.string.bookcase_shelves);
             builder.setItems(names.toArray(new String[names.size()]),
-                    actions.getOrCreateAction(R.id.actions_selectShelf));
+                    getController().getOrCreateAction(R.id.actions_selectShelf));
             builder.show();
         }
     }

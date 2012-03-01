@@ -10,7 +10,7 @@ import android.content.Context;
 
 import org.emdev.ui.actions.IActionController;
 
-public interface IActivityController {
+public interface IActivityController extends IActionController<ViewerActivity> {
 
     Context getContext();
 

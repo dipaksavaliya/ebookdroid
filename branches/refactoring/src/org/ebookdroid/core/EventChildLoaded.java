@@ -28,8 +28,6 @@ public class EventChildLoaded extends AbstractEvent {
     final void init(final AbstractViewController ctrl, final PageTreeNode child, final Rect bitmapBounds) {
         this.viewState = new ViewState(ctrl);
         this.ctrl = ctrl;
-        this.model = viewState.model;
-        this.view = viewState.view;
         this.page = child.page;
         this.nodes = page.nodes;
         this.child = child;
@@ -38,7 +36,6 @@ public class EventChildLoaded extends AbstractEvent {
 
     final void release() {
         this.ctrl = null;
-        this.model = null;
         this.viewState = null;
         this.child = null;
         this.nodes = null;
@@ -56,7 +53,7 @@ public class EventChildLoaded extends AbstractEvent {
     @Override
     public final ViewState process() {
         try {
-            if (ctrl == null || model == null || view == null) {
+            if (ctrl == null) {
                 return null;
             }
 

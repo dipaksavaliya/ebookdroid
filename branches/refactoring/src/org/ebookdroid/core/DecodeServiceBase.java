@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DecodeServiceBase implements DecodeService {
 
-    public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding", false);
+    public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding", true);
 
     static final AtomicLong TASK_ID_SEQ = new AtomicLong();
 
@@ -101,6 +101,7 @@ public class DecodeServiceBase implements DecodeService {
     @Override
     public void open(final String fileName, final String password) {
         document = codecContext.openDocument(fileName, password);
+        System.out.println("DecodeServiceBase.open(" + this.hashCode() + "): " + document);
     }
 
     @Override
@@ -180,7 +181,7 @@ public class DecodeServiceBase implements DecodeService {
                 pages.put(Integer.MAX_VALUE - i, null);
             }
             pages.clear();
-            if(vuPage != null)
+            if (vuPage != null)
                 vuPage.recycle();
 
             BitmapManager.clear("DecodeService OutOfMemoryError: ");
@@ -282,6 +283,7 @@ public class DecodeServiceBase implements DecodeService {
 
     @Override
     public int getPageCount() {
+        System.out.println("DecodeServiceBase.getPageCount(" + this.hashCode() + "): " + document);
         return document.getPageCount();
     }
 

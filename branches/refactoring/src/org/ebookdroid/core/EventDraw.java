@@ -36,7 +36,7 @@ public class EventDraw implements IEvent {
         this.viewState = viewState;
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.canvas = canvas;
-        this.viewBase = viewState.view.getBase(viewState.viewRect);
+        this.viewBase = viewState.ctrl.getView().getBase(viewState.viewRect);
     }
 
     void init(final EventDraw event, final Canvas canvas) {

@@ -4,7 +4,6 @@ import org.ebookdroid.R;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
-import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.views.DragMark;
 
@@ -67,7 +66,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
         if (SettingsManager.getAppSettings().getShowAnimIcon()) {
             DragMark.draw(eventDraw.canvas, viewState);
         }
-        view.continueScroll();
+        getView().continueScroll();
     }
 
     /**
@@ -79,13 +78,8 @@ public abstract class AbstractScrollController extends AbstractViewController {
     @Override
     public final boolean onLayoutChanged(final boolean layoutChanged, final boolean layoutLocked, final Rect oldLaout,
             final Rect newLayout) {
-        final DocumentModel dm = base.getDocumentModel();
         final BookSettings bs = SettingsManager.getBookSettings();
-        if (dm == null || bs == null) {
-            return false;
-        }
-
-        int page = dm.getCurrentViewPageIndex();
+        int page = model.getCurrentViewPageIndex();
         float offsetX = bs.offsetX;
         float offsetY = bs.offsetY;
 

@@ -2,7 +2,6 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
-import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Rect;
@@ -16,7 +15,7 @@ public class VScrollController extends AbstractScrollController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#calculateCurrentPage(org.ebookdroid.core.ViewState)
      */
     @Override
@@ -43,7 +42,7 @@ public class VScrollController extends AbstractScrollController {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#verticalConfigScroll(int)
      */
     @Override
@@ -51,34 +50,30 @@ public class VScrollController extends AbstractScrollController {
         final int scrollheight = SettingsManager.getAppSettings().getScrollHeight();
         final int dy = (int) (direction * getHeight() * (scrollheight / 100.0));
 
-        view.startPageScroll(0, dy);
+        getView().startPageScroll(0, dy);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#getScrollLimits()
      */
     @Override
     public final Rect getScrollLimits() {
-        final DocumentModel dm = getBase().getDocumentModel();
-        if (dm != null) {
-            final int width = getWidth();
-            final int height = getHeight();
-            final Page lpo = dm.getLastPageObject();
-            final float zoom = getBase().getZoomModel().getZoom();
+        final int width = getWidth();
+        final int height = getHeight();
+        final Page lpo = model.getLastPageObject();
+        final float zoom = getBase().getZoomModel().getZoom();
 
-            final int bottom = lpo != null ? (int) lpo.getBounds(zoom).bottom - height : 0;
-            final int right = (int) (width * zoom) - width;
+        final int bottom = lpo != null ? (int) lpo.getBounds(zoom).bottom - height : 0;
+        final int right = (int) (width * zoom) - width;
 
-            return new Rect(0, 0, right, bottom);
-        }
-        return new Rect(0, 0, 0, 0);
+        return new Rect(0, 0, right, bottom);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.ebookdroid.ui.viewer.IViewController#invalidatePageSizes(org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason,
      *      org.ebookdroid.core.Page)
      */
@@ -92,13 +87,9 @@ public class VScrollController extends AbstractScrollController {
             return;
         }
 
-        final DocumentModel model = getBase().getDocumentModel();
-        if (model == null) {
-            return;
-        }
-
         final int width = getWidth();
-
+        System.out.println("VScrollController.invalidatePageSizes(): " + width);
+        
         if (changedPage == null) {
             float heightAccum = 0;
             for (final Page page : model.getPages()) {

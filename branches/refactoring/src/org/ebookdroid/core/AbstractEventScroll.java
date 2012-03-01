@@ -19,15 +19,12 @@ public abstract class AbstractEventScroll<E extends AbstractEventScroll<E>> exte
     final void init(final AbstractViewController ctrl) {
         this.viewState = new ViewState(ctrl);
         this.ctrl = ctrl;
-        this.model = viewState.model;
-        this.view = viewState.view;
         this.level = PageTreeLevel.getLevel(viewState.zoom);
     }
 
     @SuppressWarnings("unchecked")
     final void release() {
         this.ctrl = null;
-        this.model = null;
         this.viewState = null;
         this.level = null;
         this.bitmapsToRecycle.clear();
@@ -44,16 +41,14 @@ public abstract class AbstractEventScroll<E extends AbstractEventScroll<E>> exte
     public final ViewState process() {
         try {
             viewState = super.process();
-            if (model != null) {
-                final Page page = viewState.pages.getCurrentPage();
-                if (page != null) {
-                    if (ctrl.mode != DocumentViewMode.SINGLE_PAGE) {
-                        model.setCurrentPageIndex(page.index);
-                    }
-                    ctrl.updatePosition(page, viewState);
+            final Page page = viewState.pages.getCurrentPage();
+            if (page != null) {
+                if (ctrl.mode != DocumentViewMode.SINGLE_PAGE) {
+                    ctrl.model.setCurrentPageIndex(page.index);
                 }
+                ctrl.updatePosition(page, viewState);
             }
-            view.redrawView(viewState);
+            ctrl.getView().redrawView(viewState);
             return viewState;
         } finally {
             release();

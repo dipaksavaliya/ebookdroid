@@ -3,6 +3,7 @@ package org.emdev.ui.actions;
 import org.ebookdroid.R;
 
 import android.app.AlertDialog;
+import android.content.Context;
 
 import org.emdev.utils.LengthUtils;
 
@@ -10,8 +11,8 @@ public class ActionDialogBuilder extends AlertDialog.Builder {
 
     private final IActionController<?> actions;
 
-    public ActionDialogBuilder(final IActionController<?> actions) {
-        super(actions.getContext());
+    public ActionDialogBuilder(final Context context, final IActionController<?> actions) {
+        super(context);
         this.actions = actions;
     }
 

@@ -86,11 +86,12 @@ public class Page {
     }
 
     public RectF getBounds(final float zoom) {
-        if (zoom != storedZoom) {
-            storedZoom = zoom;
-            zoomedBounds = MathUtils.zoom(bounds, zoom);
-        }
-        return zoomedBounds;
+//        if (zoom != storedZoom) {
+//            storedZoom = zoom;
+//            zoomedBounds = MathUtils.zoom(bounds, zoom);
+//        }
+//        return zoomedBounds;
+        return MathUtils.zoom(bounds, zoom);
     }
 
     public float getTargetRectScale() {

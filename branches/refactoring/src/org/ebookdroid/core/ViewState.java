@@ -6,7 +6,6 @@ import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.models.DocumentModel;
-import org.ebookdroid.ui.viewer.IView;
 import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.RectF;
@@ -17,7 +16,6 @@ public class ViewState {
     public final AppSettings app;
     public final BookSettings book;
     public final IViewController ctrl;
-    public final IView view;
     public final DocumentModel model;
 
     public final RectF viewRect;
@@ -42,10 +40,9 @@ public class ViewState {
         this.app = SettingsManager.getAppSettings();
         this.book = SettingsManager.getBookSettings();
         this.ctrl = dc;
-        this.view = dc.getView();
         this.model = dc.getBase().getDocumentModel();
 
-        this.viewRect = new RectF(view.getViewRect());
+        this.viewRect = new RectF(ctrl.getView().getViewRect());
         this.zoom = zoom;
         this.pageAlign = DocumentViewMode.getPageAlign(book);
         this.nightMode = app.getNightMode();
@@ -58,7 +55,6 @@ public class ViewState {
         this.app = SettingsManager.getAppSettings();
         this.book = SettingsManager.getBookSettings();
         this.ctrl = dc;
-        this.view = dc.getView();
         this.model = dc.getBase().getDocumentModel();
 
         this.viewRect = oldState.viewRect;
@@ -74,7 +70,6 @@ public class ViewState {
         this.app = SettingsManager.getAppSettings();
         this.book = SettingsManager.getBookSettings();
         this.ctrl = oldState.ctrl;
-        this.view = oldState.view;
         this.model = oldState.model;
 
         this.viewRect = oldState.viewRect;
@@ -87,12 +82,13 @@ public class ViewState {
     }
 
     public RectF getBounds(final Page page) {
-        RectF bounds = cachedBounds.get(page.index.viewIndex);
-        if (bounds == null) {
-            bounds = page.getBounds(zoom);
-            cachedBounds.append(page.index.viewIndex, bounds);
-        }
-        return bounds;
+//        RectF bounds = cachedBounds.get(page.index.viewIndex);
+//        if (bounds == null) {
+//            bounds = page.getBounds(zoom);
+//            cachedBounds.append(page.index.viewIndex, bounds);
+//        }
+//        return bounds;
+        return page.getBounds(zoom);
     }
 
     public final boolean isPageKeptInMemory(final Page page) {
@@ -188,7 +184,7 @@ public class ViewState {
             buf.append("[");
             toString(buf);
             buf.append("]");
-            return super.toString();
+            return buf.toString();
         }
 
         StringBuilder toString(final StringBuilder buf) {

@@ -1,10 +1,8 @@
 package org.emdev.ui.actions;
 
-import android.content.Context;
-
 /**
  * This interface defines base features for component controller.
- *
+ * 
  * @param <ManagedComponent>
  *            manager GUI component class
  */
@@ -32,11 +30,6 @@ public interface IActionController<ManagedComponent> {
     String DIALOG_SELECTED_ITEMS_PROPERTY = "DialogSelectedItems";
 
     /**
-     * @return the base context
-     */
-    Context getContext();
-
-    /**
      * @return the parent controller
      */
     IActionController<?> getParent();
@@ -46,14 +39,11 @@ public interface IActionController<ManagedComponent> {
      */
     ManagedComponent getManagedComponent();
 
-    /**
-     * @return the action dispatcher
-     */
-    ActionDispatcher getDispatcher();
+    void setManagedComponent(ManagedComponent component);
 
     /**
      * Searches for a global action by the given action id.
-     *
+     * 
      * @param id
      *            action id
      * @return an instance of the {@link ActionEx} object or <code>null</code>
@@ -62,7 +52,7 @@ public interface IActionController<ManagedComponent> {
 
     /**
      * Creates an action
-     *
+     * 
      * @param id
      *            action id
      * @return an instance of {@link ActionEx} object or <code>null</code>
@@ -71,7 +61,7 @@ public interface IActionController<ManagedComponent> {
 
     /**
      * Creates an action
-     *
+     * 
      * @param id
      *            action id
      * @param parameters

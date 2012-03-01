@@ -2,7 +2,6 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
-import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Rect;
@@ -52,7 +51,7 @@ public class HScrollController extends AbstractScrollController {
         final int scrollheight = SettingsManager.getAppSettings().getScrollHeight();
         final int dx = (int) (direction * getWidth() * (scrollheight / 100.0));
 
-        view.startPageScroll(dx, 0);
+        getView().startPageScroll(dx, 0);
     }
 
     /**
@@ -62,19 +61,15 @@ public class HScrollController extends AbstractScrollController {
      */
     @Override
     public final Rect getScrollLimits() {
-        final DocumentModel dm = getBase().getDocumentModel();
-        if (dm != null) {
-            final int width = getWidth();
-            final int height = getHeight();
-            final Page lpo = dm.getLastPageObject();
-            final float zoom = getBase().getZoomModel().getZoom();
+        final int width = getWidth();
+        final int height = getHeight();
+        final Page lpo = model.getLastPageObject();
+        final float zoom = getBase().getZoomModel().getZoom();
 
-            final int right = lpo != null ? (int) lpo.getBounds(zoom).right - width : 0;
-            final int bottom = (int) (height * zoom) - height;
+        final int right = lpo != null ? (int) lpo.getBounds(zoom).right - width : 0;
+        final int bottom = (int) (height * zoom) - height;
 
-            return new Rect(0, 0, right, bottom);
-        }
-        return new Rect(0, 0, 0, 0);
+        return new Rect(0, 0, right, bottom);
     }
 
     /**
@@ -90,11 +85,6 @@ public class HScrollController extends AbstractScrollController {
         }
 
         if (reason == InvalidateSizeReason.PAGE_ALIGN) {
-            return;
-        }
-
-        final DocumentModel model = getBase().getDocumentModel();
-        if (model == null) {
             return;
         }
 

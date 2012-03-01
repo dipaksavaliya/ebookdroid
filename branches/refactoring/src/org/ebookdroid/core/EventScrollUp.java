@@ -17,7 +17,7 @@ public class EventScrollUp extends AbstractEventScroll<EventScrollUp> {
      */
     @Override
     protected ViewState calculatePageVisibility(final ViewState initial) {
-        final Page[] pages = model.getPages();
+        final Page[] pages = ctrl.model.getPages();
 
         int firstVisiblePage = initial.pages.firstVisible;
         int lastVisiblePage = initial.pages.lastVisible;

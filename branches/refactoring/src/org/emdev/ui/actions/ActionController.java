@@ -1,7 +1,5 @@
 package org.emdev.ui.actions;
 
-import android.app.Activity;
-
 /**
  * This class defines base features for action controller.
  * 
@@ -16,8 +14,8 @@ public class ActionController<ManagedComponent> extends AbstractComponentControl
      * @param managedComponent
      *            managed component
      */
-    public ActionController(final Activity base, final ManagedComponent managedComponent) {
-        this(base, null, managedComponent);
+    public ActionController(final ManagedComponent managedComponent) {
+        this(null, managedComponent);
     }
 
     /**
@@ -28,7 +26,7 @@ public class ActionController<ManagedComponent> extends AbstractComponentControl
      * @param managedComponent
      *            managed component
      */
-    public ActionController(final Activity base, final IActionController<?> parent, final ManagedComponent managedComponent) {
-        super(base, parent, managedComponent);
+    public ActionController(final IActionController<?> parent, final ManagedComponent managedComponent) {
+        super(parent, managedComponent);
     }
 }

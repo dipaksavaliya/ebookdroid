@@ -6,7 +6,7 @@ class NewHardwareAcceleration implements IHardwareAcceleration {
 
     @Override
     public void setMode(final View view, final boolean enabled, final boolean accelerated) {
-        if (enabled) {
+        if (enabled && view != null) {
             view.setLayerType(accelerated ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_SOFTWARE, null);
         }
     }

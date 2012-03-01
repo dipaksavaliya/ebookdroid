@@ -1,6 +1,5 @@
 package org.emdev.ui.actions;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.view.View;
 import android.widget.TextView;
@@ -19,8 +18,8 @@ public class DialogController<ManagedComponent extends Dialog> extends AbstractC
      * @param dialog
      *            managed dialog
      */
-    public DialogController(final Activity base, final ManagedComponent dialog) {
-        this(base, null, dialog);
+    public DialogController(final ManagedComponent dialog) {
+        this(null, dialog);
     }
 
     /**
@@ -31,9 +30,8 @@ public class DialogController<ManagedComponent extends Dialog> extends AbstractC
      * @param managedComponent
      *            managed component
      */
-    public DialogController(final Activity base, final IActionController<?> parent,
-            final ManagedComponent managedComponent) {
-        super(base, parent, managedComponent);
+    public DialogController(final IActionController<?> parent, final ManagedComponent managedComponent) {
+        super(parent, managedComponent);
     }
 
     public ActionEx connectViewToAction(final int viewId) {

@@ -12,6 +12,7 @@ import org.ebookdroid.common.touch.IGestureDetector;
 import org.ebookdroid.common.touch.IMultiTouchListener;
 import org.ebookdroid.common.touch.MultiTouchGestureDetectorFactory;
 import org.ebookdroid.common.touch.TouchManager;
+import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
 import org.ebookdroid.ui.viewer.IView;
@@ -49,11 +50,11 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     public static final int DOUBLE_TAP_TIME = 500;
 
-    protected final IActivityController base;
+    public final IActivityController base;
 
-    protected final IView view;
+    public final DocumentModel model;
 
-    protected final DocumentViewMode mode;
+    public final DocumentViewMode mode;
 
     protected boolean isInitialized = false;
 
@@ -71,12 +72,12 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     private List<IGestureDetector> detectors;
 
-    public AbstractViewController(final IActivityController baseActivity, final DocumentViewMode mode) {
-        super(baseActivity.getActivity(), baseActivity.getActionController(), baseActivity.getView());
+    public AbstractViewController(final IActivityController base, final DocumentViewMode mode) {
+        super(base, base.getView());
 
-        this.base = baseActivity;
-        this.view = base.getView();
+        this.base = base;
         this.mode = mode;
+        this.model = base.getDocumentModel();
 
         this.firstVisiblePage = -1;
         this.lastVisiblePage = -1;
@@ -108,7 +109,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final IView getView() {
-        return view;
+        return base.getView();
     }
 
     /**
@@ -130,11 +131,19 @@ public abstract class AbstractViewController extends AbstractComponentController
     public final void init(final IBookLoadTask task) {
         if (!isInitialized) {
             try {
-                getBase().getDocumentModel().initPages(base, task);
+                model.initPages(base, task);
             } finally {
                 isInitialized = true;
             }
         }
+    }
+
+    /**
+     * 
+     */
+    @Override
+    public final void onDestroy() {
+        // isShown = false;
     }
 
     /**
@@ -144,7 +153,13 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void show() {
-        if (isInitialized && !isShown) {
+        if (!isInitialized) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("View is not initialized yet");
+            }
+            return;
+        }
+        if (!isShown) {
             isShown = true;
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Showing view content...");
@@ -153,21 +168,20 @@ public abstract class AbstractViewController extends AbstractComponentController
             invalidatePageSizes(InvalidateSizeReason.INIT, null);
 
             final BookSettings bs = SettingsManager.getBookSettings();
-            final Page page = pageToGo.getActualPage(base.getDocumentModel(), bs);
+            final Page page = pageToGo.getActualPage(model, bs);
             final int toPage = page != null ? page.index.viewIndex : 0;
 
             goToPage(toPage, bs.offsetX, bs.offsetY);
-
         } else {
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("View is not initialized yet");
+                LCTX.d("View has been shown before");
             }
         }
     }
 
     protected final void updatePosition(final Page page, final ViewState viewState) {
-        final int left = view.getScrollX();
-        final int top = view.getScrollY();
+        final int left = getScrollX();
+        final int top = getScrollY();
 
         final RectF cpBounds = viewState.getBounds(page);
         final float offsetX = (left - cpBounds.left) / cpBounds.width();
@@ -202,19 +216,19 @@ public abstract class AbstractViewController extends AbstractComponentController
     }
 
     public final int getScrollX() {
-        return view.getScrollX();
+        return getView().getScrollX();
     }
 
     public final int getWidth() {
-        return view.getWidth();
+        return getView().getWidth();
     }
 
     public final int getScrollY() {
-        return view.getScrollY();
+        return getView().getScrollY();
     }
 
     public final int getHeight() {
-        return view.getHeight();
+        return getView().getHeight();
     }
 
     /**
@@ -285,6 +299,10 @@ public abstract class AbstractViewController extends AbstractComponentController
             if (isShown) {
                 EventPool.newEventReset(this, InvalidateSizeReason.LAYOUT, true).process();
                 return true;
+            } else {
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d("onLayoutChanged(): view not shown yet");
+                }
             }
         }
         return false;
@@ -309,7 +327,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         if (!isShown) {
             return;
         }
-        view.invalidateScroll();
+        getView().invalidateScroll();
     }
 
     /**
@@ -359,7 +377,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void redrawView() {
-        view.redrawView(new ViewState(this));
+        getView().redrawView(new ViewState(this));
     }
 
     /**
@@ -369,7 +387,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final void redrawView(final ViewState viewState) {
-        view.redrawView(viewState);
+        getView().redrawView(viewState);
     }
 
     @ActionMethod(ids = { R.id.actions_verticalConfigScrollUp, R.id.actions_verticalConfigScrollDown })
@@ -419,7 +437,7 @@ public abstract class AbstractViewController extends AbstractComponentController
          */
         @Override
         public boolean onDown(final MotionEvent e) {
-            view.forceFinishScroll();
+            getView().forceFinishScroll();
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("onDown(" + e + ")");
             }
@@ -445,8 +463,8 @@ public abstract class AbstractViewController extends AbstractComponentController
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("onFling(" + x + ", " + y + ")");
             }
-            view.startFling(x, y, l);
-            view.redrawView();
+            getView().startFling(x, y, l);
+            getView().redrawView();
             return true;
         }
 
@@ -468,7 +486,7 @@ public abstract class AbstractViewController extends AbstractComponentController
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("onScroll(" + x + ", " + y + ")");
             }
-            view.scrollBy((int) x, (int) y);
+            getView().scrollBy((int) x, (int) y);
             return true;
         }
 

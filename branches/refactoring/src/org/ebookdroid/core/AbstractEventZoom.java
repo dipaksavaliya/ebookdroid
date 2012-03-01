@@ -23,8 +23,6 @@ public abstract class AbstractEventZoom<E extends AbstractEventZoom<E>> extends 
     final void init(final AbstractViewController ctrl, final float oldZoom, final float newZoom, final boolean committed) {
         this.viewState = new ViewState(ctrl, newZoom);
         this.ctrl = ctrl;
-        this.model = viewState.model;
-        this.view = viewState.view;
 
         this.oldZoom = oldZoom;
         this.newZoom = newZoom;
@@ -39,7 +37,6 @@ public abstract class AbstractEventZoom<E extends AbstractEventZoom<E>> extends 
     @SuppressWarnings("unchecked")
     final void release() {
         this.ctrl = null;
-        this.model = null;
         this.viewState = null;
         this.oldLevel = null;
         this.newLevel = null;
@@ -57,7 +54,7 @@ public abstract class AbstractEventZoom<E extends AbstractEventZoom<E>> extends 
     public final ViewState process() {
         try {
             if (!committed) {
-                view.invalidateScroll(newZoom, oldZoom);
+                ctrl.getView().invalidateScroll(newZoom, oldZoom);
                 viewState = new ViewState(ctrl);
             }
 
@@ -67,7 +64,7 @@ public abstract class AbstractEventZoom<E extends AbstractEventZoom<E>> extends 
                 ctrl.redrawView(viewState);
             } else {
                 SettingsManager.zoomChanged(newZoom, true);
-                ctrl.updatePosition(model.getCurrentPageObject(), viewState);
+                ctrl.updatePosition(ctrl.model.getCurrentPageObject(), viewState);
             }
             return viewState;
         } finally {
@@ -92,11 +89,11 @@ public abstract class AbstractEventZoom<E extends AbstractEventZoom<E>> extends 
      */
     @Override
     protected final ViewState calculatePageVisibility(final ViewState initial) {
-        final int viewIndex = model.getCurrentViewPageIndex();
+        final int viewIndex = ctrl.model.getCurrentViewPageIndex();
         int firstVisiblePage = viewIndex;
         int lastVisiblePage = viewIndex;
 
-        final Page[] pages = model.getPages();
+        final Page[] pages = ctrl.model.getPages();
 
         while (firstVisiblePage > 0) {
             final int index = firstVisiblePage - 1;

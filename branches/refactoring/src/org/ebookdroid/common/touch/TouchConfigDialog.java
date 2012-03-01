@@ -44,7 +44,7 @@ public class TouchConfigDialog extends Dialog {
         super(base.getContext());
         this.view = view;
         this.profile = profile;
-        this.actions = new DialogController<TouchConfigDialog>(base.getActivity(), this);
+        this.actions = new DialogController<TouchConfigDialog>(this);
 
         setTitle("Tap configuration");
         setContentView(R.layout.tap_zones_config);
