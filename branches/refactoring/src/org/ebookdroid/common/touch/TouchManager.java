@@ -54,8 +54,7 @@ public class TouchManager {
             final TouchProfile def = addProfile(DEFAULT_PROFILE);
             {
                 final Region r = def.addRegion(0, 0, 100, 100);
-                r.setAction(Touch.DoubleTap, R.id.mainmenu_zoom, true);
-                r.setAction(Touch.TwoFingerTap, R.id.actions_openOptionsMenu, true);
+                r.setAction(Touch.DoubleTap, R.id.actions_openOptionsMenu, true);
             }
             {
                 final Region r = def.addRegion(80, 0, 100, 20);

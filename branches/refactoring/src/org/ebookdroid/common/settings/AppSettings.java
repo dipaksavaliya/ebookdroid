@@ -228,7 +228,7 @@ public class AppSettings {
 
     public String getTouchProfiles() {
         if (touchProfiles == null) {
-            touchProfiles = prefs.getString("tap_profiles", "");
+            touchProfiles = prefs.getString("tapprofiles", "");
         }
         return touchProfiles;
     }
@@ -236,7 +236,7 @@ public class AppSettings {
     public void updateTouchProfiles(final String profiles) {
         touchProfiles = profiles;
         final Editor edit = prefs.edit();
-        edit.putString("tap_profiles", touchProfiles);
+        edit.putString("tapprofiles", touchProfiles);
         edit.commit();
     }
 

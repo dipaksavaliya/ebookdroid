@@ -177,8 +177,10 @@ public final class BaseView extends View implements IView {
      */
     @Override
     public boolean onTouchEvent(final MotionEvent ev) {
-        super.onTouchEvent(ev);
-        return base.getDocumentController().onTouchEvent(ev);
+        if (base.getDocumentController().onTouchEvent(ev)) {
+            return true;
+        }
+        return super.onTouchEvent(ev);
     }
 
     /**

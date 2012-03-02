@@ -181,8 +181,10 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
      */
     @Override
     public boolean onTouchEvent(final MotionEvent ev) {
-        super.onTouchEvent(ev);
-        return base.getDocumentController().onTouchEvent(ev);
+        if (base.getDocumentController().onTouchEvent(ev)) {
+            return true;
+        }
+        return super.onTouchEvent(ev);
     }
 
     /**

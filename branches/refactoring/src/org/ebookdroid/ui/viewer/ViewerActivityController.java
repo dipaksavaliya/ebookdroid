@@ -54,7 +54,7 @@ import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.actions.params.EditableValue;
-import org.emdev.ui.fullscreen.IFullScreenManager;
+import org.emdev.ui.uimanager.IUIManager;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.StringUtils;
 import org.emdev.utils.filesystem.PathFromUri;
@@ -127,24 +127,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         final AppSettings newSettings = SettingsManager.getAppSettings();
-        final Window window = getManagedComponent().getWindow();
 
         activity.setRequestedOrientation(newSettings.getRotation().getOrientation());
 
-        IFullScreenManager.instance.setFullScreenMode(window, newSettings.getFullScreen());
-
-        try {
-            if (!newSettings.getShowTitle()) {
-                window.requestFeature(Window.FEATURE_NO_TITLE);
-            } else {
-                window.requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-                activity.setProgressBarIndeterminate(true);
-                activity.setProgressBarIndeterminateVisibility(true);
-                window.setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, 1);
-            }
-        } catch (final Throwable th) {
-            LCTX.e("Error on requestFeature call: " + th.getMessage());
-        }
+        IUIManager.instance.setFullScreenMode(activity, newSettings.getFullScreen());
+        IUIManager.instance.setTitleVisible(activity, newSettings.getShowTitle());
 
         TouchManager.loadFromSettings(newSettings);
         KeysBindingManager.loadFromSettings(newSettings);
@@ -231,10 +218,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         getDocumentController().onDestroy();
     }
 
-    public IView createView() {
-        return SettingsManager.getAppSettings().getDocumentViewType().create(this);
-    }
-
     @ActionMethod(ids = R.id.actions_redecodingWithPassord)
     public void redecodingWithPassord(final ActionEx action) {
         final EditText te = (EditText) getManagedComponent().findViewById(R.id.pass_req);
@@ -294,6 +277,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         currentFilename = LengthUtils.safeString(intent.getData().getLastPathSegment(), E_MAIL_ATTACHMENT);
         currentFilename = StringUtils.cleanupTitle(currentFilename);
         getManagedComponent().getWindow().setTitle(currentFilename);
+    }
+
+    @ActionMethod(ids = R.id.actions_openOptionsMenu)
+    public void openOptionsMenu(final ActionEx action) {
+        IUIManager.instance.openOptionsMenu(getManagedComponent(), getManagedComponent().view.getView());
     }
 
     @ActionMethod(ids = R.id.actions_gotoOutlineItem)
@@ -495,8 +483,9 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.ebookdroid.common.settings.ISettingsChangeListener#onAppSettingsChanged(org.ebookdroid.common.settings.AppSettings, org.ebookdroid.common.settings.AppSettings, org.ebookdroid.common.settings.AppSettings.Diff)
+     * 
+     * @see org.ebookdroid.common.settings.ISettingsChangeListener#onAppSettingsChanged(org.ebookdroid.common.settings.AppSettings,
+     *      org.ebookdroid.common.settings.AppSettings, org.ebookdroid.common.settings.AppSettings.Diff)
      */
     @Override
     public void onAppSettingsChanged(final AppSettings oldSettings, final AppSettings newSettings,
@@ -506,8 +495,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         if (diff.isFullScreenChanged()) {
-            IFullScreenManager.instance.setFullScreenMode(getManagedComponent().getWindow(),
-                    newSettings.getFullScreen());
+            IUIManager.instance.setFullScreenMode(getManagedComponent(), newSettings.getFullScreen());
         }
 
         if (diff.isKeepScreenOnChanged()) {
@@ -527,8 +515,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.ebookdroid.common.settings.ISettingsChangeListener#onBookSettingsChanged(org.ebookdroid.common.settings.books.BookSettings, org.ebookdroid.common.settings.books.BookSettings, org.ebookdroid.common.settings.books.BookSettings.Diff, org.ebookdroid.common.settings.AppSettings.Diff)
+     * 
+     * @see org.ebookdroid.common.settings.ISettingsChangeListener#onBookSettingsChanged(org.ebookdroid.common.settings.books.BookSettings,
+     *      org.ebookdroid.common.settings.books.BookSettings, org.ebookdroid.common.settings.books.BookSettings.Diff,
+     *      org.ebookdroid.common.settings.AppSettings.Diff)
      */
     @Override
     public void onBookSettingsChanged(final BookSettings oldSettings, final BookSettings newSettings,

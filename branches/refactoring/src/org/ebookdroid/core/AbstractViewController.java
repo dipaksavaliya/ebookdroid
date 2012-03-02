@@ -523,6 +523,9 @@ public abstract class AbstractViewController extends AbstractComponentController
          */
         @Override
         public void onLongPress(final MotionEvent e) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onLongPress(" + e + ")");
+            }
             // LongTap operation cause side-effects
             // processTap(TouchManager.Touch.LongTap, e);
         }

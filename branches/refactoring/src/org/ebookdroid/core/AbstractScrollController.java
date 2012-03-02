@@ -12,7 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import org.emdev.ui.hwa.IHardwareAcceleration;
+import org.emdev.ui.uimanager.IUIManager;
 
 public abstract class AbstractScrollController extends AbstractViewController {
 
@@ -23,8 +23,8 @@ public abstract class AbstractScrollController extends AbstractViewController {
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
         }
-        IHardwareAcceleration.Factory.getInstance().setMode(getView().getView(),
-                SettingsManager.getAppSettings().isHWAEnabled(), true);
+        IUIManager.instance.setHardwareAccelerationEnabled(SettingsManager.getAppSettings().isHWAEnabled());
+        IUIManager.instance.setHardwareAccelerationMode(getView().getView(), true);
     }
 
     /**

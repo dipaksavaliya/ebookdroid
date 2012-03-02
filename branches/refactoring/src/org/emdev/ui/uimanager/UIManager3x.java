@@ -1,12 +1,13 @@
-package org.emdev.ui.fullscreen;
+package org.emdev.ui.uimanager;
 
 import org.ebookdroid.EBookDroidApp;
-import org.ebookdroid.common.log.LogContext;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
 import android.content.Context;
+import android.view.View;
 import android.view.Window;
 
 import java.io.File;
@@ -17,9 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class FullScreenManagerNew implements IFullScreenManager {
-
-    private static final LogContext LCTX = LogContext.ROOT.lctx("FullScreen");
+public class UIManager3x implements IUIManager {
 
     private static final String SYS_UI_CLS = "com.android.systemui.SystemUIService";
     private static final String SYS_UI_PKG = "com.android.systemui";
@@ -29,96 +28,119 @@ class FullScreenManagerNew implements IFullScreenManager {
     private static final String SU_PATH2 = "/system/xbin/su";
     private static final String AM_PATH = "/system/bin/am";
 
-    private final AtomicBoolean fullScreen = new AtomicBoolean();
-    private final AtomicBoolean wasSet = new AtomicBoolean();
+    private boolean hwaEnabled = false;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.emdev.ui.fullscreen.FullScreenManagerOld#setFullScreenMode(android.view.Window, boolean)
-     */
+    private boolean fullScreen = false;
+
+    private final AtomicBoolean fullScreenState = new AtomicBoolean();
+
     @Override
-    public void setFullScreenMode(final Window w, final boolean fullScreen) {
-        if (this.fullScreen.compareAndSet(!fullScreen, fullScreen)) {
-            if (fullScreen) {
-                stopSystemUI();
+    public void setTitleVisible(final Activity activity, final boolean visible) {
+        try {
+            final Window window = activity.getWindow();
+            if (!visible) {
+                window.requestFeature(Window.FEATURE_NO_TITLE);
             } else {
-                startSystemUI();
+                window.requestFeature(Window.FEATURE_ACTION_BAR);
+                window.requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+                activity.setProgressBarIndeterminate(true);
+                activity.setProgressBarIndeterminateVisibility(true);
+                window.setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, 1);
             }
+        } catch (final Throwable th) {
+            LCTX.e("Error on requestFeature call: " + th.getMessage());
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.emdev.ui.fullscreen.FullScreenManagerOld#onPause()
-     */
     @Override
-    public void onPause(final Window w) {
-        if (wasSet.get()) {
+    public void setFullScreenMode(final Activity activity, final boolean fullScreen) {
+        this.fullScreen = fullScreen;
+        if (fullScreen) {
+            stopSystemUI();
+        } else {
             startSystemUI();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.emdev.ui.fullscreen.FullScreenManagerOld#onResume()
-     */
     @Override
-    public void onResume(final Window w) {
-        if (wasSet.get()) {
+    public void setHardwareAccelerationEnabled(final boolean enabled) {
+        this.hwaEnabled = enabled;
+    }
+
+    @Override
+    public void setHardwareAccelerationMode(final View view, final boolean accelerated) {
+        if (this.hwaEnabled && view != null) {
+            view.setLayerType(accelerated ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_SOFTWARE, null);
+        }
+    }
+
+    @Override
+    public void openOptionsMenu(final Activity activity, final View view) {
+        activity.openOptionsMenu();
+    }
+
+    @Override
+    public void onMenuOpened(final Activity activity) {
+        if (fullScreen && fullScreenState.get()) {
+            startSystemUI();
+        }
+    }
+
+    @Override
+    public void onMenuClosed(final Activity activity) {
+        if (fullScreen && !fullScreenState.get()) {
             stopSystemUI();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.emdev.ui.fullscreen.IFullScreenManager#onMenuOpened(android.view.Window)
-     */
     @Override
-    public void onMenuOpened(final Window w) {
-        setFullScreenMode(w, false);
+    public void onPause(final Activity activity) {
+        if (fullScreen && fullScreenState.get()) {
+            startSystemUI();
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.emdev.ui.fullscreen.IFullScreenManager#onMenuClosed(android.view.Window)
-     */
     @Override
-    public void onMenuClosed(final Window w) {
-        setFullScreenMode(w, true);
+    public void onResume(final Activity activity) {
+        if (fullScreen && !fullScreenState.get()) {
+            stopSystemUI();
+        }
+    }
+
+    @Override
+    public void onDestroy(final Activity activity) {
+        if (fullScreen && fullScreenState.get()) {
+            startSystemUI();
+        }
     }
 
     protected void startSystemUI() {
         if (isSystemUIRunning()) {
-            wasSet.set(false);
+            fullScreenState.set(false);
             return;
         }
-        exec(new String[] { AM_PATH, "startservice", "-n", SYS_UI.flattenToString() });
+        exec(false, AM_PATH, "startservice", "-n", SYS_UI.flattenToString());
     }
 
     protected void stopSystemUI() {
         if (!isSystemUIRunning()) {
-            wasSet.set(false);
+            fullScreenState.set(true);
             return;
         }
 
         final String su = getSuPath();
         if (su == null) {
-            wasSet.set(false);
+            fullScreenState.set(false);
             return;
         }
 
-        exec(new String[] { su, "-c", "service call activity 79 s16 " + SYS_UI_PKG });
+        exec(true, su, "-c", "service call activity 79 s16 " + SYS_UI_PKG);
     }
 
     protected boolean isSystemUIRunning() {
-        final ActivityManager actvityManager = (ActivityManager) EBookDroidApp.context
-                .getSystemService(Context.ACTIVITY_SERVICE);
-        final List<RunningServiceInfo> rsiList = actvityManager.getRunningServices(1000);
+        final Context ctx = EBookDroidApp.context;
+        final ActivityManager am = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+        final List<RunningServiceInfo> rsiList = am.getRunningServices(1000);
 
         for (final RunningServiceInfo rsi : rsiList) {
             LCTX.d("Service: " + rsi.service);
@@ -130,18 +152,17 @@ class FullScreenManagerNew implements IFullScreenManager {
         return false;
     }
 
-    protected void exec(final String... as) {
+    protected void exec(final boolean expected, final String... as) {
         (new Thread(new Runnable() {
 
             @Override
             public void run() {
                 try {
                     final boolean result = execImpl(as);
-                    wasSet.set(result);
+                    fullScreenState.set(result ? expected : !expected);
                 } catch (final Throwable th) {
                     LCTX.e("Changing full screen mode failed: " + th.getCause());
-                    wasSet.set(false);
-                    fullScreen.set(!fullScreen.get());
+                    fullScreenState.set(!expected);
                 }
             }
         })).start();
@@ -164,7 +185,7 @@ class FullScreenManagerNew implements IFullScreenManager {
             r.close();
             process.waitFor();
 
-            int exitValue = process.exitValue();
+            final int exitValue = process.exitValue();
             final String text = w.toString();
             LCTX.d("Result code: " + exitValue);
             LCTX.d("Output:\n" + text);
@@ -189,4 +210,5 @@ class FullScreenManagerNew implements IFullScreenManager {
         }
         return null;
     }
+
 }

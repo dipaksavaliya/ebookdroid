@@ -18,7 +18,7 @@ import android.graphics.RectF;
 
 import java.util.List;
 
-import org.emdev.ui.hwa.IHardwareAcceleration;
+import org.emdev.ui.uimanager.IUIManager;
 
 /**
  * The Class SinglePageController.
@@ -244,8 +244,8 @@ public class SinglePageController extends AbstractViewController {
         final PageAnimationType animationType = SettingsManager.getBookSettings().animationType;
         final PageAnimator newCurler = PageAnimationType.create(animationType, this);
 
-        IHardwareAcceleration.Factory.getInstance().setMode(getView().getView(),
-                SettingsManager.getAppSettings().isHWAEnabled(), animationType.isHardwareAccelSupported());
+        IUIManager.instance.setHardwareAccelerationEnabled(SettingsManager.getAppSettings().isHWAEnabled());
+        IUIManager.instance.setHardwareAccelerationMode(getView().getView(), animationType.isHardwareAccelSupported());
 
         newCurler.init();
         curler.switchCurler(newCurler);

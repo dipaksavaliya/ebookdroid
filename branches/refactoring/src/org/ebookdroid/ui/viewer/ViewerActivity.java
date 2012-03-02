@@ -11,6 +11,8 @@ import org.ebookdroid.ui.viewer.views.ViewEffects;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -27,7 +29,7 @@ import org.emdev.ui.AbstractActionActivity;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.IActionController;
-import org.emdev.ui.fullscreen.IFullScreenManager;
+import org.emdev.ui.uimanager.IUIManager;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
@@ -98,8 +100,10 @@ public class ViewerActivity extends AbstractActionActivity {
         LCTX.i("XDPI=" + DM.xdpi + ", YDPI=" + DM.ydpi);
 
         frameLayout = new FrameLayout(this);
-
-        view = createView();
+        
+        view = SettingsManager.getAppSettings().getDocumentViewType().create(controller);
+        this.registerForContextMenu(view.getView());
+        
         LayoutUtils.fillInParent(frameLayout, view.getView());
 
         frameLayout.addView(view.getView());
@@ -118,7 +122,7 @@ public class ViewerActivity extends AbstractActionActivity {
         this.controller.beforeResume();
 
         super.onResume();
-        IFullScreenManager.instance.onResume(getWindow());
+        IUIManager.instance.onResume(this);
 
         this.controller.afterResume();
     }
@@ -130,7 +134,7 @@ public class ViewerActivity extends AbstractActionActivity {
         this.controller.beforePause();
 
         super.onPause();
-        IFullScreenManager.instance.onPause(getWindow());
+        IUIManager.instance.onPause(this);
 
         this.controller.afterPause();
     }
@@ -216,6 +220,14 @@ public class ViewerActivity extends AbstractActionActivity {
         return zoomControls;
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        menu.setHeaderTitle(R.string.app_name);
+        menu.setHeaderIcon(R.drawable.icon);
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.mainmenu, menu);
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -236,7 +248,7 @@ public class ViewerActivity extends AbstractActionActivity {
     @Override
     public boolean onMenuOpened(final int featureId, final Menu menu) {
         view.changeLayoutLock(true);
-        IFullScreenManager.instance.onMenuOpened(getWindow());
+        IUIManager.instance.onMenuOpened(this);
         return super.onMenuOpened(featureId, menu);
     }
 
@@ -262,7 +274,7 @@ public class ViewerActivity extends AbstractActionActivity {
     @Override
     public void onOptionsMenuClosed(final Menu menu) {
         menuClosedCalled = true;
-        IFullScreenManager.instance.onMenuClosed(getWindow());
+        IUIManager.instance.onMenuClosed(this);
         view.changeLayoutLock(false);
     }
 

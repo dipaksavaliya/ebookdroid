@@ -42,15 +42,26 @@ public abstract class AbstractActionActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onContextItemSelected(final MenuItem item) {
+        final int actionId = item.getItemId();
+        final ActionEx action = getController().getOrCreateAction(actionId);
+        if (action.getMethod().isValid()) {
+            action.run();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public final void onButtonClick(final View view) {
         final int actionId = view.getId();
         final ActionEx action = getController().getOrCreateAction(actionId);
         action.onClick(view);
     }
 
-    public final void setActionForView(int id) {
-        View view = findViewById(id);
-        ActionEx action = getController().getOrCreateAction(id);
+    public final void setActionForView(final int id) {
+        final View view = findViewById(id);
+        final ActionEx action = getController().getOrCreateAction(id);
         if (view != null && action != null) {
             view.setOnClickListener(action);
         }
