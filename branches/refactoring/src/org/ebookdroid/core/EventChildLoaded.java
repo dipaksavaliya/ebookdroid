@@ -53,7 +53,7 @@ public class EventChildLoaded extends AbstractEvent {
     @Override
     public final ViewState process() {
         try {
-            if (ctrl == null) {
+            if (ctrl == null || viewState.book == null) {
                 return null;
             }
 
