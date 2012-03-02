@@ -76,14 +76,7 @@ public abstract class AbstractEvent implements IEvent {
      */
     @Override
     public boolean process(final PageTree nodes, final PageTreeLevel level) {
-        boolean res = false;
-        for (int nodeIndex = level.start; nodeIndex < level.end; nodeIndex++) {
-            if (nodes.nodes[nodeIndex] == null) {
-                nodes.createChildren(nodes.getParent(nodeIndex, true));
-            }
-            res |= process(nodes.nodes[nodeIndex]);
-        }
-        return res;
+        return nodes.process(this, level);
     }
 
     protected ViewState calculatePageVisibility(final ViewState initial) {

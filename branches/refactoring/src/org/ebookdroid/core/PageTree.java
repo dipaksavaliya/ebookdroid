@@ -22,18 +22,57 @@ public class PageTree {
 
     final Page owner;
 
-    final PageTreeNode[] nodes;
+    final PageTreeNode root;
 
-    int maxNodeId;
+    private PageTreeNode[] treeNodes;
+
+    private volatile int maxNodeId;
 
     public PageTree(final Page owner) {
         this.owner = owner;
-        this.nodes = new PageTreeNode[PageTreeLevel.NODES];
-        this.nodes[0] = new PageTreeNode(owner);
+        this.root = new PageTreeNode(owner);
         this.maxNodeId = 1;
     }
 
+    private synchronized PageTreeNode[] getNodes() {
+        if (this.treeNodes == null) {
+            this.treeNodes = new PageTreeNode[PageTreeLevel.NODES];
+            this.treeNodes[0] = root;
+        }
+        return this.treeNodes;
+    }
+
+    public boolean process(final IEvent event, final PageTreeLevel level) {
+        boolean res = false;
+        if (level.start < maxNodeId) {
+            final PageTreeNode[] nodes = getNodes();
+            for (int nodeIndex = level.start; nodeIndex < level.end; nodeIndex++) {
+                if (nodes[nodeIndex] == null) {
+                    createChildren(getParent(nodeIndex, true));
+                }
+                res |= event.process(nodes[nodeIndex]);
+            }
+        }
+        return res;
+    }
+
+    public boolean paintChildren(final EventDraw event, final PageTreeNode node, final RectF nodeRect) {
+        boolean res = true;
+        int childId = PageTree.getFirstChildId(node.id);
+        if (childId < maxNodeId) {
+            final PageTreeNode[] nodes = getNodes();
+            for (final int end = Math.min(nodes.length, childId + PageTree.splitMasks.length); childId < end; childId++) {
+                final PageTreeNode child = nodes[childId];
+                if (child != null) {
+                    res &= event.paintChild(node, child, nodeRect);
+                }
+            }
+        }
+        return res;
+    }
+
     public boolean createChildren(final PageTreeNode parent) {
+        final PageTreeNode[] nodes = getNodes();
         int childId = getFirstChildId(parent.id);
         for (int i = 0; i < splitMasks.length; i++, childId++) {
             if (nodes[childId] == null) {
@@ -48,6 +87,10 @@ public class PageTree {
         if (nodeIndex == 0) {
             return null;
         }
+        if (nodeIndex >= maxNodeId && !create) {
+            return null;
+        }
+        final PageTreeNode[] nodes = getNodes();
         final int parentIndex = (nodeIndex - 1) / 4;
         if (nodes[parentIndex] == null && create) {
             createChildren(getParent(parentIndex, true));
@@ -58,12 +101,15 @@ public class PageTree {
     public boolean recycleAll(final List<Bitmaps> bitmapsToRecycle, final boolean includeRoot) {
         boolean res = false;
         if (includeRoot) {
-            res |= nodes[0].recycle(bitmapsToRecycle);
+            res |= root.recycle(bitmapsToRecycle);
         }
-        for (int index = 1; index < maxNodeId; index++) {
-            if (nodes[index] != null) {
-                res |= nodes[index].recycle(bitmapsToRecycle);
-                nodes[index] = null;
+        if (maxNodeId > 1) {
+            final PageTreeNode[] nodes = getNodes();
+            for (int index = 1; index < maxNodeId; index++) {
+                if (nodes[index] != null) {
+                    res |= nodes[index].recycle(bitmapsToRecycle);
+                    nodes[index] = null;
+                }
             }
         }
         maxNodeId = 1;
@@ -89,6 +135,10 @@ public class PageTree {
     public boolean recycleChildren(final PageTreeNode node, final List<Bitmaps> bitmapsToRecycle) {
         boolean res = false;
         int childId = getFirstChildId(node.id);
+        if (childId >= maxNodeId) {
+            return res;
+        }
+        final PageTreeNode[] nodes = getNodes();
         for (final int end = Math.min(nodes.length, childId + splitMasks.length); childId < end; childId++) {
             if (nodes[childId] != null) {
                 res |= nodes[childId].recycle(bitmapsToRecycle);
@@ -108,6 +158,10 @@ public class PageTree {
     }
 
     public void recycleNodes(final PageTreeLevel level, final List<Bitmaps> bitmapsToRecycle) {
+        if (level.start >= maxNodeId) {
+            return;
+        }
+        final PageTreeNode[] nodes = getNodes();
         for (int i = level.start; i < maxNodeId; i++) {
             if (nodes[i] != null) {
                 nodes[i].recycle(bitmapsToRecycle);
@@ -126,6 +180,7 @@ public class PageTree {
         if (childId >= maxNodeId) {
             return false;
         }
+        final PageTreeNode[] nodes = getNodes();
         for (final int end = Math.min(nodes.length, childId + splitMasks.length); childId < end; childId++) {
             final PageTreeNode child = nodes[childId];
             if (child == null) {

@@ -86,14 +86,7 @@ public class EventDraw implements IEvent {
 
     @Override
     public boolean process(final PageTree nodes, final PageTreeLevel level) {
-        boolean res = false;
-        for (int nodeIndex = level.start; nodeIndex < level.end; nodeIndex++) {
-            final PageTreeNode node = nodes.nodes[nodeIndex];
-            if (node != null) {
-                res |= process(node);
-            }
-        }
-        return res;
+        return nodes.process(this, level);
     }
 
     @Override
@@ -120,22 +113,16 @@ public class EventDraw implements IEvent {
                 }
             }
 
-            final PageTree nodes = node.page.nodes;
+            return node.page.nodes.paintChildren(this, node, nodeRect);
 
-            boolean res = true;
-            int childId = PageTree.getFirstChildId(node.id);
-            for (final int end = Math.min(nodes.nodes.length, childId + PageTree.splitMasks.length); childId < end; childId++) {
-                final PageTreeNode child = nodes.nodes[childId];
-                if (child != null) {
-                    final RectF childRect = child.getTargetRect(viewState, pageBounds);
-                    res &= child.holder.drawBitmap(canvas, viewState.paint, viewBase, childRect, nodeRect);
-                }
-            }
-
-            return res;
         } finally {
             drawBrightnessFilter(canvas, nodeRect);
         }
+    }
+
+    public boolean paintChild(final PageTreeNode node, final PageTreeNode child, final RectF nodeRect) {
+        final RectF childRect = child.getTargetRect(viewState, pageBounds);
+        return child.holder.drawBitmap(canvas, viewState.paint, viewBase, childRect, nodeRect);
     }
 
     protected void drawPageBackground(final Page page) {
