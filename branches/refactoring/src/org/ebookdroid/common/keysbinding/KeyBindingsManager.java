@@ -15,11 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class KeysBindingManager {
+public class KeyBindingsManager {
 
     private static final LogContext LCTX = LogContext.ROOT.lctx("Actions");
 
-    private static SparseArrayEx<ActionRef> actions = new SparseArrayEx<KeysBindingManager.ActionRef>();
+    private static SparseArrayEx<ActionRef> actions = new SparseArrayEx<KeyBindingsManager.ActionRef>();
 
     public static void loadFromSettings(final AppSettings newSettings) {
         actions.clear();
@@ -63,14 +63,22 @@ public class KeysBindingManager {
     }
 
     public static Integer getAction(final KeyEvent ev) {
-        final ActionRef ref = actions.get(ev.getKeyCode());
+        return getAction(ev.getKeyCode());
+    }
+
+    public static Integer getAction(final int code) {
+        final ActionRef ref = actions.get(code);
         return ref != null && ref.enabled ? Integer.valueOf(ref.id) : null;
     }
 
     public static void addAction(final int id, final int... keys) {
-        for (int key : keys) {
+        for (final int key : keys) {
             actions.append(key, new ActionRef(key, id, true));
         }
+    }
+
+    public static void removeAction(final int code) {
+        actions.remove(code);
     }
 
     private static void fromJSON(final String str) throws JSONException {
@@ -130,4 +138,5 @@ public class KeysBindingManager {
         }
 
     }
+
 }

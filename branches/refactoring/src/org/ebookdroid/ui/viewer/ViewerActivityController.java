@@ -4,7 +4,8 @@ import org.ebookdroid.CodecType;
 import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.cache.CacheManager;
-import org.ebookdroid.common.keysbinding.KeysBindingManager;
+import org.ebookdroid.common.keysbinding.KeyBindingsDialog;
+import org.ebookdroid.common.keysbinding.KeyBindingsManager;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.ISettingsChangeListener;
@@ -134,7 +135,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         IUIManager.instance.setTitleVisible(activity, newSettings.getShowTitle());
 
         TouchManager.loadFromSettings(newSettings);
-        KeysBindingManager.loadFromSettings(newSettings);
+        KeyBindingsManager.loadFromSettings(newSettings);
 
         BitmapManager.setPartSize(newSettings.getBitmapSize());
         BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());
@@ -378,6 +379,12 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         SettingsManager.edit(bs).commit();
     }
 
+    @ActionMethod(ids = R.id.actions_keyBindings)
+    public void showKeyBindingsDialog(final ActionEx action) {
+        KeyBindingsDialog dlg = new KeyBindingsDialog(this);
+        dlg.show();
+    }
+
     /**
      * Gets the zoom model.
      * 
@@ -505,7 +512,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         TouchManager.loadFromSettings(newSettings);
-        KeysBindingManager.loadFromSettings(newSettings);
+        KeyBindingsManager.loadFromSettings(newSettings);
 
         BitmapManager.setPartSize(newSettings.getBitmapSize());
         BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());

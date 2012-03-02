@@ -48,6 +48,9 @@
 		android:id="@+id/actions_toggleTouchManagerView"
 		android:title="Tap configuration" />
 	<item
+		android:id="@+id/actions_keyBindings"
+		android:title="Key bindings" />
+	<item
 		android:id="@+id/mainmenu_about"
 		android:title="@string/menu_about"
 		android:icon="@drawable/about"/>

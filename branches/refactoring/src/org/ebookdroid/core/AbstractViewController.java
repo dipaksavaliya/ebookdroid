@@ -1,7 +1,7 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.R;
-import org.ebookdroid.common.keysbinding.KeysBindingManager;
+import org.ebookdroid.common.keysbinding.KeyBindingsManager;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
@@ -239,7 +239,7 @@ public abstract class AbstractViewController extends AbstractComponentController
     @Override
     public final boolean dispatchKeyEvent(final KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            final Integer actionId = KeysBindingManager.getAction(event);
+            final Integer actionId = KeyBindingsManager.getAction(event);
             final ActionEx action = actionId != null ? getOrCreateAction(actionId) : null;
             if (action != null) {
                 if (LCTX.isDebugEnabled()) {
@@ -253,7 +253,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                 }
             }
         } else if (event.getAction() == KeyEvent.ACTION_UP) {
-            Integer id = KeysBindingManager.getAction(event);
+            Integer id = KeyBindingsManager.getAction(event);
             if (id != null) {
                 return true;
             }
