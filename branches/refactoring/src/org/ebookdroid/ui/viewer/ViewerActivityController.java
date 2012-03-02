@@ -78,7 +78,8 @@ actions = {
         @ActionMethodDef(id = R.id.mainmenu_thumbnail, method = "setCurrentPageAsThumbnail"),
         @ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout"),
         @ActionMethodDef(id = R.id.actions_toggleTouchManagerView, method = "toggleControls"),
-        @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu")
+        @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu"),
+        @ActionMethodDef(id = R.id.actions_keyBindings, method = "showKeyBindingsDialog")
 // finish
 })
 public class ViewerActivityController extends ActionController<ViewerActivity> implements IActivityController,
