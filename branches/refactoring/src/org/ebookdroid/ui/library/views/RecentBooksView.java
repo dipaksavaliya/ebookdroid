@@ -7,9 +7,7 @@ import org.ebookdroid.ui.settings.SettingsUI;
 
 import android.net.Uri;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 
 import java.io.File;
 
@@ -29,8 +27,6 @@ public class RecentBooksView extends android.widget.ListView implements AdapterV
         setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         setOnItemClickListener(this);
         setOnItemLongClickListener(this);
-        setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
-                ViewGroup.LayoutParams.FILL_PARENT));
     }
 
     @Override

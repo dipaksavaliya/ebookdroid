@@ -9,9 +9,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -36,10 +34,6 @@ public class FileBrowserView extends ListView implements AdapterView.OnItemClick
         this.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         this.setOnItemClickListener(this);
         this.setOnItemLongClickListener(this);
-
-        this.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
-                ViewGroup.LayoutParams.FILL_PARENT));
-
     }
 
     @Override

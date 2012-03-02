@@ -8,6 +8,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.emdev.utils.LayoutUtils;
+
 public class PageViewZoomControls extends LinearLayout {
 
     public PageViewZoomControls(final Context context, final ZoomModel zoomModel) {
@@ -15,7 +17,7 @@ public class PageViewZoomControls extends LinearLayout {
         setVisibility(View.GONE);
         setOrientation(LinearLayout.HORIZONTAL);
         setGravity(Gravity.BOTTOM);
-        addView(new ZoomRoll(context, zoomModel));
+        addView(LayoutUtils.fillInParent(this, new ZoomRoll(context, zoomModel)));
     }
 
     @Override

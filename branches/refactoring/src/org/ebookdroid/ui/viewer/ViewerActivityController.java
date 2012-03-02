@@ -125,13 +125,35 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         if (getManagedComponent() != activity) {
             setManagedComponent(activity);
         }
+
+        final AppSettings newSettings = SettingsManager.getAppSettings();
+        final Window window = getManagedComponent().getWindow();
+
+        activity.setRequestedOrientation(newSettings.getRotation().getOrientation());
+
+        IFullScreenManager.instance.setFullScreenMode(window, newSettings.getFullScreen());
+
+        try {
+            if (!newSettings.getShowTitle()) {
+                window.requestFeature(Window.FEATURE_NO_TITLE);
+            } else {
+                window.requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+                activity.setProgressBarIndeterminate(true);
+                activity.setProgressBarIndeterminateVisibility(true);
+                window.setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, 1);
+            }
+        } catch (final Throwable th) {
+            LCTX.e("Error on requestFeature call: " + th.getMessage());
+        }
+
+        TouchManager.loadFromSettings(newSettings);
+        KeysBindingManager.loadFromSettings(newSettings);
+
+        BitmapManager.setPartSize(newSettings.getBitmapSize());
+        BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());
     }
 
     public void afterCreate() {
-        final AppSettings oldSettings = null;
-        final AppSettings newSettings = SettingsManager.getAppSettings();
-        final AppSettings.Diff diff = new AppSettings.Diff(oldSettings, newSettings);
-        this.onAppSettingsChanged(oldSettings, newSettings, diff);
 
         createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
         createAction(R.id.mainmenu_zoom).putValue("view", getManagedComponent().getZoomControls());
@@ -161,7 +183,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
             SettingsManager.init(m_fileName);
             SettingsManager.applyBookSettingsChanges(null, SettingsManager.getBookSettings(), null);
-            getManagedComponent().view.getView().post(new BookRefreshTask());
         }
     }
 
@@ -172,8 +193,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         setWindowTitle();
         if (loadingCount == 1) {
             startDecoding(m_fileName, "");
-        } else {
-            // getManagedComponent().view.getView().post(new BookRefreshTask());
         }
     }
 
@@ -243,7 +262,21 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @Override
     public void decodingProgressChanged(final int currentlyDecoding) {
-        getManagedComponent().decodingProgressChanged(currentlyDecoding);
+        final ViewerActivity activity = getManagedComponent();
+        System.out.println("ViewerActivityController.decodingProgressChanged(" + activity.LCTX + "): "
+                + currentlyDecoding);
+        activity.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    activity.setProgressBarIndeterminateVisibility(currentlyDecoding > 0);
+                    activity.getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS,
+                            currentlyDecoding == 0 ? 10000 : currentlyDecoding);
+                } catch (final Throwable e) {
+                }
+            }
+        });
     }
 
     @Override
@@ -460,6 +493,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         getManagedComponent().finish();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.common.settings.ISettingsChangeListener#onAppSettingsChanged(org.ebookdroid.common.settings.AppSettings, org.ebookdroid.common.settings.AppSettings, org.ebookdroid.common.settings.AppSettings.Diff)
+     */
     @Override
     public void onAppSettingsChanged(final AppSettings oldSettings, final AppSettings newSettings,
             final AppSettings.Diff diff) {
@@ -472,26 +510,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                     newSettings.getFullScreen());
         }
 
-        if (diff.isShowTitleChanged() && diff.isFirstTime()) {
-            final Window window = getManagedComponent().getWindow();
-            try {
-                if (!newSettings.getShowTitle()) {
-                    window.requestFeature(Window.FEATURE_NO_TITLE);
-                } else {
-                    // Android 3.0+ you need both progress!!!
-                    window.requestFeature(Window.FEATURE_PROGRESS);
-                    window.requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-                    getManagedComponent().setProgressBarIndeterminate(true);
-                }
-            } catch (final Throwable th) {
-                LCTX.e("Error on requestFeature call: " + th.getMessage());
-            }
-        }
         if (diff.isKeepScreenOnChanged()) {
             getManagedComponent().view.getView().setKeepScreenOn(newSettings.isKeepScreenOn());
         }
 
-        if (diff.isNightModeChanged() && !diff.isFirstTime()) {
+        if (diff.isNightModeChanged()) {
             getDocumentController().toggleNightMode(newSettings.getNightMode());
         }
 
@@ -502,6 +525,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.common.settings.ISettingsChangeListener#onBookSettingsChanged(org.ebookdroid.common.settings.books.BookSettings, org.ebookdroid.common.settings.books.BookSettings, org.ebookdroid.common.settings.books.BookSettings.Diff, org.ebookdroid.common.settings.AppSettings.Diff)
+     */
     @Override
     public void onBookSettingsChanged(final BookSettings oldSettings, final BookSettings newSettings,
             final BookSettings.Diff diff, final AppSettings.Diff appDiff) {
@@ -601,8 +629,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                     final DocumentModel dm = getDocumentModel();
                     currentPageChanged(PageIndex.NULL, dm.getCurrentIndex());
 
-                    getManagedComponent().setProgressBarIndeterminateVisibility(false);
-
                     try {
                         progressDialog.dismiss();
                     } catch (final Throwable th) {
@@ -642,45 +668,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 } else {
                     progressDialog.setMessage(values[0]);
                 }
-            }
-        }
-    }
-
-    final class BookRefreshTask extends AsyncTask<String, String, Exception> implements Runnable {
-
-        public BookRefreshTask() {
-        }
-
-        @Override
-        public void run() {
-            execute("");
-        }
-
-        @Override
-        protected Exception doInBackground(final String... params) {
-            LCTX.d("BookRefreshTask.doInBackground(): start");
-            try {
-                getView().waitForInitialization();
-                return null;
-            } finally {
-                LCTX.d("BookRefreshTask.doInBackground(): finish");
-            }
-        }
-
-        @Override
-        protected void onPostExecute(final Exception result) {
-            LCTX.d("BookRefreshTask.onPostExecute(): start");
-            try {
-                if (result == null) {
-                    getDocumentController().show();
-                    final DocumentModel dm = getDocumentModel();
-                    currentPageChanged(PageIndex.NULL, dm.getCurrentIndex());
-                    getManagedComponent().setProgressBarIndeterminateVisibility(false);
-                }
-            } catch (final Throwable th) {
-                LCTX.e("BookRefreshTask.onPostExecute(): Unexpected error", th);
-            } finally {
-                LCTX.d("BookRefreshTask.onPostExecute(): finish");
             }
         }
     }

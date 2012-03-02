@@ -15,7 +15,6 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Scroller;
 
 public class ZoomRoll extends View implements ZoomListener {
@@ -46,8 +45,6 @@ public class ZoomRoll extends View implements ZoomListener {
         scroller = new Scroller(context);
         gestureDetector = new GestureDetector(getContext(), new GestureListener());
 
-        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
         setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
     }
 

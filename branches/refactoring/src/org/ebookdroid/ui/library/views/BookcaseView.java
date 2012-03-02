@@ -7,10 +7,10 @@ import org.ebookdroid.ui.library.adapters.BooksAdapter;
 import android.database.DataSetObserver;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.emdev.utils.LayoutUtils;
 
 public class BookcaseView extends LinearLayout {
 
@@ -31,12 +31,10 @@ public class BookcaseView extends LinearLayout {
         addView(ll);
 
         shelfCaption = (TextView) ll.findViewById(R.id.ShelfCaption);
-        shelves = new ViewPager(getContext()) {
-        };
+        shelves = new ViewPager(getContext());
 
         shelves.setAdapter(adapter);
-        shelves.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
-                ViewGroup.LayoutParams.FILL_PARENT));
+        LayoutUtils.fillInParent(this, shelves);
         addView(shelves);
 
         adapter.registerDataSetObserver(new DataSetObserver() {

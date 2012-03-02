@@ -16,8 +16,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -30,6 +28,7 @@ import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.fullscreen.IFullScreenManager;
+import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
 public class ViewerActivity extends AbstractActionActivity {
@@ -98,10 +97,11 @@ public class ViewerActivity extends AbstractActionActivity {
         getWindowManager().getDefaultDisplay().getMetrics(DM);
         LCTX.i("XDPI=" + DM.xdpi + ", YDPI=" + DM.ydpi);
 
-        frameLayout = createMainContainer();
+        frameLayout = new FrameLayout(this);
+
         view = createView();
-        view.getView().setLayoutParams(
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+        LayoutUtils.fillInParent(frameLayout, view.getView());
+
         frameLayout.addView(view.getView());
         frameLayout.addView(getZoomControls());
         frameLayout.addView(getTouchView());
@@ -183,21 +183,6 @@ public class ViewerActivity extends AbstractActionActivity {
         cancel.setOnClickListener(controller.getOrCreateAction(R.id.mainmenu_close));
     }
 
-    public void decodingProgressChanged(final int currentlyDecoding) {
-        runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    setProgressBarIndeterminateVisibility(true);
-                    getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS,
-                            currentlyDecoding == 0 ? 10000 : currentlyDecoding);
-                } catch (final Throwable e) {
-                }
-            }
-        });
-    }
-
     public void currentPageChanged(final String pageText, final String currentFilename) {
         String prefix = "";
         if (LengthUtils.isNotEmpty(pageText)) {
@@ -229,10 +214,6 @@ public class ViewerActivity extends AbstractActionActivity {
             zoomControls.setGravity(Gravity.RIGHT | Gravity.BOTTOM);
         }
         return zoomControls;
-    }
-
-    private FrameLayout createMainContainer() {
-        return new FrameLayout(this);
     }
 
     /**

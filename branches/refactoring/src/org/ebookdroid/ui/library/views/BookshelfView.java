@@ -40,6 +40,7 @@ import java.util.GregorianCalendar;
 
 import org.emdev.ui.drawable.SpotlightDrawable;
 import org.emdev.ui.drawable.TransitionDrawable;
+import org.emdev.utils.LayoutUtils;
 
 public class BookshelfView extends GridView implements OnItemClickListener {
 
@@ -70,7 +71,7 @@ public class BookshelfView extends GridView implements OnItemClickListener {
         if (adapter != null) {
             setAdapter(adapter);
         }
-        setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+        LayoutUtils.fillInParent(shelves, this);
         final Resources r = getResources();
         final float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, r.getDisplayMetrics());
         setColumnWidth((int) px);

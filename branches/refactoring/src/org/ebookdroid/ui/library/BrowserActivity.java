@@ -27,6 +27,7 @@ import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.ActionMethodDef;
 import org.emdev.ui.actions.ActionTarget;
+import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.android.AndroidVersion;
 import org.emdev.utils.filesystem.CompositeFilter;
 import org.emdev.utils.filesystem.DirectoryFilter;
@@ -65,7 +66,7 @@ public class BrowserActivity extends AbstractActionActivity implements IBrowserA
         adapter = new BrowserAdapter(filter);
         header = (TextView) findViewById(R.id.browsertext);
         viewflipper = (ViewFlipper) findViewById(R.id.browserflip);
-        viewflipper.addView(new FileBrowserView(this, adapter));
+        viewflipper.addView(LayoutUtils.fillInParent(viewflipper, new FileBrowserView(this, adapter)));
 
         if (AndroidVersion.VERSION == 3) {
             setActionForView(R.id.browserhome);
