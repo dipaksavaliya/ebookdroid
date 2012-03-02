@@ -213,6 +213,11 @@ public class FB2Document implements CodecDocument {
     }
 
     @Override
+    public CodecPageInfo getUnifiedPageInfo() {
+        return FB2Page.CPI;
+    }
+
+    @Override
     public CodecPageInfo getPageInfo(final int pageNuber) {
         return FB2Page.CPI;
     }

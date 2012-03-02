@@ -33,6 +33,11 @@ public abstract class AbstractCodecDocument implements CodecDocument {
     }
 
     @Override
+    public CodecPageInfo getUnifiedPageInfo() {
+        return null;
+    }
+
+    @Override
     public CodecPageInfo getPageInfo(final int pageIndex) {
         return null;
     }

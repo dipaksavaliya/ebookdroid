@@ -236,11 +236,12 @@ public class DocumentModel extends ListenerProxy {
         }
 
         final CodecPageInfo[] infos = new CodecPageInfo[getDecodeService().getPageCount()];
+        final CodecPageInfo unified = decodeService.getUnifiedPageInfo();
         for (int i = 0; i < infos.length; i++) {
             if (task != null) {
                 task.setProgressDialogMessage(R.string.msg_getting_page_size, (i + 1), infos.length);
             }
-            infos[i] = getDecodeService().getPageInfo(i);
+            infos[i] = unified != null ? unified : getDecodeService().getPageInfo(i);
         }
 
         if (decodeService.isPageSizeCacheable()) {

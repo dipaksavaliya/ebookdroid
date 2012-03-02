@@ -11,6 +11,8 @@ public interface CodecDocument {
 
     CodecPage getPage(int pageNuber);
 
+    CodecPageInfo getUnifiedPageInfo();
+
     CodecPageInfo getPageInfo(int pageNuber);
 
     List<PageLink> getPageLinks(int pageNuber);

@@ -37,17 +37,18 @@ public class CustomTextPaint extends TextPaint {
     }
 
     private void initMeasures() {
-        final char[] chars = { ' ' };
+        initMeasures(0x0000, standard);
+        initMeasures(0x0100, latin1);
+        initMeasures(0x0400, rus);
+        initMeasures(0x2000, punct);
+    }
+
+    private void initMeasures(int codepage, float[] widths) {
+        final char[] chars = new char[256];
         for (int i = 0; i < 256; i++) {
-            chars[0] = (char) i;
-            standard[i] = super.measureText(chars, 0, 1);
-            chars[0] = (char) (i + 0x0100);
-            latin1[i] = super.measureText(chars, 0, 1);
-            chars[0] = (char) (i + 0x0400);
-            rus[i] = super.measureText(chars, 0, 1);
-            chars[0] = (char) (i + 0x2000);
-            punct[i] = super.measureText(chars, 0, 1);
+            chars[i] = (char) (i + codepage);
         }
+        this.getTextWidths(chars, 0, chars.length, widths);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class CustomTextPaint extends TextPaint {
         float sum = 0;
         for (int i = index, n = 0; n < count; i++, n++) {
             final int ch = text[i];
-            final int enc = ch & 0x0000FF00;
+            final int enc = ch & 0xFFFFFF00;
             switch (enc) {
                 case 0x0000:
                     sum += standard[ch & 0x00FF];
@@ -71,8 +72,7 @@ public class CustomTextPaint extends TextPaint {
                     break;
                 default:
                     // System.out.println("CTP: unknown symbol: " + text[i] + " " + Integer.toHexString(ch));
-                    // return super.measureText(text, index, count);
-                    return sum + super.measureText(text, i, count - n);
+                    sum += super.measureText(text, i, 1);
             }
         }
         return sum;

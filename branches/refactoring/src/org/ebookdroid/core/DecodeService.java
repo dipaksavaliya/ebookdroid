@@ -23,6 +23,8 @@ public interface DecodeService {
 
     List<OutlineLink> getOutline();
 
+    CodecPageInfo getUnifiedPageInfo();
+
     CodecPageInfo getPageInfo(int pageIndex);
 
     void recycle();

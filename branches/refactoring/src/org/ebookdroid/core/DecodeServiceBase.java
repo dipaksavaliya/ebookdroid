@@ -101,7 +101,11 @@ public class DecodeServiceBase implements DecodeService {
     @Override
     public void open(final String fileName, final String password) {
         document = codecContext.openDocument(fileName, password);
-        System.out.println("DecodeServiceBase.open(" + this.hashCode() + "): " + document);
+    }
+
+    @Override
+    public CodecPageInfo getUnifiedPageInfo() {
+        return document.getUnifiedPageInfo();
     }
 
     @Override
