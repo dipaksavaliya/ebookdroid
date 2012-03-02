@@ -16,7 +16,7 @@ import org.emdev.ui.hwa.IHardwareAcceleration;
 
 public abstract class AbstractScrollController extends AbstractViewController {
 
-    protected static Bitmap dragBitmap;
+    protected static volatile Bitmap dragBitmap;
 
     protected AbstractScrollController(final IActivityController base, DocumentViewMode mode) {
         super(base, mode);

@@ -25,7 +25,7 @@ public class Bitmaps {
 
     private static boolean useDefaultBitmapType = true;
 
-    private static RawBitmap slice;
+    private static volatile RawBitmap slice;
 
     public final Bitmap.Config config;
     public final int partSize;
