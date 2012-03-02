@@ -46,7 +46,7 @@ actions = {
 })
 public abstract class AbstractViewController extends AbstractComponentController<IView> implements IViewController {
 
-    protected static final LogContext LCTX = LogContext.ROOT.lctx("View", true);
+    protected static final LogContext LCTX = LogContext.ROOT.lctx("View", false);
 
     public static final int DOUBLE_TAP_TIME = 500;
 

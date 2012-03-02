@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DecodeServiceBase implements DecodeService {
 
-    public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding", true);
+    public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding", false);
 
     static final AtomicLong TASK_ID_SEQ = new AtomicLong();
 

@@ -116,7 +116,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
      */
     public ViewerActivityController(final ViewerActivity activity) {
         super(activity);
-        LCTX = LogContext.ROOT.lctx("Controller", true).lctx("" + SEQ.getAndIncrement());
+        LCTX = LogContext.ROOT.lctx("Controller", true).lctx("" + SEQ.getAndIncrement(), true);
         this.intent = activity.getIntent();
         SettingsManager.addListener(this);
     }
@@ -246,8 +246,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     @Override
     public void decodingProgressChanged(final int currentlyDecoding) {
         final ViewerActivity activity = getManagedComponent();
-        System.out.println("ViewerActivityController.decodingProgressChanged(" + activity.LCTX + "): "
-                + currentlyDecoding);
         activity.runOnUiThread(new Runnable() {
 
             @Override

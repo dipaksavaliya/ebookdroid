@@ -15,7 +15,7 @@ import org.emdev.utils.MathUtils;
 
 public class Page {
 
-    static final LogContext LCTX = LogContext.ROOT.lctx("Page", true);
+    static final LogContext LCTX = LogContext.ROOT.lctx("Page", false);
 
     public final PageIndex index;
     public final PageType type;

@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 
 public class SinglePageView implements PageAnimator {
 
-    protected static final LogContext LCTX = LogContext.ROOT.lctx("View", true);
+    protected static final LogContext LCTX = LogContext.ROOT.lctx("View", false);
 
     protected final PageAnimationType type;
 
