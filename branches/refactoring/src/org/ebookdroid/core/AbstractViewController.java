@@ -270,7 +270,7 @@ public abstract class AbstractViewController extends AbstractComponentController
     @Override
     public final boolean onTouchEvent(final MotionEvent ev) {
         try {
-            Thread.sleep(16);
+            Thread.sleep(50);
         } catch (final InterruptedException e) {
             Thread.interrupted();
         }
