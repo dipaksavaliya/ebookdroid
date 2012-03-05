@@ -9,6 +9,8 @@ import _android.util.SparseArrayEx;
 
 import android.view.KeyEvent;
 
+import java.lang.reflect.Field;
+
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.utils.LengthUtils;
 import org.json.JSONArray;
@@ -20,6 +22,8 @@ public class KeyBindingsManager {
     private static final LogContext LCTX = LogContext.ROOT.lctx("Actions");
 
     private static SparseArrayEx<ActionRef> actions = new SparseArrayEx<KeyBindingsManager.ActionRef>();
+
+    private static SparseArrayEx<String> keyLabels;
 
     public static void loadFromSettings(final AppSettings newSettings) {
         actions.clear();
@@ -81,6 +85,25 @@ public class KeyBindingsManager {
         actions.remove(code);
     }
 
+    public static String keyCodeToString(final int code) {
+        if (keyLabels == null) {
+            keyLabels = new SparseArrayEx<String>();
+            for (final Field f : KeyEvent.class.getFields()) {
+                if (f.getName().startsWith("KEYCODE_")) {
+                    try {
+                        final Integer value = f.getInt(null);
+                        final String label = f.getName().substring("KEYCODE_".length());
+                        keyLabels.append(value, label.replaceAll("_", " "));
+                    } catch (final Throwable th) {
+                        th.printStackTrace();
+                    }
+                }
+            }
+        }
+        final String label = keyLabels.get(code);
+        return label != null ? label : Integer.toString(code);
+    }
+
     private static void fromJSON(final String str) throws JSONException {
         final JSONObject root = new JSONObject(str);
 
@@ -138,5 +161,4 @@ public class KeyBindingsManager {
         }
 
     }
-
 }

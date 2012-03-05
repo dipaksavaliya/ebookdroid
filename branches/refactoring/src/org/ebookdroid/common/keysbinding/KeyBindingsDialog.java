@@ -121,11 +121,7 @@ public class KeyBindingsDialog extends Dialog {
         public KeyAction(final int code) {
             this.code = code;
 
-            String label = KeyEvent.keyCodeToString(code);
-            if (label.startsWith("KEYCODE_")) {
-                label = label.substring("KEYCODE_".length());
-            }
-            label = label.replaceAll("_", " ");
+            String label = KeyBindingsManager.keyCodeToString(code);
             this.label = label + " [" + code + "]";
 
             final Integer actionId = KeyBindingsManager.getAction(code);
