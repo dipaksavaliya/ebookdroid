@@ -22,6 +22,7 @@ import java.util.List;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.DialogController;
+import org.emdev.ui.adapters.ActionsAdapter;
 
 public class TouchConfigDialog extends Dialog {
 
@@ -32,8 +33,8 @@ public class TouchConfigDialog extends Dialog {
     private RegionWrapper wrapper;
 
     private final RegionsAdapter adapter;
-    private final String[] actionIds;
-    private final String[] actionLabels;
+    private final ActionsAdapter actionsAdapter;
+
     private final Spinner stList;
     private final Spinner dtList;
     private final Spinner ltList;
@@ -51,30 +52,29 @@ public class TouchConfigDialog extends Dialog {
 
         final ActionSelectionListener actionListener = new ActionSelectionListener();
 
-        actionIds = getContext().getResources().getStringArray(R.array.list_actions_ids);
-        actionLabels = getContext().getResources().getStringArray(R.array.list_actions_labels);
+        actionsAdapter = new ActionsAdapter(getContext(), R.array.list_actions_ids, R.array.list_actions_labels);
 
         stList = (Spinner) this.findViewById(R.id.tapZonesConfigSingleAction);
-        stList.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, actionLabels));
+        stList.setAdapter(actionsAdapter);
         stList.setTag(TouchManager.Touch.SingleTap);
         stList.setOnItemSelectedListener(actionListener);
 
         dtList = (Spinner) this.findViewById(R.id.tapZonesConfigDoubleAction);
-        dtList.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, actionLabels));
+        dtList.setAdapter(actionsAdapter);
         dtList.setTag(TouchManager.Touch.DoubleTap);
         dtList.setOnItemSelectedListener(actionListener);
 
         ltList = (Spinner) this.findViewById(R.id.tapZonesConfigLongAction);
-        ltList.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, actionLabels));
+        ltList.setAdapter(actionsAdapter);
         ltList.setTag(TouchManager.Touch.LongTap);
         ltList.setOnItemSelectedListener(actionListener);
 
         tftList = (Spinner) this.findViewById(R.id.tapZonesConfigTwoFingerAction);
-        tftList.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, actionLabels));
+        tftList.setAdapter(actionsAdapter);
         tftList.setTag(TouchManager.Touch.TwoFingerTap);
         tftList.setOnItemSelectedListener(actionListener);
 
-        adapter = new RegionsAdapter(getContext(), android.R.layout.simple_list_item_1, wraps(profile.regions));
+        adapter = new RegionsAdapter(getContext(), wraps(profile.regions));
         final Spinner regionsList = (Spinner) this.findViewById(R.id.tapZonesConfigRegions);
         regionsList.setAdapter(adapter);
         regionsList.setSelection(profile.regions.indexOf(region));
@@ -88,9 +88,9 @@ public class TouchConfigDialog extends Dialog {
     }
 
     public void print() {
-//        for (Region r : this.profile.regions) {
-//            System.out.println(r);
-//        }
+        // for (Region r : this.profile.regions) {
+        // System.out.println(r);
+        // }
     }
 
     @Override
@@ -115,12 +115,8 @@ public class TouchConfigDialog extends Dialog {
             final ActionRef ref = wrapper.r.getAction(t);
             if (ref != null) {
                 final String name = ref.name;
-                for (int i = 0; i < actionIds.length; i++) {
-                    if (name.equals(actionIds[i])) {
-                        view.setSelection(i);
-                        return;
-                    }
-                }
+                view.setSelection(actionsAdapter.getPosition(name));
+                return;
             }
         }
         view.setSelection(0);
@@ -196,7 +192,7 @@ public class TouchConfigDialog extends Dialog {
         @Override
         public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
             if (wrapper != null) {
-                final Integer actionId = ActionEx.getActionId(actionIds[position]);
+                final Integer actionId = ActionEx.getActionId(actionsAdapter.getActionId(position));
                 if (actionId != null) {
                     wrapper.r.setAction((Touch) parent.getTag(), actionId, true);
                 }
@@ -213,8 +209,8 @@ public class TouchConfigDialog extends Dialog {
 
     final class RegionsAdapter extends ArrayAdapter<RegionWrapper> {
 
-        RegionsAdapter(final Context context, final int textViewResourceId, final List<RegionWrapper> objects) {
-            super(context, textViewResourceId, objects);
+        RegionsAdapter(final Context context, final List<RegionWrapper> objects) {
+            super(context, R.layout.list_item, R.id.list_item, objects);
         }
     }
 

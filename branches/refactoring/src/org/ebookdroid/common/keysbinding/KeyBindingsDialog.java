@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Spinner;
@@ -23,13 +22,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.emdev.ui.actions.ActionEx;
+import org.emdev.ui.adapters.ActionsAdapter;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
 public class KeyBindingsDialog extends Dialog {
 
-    private final String[] actionIds;
-    private final String[] actionLabels;
+    private final ActionsAdapter actionsAdapter;
     private final KeyGroups groups = new KeyGroups();
 
     public KeyBindingsDialog(final IActivityController base) {
@@ -37,8 +36,7 @@ public class KeyBindingsDialog extends Dialog {
 
         setTitle("Keys binding");
 
-        actionIds = getContext().getResources().getStringArray(R.array.list_actions_ids);
-        actionLabels = getContext().getResources().getStringArray(R.array.list_actions_labels);
+        actionsAdapter = new ActionsAdapter(getContext(), R.array.list_actions_ids, R.array.list_actions_labels);
 
         final ExpandableListView list = new ExpandableListView(getContext());
         final KeyGroups groups = initKeyActions();
@@ -102,12 +100,8 @@ public class KeyBindingsDialog extends Dialog {
         final KeyAction action = (KeyAction) view.getTag();
         final String name = action.action;
         if (LengthUtils.isNotEmpty(name)) {
-            for (int i = 0; i < actionIds.length; i++) {
-                if (name.equals(actionIds[i])) {
-                    view.setSelection(i);
-                    return;
-                }
-            }
+            view.setSelection(actionsAdapter.getPosition(name));
+            return;
         }
         view.setSelection(0);
     }
@@ -220,9 +214,7 @@ public class KeyBindingsDialog extends Dialog {
 
             final Spinner actionsView = (Spinner) convertView.findViewById(R.id.keybinding_actions);
             actionsView.setOnItemSelectedListener(this);
-            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                    android.R.layout.simple_list_item_1, actionLabels);
-            actionsView.setAdapter(adapter);
+            actionsView.setAdapter(actionsAdapter);
             actionsView.setTag(action);
             updateAction(actionsView);
 
@@ -246,7 +238,7 @@ public class KeyBindingsDialog extends Dialog {
 
         @Override
         public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
-            final String actionId = actionIds[position];
+            final String actionId = actionsAdapter.getActionId(position);
             final KeyAction action = (KeyAction) parent.getTag();
             action.action = LengthUtils.unsafeString(actionId);
         }
