@@ -86,7 +86,7 @@ public class EventDraw implements IEvent {
 
     @Override
     public boolean process(final PageTree nodes, final PageTreeLevel level) {
-        return nodes.process(this, level);
+        return nodes.process(this, level, false);
     }
 
     @Override

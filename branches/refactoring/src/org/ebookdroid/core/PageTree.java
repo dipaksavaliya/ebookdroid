@@ -42,9 +42,9 @@ public class PageTree {
         return this.treeNodes;
     }
 
-    public boolean process(final IEvent event, final PageTreeLevel level) {
+    public boolean process(final IEvent event, final PageTreeLevel level, final boolean createNodes) {
         boolean res = false;
-        if (level.start < maxNodeId) {
+        if (createNodes || level.start < maxNodeId) {
             final PageTreeNode[] nodes = getNodes();
             for (int nodeIndex = level.start; nodeIndex < level.end; nodeIndex++) {
                 if (nodes[nodeIndex] == null) {

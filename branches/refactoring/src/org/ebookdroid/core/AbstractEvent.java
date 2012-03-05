@@ -76,7 +76,7 @@ public abstract class AbstractEvent implements IEvent {
      */
     @Override
     public boolean process(final PageTree nodes, final PageTreeLevel level) {
-        return nodes.process(this, level);
+        return nodes.process(this, level, true);
     }
 
     protected ViewState calculatePageVisibility(final ViewState initial) {
