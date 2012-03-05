@@ -170,6 +170,6 @@
     <string name="outline_title">Зміст</string>
     <string name="outline_missed">Зміст відсутній</string>
     <string name="error_page_out_of_rande">Неправильный номер сторінки. Допустимий діапазон: 1-%i</string>
-    <string name="msg_loading"> Завантаження... почекайте </string>
+    <string name="msg_loading"> Завантаження&#8230; почекайте </string>
 
 </resources>
