@@ -83,7 +83,9 @@ public class ViewerActivity extends AbstractActionActivity {
      */
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        LCTX.d("onCreate()");
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("onCreate()");
+        }
 
         Object last = this.getLastNonConfigurationInstance();
         if (last instanceof ViewerActivityController) {
@@ -100,10 +102,10 @@ public class ViewerActivity extends AbstractActionActivity {
         LCTX.i("XDPI=" + DM.xdpi + ", YDPI=" + DM.ydpi);
 
         frameLayout = new FrameLayout(this);
-        
+
         view = SettingsManager.getAppSettings().getDocumentViewType().create(controller);
         this.registerForContextMenu(view.getView());
-        
+
         LayoutUtils.fillInParent(frameLayout, view.getView());
 
         frameLayout.addView(view.getView());
@@ -117,7 +119,9 @@ public class ViewerActivity extends AbstractActionActivity {
 
     @Override
     protected void onResume() {
-        LCTX.d("onResume()");
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("onResume()");
+        }
 
         this.controller.beforeResume();
 
@@ -129,7 +133,9 @@ public class ViewerActivity extends AbstractActionActivity {
 
     @Override
     protected void onPause() {
-        LCTX.d("onPause()");
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("onPause(): " + isFinishing());
+        }
 
         this.controller.beforePause();
 
@@ -146,7 +152,9 @@ public class ViewerActivity extends AbstractActionActivity {
 
     @Override
     protected void onDestroy() {
-        LCTX.d("onDestroy()");
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("onDestroy(): " + isFinishing());
+        }
 
         controller.beforeDestroy();
         super.onDestroy();

@@ -124,6 +124,9 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     }
 
     public void beforeCreate(final ViewerActivity activity) {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("beforeCreate(): " + activity.LCTX);
+        }
         if (getManagedComponent() != activity) {
             setManagedComponent(activity);
         }
@@ -143,6 +146,9 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     }
 
     public void afterCreate() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("afterCreate()");
+        }
 
         createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
         createAction(R.id.mainmenu_zoom).putValue("view", getManagedComponent().getZoomControls());
@@ -176,9 +182,15 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     }
 
     public void beforePostCreate() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("beforePostCreate()");
+        }
     }
 
     public void afterPostCreate() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("afterPostCreate()");
+        }
         setWindowTitle();
         if (loadingCount == 1) {
             startDecoding(m_fileName, "");
@@ -190,21 +202,36 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     }
 
     public void beforeResume() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("beforeResume()");
+        }
     }
 
     public void afterResume() {
-
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("afterResume()");
+        }
     }
 
     public void beforePause() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("beforePause()");
+        }
     }
 
     public void afterPause() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("afterPause()");
+        }
         SettingsManager.storeBookSettings();
     }
 
     public void beforeDestroy() {
-        if (getManagedComponent().isFinishing()) {
+        final boolean finishing = getManagedComponent().isFinishing();
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("beforeDestroy(): " + finishing);
+        }
+        if (finishing) {
             getManagedComponent().view.onDestroy();
             if (documentModel != null) {
                 documentModel.recycle();
@@ -217,6 +244,9 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     }
 
     public void afterDestroy() {
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("afterDestroy()");
+        }
         getDocumentController().onDestroy();
     }
 
