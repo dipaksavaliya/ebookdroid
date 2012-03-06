@@ -7,69 +7,70 @@
         android:title="@string/pref_ui_category" >
 
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="loadrecent"
+            android:defaultValue="@string/pref_loadrecent_defvalue"
+            android:key="@string/pref_loadrecent_id"
             android:summary="@string/pref_loadrecent_summary"
             android:title="@string/pref_loadrecent_title" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="nightmode"
+            android:defaultValue="@string/pref_nightmode_id"
+            android:key="@string/pref_nightmode_id"
             android:summary="@string/pref_nightmode_summary"
             android:title="@string/pref_nightmode_title" />
 
         <EditTextPreference
-            android:defaultValue="100"
-            android:key="brightness"
+            android:defaultValue="@string/pref_brightness_defvalue"
+            android:key="@string/pref_brightness_id"
             android:maxLength="3"
             android:numeric="integer"
             android:summary="@string/pref_brightness_summary"
             android:title="@string/pref_brightness_title" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="brightnessnightmodeonly"
+            android:defaultValue="@string/pref_brightnessnightmodeonly_defvalue"
+            android:key="@string/pref_brightnessnightmodeonly_id"
             android:summary="@string/pref_brightnessnightmodeonly_summary"
             android:title="@string/pref_brightnessnightmodeonly_title" />
 
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="keepscreenon"
+            android:defaultValue="@string/pref_keepscreenon_defvalue"
+            android:key="@string/pref_keepscreenon_id"
             android:summary="@string/pref_keepscreenon_summary"
             android:title="@string/pref_keepscreenon_title" />
 
         <ListPreference
-            android:defaultValue="Default"
+            android:defaultValue="@string/pref_rotation_auto"
             android:entries="@array/list_rotation"
             android:entryValues="@array/list_rotation_values"
-            android:key="rotation"
+            android:key="@string/pref_rotation_id"
             android:summary="@string/pref_rotation_summary"
             android:title="@string/pref_rotation_title" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="fullscreen"
+            android:defaultValue="@string/pref_fullscreen_defvalue"
+            android:key="@string/pref_fullscreen_id"
             android:summary="@string/pref_fullscreen_summary"
             android:title="@string/pref_fullscreen_title" />
 
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="title"
+            android:defaultValue="@string/pref_title_defvalue"
+            android:key="@string/pref_title_id"
             android:summary="@string/pref_title_summary"
             android:title="@string/pref_title_title" />
 
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:dependency="title"
-            android:key="pageintitle"
+            android:defaultValue="@string/pref_pageintitle_defvalue"
+            android:dependency="@string/pref_title_id"
+            android:key="@string/pref_pageintitle_id"
             android:summary="@string/pref_pageintitle_summary"
             android:title="@string/pref_pageintitle_title" />
 
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="showanimicon"
+            android:defaultValue="@string/pref_showanimicon_defvalue"
+            android:key="@string/pref_showanimicon_id"
             android:summary="@string/pref_showanimicon_summary"
             android:title="@string/pref_showanimicon_title" />
+
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -77,22 +78,22 @@
         android:title="@string/pref_scroll_category" >
 
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="tapsenabled"
+            android:defaultValue="@string/pref_tapsenabled_defvalue"
+            android:key="@string/pref_tapsenabled_id"
             android:summary="@string/pref_tapsenabled_summary"
             android:title="@string/pref_tapsenabled_title" />
 
         <EditTextPreference
-            android:defaultValue="50"
-            android:key="scrollheight"
+            android:defaultValue="@string/pref_scrollheight_defvalue"
+            android:key="@string/pref_scrollheight_id"
             android:maxLength="3"
             android:numeric="integer"
             android:summary="@string/pref_scroll_summary"
             android:title="@string/pref_scroll_title" />
 
         <EditTextPreference
-            android:defaultValue="50"
-            android:key="touchdelay"
+            android:defaultValue="@string/pref_touchdelay_defvalue"
+            android:key="@string/pref_touchdelay_id"
             android:maxLength="3"
             android:numeric="integer"
             android:summary="@string/pref_touchdelay_summary"

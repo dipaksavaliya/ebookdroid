@@ -14,16 +14,14 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.emdev.utils.MathUtils;
-import org.emdev.utils.StringUtils;
 import org.emdev.utils.android.AndroidVersion;
 import org.emdev.utils.filesystem.FileExtensionFilter;
 
-public class AppSettings {
+public class AppSettings implements AppPreferences {
 
     private final SharedPreferences prefs;
 
@@ -57,9 +55,9 @@ public class AppSettings {
 
     private Integer brightness;
 
-    private Boolean brightnessnightmodeonly;
+    private Boolean brightnessInNightModeOnly;
 
-    private Boolean keepscreenon;
+    private Boolean keepScreenOn;
 
     private Set<String> autoScanDirs;
 
@@ -71,7 +69,7 @@ public class AppSettings {
 
     private Boolean cropPages;
 
-    private String touchProfiles;
+    private String tapProfiles;
 
     private String keysBinding;
 
@@ -105,16 +103,146 @@ public class AppSettings {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    /* =============== UI settings =============== */
+
     public boolean isLoadRecentBook() {
         if (loadRecent == null) {
-            loadRecent = prefs.getBoolean("loadrecent", false);
+            loadRecent = LOAD_RECENT.getPreferenceValue(prefs);
         }
         return loadRecent;
     }
 
+    public int getBrightness() {
+        if (isBrightnessInNightModeOnly() && !getNightMode()) {
+            return BRIGHTNESS.maxValue;
+        }
+        if (brightness == null) {
+            brightness = BRIGHTNESS.getPreferenceValue(prefs);
+        }
+        return brightness;
+    }
+
+    public boolean getNightMode() {
+        if (nightMode == null) {
+            nightMode = NIGHT_MODE.getPreferenceValue(prefs);
+        }
+        return nightMode;
+    }
+
+    public void switchNightMode() {
+        nightMode = !nightMode;
+        final Editor edit = prefs.edit();
+        NIGHT_MODE.setPreferenceValue(edit, nightMode);
+        edit.commit();
+    }
+
+    public boolean isBrightnessInNightModeOnly() {
+        if (brightnessInNightModeOnly == null) {
+            brightnessInNightModeOnly = BRIGHTNESS_NIGHT_MODE_ONLY.getPreferenceValue(prefs);
+        }
+        return brightnessInNightModeOnly;
+    }
+
+    public boolean isKeepScreenOn() {
+        if (keepScreenOn == null) {
+            keepScreenOn = KEEP_SCREEN_ON.getPreferenceValue(prefs);
+        }
+        return keepScreenOn;
+    }
+
+    public RotationType getRotation() {
+        if (rotation == null) {
+            rotation = ROTATION.getPreferenceValue(prefs);
+        }
+        return rotation;
+    }
+
+    public boolean getFullScreen() {
+        if (fullScreen == null) {
+            fullScreen = FULLSCREEN.getPreferenceValue(prefs);
+        }
+        return fullScreen;
+    }
+
+    public boolean getShowTitle() {
+        if (showTitle == null) {
+            showTitle = SHOW_TITLE.getPreferenceValue(prefs);
+        }
+        return showTitle;
+    }
+
+    public boolean getPageInTitle() {
+        if (pageInTitle == null) {
+            pageInTitle = SHOW_PAGE_IN_TITLE.getPreferenceValue(prefs);
+        }
+        return pageInTitle;
+    }
+
+    public boolean getShowAnimIcon() {
+        if (showAnimIcon == null) {
+            showAnimIcon = SHOW_ANIM_ICON.getPreferenceValue(prefs);
+        }
+        return showAnimIcon;
+    }
+
+    /* =============== Tap & Scroll settings =============== */
+
+    public boolean getTapsEnabled() {
+        if (tapsEnabled == null) {
+            tapsEnabled = TAPS_ENABLED.getPreferenceValue(prefs);
+        }
+        return tapsEnabled;
+    }
+
+    public int getScrollHeight() {
+        if (scrollHeight == null) {
+            scrollHeight = SCROLL_HEIGHT.getPreferenceValue(prefs);
+        }
+        return scrollHeight.intValue();
+    }
+
+    public int getTouchProcessingDelay() {
+        if (touchProcessingDelay == null) {
+            touchProcessingDelay = TOUCH_DELAY.getPreferenceValue(prefs);
+        }
+        return touchProcessingDelay;
+    }
+
+    /* =============== Tap & Keyboard settings =============== */
+
+    public String getTapProfiles() {
+        if (tapProfiles == null) {
+            tapProfiles = TAP_PROFILES.getPreferenceValue(prefs);
+        }
+        return tapProfiles;
+    }
+
+    public void updateTapProfiles(final String profiles) {
+        tapProfiles = profiles;
+        final Editor edit = prefs.edit();
+        TAP_PROFILES.setPreferenceValue(edit, profiles);
+        edit.commit();
+    }
+
+    public String getKeysBinding() {
+        if (keysBinding == null) {
+            keysBinding = KEY_BINDINGS.getPreferenceValue(prefs);
+        }
+        return keysBinding;
+    }
+
+    public void updateKeysBinding(final String json) {
+        keysBinding = json;
+        final Editor edit = prefs.edit();
+        KEY_BINDINGS.setPreferenceValue(edit, json);
+        edit.commit();
+    }
+
+    /* =============== Browser settings =============== */
+
     public Set<String> getAutoScanDirs() {
         if (autoScanDirs == null) {
-            autoScanDirs = StringUtils.split(File.pathSeparator, prefs.getString("brautoscandir", "/sdcard"));
+            autoScanDirs = AUTO_SCAN_DIRS.getPreferenceValue(prefs);
         }
         return autoScanDirs;
     }
@@ -122,7 +250,7 @@ public class AppSettings {
     public void setAutoScanDirs(final Set<String> dirs) {
         autoScanDirs = dirs;
         final Editor edit = prefs.edit();
-        edit.putString("brautoscandir", StringUtils.merge(File.pathSeparator, autoScanDirs));
+        AUTO_SCAN_DIRS.setPreferenceValue(edit, dirs);
         edit.commit();
     }
 
@@ -149,132 +277,6 @@ public class AppSettings {
 
     public boolean isFileTypeAllowed(final String ext) {
         return prefs.getBoolean("brfiletype" + ext, true);
-    }
-
-    public int getBrightness() {
-        if (isBrightnessInNightModeOnly() && !getNightMode()) {
-            return 100;
-        }
-        if (brightness == null) {
-            brightness = getIntValue("brightness", 100);
-        }
-        return brightness;
-    }
-
-    public boolean getShowAnimIcon() {
-        if (showAnimIcon == null) {
-            showAnimIcon = prefs.getBoolean("showanimicon", true);
-        }
-        return showAnimIcon;
-    }
-
-    public boolean getNightMode() {
-        if (nightMode == null) {
-            nightMode = prefs.getBoolean("nightmode", false);
-        }
-        return nightMode;
-    }
-
-    public boolean isKeepScreenOn() {
-        if (keepscreenon == null) {
-            keepscreenon = prefs.getBoolean("keepscreenon", true);
-        }
-        return keepscreenon;
-    }
-
-    public boolean isBrightnessInNightModeOnly() {
-        if (brightnessnightmodeonly == null) {
-            brightnessnightmodeonly = prefs.getBoolean("brightnessnightmodeonly", false);
-        }
-        return brightnessnightmodeonly;
-    }
-
-    public void switchNightMode() {
-        nightMode = !nightMode;
-        final Editor edit = prefs.edit();
-        edit.putBoolean("nightmode", nightMode);
-        edit.commit();
-    }
-
-    public RotationType getRotation() {
-        if (rotation == null) {
-            final String rotationStr = prefs.getString("rotation", RotationType.AUTOMATIC.getResValue());
-            rotation = RotationType.getByResValue(rotationStr);
-            if (rotation == null) {
-                rotation = RotationType.AUTOMATIC;
-            }
-        }
-        return rotation;
-    }
-
-    public boolean getFullScreen() {
-        if (fullScreen == null) {
-            fullScreen = prefs.getBoolean("fullscreen", false);
-        }
-        return fullScreen;
-    }
-
-    public boolean getShowTitle() {
-        if (showTitle == null) {
-            showTitle = prefs.getBoolean("title", true);
-        }
-        return showTitle;
-    }
-
-    public boolean getPageInTitle() {
-        if (pageInTitle == null) {
-            pageInTitle = prefs.getBoolean("pageintitle", true);
-        }
-        return pageInTitle;
-    }
-
-    public String getTouchProfiles() {
-        if (touchProfiles == null) {
-            touchProfiles = prefs.getString("tapprofiles", "");
-        }
-        return touchProfiles;
-    }
-
-    public void updateTouchProfiles(final String profiles) {
-        touchProfiles = profiles;
-        final Editor edit = prefs.edit();
-        edit.putString("tapprofiles", touchProfiles);
-        edit.commit();
-    }
-
-    public String getKeysBinding() {
-        if (keysBinding == null) {
-            keysBinding = prefs.getString("keys_binding", "");
-        }
-        return keysBinding;
-    }
-
-    public void updateKeysBinding(String json) {
-        keysBinding = json;
-        final Editor edit = prefs.edit();
-        edit.putString("keys_binding", keysBinding);
-        edit.commit();
-    }
-
-    public boolean getTapsEnabled() {
-        if (tapsEnabled == null) {
-            tapsEnabled = prefs.getBoolean("tapsenabled", true);
-        }
-        return tapsEnabled;
-    }
-
-    public int getScrollHeight() {
-        if (scrollHeight == null) {
-            scrollHeight = getIntValue("scrollheight", 50);
-        }
-        return scrollHeight.intValue();
-    }
-
-    public int getTouchProcessingDelay() {
-        if (touchProcessingDelay == null) {
-            touchProcessingDelay = getIntValue("touchdelay", 50);
-        }
-        return touchProcessingDelay;
     }
 
     public int getPagesInMemory() {

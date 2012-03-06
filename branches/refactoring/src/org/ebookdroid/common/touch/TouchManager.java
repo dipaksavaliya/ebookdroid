@@ -37,7 +37,7 @@ public class TouchManager {
         stack.clear();
 
         boolean fromJSON = false;
-        final String str = newSettings.getTouchProfiles();
+        final String str = newSettings.getTapProfiles();
         if (LengthUtils.isNotEmpty(str)) {
             try {
                 final List<TouchProfile> list = fromJSON(str);
@@ -78,7 +78,7 @@ public class TouchManager {
     public static void persist() {
         try {
             final JSONObject json = toJSON();
-            SettingsManager.getAppSettings().updateTouchProfiles(json.toString());
+            SettingsManager.getAppSettings().updateTapProfiles(json.toString());
         } catch (final JSONException ex) {
             ex.printStackTrace();
         }

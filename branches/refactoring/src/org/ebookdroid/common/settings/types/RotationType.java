@@ -1,27 +1,32 @@
 package org.ebookdroid.common.settings.types;
 
+import org.ebookdroid.EBookDroidApp;
+import org.ebookdroid.R;
+
 import android.content.pm.ActivityInfo;
 
-public enum RotationType {
+import org.emdev.utils.enums.ResourceConstant;
+
+public enum RotationType implements ResourceConstant {
     /**
      *
      */
-    AUTOMATIC("Automatic", ActivityInfo.SCREEN_ORIENTATION_SENSOR),
+    AUTOMATIC(R.string.pref_rotation_auto, ActivityInfo.SCREEN_ORIENTATION_SENSOR),
     /**
      *
      */
-    LANDSCAPE("Force landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
+    LANDSCAPE(R.string.pref_rotation_land, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
     /**
      *
      */
-    PORTRAIT("Force portrait", ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    PORTRAIT(R.string.pref_rotation_port, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
     private final String resValue;
 
     private final int orientation;
 
-    private RotationType(final String resValue, final int orientation) {
-        this.resValue = resValue;
+    private RotationType(final int resId, final int orientation) {
+        this.resValue = EBookDroidApp.context.getString(resId);
         this.orientation = orientation;
     }
 
@@ -32,14 +37,4 @@ public enum RotationType {
     public int getOrientation() {
         return orientation;
     }
-
-    public static RotationType getByResValue(final String rotationStr) {
-        for (final RotationType rt : values()) {
-            if (rt.getResValue().equalsIgnoreCase(rotationStr)) {
-                return rt;
-            }
-        }
-        return null;
-    }
-
 }
