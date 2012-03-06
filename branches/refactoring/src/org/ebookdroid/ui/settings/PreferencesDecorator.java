@@ -79,7 +79,7 @@ public class PreferencesDecorator implements IPreferenceContainer {
     }
 
     public void decorateScrollSettings() {
-        decoratePreferences("tapsize", "scrollheight");
+        decoratePreferences("scrollheight", "touchdelay");
     }
 
     public void decorateUISettings() {

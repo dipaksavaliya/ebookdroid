@@ -48,7 +48,7 @@
 
     <string name="pref_reloadduringzoom_title">Reload page during zoom</string>
     <string name="pref_reloadduringzoom_summary">Reload page during zoom if zoom changed more than 20%</string>
-    
+
     <string name="pref_brfiletypespecificpdf_title">"PDF"</string>
     <string name="pref_brfiletypespecificpdf_summary">"PDF format specific settings"</string>
 
@@ -57,7 +57,7 @@
 
     <string name="pref_xdpi_title">X DPI</string>
     <string name="pref_xdpi_summary">X DPI</string>
-    
+
     <string name="pref_ydpi_title">Y DPI</string>
     <string name="pref_ydpi_summary">Y DPI</string>
 
@@ -75,5 +75,8 @@
 
     <string name="pref_fb2hyphen_title">Enable Hyphenation</string>
     <string name="pref_fb2hyphen_summary">Experimental Hyphenation implementation</string>
+
+    <string name="pref_touchdelay_title">Touch processing delay</string>
+    <string name="pref_touchdelay_summary">Touch processing delay (in milliseconds)</string>
 
 </resources>

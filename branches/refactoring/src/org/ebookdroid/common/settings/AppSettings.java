@@ -47,6 +47,8 @@ public class AppSettings {
 
     private Integer scrollHeight;
 
+    private Integer touchProcessingDelay;
+
     private PageAnimationType animationType;
 
     private Boolean splitPages;
@@ -266,6 +268,13 @@ public class AppSettings {
             scrollHeight = getIntValue("scrollheight", 50);
         }
         return scrollHeight.intValue();
+    }
+
+    public int getTouchProcessingDelay() {
+        if (touchProcessingDelay == null) {
+            touchProcessingDelay = getIntValue("touchdelay", 50);
+        }
+        return touchProcessingDelay;
     }
 
     public int getPagesInMemory() {
