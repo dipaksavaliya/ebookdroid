@@ -71,3 +71,42 @@ JNIEXPORT void JNICALL
 
     (*env)->ReleaseIntArrayElements(env, srcArray, src, 0);
 }
+
+JNIEXPORT void JNICALL
+ Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeContrast(JNIEnv* env, jclass classObject, jintArray srcArray,
+                                                          jint width, jint height, jint contrast)
+{
+    jint* src;
+    int i, a;
+    unsigned char buf[256];
+    int midBright = 0;
+    unsigned char* src1;
+
+    src = (*env)->GetIntArrayElements(env, srcArray, 0);
+
+	src1 = (unsigned char*)src;
+
+    for (i = 0; i < width * height * 4; i += 4) {
+        midBright += src1[i+2] * 77 + src1[i + 1] * 150 + src1[i] * 29;
+    }
+    midBright /= (256 * width * height);
+
+    for (i = 0; i < 256; i++) {
+        a = (((i - midBright) * contrast) / 256) + midBright;
+        if (a < 0) {
+            buf[i] = 0;
+        } else if (a > 255) {
+            buf[i] = 255;
+        } else {
+            buf[i] = a;
+        }
+    }
+
+    for (i = 0; i < width * height * 4; i+=4) {
+        src1[i] = buf[src1[i]];
+        src1[i+1] = buf[src1[i+1]];
+        src1[i+2] = buf[src1[i+2]];
+    }
+
+    (*env)->ReleaseIntArrayElements(env, srcArray, src, 0);
+}

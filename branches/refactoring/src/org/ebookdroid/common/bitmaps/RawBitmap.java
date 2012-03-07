@@ -128,4 +128,6 @@ public final class RawBitmap {
 
     private static native void nativeInvert(int[] src, int width, int height);
 
+    private static native void nativeContrast(int[] src, int width, int height, int contrast);
+
 }
