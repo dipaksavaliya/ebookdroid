@@ -373,7 +373,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.mainmenu_nightmode)
     public void toggleNightMode(final ActionEx action) {
-        SettingsManager.getAppSettings().switchNightMode();
+        SettingsManager.getAppSettings().toggleNightMode();
         getDocumentController().toggleNightMode(SettingsManager.getAppSettings().getNightMode());
     }
 

@@ -3,8 +3,8 @@
         android:title="@string/pref_performance_category" >
 
         <EditTextPreference
-            android:defaultValue="0"
-            android:key="pagesinmemory"
+            android:defaultValue="@string/pref_pagesinmemory_defvalue"
+            android:key="@string/pref_pagesinmemory_id"
             android:maxLength="3"
             android:numeric="integer"
             android:summary="@string/pref_pagesinmemory_summary"
@@ -15,58 +15,58 @@
             android:title="@string/pref_lowlevel_category" >
 
             <ListPreference
-                android:defaultValue="Surface"
-                android:entries="@array/list_docviewtype"
-                android:entryValues="@array/list_docviewtype_values"
-                android:key="docviewtype"
+                android:defaultValue="@string/pref_docviewtype_surface"
+                android:entries="@array/pref_docviewtype_entries"
+                android:entryValues="@array/pref_docviewtype_values"
+                android:key="@string/pref_docviewtype_id"
                 android:summary="@string/pref_docviewtype_summary"
                 android:title="@string/pref_docviewtype_title" />
         
             <ListPreference
-                android:defaultValue="5"
-                android:entries="@array/list_thread_priority"
-                android:entryValues="@array/list_thread_priority_values"
-                android:key="decodethread_priority"
+                android:defaultValue="@string/pref_thread_priority_normal"
+                android:entries="@array/pref_thread_priority_entries"
+                android:entryValues="@array/pref_thread_priority_values"
+                android:key="@string/pref_decodethread_priority_id"
                 android:summary="@string/pref_decodethread_priority_summary"
                 android:title="@string/pref_decodethread_priority_title" />
 
             <ListPreference
-                android:defaultValue="5"
-                android:entries="@array/list_thread_priority"
-                android:entryValues="@array/list_thread_priority_values"
-                android:key="drawthread_priority"
+                android:defaultValue="@string/pref_thread_priority_normal"
+                android:entries="@array/pref_thread_priority_entries"
+                android:entryValues="@array/pref_thread_priority_values"
+                android:key="@string/pref_drawthread_priority_id"
                 android:summary="@string/pref_drawthread_priority_summary"
                 android:title="@string/pref_drawthread_priority_title" />
 
             <SwitchPreference
-                android:defaultValue="false"
-                android:key="hwa_enabled"
+                android:defaultValue="@string/pref_hwa_enabled_defvalue"
+                android:key="@string/pref_hwa_enabled_id"
                 android:summary="@string/pref_hwa_enabled_summary"
                 android:title="@string/pref_hwa_enabled_title" />
 
             <ListPreference
-                android:defaultValue="7"
-                android:entries="@array/list_bitmapsize"
-                android:entryValues="@array/list_bitmapsize_values"
-                android:key="bitmapsize"
+                android:defaultValue="@string/pref_bitmapsize_128"
+                android:entries="@array/pref_bitmapsize_entries"
+                android:entryValues="@array/pref_bitmapsize_values"
+                android:key="@string/pref_bitmapsize_id"
                 android:summary="@string/pref_bitmapsize_summary"
                 android:title="@string/pref_bitmapsize_title" />
 
             <SwitchPreference
-                android:defaultValue="true"
-                android:key="texturereuse"
+                android:defaultValue="@string/pref_texturereuse_defvalue"
+                android:key="@string/pref_texturereuse_id"
                 android:summary="@string/pref_texturereuse_summary"
                 android:title="@string/pref_texturereuse_title" />
 
             <SwitchPreference
-                android:defaultValue="false"
-                android:key="earlyrecycling"
+                android:defaultValue="@string/pref_earlyrecycling_defvalue"
+                android:key="@string/pref_earlyrecycling_id"
                 android:summary="@string/pref_earlyrecycling_summary"
                 android:title="@string/pref_earlyrecycling_title" />
 
             <SwitchPreference
-                android:defaultValue="true"
-                android:key="reloadduringzoom"
+                android:defaultValue="@string/pref_reloadduringzoom_defvalue"
+                android:key="@string/pref_reloadduringzoom_id"
                 android:summary="@string/pref_reloadduringzoom_summary"
                 android:title="@string/pref_reloadduringzoom_title" />
 

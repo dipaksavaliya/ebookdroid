@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <string-array name="list_rotation" translatable="false">
-        <item>@string/list_rotation_land</item>
-        <item>@string/list_rotation_port</item>
-        <item>@string/list_rotation_auto</item>
-    </string-array>
-    
-    <string-array name="list_rotation_values" translatable="false">
-        <item>@string/pref_rotation_land</item>
-        <item>@string/pref_rotation_port</item>
-        <item>@string/pref_rotation_auto</item>
-    </string-array>
-    
     <string-array name="list_align" translatable="false">
         <item>@string/list_align_by_width</item>
         <item>@string/list_align_by_height</item>
@@ -55,16 +43,6 @@
         <item>Delete from Scan Dir</item>
     </string-array>
     
-    <string-array name="list_docviewtype" translatable="false">
-        <item>@string/list_docviewtype_base</item>
-        <item>@string/list_docviewtype_surface</item>
-    </string-array>
-    
-    <string-array name="list_docviewtype_values" translatable="false">
-        <item>Base</item>
-        <item>Surface</item>
-    </string-array>
-    
     <string-array name="list_djvu_rendering_mode" translatable="false">
         <item>@string/list_djvu_rendering_mode_0</item>
         <item>@string/list_djvu_rendering_mode_1</item>
@@ -100,38 +78,6 @@
         <item>Vertical scroll</item>
         <item>Horizontal scroll</item>
         <item>Single page</item>
-    </string-array>
-    
-    <string-array name="list_thread_priority" translatable="false">
-        <item>@string/list_thread_priority_lowest</item>
-        <item>@string/list_thread_priority_lower</item>
-        <item>@string/list_thread_priority_normal</item>
-        <item>@string/list_thread_priority_higher</item>
-        <item>@string/list_thread_priority_highest</item>
-    </string-array>
-    
-    <string-array name="list_thread_priority_values" translatable="false">
-        <item>1</item>
-        <item>3</item>
-        <item>5</item>
-        <item>7</item>
-        <item>10</item>
-    </string-array>
-    
-    <string-array name="list_bitmapsize" translatable="false">
-        <item>@string/list_bitmapsize_64</item>
-        <item>@string/list_bitmapsize_128</item>
-        <item>@string/list_bitmapsize_256</item>
-        <item>@string/list_bitmapsize_512</item>
-        <item>@string/list_bitmapsize_1024</item>
-    </string-array>
-    
-    <string-array name="list_bitmapsize_values" translatable="false">
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
     </string-array>
     
     <string-array name="list_fontsize" translatable="false">

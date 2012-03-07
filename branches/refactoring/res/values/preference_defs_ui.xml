@@ -23,6 +23,18 @@
     <string name="pref_rotation_land">Force landscape</string>
     <string name="pref_rotation_port">Force portrait</string>
 
+    <string-array name="pref_rotation_entries" translatable="false">
+        <item>@string/list_rotation_land</item>
+        <item>@string/list_rotation_port</item>
+        <item>@string/list_rotation_auto</item>
+    </string-array>
+
+    <string-array name="pref_rotation_values" translatable="false">
+        <item>@string/pref_rotation_land</item>
+        <item>@string/pref_rotation_port</item>
+        <item>@string/pref_rotation_auto</item>
+    </string-array>
+
     <string name="pref_fullscreen_id">fullscreen</string>
     <string name="pref_fullscreen_defvalue">false</string>
 

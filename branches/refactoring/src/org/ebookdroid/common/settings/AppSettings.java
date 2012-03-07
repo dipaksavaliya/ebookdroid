@@ -112,16 +112,6 @@ public class AppSettings implements AppPreferences {
         return loadRecent;
     }
 
-    public int getBrightness() {
-        if (isBrightnessInNightModeOnly() && !getNightMode()) {
-            return BRIGHTNESS.maxValue;
-        }
-        if (brightness == null) {
-            brightness = BRIGHTNESS.getPreferenceValue(prefs);
-        }
-        return brightness;
-    }
-
     public boolean getNightMode() {
         if (nightMode == null) {
             nightMode = NIGHT_MODE.getPreferenceValue(prefs);
@@ -129,7 +119,7 @@ public class AppSettings implements AppPreferences {
         return nightMode;
     }
 
-    public void switchNightMode() {
+    public void toggleNightMode() {
         nightMode = !nightMode;
         final Editor edit = prefs.edit();
         NIGHT_MODE.setPreferenceValue(edit, nightMode);
@@ -141,6 +131,16 @@ public class AppSettings implements AppPreferences {
             brightnessInNightModeOnly = BRIGHTNESS_NIGHT_MODE_ONLY.getPreferenceValue(prefs);
         }
         return brightnessInNightModeOnly;
+    }
+
+    public int getBrightness() {
+        if (isBrightnessInNightModeOnly() && !getNightMode()) {
+            return BRIGHTNESS.maxValue;
+        }
+        if (brightness == null) {
+            brightness = BRIGHTNESS.getPreferenceValue(prefs);
+        }
+        return brightness;
     }
 
     public boolean isKeepScreenOn() {
@@ -238,129 +238,85 @@ public class AppSettings implements AppPreferences {
         edit.commit();
     }
 
-    /* =============== Browser settings =============== */
-
-    public Set<String> getAutoScanDirs() {
-        if (autoScanDirs == null) {
-            autoScanDirs = AUTO_SCAN_DIRS.getPreferenceValue(prefs);
-        }
-        return autoScanDirs;
-    }
-
-    public void setAutoScanDirs(final Set<String> dirs) {
-        autoScanDirs = dirs;
-        final Editor edit = prefs.edit();
-        AUTO_SCAN_DIRS.setPreferenceValue(edit, dirs);
-        edit.commit();
-    }
-
-    public void changeAutoScanDirs(final String dir, final boolean add) {
-        final Set<String> dirs = getAutoScanDirs();
-        if (add && dirs.add(dir) || dirs.remove(dir)) {
-            setAutoScanDirs(dirs);
-        }
-    }
-
-    public FileExtensionFilter getAllowedFileTypes() {
-        return getAllowedFileTypes(CodecType.getAllExtensions());
-    }
-
-    public FileExtensionFilter getAllowedFileTypes(final Set<String> fileTypes) {
-        final Set<String> res = new HashSet<String>();
-        for (final String ext : fileTypes) {
-            if (isFileTypeAllowed(ext)) {
-                res.add(ext);
-            }
-        }
-        return new FileExtensionFilter(res);
-    }
-
-    public boolean isFileTypeAllowed(final String ext) {
-        return prefs.getBoolean("brfiletype" + ext, true);
-    }
+    /* =============== Performance settings =============== */
 
     public int getPagesInMemory() {
         if (pagesInMemory == null) {
-            pagesInMemory = getIntValue("pagesinmemory", 2);
+            pagesInMemory = PAGES_IN_MEMORY.getPreferenceValue(prefs);
         }
         return pagesInMemory.intValue();
     }
 
     public DocumentViewType getDocumentViewType() {
         if (viewType == null) {
-            final String typeStr = prefs.getString("docviewtype", DocumentViewType.DEFAULT.getResValue());
-            viewType = DocumentViewType.getByResValue(typeStr);
-            if (viewType == null) {
-                viewType = DocumentViewType.DEFAULT;
-            }
+            viewType = VIEW_TYPE.getPreferenceValue(prefs);
         }
         return viewType;
     }
 
     public int getDecodingThreadPriority() {
         if (decodingThreadPriority == null) {
-            final int value = getIntValue("decodethread_priority", Thread.NORM_PRIORITY);
-            decodingThreadPriority = MathUtils.adjust(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+            decodingThreadPriority = DECODE_THREAD_PRIORITY.getPreferenceValue(prefs);
         }
         return decodingThreadPriority.intValue();
     }
 
     public int getDrawThreadPriority() {
         if (drawThreadPriority == null) {
-            final int value = getIntValue("drawthread_priority", Thread.NORM_PRIORITY);
-            drawThreadPriority = MathUtils.adjust(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+            drawThreadPriority = DRAW_THREAD_PRIORITY.getPreferenceValue(prefs);
         }
         return drawThreadPriority.intValue();
     }
 
     public boolean isHWAEnabled() {
         if (hwaEnabled == null) {
-            hwaEnabled = prefs.getBoolean("hwa_enabled", false);
+            hwaEnabled = HWA_ENABLED.getPreferenceValue(prefs);
         }
         return hwaEnabled.booleanValue();
     }
 
     public int getBitmapSize() {
         if (bitmapSize == null) {
-            final int value = getIntValue("bitmapsize", 7);
-            bitmapSize = 1 << MathUtils.adjust(value, 6, 10);
+            bitmapSize = 1 << BITMAP_SIZE.getPreferenceValue(prefs);
         }
         return bitmapSize.intValue();
     }
 
     public boolean getTextureReuseEnabled() {
         if (textureReuseEnabled == null) {
-            textureReuseEnabled = prefs.getBoolean("texturereuse", true);
+            textureReuseEnabled = REUSE_TEXTURES.getPreferenceValue(prefs);
         }
         return textureReuseEnabled;
     }
 
     public boolean getUseEarlyRecycling() {
         if (useEarlyRecycling == null) {
-            useEarlyRecycling = prefs.getBoolean("earlyrecycling", false);
+            useEarlyRecycling = EARLY_RECYCLING.getPreferenceValue(prefs);
         }
         return useEarlyRecycling;
     }
 
     public boolean getReloadDuringZoom() {
         if (reloadDuringZoom == null) {
-            reloadDuringZoom = prefs.getBoolean("reloadduringzoom", true);
+            reloadDuringZoom = RELOAD_DURING_ZOOM.getPreferenceValue(prefs);
         }
         return reloadDuringZoom;
     }
 
-    public boolean getUseBookcase() {
-        if (useBookcase == null) {
-            useBookcase = prefs.getBoolean("usebookcase", true);
-        }
-        return !AndroidVersion.is1x && useBookcase;
-    }
+    /* =============== Default rendering settings =============== */
 
     boolean getSplitPages() {
         if (splitPages == null) {
             splitPages = prefs.getBoolean("splitpages", false);
         }
         return splitPages;
+    }
+
+    boolean getCropPages() {
+        if (cropPages == null) {
+            cropPages = prefs.getBoolean("croppages", false);
+        }
+        return cropPages;
     }
 
     public DocumentViewMode getViewMode() {
@@ -391,6 +347,8 @@ public class AppSettings implements AppPreferences {
         }
         return animationType;
     }
+
+    /* =============== Format-specific settings =============== */
 
     public int getDjvuRenderingMode() {
         if (djvuRenderingMode == null) {
@@ -444,12 +402,55 @@ public class AppSettings implements AppPreferences {
         return fb2HyphenEnabled;
     }
 
-    boolean getCropPages() {
-        if (cropPages == null) {
-            cropPages = prefs.getBoolean("croppages", false);
+    /* =============== Browser settings =============== */
+
+    public boolean getUseBookcase() {
+        if (useBookcase == null) {
+            useBookcase = prefs.getBoolean("usebookcase", true);
         }
-        return cropPages;
+        return !AndroidVersion.is1x && useBookcase;
     }
+
+    public Set<String> getAutoScanDirs() {
+        if (autoScanDirs == null) {
+            autoScanDirs = AUTO_SCAN_DIRS.getPreferenceValue(prefs);
+        }
+        return autoScanDirs;
+    }
+
+    public void setAutoScanDirs(final Set<String> dirs) {
+        autoScanDirs = dirs;
+        final Editor edit = prefs.edit();
+        AUTO_SCAN_DIRS.setPreferenceValue(edit, dirs);
+        edit.commit();
+    }
+
+    public void changeAutoScanDirs(final String dir, final boolean add) {
+        final Set<String> dirs = getAutoScanDirs();
+        if (add && dirs.add(dir) || dirs.remove(dir)) {
+            setAutoScanDirs(dirs);
+        }
+    }
+
+    public FileExtensionFilter getAllowedFileTypes() {
+        return getAllowedFileTypes(CodecType.getAllExtensions());
+    }
+
+    public FileExtensionFilter getAllowedFileTypes(final Set<String> fileTypes) {
+        final Set<String> res = new HashSet<String>();
+        for (final String ext : fileTypes) {
+            if (isFileTypeAllowed(ext)) {
+                res.add(ext);
+            }
+        }
+        return new FileExtensionFilter(res);
+    }
+
+    public boolean isFileTypeAllowed(final String ext) {
+        return prefs.getBoolean("brfiletype" + ext, true);
+    }
+
+    /* =============== */
 
     void clearPseudoBookSettings() {
         final Editor editor = prefs.edit();
