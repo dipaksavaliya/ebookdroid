@@ -128,6 +128,10 @@ public final class RawBitmap {
 
     private static native void nativeInvert(int[] src, int width, int height);
 
+    /* contrast value 256 - normal*/
     private static native void nativeContrast(int[] src, int width, int height, int contrast);
+
+    /* Exposure correction values -128...+128*/
+    private static native void nativeExposure(int[] src, int width, int height, int exposure);
 
 }

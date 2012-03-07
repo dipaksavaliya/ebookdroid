@@ -4,6 +4,9 @@
 #include "hqxcommon.h"
 #include "hqx.h"
 
+#define MAX(a,b) (((a) > (b)) ? (a) : (b))
+#define MIN(a,b) (((a) < (b)) ? (a) : (b))
+
 JNIEXPORT void JNICALL
 Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeHq4x(JNIEnv* env, jclass classObject, jintArray srcArray,
                                                           jintArray dstArray, jint width, jint height)
@@ -106,6 +109,27 @@ JNIEXPORT void JNICALL
         src1[i] = buf[src1[i]];
         src1[i+1] = buf[src1[i+1]];
         src1[i+2] = buf[src1[i+2]];
+    }
+
+    (*env)->ReleaseIntArrayElements(env, srcArray, src, 0);
+}
+
+JNIEXPORT void JNICALL
+ Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeExposure(JNIEnv* env, jclass classObject, jintArray srcArray,
+                                                          jint width, jint height, jint exp)
+{
+    jint* src;
+    int i, a;
+    unsigned char* src1;
+
+    src = (*env)->GetIntArrayElements(env, srcArray, 0);
+
+    src1 = (unsigned char*)src;
+
+    for (i = 0; i < width * height * 4; i += 4) {
+        src1[i] = MIN(MAX(src1[i] + exp * 11 / 100, 0), 255);
+        src1[i+1] = MIN(MAX(src1[i+1] + exp * 59 / 100, 0), 255);
+        src1[i+2] = MIN(MAX(src1[i+2] + exp * 30 / 100, 0), 255);
     }
 
     (*env)->ReleaseIntArrayElements(env, srcArray, src, 0);
