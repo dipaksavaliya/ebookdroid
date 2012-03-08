@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.emdev.utils.android.AndroidVersion;
-import org.emdev.utils.enums.EnumUtils;
 import org.emdev.utils.filesystem.FileExtensionFilter;
 
 public class AppSettings implements AppPreferences {
@@ -444,34 +443,31 @@ public class AppSettings implements AppPreferences {
 
     void clearPseudoBookSettings() {
         final Editor editor = prefs.edit();
-        editor.remove("book");
-        editor.remove("book_splitpages");
-        editor.remove("book_singlepage");
-        editor.remove("book_align");
-        editor.remove("book_animationType");
-        editor.remove("book_croppages");
+        editor.remove(BOOK.key);
+        editor.remove(BOOK_SPLIT_PAGES.key);
+        editor.remove(BOOK_CROP_PAGES.key);
+        editor.remove(BOOK_PAGE_ALIGN.key);
+        editor.remove(BOOK_ANIMATION_TYPE.key);
         editor.commit();
     }
 
     void updatePseudoBookSettings(final BookSettings bs) {
-        final Editor editor = prefs.edit();
-        editor.putString("book", bs.fileName);
-        editor.putBoolean("book_splitpages", bs.splitPages);
-        editor.putString("book_viewmode", bs.viewMode.getResValue());
-        editor.putString("book_align", bs.pageAlign.getResValue());
-        editor.putString("book_animationType", bs.animationType.getResValue());
-        editor.putBoolean("book_croppages", bs.cropPages);
-        editor.commit();
+        final Editor edit = prefs.edit();
+        BOOK.setPreferenceValue(edit, bs.fileName);
+        BOOK_SPLIT_PAGES.setPreferenceValue(edit, bs.splitPages);
+        BOOK_CROP_PAGES.setPreferenceValue(edit, bs.cropPages);
+        BOOK_VIEW_MODE.setPreferenceValue(edit, bs.viewMode);
+        BOOK_PAGE_ALIGN.setPreferenceValue(edit, bs.pageAlign);
+        BOOK_ANIMATION_TYPE.setPreferenceValue(edit, bs.animationType);
+        edit.commit();
     }
 
     void fillBookSettings(final BookSettings bs) {
-        bs.splitPages = prefs.getBoolean("book_splitpages", getSplitPages());
-
-        bs.viewMode = EnumUtils.getByResValue(DocumentViewMode.class, prefs.getString("book_viewmode", null), getViewMode());
-        bs.pageAlign = EnumUtils.getByResValue(PageAlign.class, prefs.getString("book_align", null), getPageAlign());
-        bs.animationType = EnumUtils.getByResValue(PageAnimationType.class, prefs.getString("book_animationType", null), getAnimationType());
-
-        bs.cropPages = prefs.getBoolean("book_croppages", getCropPages());
+        bs.splitPages = BOOK_SPLIT_PAGES.getPreferenceValue(prefs, getSplitPages());
+        bs.cropPages = BOOK_CROP_PAGES.getPreferenceValue(prefs, getCropPages());
+        bs.viewMode = BOOK_VIEW_MODE.getPreferenceValue(prefs, getViewMode());
+        bs.pageAlign = BOOK_PAGE_ALIGN.getPreferenceValue(prefs, getPageAlign());
+        bs.animationType = BOOK_ANIMATION_TYPE.getPreferenceValue(prefs, getAnimationType());
     }
 
     public static class Diff {

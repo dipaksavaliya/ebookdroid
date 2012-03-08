@@ -37,4 +37,15 @@ public class IntegerPreferenceDefinition extends BasePreferenceDefinition {
         }
         return MathUtils.adjust(value, minValue, maxValue);
     }
+
+    public int getPreferenceValue(final SharedPreferences prefs, final int defValue) {
+        final String str = prefs.getString(key, "" + defValue);
+        int value = defValue;
+        try {
+            value = Integer.parseInt(str);
+        } catch (final NumberFormatException e) {
+        }
+        return MathUtils.adjust(value, minValue, maxValue);
+    }
+
 }

@@ -4,7 +4,7 @@ import org.ebookdroid.EBookDroidApp;
 
 public class BasePreferenceDefinition {
 
-    protected final String key;
+    public final String key;
 
     public BasePreferenceDefinition(final int keyRes) {
         key = EBookDroidApp.context.getString(keyRes);

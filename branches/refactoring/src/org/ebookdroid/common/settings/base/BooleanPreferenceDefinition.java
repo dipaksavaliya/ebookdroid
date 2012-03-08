@@ -18,6 +18,10 @@ public class BooleanPreferenceDefinition extends BasePreferenceDefinition {
         return prefs.getBoolean(key, defValue);
     }
 
+    public boolean getPreferenceValue(final SharedPreferences prefs, boolean defValue) {
+        return prefs.getBoolean(key, defValue);
+    }
+
     public void setPreferenceValue(final Editor edit, final boolean value) {
         edit.putBoolean(key, value);
     }

@@ -5,43 +5,43 @@
 	android:title="@string/pref_book_category">
 
 	<SwitchPreference
-		android:defaultValue="false"
-		android:key="book_splitpages"
-		android:summary="@string/pref_splitpages_summary"
-		android:title="@string/pref_splitpages_title" />
+            android:defaultValue="@string/pref_splitpages_defvalue"
+            android:key="@string/pref_book_splitpages_id"
+            android:summary="@string/pref_splitpages_summary"
+            android:title="@string/pref_splitpages_title" />
 
 	<SwitchPreference
-		android:defaultValue="false"
-		android:key="book_croppages"
-		android:summary="@string/pref_croppages_summary"
-		android:title="@string/pref_croppages_title" />
+            android:defaultValue="@string/pref_croppages_defvalue"
+            android:key="@string/pref_book_croppages_id"
+            android:summary="@string/pref_croppages_summary"
+            android:title="@string/pref_croppages_title" />
 
     <ListPreference
-        android:defaultValue="Vertical scroll"
+            android:defaultValue="@string/pref_viewmode_vertical_scroll"
             android:entries="@array/pref_viewmode_entries"
             android:entryValues="@array/pref_viewmode_values"
-        android:key="book_viewmode"
-        android:summary="@string/pref_viewmode_summary"
-        android:title="@string/pref_viewmode_title" />
+            android:key="@string/pref_book_viewmode_id"
+            android:summary="@string/pref_viewmode_summary"
+            android:title="@string/pref_viewmode_title" />
 
 	<PreferenceCategory
 		android:summary="@string/pref_singlepage_category_summary"
 		android:title="@string/pref_singlepage_category">
 
 		<ListPreference
-			android:defaultValue="By Width"
+                android:defaultValue="@string/pref_align_auto"
                 android:entries="@array/pref_align_entries"
                 android:entryValues="@array/pref_align_values"
-			android:key="book_align"
-			android:summary="@string/pref_align_summary"
-			android:title="@string/pref_align_title" />
+                android:key="@string/pref_book_align_id"
+                android:summary="@string/pref_align_summary"
+                android:title="@string/pref_align_title" />
 
 		<ListPreference
-			android:defaultValue=""
-                android:entries="@array/pref_align_entries"
-                android:entryValues="@array/pref_align_values"
-			android:key="book_animationType"
-			android:summary="@string/pref_animationtype_summary"
-			android:title="@string/pref_animationtype_title" />
+                android:defaultValue="@string/pref_animation_type_none"
+                android:entries="@array/pref_animation_type_entries"
+                android:entryValues="@array/pref_animation_type_values"
+                android:key="@string/pref_book_animation_type_id"
+                android:summary="@string/pref_animationtype_summary"
+                android:title="@string/pref_animationtype_title" />
 	</PreferenceCategory>
 </PreferenceScreen>

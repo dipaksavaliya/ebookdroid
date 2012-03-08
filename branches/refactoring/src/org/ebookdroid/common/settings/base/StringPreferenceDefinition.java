@@ -18,6 +18,10 @@ public class StringPreferenceDefinition extends BasePreferenceDefinition {
         return prefs.getString(key, defValue);
     }
 
+    public String getPreferenceValue(final SharedPreferences prefs, final String defValue) {
+        return prefs.getString(key, defValue);
+    }
+
     public void setPreferenceValue(final Editor edit, final String value) {
         edit.putString(key, value);
     }

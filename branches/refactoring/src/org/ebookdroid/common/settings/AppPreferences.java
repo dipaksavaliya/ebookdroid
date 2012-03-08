@@ -130,6 +130,25 @@ public interface AppPreferences {
     BooleanPreferenceDefinition FB2_HYPHEN = new BooleanPreferenceDefinition(pref_fb2hyphen_id,
             pref_fb2hyphen_defvalue);
 
+    /* =============== Book rendering settings =============== */
+
+    StringPreferenceDefinition BOOK = new StringPreferenceDefinition(pref_book_id, 0);
+
+    BooleanPreferenceDefinition BOOK_SPLIT_PAGES = new BooleanPreferenceDefinition(pref_book_splitpages_id,
+            pref_splitpages_defvalue);
+
+    BooleanPreferenceDefinition BOOK_CROP_PAGES = new BooleanPreferenceDefinition(pref_book_croppages_id, pref_croppages_defvalue);
+
+    EnumPreferenceDefinition<DocumentViewMode> BOOK_VIEW_MODE = new EnumPreferenceDefinition<DocumentViewMode>(
+            DocumentViewMode.class, pref_book_viewmode_id, pref_viewmode_vertical_scroll);
+
+    EnumPreferenceDefinition<PageAlign> BOOK_PAGE_ALIGN = new EnumPreferenceDefinition<PageAlign>(PageAlign.class,
+            pref_book_align_id, pref_align_by_width);
+
+    EnumPreferenceDefinition<PageAnimationType> BOOK_ANIMATION_TYPE = new EnumPreferenceDefinition<PageAnimationType>(
+            PageAnimationType.class, pref_book_animation_type_id, pref_animation_type_none);
+
+
     /* =============== Browser settings =============== */
 
     FileListPreferenceDefinition AUTO_SCAN_DIRS = new FileListPreferenceDefinition(pref_brautoscandir_id,
