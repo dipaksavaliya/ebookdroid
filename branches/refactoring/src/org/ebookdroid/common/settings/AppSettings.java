@@ -17,7 +17,6 @@ import android.preference.PreferenceManager;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.emdev.utils.MathUtils;
 import org.emdev.utils.android.AndroidVersion;
 import org.emdev.utils.enums.EnumUtils;
 import org.emdev.utils.filesystem.FileExtensionFilter;
@@ -345,24 +344,23 @@ public class AppSettings implements AppPreferences {
 
     public int getDjvuRenderingMode() {
         if (djvuRenderingMode == null) {
-            djvuRenderingMode = getIntValue("djvu_rendering_mode", 0);
+            djvuRenderingMode = DJVU_RENDERING_MODE.getPreferenceValue(prefs);
         }
         return djvuRenderingMode;
     }
 
     public boolean useCustomDpi() {
         if (useCustomDpi == null) {
-            useCustomDpi = prefs.getBoolean("customdpi", false);
+            useCustomDpi = PDF_CUSTOM_DPI.getPreferenceValue(prefs);
         }
         return useCustomDpi.booleanValue();
     }
 
     public float getXDpi(final float def) {
+        if (xDpi == null) {
+            xDpi = PDF_CUSTOM_XDPI.getPreferenceValue(prefs);
+        }
         if (useCustomDpi()) {
-            if (xDpi == null) {
-                final int value = getIntValue("xdpi", (int) def);
-                xDpi = Integer.valueOf(MathUtils.adjust(value, 0, 720));
-            }
             return xDpi.floatValue();
         } else {
             return def;
@@ -370,11 +368,10 @@ public class AppSettings implements AppPreferences {
     }
 
     public float getYDpi(final float def) {
+        if (yDpi == null) {
+            yDpi = PDF_CUSTOM_YDPI.getPreferenceValue(prefs);
+        }
         if (useCustomDpi()) {
-            if (yDpi == null) {
-                final int value = getIntValue("ydpi", (int) def);
-                yDpi = Integer.valueOf(MathUtils.adjust(value, 0, 720));
-            }
             return yDpi.floatValue();
         } else {
             return def;
@@ -383,14 +380,14 @@ public class AppSettings implements AppPreferences {
 
     public FontSize getFontSize() {
         if (fontSize == null) {
-            fontSize = FontSize.getByResValue(prefs.getString("fontsize", FontSize.NORMAL.toString()));
+            fontSize = FB2_FONT_SIZE.getPreferenceValue(prefs);
         }
         return fontSize;
     }
 
     public boolean isFb2HyphenEnabled() {
         if (fb2HyphenEnabled == null) {
-            fb2HyphenEnabled = prefs.getBoolean("fb2hyphen", false);
+            fb2HyphenEnabled = FB2_HYPHEN.getPreferenceValue(prefs);
         }
         return fb2HyphenEnabled;
     }
@@ -475,16 +472,6 @@ public class AppSettings implements AppPreferences {
         bs.animationType = EnumUtils.getByResValue(PageAnimationType.class, prefs.getString("book_animationType", null), getAnimationType());
 
         bs.cropPages = prefs.getBoolean("book_croppages", getCropPages());
-    }
-
-    private int getIntValue(final String key, final int defaultValue) {
-        final String str = prefs.getString(key, "" + defaultValue);
-        int value = defaultValue;
-        try {
-            value = Integer.parseInt(str);
-        } catch (final NumberFormatException e) {
-        }
-        return value;
     }
 
     public static class Diff {

@@ -9,6 +9,7 @@ import org.ebookdroid.common.settings.base.IntegerPreferenceDefinition;
 import org.ebookdroid.common.settings.base.StringPreferenceDefinition;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.DocumentViewType;
+import org.ebookdroid.common.settings.types.FontSize;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.common.settings.types.RotationType;
 import org.ebookdroid.core.curl.PageAnimationType;
@@ -108,6 +109,26 @@ public interface AppPreferences {
 
     EnumPreferenceDefinition<PageAnimationType> ANIMATION_TYPE = new EnumPreferenceDefinition<PageAnimationType>(
             PageAnimationType.class, pref_animation_type_id, pref_animation_type_none);
+
+    /* =============== Format-specific settings =============== */
+
+    IntegerPreferenceDefinition DJVU_RENDERING_MODE = new IntegerPreferenceDefinition(pref_djvu_rendering_mode_id,
+            pref_djvu_rendering_mode_0, pref_djvu_rendering_mode_0, pref_djvu_rendering_mode_5);
+
+    BooleanPreferenceDefinition PDF_CUSTOM_DPI = new BooleanPreferenceDefinition(pref_customdpi_id,
+            pref_customdpi_defvalue);
+
+    IntegerPreferenceDefinition PDF_CUSTOM_XDPI = new IntegerPreferenceDefinition(pref_xdpi_id, pref_xdpi_defvalue,
+            pref_xdpi_minvalue, pref_xdpi_maxvalue);
+
+    IntegerPreferenceDefinition PDF_CUSTOM_YDPI = new IntegerPreferenceDefinition(pref_ydpi_id, pref_ydpi_defvalue,
+            pref_ydpi_minvalue, pref_ydpi_maxvalue);
+
+    EnumPreferenceDefinition<FontSize> FB2_FONT_SIZE = new EnumPreferenceDefinition<FontSize>(FontSize.class,
+            pref_fontsize_id, pref_fontsize_normal);
+
+    BooleanPreferenceDefinition FB2_HYPHEN = new BooleanPreferenceDefinition(pref_fb2hyphen_id,
+            pref_fb2hyphen_defvalue);
 
     /* =============== Browser settings =============== */
 
