@@ -1,21 +1,23 @@
 package org.ebookdroid.common.settings.types;
 
+import org.ebookdroid.EBookDroidApp;
+import org.ebookdroid.R;
+
+import org.emdev.utils.enums.ResourceConstant;
+
 /**
  * The Enum PageAlign.
  */
-public enum PageAlign {
+public enum PageAlign implements ResourceConstant {
     /** BY WIDTH. */
-    WIDTH("By Width"),
+    WIDTH(R.string.pref_align_by_width),
     /** BY HEIGHT. */
-    HEIGHT("By Height"),
+    HEIGHT(R.string.pref_align_by_height),
     /** AUTO. */
-    AUTO("Auto");
+    AUTO(R.string.pref_align_auto);
 
     /** The resource value. */
     private final String resValue;
-
-    /** The _values. */
-    private static PageAlign[] _values = values();
 
     /**
      * Instantiates a new page align object.
@@ -23,8 +25,8 @@ public enum PageAlign {
      * @param resValue
      *            the res value
      */
-    private PageAlign(final String resValue) {
-        this.resValue = resValue;
+    private PageAlign(final int resId) {
+        this.resValue = EBookDroidApp.context.getString(resId);
     }
 
     /**
@@ -35,21 +37,4 @@ public enum PageAlign {
     public String getResValue() {
         return resValue;
     }
-
-    /**
-     * Gets the by resource value.
-     *
-     * @param resValue
-     *            the resource value
-     * @return the enum value or @null
-     */
-    public static PageAlign getByResValue(final String resValue) {
-        for (final PageAlign pa : _values) {
-            if (pa.resValue.equals(resValue)) {
-                return pa;
-            }
-        }
-        return null;
-    }
-
 }

@@ -1,25 +1,26 @@
 package org.ebookdroid.core.curl;
 
+import org.ebookdroid.EBookDroidApp;
+import org.ebookdroid.R;
 import org.ebookdroid.core.SinglePageController;
 
-public enum PageAnimationType {
+import org.emdev.utils.enums.ResourceConstant;
 
-    NONE("None", true),
+public enum PageAnimationType implements ResourceConstant {
 
-    CURLER("Simple curler", false),
+    NONE(R.string.pref_animation_type_none, true),
 
-    CURLER_DYNAMIC("Dynamic curler", false),
+    CURLER(R.string.pref_animation_type_curler_simple, false),
 
-    CURLER_NATURAL("Natural curler", false),
+    CURLER_DYNAMIC(R.string.pref_animation_type_curler_dynamic, false),
 
-    SLIDER("Slider", true),
+    CURLER_NATURAL(R.string.pref_animation_type_curler_natural, false),
 
-    FADER("Fade in", true),
+    SLIDER(R.string.pref_animation_type_slider, true),
 
-    SQUEEZER("Squeeze", true);
+    FADER(R.string.pref_animation_type_fader, true),
 
-    /** The _values. */
-    private static PageAnimationType[] _values = values();
+    SQUEEZER(R.string.pref_animation_type_squeezer, true);
 
     /** The resource value. */
     private final String resValue;
@@ -32,8 +33,8 @@ public enum PageAnimationType {
      * @param resValue
      *            the res value
      */
-    private PageAnimationType(final String resValue, final boolean hardwareAccelSupported) {
-        this.resValue = resValue;
+    private PageAnimationType(final int resId, final boolean hardwareAccelSupported) {
+        this.resValue = EBookDroidApp.context.getString(resId);
         this.hardwareAccelSupported = hardwareAccelSupported;
     }
 
@@ -48,15 +49,6 @@ public enum PageAnimationType {
 
     public boolean isHardwareAccelSupported() {
         return hardwareAccelSupported;
-    }
-
-    public static PageAnimationType get(final String resValue) {
-        for (final PageAnimationType t : _values) {
-            if (t.getResValue().equalsIgnoreCase(resValue)) {
-                return t;
-            }
-        }
-        return NONE;
     }
 
     public static PageAnimator create(final PageAnimationType type, final SinglePageController singlePageDocumentView) {

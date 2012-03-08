@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.emdev.utils.MathUtils;
 import org.emdev.utils.android.AndroidVersion;
+import org.emdev.utils.enums.EnumUtils;
 import org.emdev.utils.filesystem.FileExtensionFilter;
 
 public class AppSettings implements AppPreferences {
@@ -307,43 +308,35 @@ public class AppSettings implements AppPreferences {
 
     boolean getSplitPages() {
         if (splitPages == null) {
-            splitPages = prefs.getBoolean("splitpages", false);
+            splitPages = SPLIT_PAGES.getPreferenceValue(prefs);
         }
         return splitPages;
     }
 
     boolean getCropPages() {
         if (cropPages == null) {
-            cropPages = prefs.getBoolean("croppages", false);
+            cropPages = CROP_PAGES.getPreferenceValue(prefs);
         }
         return cropPages;
     }
 
     public DocumentViewMode getViewMode() {
         if (viewMode == null) {
-            viewMode = DocumentViewMode.getByResValue(prefs.getString("viewmode", null));
-            if (viewMode == null) {
-                final boolean singlePage = prefs.getBoolean("singlepage", false);
-                viewMode = singlePage ? DocumentViewMode.SINGLE_PAGE : DocumentViewMode.VERTICALL_SCROLL;
-            }
+            viewMode = VIEW_MODE.getPreferenceValue(prefs);
         }
         return viewMode;
     }
 
     PageAlign getPageAlign() {
         if (pageAlign == null) {
-            final String align = prefs.getString("align", PageAlign.AUTO.getResValue());
-            pageAlign = PageAlign.getByResValue(align);
-            if (pageAlign == null) {
-                pageAlign = PageAlign.AUTO;
-            }
+            pageAlign = PAGE_ALIGN.getPreferenceValue(prefs);
         }
         return pageAlign;
     }
 
     PageAnimationType getAnimationType() {
         if (animationType == null) {
-            animationType = PageAnimationType.get(prefs.getString("animationType", null));
+            animationType = ANIMATION_TYPE.getPreferenceValue(prefs);
         }
         return animationType;
     }
@@ -477,22 +470,11 @@ public class AppSettings implements AppPreferences {
     void fillBookSettings(final BookSettings bs) {
         bs.splitPages = prefs.getBoolean("book_splitpages", getSplitPages());
 
-        bs.viewMode = DocumentViewMode.getByResValue(prefs.getString("book_viewmode", getViewMode().getResValue()));
-        if (bs.viewMode == null) {
-            bs.viewMode = DocumentViewMode.VERTICALL_SCROLL;
-        }
+        bs.viewMode = EnumUtils.getByResValue(DocumentViewMode.class, prefs.getString("book_viewmode", null), getViewMode());
+        bs.pageAlign = EnumUtils.getByResValue(PageAlign.class, prefs.getString("book_align", null), getPageAlign());
+        bs.animationType = EnumUtils.getByResValue(PageAnimationType.class, prefs.getString("book_animationType", null), getAnimationType());
 
-        bs.pageAlign = PageAlign.getByResValue(prefs.getString("book_align", getPageAlign().getResValue()));
-        if (bs.pageAlign == null) {
-            bs.pageAlign = PageAlign.AUTO;
-        }
-        bs.animationType = PageAnimationType.get(prefs
-                .getString("book_animationType", getAnimationType().getResValue()));
-        if (bs.animationType == null) {
-            bs.animationType = PageAnimationType.NONE;
-        }
         bs.cropPages = prefs.getBoolean("book_croppages", getCropPages());
-
     }
 
     private int getIntValue(final String key, final int defaultValue) {

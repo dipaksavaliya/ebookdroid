@@ -1,5 +1,7 @@
 package org.ebookdroid.common.settings.types;
 
+import org.ebookdroid.EBookDroidApp;
+import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.core.VScrollController;
@@ -10,13 +12,15 @@ import org.ebookdroid.ui.viewer.IViewController;
 
 import java.lang.reflect.Constructor;
 
-public enum DocumentViewMode {
+import org.emdev.utils.enums.ResourceConstant;
 
-    VERTICALL_SCROLL("Vertical scroll", PageAlign.WIDTH, VScrollController.class),
+public enum DocumentViewMode implements ResourceConstant {
 
-    HORIZONTAL_SCROLL("Horizontal scroll", PageAlign.HEIGHT, HScrollController.class),
+    VERTICALL_SCROLL(R.string.pref_viewmode_vertical_scroll, PageAlign.WIDTH, VScrollController.class),
 
-    SINGLE_PAGE("Single page", null, SinglePageController.class);
+    HORIZONTAL_SCROLL(R.string.pref_viewmode_horizontal_scroll, PageAlign.HEIGHT, HScrollController.class),
+
+    SINGLE_PAGE(R.string.pref_viewmode_single_page, null, SinglePageController.class);
 
     private final LogContext LCTX = LogContext.ROOT.lctx("View");
 
@@ -27,9 +31,9 @@ public enum DocumentViewMode {
 
     private Constructor<? extends IViewController> c;
 
-    private DocumentViewMode(final String res, final PageAlign pageAlign,
+    private DocumentViewMode(final int resId, final PageAlign pageAlign,
             final Class<? extends IViewController> clazz) {
-        this.resValue = res;
+        this.resValue = EBookDroidApp.context.getString(resId);
         this.pageAlign = pageAlign;
         try {
             this.c = clazz.getConstructor(IActivityController.class);
@@ -60,22 +64,6 @@ public enum DocumentViewMode {
         }
         final PageAlign defAlign = bs.viewMode.pageAlign;
         return defAlign != null ? defAlign : bs.pageAlign;
-    }
-
-    /**
-     * Gets the by resource value.
-     * 
-     * @param resValue
-     *            the resource value
-     * @return the enum value or @null
-     */
-    public static DocumentViewMode getByResValue(final String resValue) {
-        for (final DocumentViewMode vm : values()) {
-            if (vm.resValue.equals(resValue)) {
-                return vm;
-            }
-        }
-        return null;
     }
 
     public static DocumentViewMode getByOrdinal(final int ord) {

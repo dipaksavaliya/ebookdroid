@@ -1,13 +1,17 @@
 package org.ebookdroid.common.settings;
 
 import static org.ebookdroid.R.string.*;
+
 import org.ebookdroid.common.settings.base.BooleanPreferenceDefinition;
 import org.ebookdroid.common.settings.base.EnumPreferenceDefinition;
 import org.ebookdroid.common.settings.base.FileListPreferenceDefinition;
 import org.ebookdroid.common.settings.base.IntegerPreferenceDefinition;
 import org.ebookdroid.common.settings.base.StringPreferenceDefinition;
+import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.DocumentViewType;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.common.settings.types.RotationType;
+import org.ebookdroid.core.curl.PageAnimationType;
 
 public interface AppPreferences {
 
@@ -88,7 +92,23 @@ public interface AppPreferences {
 
     BooleanPreferenceDefinition RELOAD_DURING_ZOOM = new BooleanPreferenceDefinition(pref_reloadduringzoom_id,
             pref_reloadduringzoom_defvalue);
-    
+
+    /* =============== Default rendering settings =============== */
+
+    BooleanPreferenceDefinition SPLIT_PAGES = new BooleanPreferenceDefinition(pref_splitpages_id,
+            pref_splitpages_defvalue);
+
+    BooleanPreferenceDefinition CROP_PAGES = new BooleanPreferenceDefinition(pref_croppages_id, pref_croppages_defvalue);
+
+    EnumPreferenceDefinition<DocumentViewMode> VIEW_MODE = new EnumPreferenceDefinition<DocumentViewMode>(
+            DocumentViewMode.class, pref_viewmode_id, pref_viewmode_vertical_scroll);
+
+    EnumPreferenceDefinition<PageAlign> PAGE_ALIGN = new EnumPreferenceDefinition<PageAlign>(PageAlign.class,
+            pref_align_id, pref_align_by_width);
+
+    EnumPreferenceDefinition<PageAnimationType> ANIMATION_TYPE = new EnumPreferenceDefinition<PageAnimationType>(
+            PageAnimationType.class, pref_animation_type_id, pref_animation_type_none);
+
     /* =============== Browser settings =============== */
 
     FileListPreferenceDefinition AUTO_SCAN_DIRS = new FileListPreferenceDefinition(pref_brautoscandir_id,

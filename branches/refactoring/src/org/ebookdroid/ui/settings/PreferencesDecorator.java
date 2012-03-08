@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.enums.EnumUtils;
 
 /**
  * @author whippet
@@ -219,7 +220,7 @@ public class PreferencesDecorator implements IPreferenceContainer {
 
         @Override
         public boolean onPreferenceChange(final Preference preference, final Object newValue) {
-            final PageAnimationType type = PageAnimationType.get(newValue.toString());
+            final PageAnimationType type = EnumUtils.getByResValue(PageAnimationType.class, newValue.toString(), null);
             setPageAlign(type, relatedKey);
             return true;
         }
@@ -235,7 +236,7 @@ public class PreferencesDecorator implements IPreferenceContainer {
 
         @Override
         public boolean onPreferenceChange(final Preference preference, final Object newValue) {
-            final DocumentViewMode type = DocumentViewMode.getByResValue(newValue.toString());
+            final DocumentViewMode type = EnumUtils.getByResValue(DocumentViewMode.class, newValue.toString(), null);
             enableSinglePageModeSetting(type, relatedKeys);
             return true;
         }

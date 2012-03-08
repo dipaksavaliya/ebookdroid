@@ -18,8 +18,8 @@
 
     <ListPreference
         android:defaultValue="Vertical scroll"
-        android:entries="@array/list_viewmode"
-        android:entryValues="@array/list_viewmode_values"
+            android:entries="@array/pref_viewmode_entries"
+            android:entryValues="@array/pref_viewmode_values"
         android:key="book_viewmode"
         android:summary="@string/pref_viewmode_summary"
         android:title="@string/pref_viewmode_title" />
@@ -30,16 +30,16 @@
 
 		<ListPreference
 			android:defaultValue="By Width"
-			android:entries="@array/list_align"
-			android:entryValues="@array/list_align_values"
+                android:entries="@array/pref_align_entries"
+                android:entryValues="@array/pref_align_values"
 			android:key="book_align"
 			android:summary="@string/pref_align_summary"
 			android:title="@string/pref_align_title" />
 
 		<ListPreference
 			android:defaultValue=""
-			android:entries="@array/list_animation"
-			android:entryValues="@array/list_animation_values"
+                android:entries="@array/pref_align_entries"
+                android:entryValues="@array/pref_align_values"
 			android:key="book_animationType"
 			android:summary="@string/pref_animationtype_summary"
 			android:title="@string/pref_animationtype_title" />
