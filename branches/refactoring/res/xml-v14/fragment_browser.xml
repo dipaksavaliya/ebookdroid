@@ -4,14 +4,14 @@
         android:title="@string/pref_browser_category" >
 
         <SwitchPreference
-            android:defaultValue="true"
-            android:key="usebookcase"
+            android:defaultValue="@string/pref_usebookcase_defvalue"
+            android:key="@string/pref_usebookcase_id"
             android:summary="@string/pref_usebookcase_summary"
             android:title="@string/pref_usebookcase_title" />
 
         <EditTextPreference
-            android:defaultValue="/sdcard"
-            android:key="brautoscandir"
+            android:defaultValue="@string/pref_brautoscandir_defvalue"
+            android:key="@string/pref_brautoscandir_id"
             android:summary="@string/pref_brautoscandir_summary"
             android:title="@string/pref_brautoscandir_title" />
 

@@ -395,7 +395,7 @@ public class AppSettings implements AppPreferences {
 
     public boolean getUseBookcase() {
         if (useBookcase == null) {
-            useBookcase = prefs.getBoolean("usebookcase", true);
+            useBookcase = USE_BOOK_CASE.getPreferenceValue(prefs);
         }
         return !AndroidVersion.is1x && useBookcase;
     }
@@ -422,12 +422,8 @@ public class AppSettings implements AppPreferences {
     }
 
     public FileExtensionFilter getAllowedFileTypes() {
-        return getAllowedFileTypes(CodecType.getAllExtensions());
-    }
-
-    public FileExtensionFilter getAllowedFileTypes(final Set<String> fileTypes) {
         final Set<String> res = new HashSet<String>();
-        for (final String ext : fileTypes) {
+        for (final String ext : CodecType.getAllExtensions()) {
             if (isFileTypeAllowed(ext)) {
                 res.add(ext);
             }
@@ -446,6 +442,7 @@ public class AppSettings implements AppPreferences {
         editor.remove(BOOK.key);
         editor.remove(BOOK_SPLIT_PAGES.key);
         editor.remove(BOOK_CROP_PAGES.key);
+        editor.remove(BOOK_VIEW_MODE.key);
         editor.remove(BOOK_PAGE_ALIGN.key);
         editor.remove(BOOK_ANIMATION_TYPE.key);
         editor.commit();

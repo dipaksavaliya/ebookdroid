@@ -151,6 +151,9 @@ public interface AppPreferences {
 
     /* =============== Browser settings =============== */
 
+    BooleanPreferenceDefinition USE_BOOK_CASE = new BooleanPreferenceDefinition(pref_usebookcase_id,
+            pref_usebookcase_defvalue);
+
     FileListPreferenceDefinition AUTO_SCAN_DIRS = new FileListPreferenceDefinition(pref_brautoscandir_id,
             pref_brautoscandir_defvalue);
 
