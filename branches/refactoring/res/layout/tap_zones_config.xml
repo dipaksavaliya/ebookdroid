@@ -27,7 +27,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:gravity="right"
-                android:text="Single tap" />
+                android:text="@string/tap_zones_single_tap" />
 
             <Spinner
                 android:id="@+id/tapZonesConfigSingleAction"
@@ -44,7 +44,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:gravity="right"
-                android:text="Double tap" />
+                android:text="@string/tap_zones_double_tap" />
 
             <Spinner
                 android:id="@+id/tapZonesConfigDoubleAction"
@@ -62,7 +62,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:gravity="right"
-                android:text="Long tap" />
+                android:text="@string/tap_zones_long_tap" />
 
             <Spinner
                 android:id="@+id/tapZonesConfigLongAction"
@@ -79,7 +79,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:gravity="right"
-                android:text="Two finger tap" />
+                android:text="@string/tap_zones_two_finger_tap" />
 
             <Spinner
                 android:id="@+id/tapZonesConfigTwoFingerAction"
@@ -102,21 +102,21 @@
                 android:layout_width="0dip"
                 android:layout_weight="1"
                 android:padding="15dip"
-                android:text="Reset" />
+                android:text="@string/tap_zones_reset" />
 
             <Button
                 android:id="@+id/tapZonesConfigDelete"
                 android:layout_width="0dip"
                 android:layout_weight="1"
                 android:padding="15dip"
-                android:text="Delete" />
+                android:text="@string/tap_zones_delete" />
 
             <Button
                 android:id="@+id/tapZonesConfigClear"
                 android:layout_width="0dip"
                 android:layout_weight="1"
                 android:padding="15dip"
-                android:text="Clear" />
+                android:text="@string/tap_zones_clear" />
         </TableRow>
     </TableLayout>
 
