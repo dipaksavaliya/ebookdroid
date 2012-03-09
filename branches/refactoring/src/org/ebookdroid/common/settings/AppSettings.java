@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,403 +23,148 @@ import org.emdev.utils.filesystem.FileExtensionFilter;
 
 public class AppSettings implements AppPreferences {
 
-    private final SharedPreferences prefs;
+    final SharedPreferences prefs;
 
-    private Boolean tapsEnabled;
+    public final boolean loadRecent;
 
-    private DocumentViewMode viewMode;
+    public final boolean nightMode;
 
-    private Integer pagesInMemory;
+    public final boolean brightnessInNightModeOnly;
 
-    private Boolean showAnimIcon;
+    public final int brightness;
 
-    private Boolean nightMode;
+    public final boolean keepScreenOn;
 
-    private PageAlign pageAlign;
+    public final RotationType rotation;
 
-    private Boolean fullScreen;
+    public final boolean fullScreen;
 
-    private RotationType rotation;
+    public final boolean showTitle;
 
-    private Boolean showTitle;
+    public final boolean pageInTitle;
 
-    private Integer scrollHeight;
+    public final boolean showAnimIcon;
 
-    private Integer touchProcessingDelay;
+    public final boolean tapsEnabled;
 
-    private PageAnimationType animationType;
+    public final int scrollHeight;
 
-    private Boolean splitPages;
+    public final int touchProcessingDelay;
 
-    private Boolean pageInTitle;
+    public final String tapProfiles;
 
-    private Integer brightness;
+    public final String keysBinding;
 
-    private Boolean brightnessInNightModeOnly;
+    public final int pagesInMemory;
 
-    private Boolean keepScreenOn;
+    public final DocumentViewType viewType;
 
-    private Set<String> autoScanDirs;
+    public final int decodingThreadPriority;
 
-    private Boolean loadRecent;
+    public final int drawThreadPriority;
 
-    private Boolean useBookcase;
+    public final boolean hwaEnabled;
 
-    private Integer djvuRenderingMode;
+    public final int bitmapSize;
 
-    private Boolean cropPages;
+    public final boolean textureReuseEnabled;
 
-    private String tapProfiles;
+    public final boolean reloadDuringZoom;
 
-    private String keysBinding;
+    public final boolean useEarlyRecycling;
 
-    private DocumentViewType viewType;
+    final boolean splitPages;
 
-    private Integer decodingThreadPriority;
+    final boolean cropPages;
 
-    private Integer drawThreadPriority;
+    public final DocumentViewMode viewMode;
 
-    private Boolean hwaEnabled;
+    final PageAlign pageAlign;
 
-    private Integer bitmapSize;
+    final PageAnimationType animationType;
 
-    private Boolean textureReuseEnabled;
+    public final int djvuRenderingMode;
 
-    private Boolean reloadDuringZoom;
+    public final boolean useCustomDpi;
 
-    private Boolean useCustomDpi;
+    public final int xDpi;
 
-    private Integer xDpi;
+    public final int yDpi;
 
-    private Integer yDpi;
+    public final FontSize fontSize;
 
-    private FontSize fontSize;
+    public final boolean fb2HyphenEnabled;
 
-    private Boolean fb2HyphenEnabled;
+    public final boolean useBookcase;
 
-    private Boolean useEarlyRecycling;
+    public final Set<String> autoScanDirs;
 
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        /* =============== UI settings =============== */
+        loadRecent = LOAD_RECENT.getPreferenceValue(prefs);
+        nightMode = NIGHT_MODE.getPreferenceValue(prefs);
+        brightnessInNightModeOnly = BRIGHTNESS_NIGHT_MODE_ONLY.getPreferenceValue(prefs);
+        brightness = BRIGHTNESS.getPreferenceValue(prefs);
+        keepScreenOn = KEEP_SCREEN_ON.getPreferenceValue(prefs);
+        rotation = ROTATION.getPreferenceValue(prefs);
+        fullScreen = FULLSCREEN.getPreferenceValue(prefs);
+        showTitle = SHOW_TITLE.getPreferenceValue(prefs);
+        pageInTitle = SHOW_PAGE_IN_TITLE.getPreferenceValue(prefs);
+        showAnimIcon = SHOW_ANIM_ICON.getPreferenceValue(prefs);
+        /* =============== Tap & Scroll settings =============== */
+        tapsEnabled = TAPS_ENABLED.getPreferenceValue(prefs);
+        scrollHeight = SCROLL_HEIGHT.getPreferenceValue(prefs);
+        touchProcessingDelay = TOUCH_DELAY.getPreferenceValue(prefs);
+        /* =============== Tap & Keyboard settings =============== */
+        tapProfiles = TAP_PROFILES.getPreferenceValue(prefs);
+        keysBinding = KEY_BINDINGS.getPreferenceValue(prefs);    
+        /* =============== Performance settings =============== */
+        pagesInMemory = PAGES_IN_MEMORY.getPreferenceValue(prefs);
+        viewType = VIEW_TYPE.getPreferenceValue(prefs);
+        decodingThreadPriority = DECODE_THREAD_PRIORITY.getPreferenceValue(prefs);
+        drawThreadPriority = DRAW_THREAD_PRIORITY.getPreferenceValue(prefs);
+        hwaEnabled = HWA_ENABLED.getPreferenceValue(prefs);
+        bitmapSize = 1 << BITMAP_SIZE.getPreferenceValue(prefs);
+        textureReuseEnabled = REUSE_TEXTURES.getPreferenceValue(prefs);
+        useEarlyRecycling = EARLY_RECYCLING.getPreferenceValue(prefs);
+        reloadDuringZoom = RELOAD_DURING_ZOOM.getPreferenceValue(prefs);
+        /* =============== Default rendering settings =============== */
+        splitPages = SPLIT_PAGES.getPreferenceValue(prefs);
+        cropPages = CROP_PAGES.getPreferenceValue(prefs);
+        viewMode = VIEW_MODE.getPreferenceValue(prefs);
+        pageAlign = PAGE_ALIGN.getPreferenceValue(prefs);
+        animationType = ANIMATION_TYPE.getPreferenceValue(prefs);
+        /* =============== Format-specific settings =============== */
+        djvuRenderingMode = DJVU_RENDERING_MODE.getPreferenceValue(prefs);
+        useCustomDpi = PDF_CUSTOM_DPI.getPreferenceValue(prefs);
+        xDpi = PDF_CUSTOM_XDPI.getPreferenceValue(prefs);
+        yDpi = PDF_CUSTOM_YDPI.getPreferenceValue(prefs);
+        fontSize = FB2_FONT_SIZE.getPreferenceValue(prefs);
+        fb2HyphenEnabled = FB2_HYPHEN.getPreferenceValue(prefs);
+        /* =============== Browser settings =============== */
+        useBookcase = USE_BOOK_CASE.getPreferenceValue(prefs);
+        autoScanDirs = Collections.unmodifiableSet(AUTO_SCAN_DIRS.getPreferenceValue(prefs));
     }
 
     /* =============== UI settings =============== */
-
-    public boolean isLoadRecentBook() {
-        if (loadRecent == null) {
-            loadRecent = LOAD_RECENT.getPreferenceValue(prefs);
-        }
-        return loadRecent;
-    }
-
-    public boolean getNightMode() {
-        if (nightMode == null) {
-            nightMode = NIGHT_MODE.getPreferenceValue(prefs);
-        }
-        return nightMode;
-    }
-
-    public void toggleNightMode() {
-        nightMode = !nightMode;
-        final Editor edit = prefs.edit();
-        NIGHT_MODE.setPreferenceValue(edit, nightMode);
-        edit.commit();
-    }
-
-    public boolean isBrightnessInNightModeOnly() {
-        if (brightnessInNightModeOnly == null) {
-            brightnessInNightModeOnly = BRIGHTNESS_NIGHT_MODE_ONLY.getPreferenceValue(prefs);
-        }
-        return brightnessInNightModeOnly;
-    }
-
-    public int getBrightness() {
-        if (isBrightnessInNightModeOnly() && !getNightMode()) {
-            return BRIGHTNESS.maxValue;
-        }
-        if (brightness == null) {
-            brightness = BRIGHTNESS.getPreferenceValue(prefs);
-        }
-        return brightness;
-    }
-
-    public boolean isKeepScreenOn() {
-        if (keepScreenOn == null) {
-            keepScreenOn = KEEP_SCREEN_ON.getPreferenceValue(prefs);
-        }
-        return keepScreenOn;
-    }
-
-    public RotationType getRotation() {
-        if (rotation == null) {
-            rotation = ROTATION.getPreferenceValue(prefs);
-        }
-        return rotation;
-    }
-
-    public boolean getFullScreen() {
-        if (fullScreen == null) {
-            fullScreen = FULLSCREEN.getPreferenceValue(prefs);
-        }
-        return fullScreen;
-    }
-
-    public boolean getShowTitle() {
-        if (showTitle == null) {
-            showTitle = SHOW_TITLE.getPreferenceValue(prefs);
-        }
-        return showTitle;
-    }
-
-    public boolean getPageInTitle() {
-        if (pageInTitle == null) {
-            pageInTitle = SHOW_PAGE_IN_TITLE.getPreferenceValue(prefs);
-        }
-        return pageInTitle;
-    }
-
-    public boolean getShowAnimIcon() {
-        if (showAnimIcon == null) {
-            showAnimIcon = SHOW_ANIM_ICON.getPreferenceValue(prefs);
-        }
-        return showAnimIcon;
-    }
-
     /* =============== Tap & Scroll settings =============== */
-
-    public boolean getTapsEnabled() {
-        if (tapsEnabled == null) {
-            tapsEnabled = TAPS_ENABLED.getPreferenceValue(prefs);
-        }
-        return tapsEnabled;
-    }
-
-    public int getScrollHeight() {
-        if (scrollHeight == null) {
-            scrollHeight = SCROLL_HEIGHT.getPreferenceValue(prefs);
-        }
-        return scrollHeight.intValue();
-    }
-
-    public int getTouchProcessingDelay() {
-        if (touchProcessingDelay == null) {
-            touchProcessingDelay = TOUCH_DELAY.getPreferenceValue(prefs);
-        }
-        return touchProcessingDelay;
-    }
-
     /* =============== Tap & Keyboard settings =============== */
-
-    public String getTapProfiles() {
-        if (tapProfiles == null) {
-            tapProfiles = TAP_PROFILES.getPreferenceValue(prefs);
-        }
-        return tapProfiles;
-    }
-
-    public void updateTapProfiles(final String profiles) {
-        tapProfiles = profiles;
-        final Editor edit = prefs.edit();
-        TAP_PROFILES.setPreferenceValue(edit, profiles);
-        edit.commit();
-    }
-
-    public String getKeysBinding() {
-        if (keysBinding == null) {
-            keysBinding = KEY_BINDINGS.getPreferenceValue(prefs);
-        }
-        return keysBinding;
-    }
-
-    public void updateKeysBinding(final String json) {
-        keysBinding = json;
-        final Editor edit = prefs.edit();
-        KEY_BINDINGS.setPreferenceValue(edit, json);
-        edit.commit();
-    }
-
-    /* =============== Performance settings =============== */
-
-    public int getPagesInMemory() {
-        if (pagesInMemory == null) {
-            pagesInMemory = PAGES_IN_MEMORY.getPreferenceValue(prefs);
-        }
-        return pagesInMemory.intValue();
-    }
-
-    public DocumentViewType getDocumentViewType() {
-        if (viewType == null) {
-            viewType = VIEW_TYPE.getPreferenceValue(prefs);
-        }
-        return viewType;
-    }
-
-    public int getDecodingThreadPriority() {
-        if (decodingThreadPriority == null) {
-            decodingThreadPriority = DECODE_THREAD_PRIORITY.getPreferenceValue(prefs);
-        }
-        return decodingThreadPriority.intValue();
-    }
-
-    public int getDrawThreadPriority() {
-        if (drawThreadPriority == null) {
-            drawThreadPriority = DRAW_THREAD_PRIORITY.getPreferenceValue(prefs);
-        }
-        return drawThreadPriority.intValue();
-    }
-
-    public boolean isHWAEnabled() {
-        if (hwaEnabled == null) {
-            hwaEnabled = HWA_ENABLED.getPreferenceValue(prefs);
-        }
-        return hwaEnabled.booleanValue();
-    }
-
-    public int getBitmapSize() {
-        if (bitmapSize == null) {
-            bitmapSize = 1 << BITMAP_SIZE.getPreferenceValue(prefs);
-        }
-        return bitmapSize.intValue();
-    }
-
-    public boolean getTextureReuseEnabled() {
-        if (textureReuseEnabled == null) {
-            textureReuseEnabled = REUSE_TEXTURES.getPreferenceValue(prefs);
-        }
-        return textureReuseEnabled;
-    }
-
-    public boolean getUseEarlyRecycling() {
-        if (useEarlyRecycling == null) {
-            useEarlyRecycling = EARLY_RECYCLING.getPreferenceValue(prefs);
-        }
-        return useEarlyRecycling;
-    }
-
-    public boolean getReloadDuringZoom() {
-        if (reloadDuringZoom == null) {
-            reloadDuringZoom = RELOAD_DURING_ZOOM.getPreferenceValue(prefs);
-        }
-        return reloadDuringZoom;
-    }
-
     /* =============== Default rendering settings =============== */
-
-    boolean getSplitPages() {
-        if (splitPages == null) {
-            splitPages = SPLIT_PAGES.getPreferenceValue(prefs);
-        }
-        return splitPages;
-    }
-
-    boolean getCropPages() {
-        if (cropPages == null) {
-            cropPages = CROP_PAGES.getPreferenceValue(prefs);
-        }
-        return cropPages;
-    }
-
-    public DocumentViewMode getViewMode() {
-        if (viewMode == null) {
-            viewMode = VIEW_MODE.getPreferenceValue(prefs);
-        }
-        return viewMode;
-    }
-
-    PageAlign getPageAlign() {
-        if (pageAlign == null) {
-            pageAlign = PAGE_ALIGN.getPreferenceValue(prefs);
-        }
-        return pageAlign;
-    }
-
-    PageAnimationType getAnimationType() {
-        if (animationType == null) {
-            animationType = ANIMATION_TYPE.getPreferenceValue(prefs);
-        }
-        return animationType;
-    }
-
     /* =============== Format-specific settings =============== */
 
-    public int getDjvuRenderingMode() {
-        if (djvuRenderingMode == null) {
-            djvuRenderingMode = DJVU_RENDERING_MODE.getPreferenceValue(prefs);
-        }
-        return djvuRenderingMode;
-    }
-
-    public boolean useCustomDpi() {
-        if (useCustomDpi == null) {
-            useCustomDpi = PDF_CUSTOM_DPI.getPreferenceValue(prefs);
-        }
-        return useCustomDpi.booleanValue();
-    }
-
     public float getXDpi(final float def) {
-        if (xDpi == null) {
-            xDpi = PDF_CUSTOM_XDPI.getPreferenceValue(prefs);
-        }
-        if (useCustomDpi()) {
-            return xDpi.floatValue();
-        } else {
-            return def;
-        }
+        return useCustomDpi ? xDpi : def;
     }
 
     public float getYDpi(final float def) {
-        if (yDpi == null) {
-            yDpi = PDF_CUSTOM_YDPI.getPreferenceValue(prefs);
-        }
-        if (useCustomDpi()) {
-            return yDpi.floatValue();
-        } else {
-            return def;
-        }
-    }
-
-    public FontSize getFontSize() {
-        if (fontSize == null) {
-            fontSize = FB2_FONT_SIZE.getPreferenceValue(prefs);
-        }
-        return fontSize;
-    }
-
-    public boolean isFb2HyphenEnabled() {
-        if (fb2HyphenEnabled == null) {
-            fb2HyphenEnabled = FB2_HYPHEN.getPreferenceValue(prefs);
-        }
-        return fb2HyphenEnabled;
+        return useCustomDpi ? yDpi : def;
     }
 
     /* =============== Browser settings =============== */
 
     public boolean getUseBookcase() {
-        if (useBookcase == null) {
-            useBookcase = USE_BOOK_CASE.getPreferenceValue(prefs);
-        }
         return !AndroidVersion.is1x && useBookcase;
-    }
-
-    public Set<String> getAutoScanDirs() {
-        if (autoScanDirs == null) {
-            autoScanDirs = AUTO_SCAN_DIRS.getPreferenceValue(prefs);
-        }
-        return autoScanDirs;
-    }
-
-    public void setAutoScanDirs(final Set<String> dirs) {
-        autoScanDirs = dirs;
-        final Editor edit = prefs.edit();
-        AUTO_SCAN_DIRS.setPreferenceValue(edit, dirs);
-        edit.commit();
-    }
-
-    public void changeAutoScanDirs(final String dir, final boolean add) {
-        final Set<String> dirs = getAutoScanDirs();
-        if (add && dirs.add(dir) || dirs.remove(dir)) {
-            setAutoScanDirs(dirs);
-        }
     }
 
     public FileExtensionFilter getAllowedFileTypes() {
@@ -460,11 +206,11 @@ public class AppSettings implements AppPreferences {
     }
 
     void fillBookSettings(final BookSettings bs) {
-        bs.splitPages = BOOK_SPLIT_PAGES.getPreferenceValue(prefs, getSplitPages());
-        bs.cropPages = BOOK_CROP_PAGES.getPreferenceValue(prefs, getCropPages());
-        bs.viewMode = BOOK_VIEW_MODE.getPreferenceValue(prefs, getViewMode());
-        bs.pageAlign = BOOK_PAGE_ALIGN.getPreferenceValue(prefs, getPageAlign());
-        bs.animationType = BOOK_ANIMATION_TYPE.getPreferenceValue(prefs, getAnimationType());
+        bs.splitPages = BOOK_SPLIT_PAGES.getPreferenceValue(prefs, splitPages);
+        bs.cropPages = BOOK_CROP_PAGES.getPreferenceValue(prefs, cropPages);
+        bs.viewMode = BOOK_VIEW_MODE.getPreferenceValue(prefs, viewMode);
+        bs.pageAlign = BOOK_PAGE_ALIGN.getPreferenceValue(prefs, pageAlign);
+        bs.animationType = BOOK_ANIMATION_TYPE.getPreferenceValue(prefs, animationType);
     }
 
     public static class Diff {
@@ -492,49 +238,49 @@ public class AppSettings implements AppPreferences {
         public Diff(final AppSettings olds, final AppSettings news) {
             firstTime = olds == null;
             if (news != null) {
-                if (firstTime || olds.getNightMode() != news.getNightMode()) {
+                if (firstTime || olds.nightMode != news.nightMode) {
                     mask |= D_NightMode;
                 }
-                if (firstTime || olds.getRotation() != news.getRotation()) {
+                if (firstTime || olds.rotation != news.rotation) {
                     mask |= D_Rotation;
                 }
-                if (firstTime || olds.getFullScreen() != news.getFullScreen()) {
+                if (firstTime || olds.fullScreen != news.fullScreen) {
                     mask |= D_FullScreen;
                 }
-                if (firstTime || olds.getShowTitle() != news.getShowTitle()) {
+                if (firstTime || olds.showTitle != news.showTitle) {
                     mask |= D_ShowTitle;
                 }
-                if (firstTime || olds.getPageInTitle() != news.getPageInTitle()) {
+                if (firstTime || olds.pageInTitle != news.pageInTitle) {
                     mask |= D_PageInTitle;
                 }
-                if (firstTime || olds.getTapsEnabled() != news.getTapsEnabled()) {
+                if (firstTime || olds.tapsEnabled != news.tapsEnabled) {
                     mask |= D_TapsEnabled;
                 }
-                if (firstTime || olds.getScrollHeight() != news.getScrollHeight()) {
+                if (firstTime || olds.scrollHeight != news.scrollHeight) {
                     mask |= D_ScrollHeight;
                 }
-                if (firstTime || olds.getPagesInMemory() != news.getPagesInMemory()) {
+                if (firstTime || olds.pagesInMemory != news.pagesInMemory) {
                     mask |= D_PagesInMemory;
                 }
-                if (firstTime || olds.getBrightness() != news.getBrightness()) {
+                if (firstTime || olds.brightness != news.brightness) {
                     mask |= D_Brightness;
                 }
-                if (firstTime || olds.isBrightnessInNightModeOnly() != news.isBrightnessInNightModeOnly()) {
+                if (firstTime || olds.brightnessInNightModeOnly != news.brightnessInNightModeOnly) {
                     mask |= D_BrightnessInNightMode;
                 }
-                if (firstTime || olds.isKeepScreenOn() != news.isKeepScreenOn()) {
+                if (firstTime || olds.keepScreenOn != news.keepScreenOn) {
                     mask |= D_KeepScreenOn;
                 }
-                if (firstTime || olds.isLoadRecentBook() != news.isLoadRecentBook()) {
+                if (firstTime || olds.loadRecent != news.loadRecent) {
                     mask |= D_LoadRecent;
                 }
                 if (firstTime || olds.getUseBookcase() != news.getUseBookcase()) {
                     mask |= D_UseBookcase;
                 }
-                if (firstTime || olds.getDjvuRenderingMode() != news.getDjvuRenderingMode()) {
+                if (firstTime || olds.djvuRenderingMode != news.djvuRenderingMode) {
                     mask |= D_DjvuRenderingMode;
                 }
-                if (firstTime || olds.getAutoScanDirs().equals(news.getAutoScanDirs())) {
+                if (firstTime || olds.autoScanDirs.equals(news.autoScanDirs)) {
                     mask |= D_AutoScanDirs;
                 }
                 if (firstTime || olds.getAllowedFileTypes().equals(news.getAllowedFileTypes())) {

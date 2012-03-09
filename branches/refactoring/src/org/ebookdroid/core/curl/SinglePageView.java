@@ -93,7 +93,7 @@ public class SinglePageView implements PageAnimator {
         final Page page = event.viewState.model.getCurrentPageObject();
         if (page != null) {
             event.process(page);
-            if (SettingsManager.getAppSettings().getShowAnimIcon()) {
+            if (SettingsManager.getAppSettings().showAnimIcon) {
                 DragMark.draw(event.canvas, event.viewState);
             }
         }

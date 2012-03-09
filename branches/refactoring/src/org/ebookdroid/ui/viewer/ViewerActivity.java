@@ -103,7 +103,7 @@ public class ViewerActivity extends AbstractActionActivity {
 
         frameLayout = new FrameLayout(this);
 
-        view = SettingsManager.getAppSettings().getDocumentViewType().create(controller);
+        view = SettingsManager.getAppSettings().viewType.create(controller);
         this.registerForContextMenu(view.getView());
 
         LayoutUtils.fillInParent(frameLayout, view.getView());
@@ -162,7 +162,7 @@ public class ViewerActivity extends AbstractActionActivity {
     }
 
     protected IView createView() {
-        return SettingsManager.getAppSettings().getDocumentViewType().create(controller);
+        return SettingsManager.getAppSettings().viewType.create(controller);
     }
 
     public TouchManagerView getTouchView() {
@@ -198,7 +198,7 @@ public class ViewerActivity extends AbstractActionActivity {
     public void currentPageChanged(final String pageText, final String currentFilename) {
         String prefix = "";
         if (LengthUtils.isNotEmpty(pageText)) {
-            if (SettingsManager.getAppSettings().getPageInTitle()) {
+            if (SettingsManager.getAppSettings().pageInTitle) {
                 prefix = "(" + pageText + ") ";
             } else {
                 if (pageNumberToast != null) {

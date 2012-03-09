@@ -74,7 +74,7 @@ public class PreferencesDecorator implements IPreferenceContainer {
         addViewModeListener("viewmode", "align", "animationType");
         addAnimationTypeListener("animationType", "align");
 
-        enableSinglePageModeSetting(SettingsManager.getAppSettings().getViewMode(), "align", "animationType");
+        enableSinglePageModeSetting(SettingsManager.getAppSettings().viewMode, "align", "animationType");
 
         decoratePreferences("djvu_rendering_mode", "xdpi", "ydpi", "fontsize");
     }

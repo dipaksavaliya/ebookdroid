@@ -269,7 +269,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final boolean onTouchEvent(final MotionEvent ev) {
-        int delay = SettingsManager.getAppSettings().getTouchProcessingDelay();
+        int delay = SettingsManager.getAppSettings().touchProcessingDelay;
         if (delay > 0) {
             try {
                 Thread.sleep(Math.min(250, delay));

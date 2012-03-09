@@ -92,7 +92,7 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
      */
     @Override
     protected final void drawExtraObjects(final EventDraw event) {
-        if (event.viewState.app.getShowAnimIcon()) {
+        if (event.viewState.app.showAnimIcon) {
             final int x = view.getWidth() - arrowsBitmap.getWidth();
             final int y = view.getHeight() - arrowsBitmap.getHeight();
             event.canvas.drawBitmap(arrowsBitmap, x, y, PAINT);

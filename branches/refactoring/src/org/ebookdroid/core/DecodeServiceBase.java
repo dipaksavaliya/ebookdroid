@@ -181,7 +181,7 @@ public class DecodeServiceBase implements DecodeService {
         } catch (final OutOfMemoryError ex) {
             LCTX.e("Task " + task.id + ": No memory to decode " + task.node);
 
-            for (int i = 0; i <= SettingsManager.getAppSettings().getPagesInMemory(); i++) {
+            for (int i = 0; i <= SettingsManager.getAppSettings().pagesInMemory; i++) {
                 pages.put(Integer.MAX_VALUE - i, null);
             }
             pages.clear();
@@ -309,7 +309,7 @@ public class DecodeServiceBase implements DecodeService {
         if (vs != null) {
             minSize = vs.pages.lastVisible - vs.pages.firstVisible + 1;
         }
-        return Math.max(minSize, SettingsManager.getAppSettings().getPagesInMemory() + 1);
+        return Math.max(minSize, SettingsManager.getAppSettings().pagesInMemory + 1);
     }
 
     class Executor implements Runnable {
@@ -325,7 +325,7 @@ public class DecodeServiceBase implements DecodeService {
             queue = new ArrayList<Runnable>();
             thread = new Thread(this);
 
-            final int decodingThreadPriority = SettingsManager.getAppSettings().getDecodingThreadPriority();
+            final int decodingThreadPriority = SettingsManager.getAppSettings().decodingThreadPriority;
             LCTX.i("Decoding thread priority: " + decodingThreadPriority);
             thread.setPriority(decodingThreadPriority);
 

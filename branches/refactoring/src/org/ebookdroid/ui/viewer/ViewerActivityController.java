@@ -133,16 +133,16 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         final AppSettings newSettings = SettingsManager.getAppSettings();
 
-        activity.setRequestedOrientation(newSettings.getRotation().getOrientation());
+        activity.setRequestedOrientation(newSettings.rotation.getOrientation());
 
-        IUIManager.instance.setFullScreenMode(activity, newSettings.getFullScreen());
-        IUIManager.instance.setTitleVisible(activity, newSettings.getShowTitle());
+        IUIManager.instance.setFullScreenMode(activity, newSettings.fullScreen);
+        IUIManager.instance.setTitleVisible(activity, newSettings.showTitle);
 
         TouchManager.loadFromSettings(newSettings);
         KeyBindingsManager.loadFromSettings(newSettings);
 
-        BitmapManager.setPartSize(newSettings.getBitmapSize());
-        BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());
+        BitmapManager.setPartSize(newSettings.bitmapSize);
+        BitmapManager.setUseEarlyRecycling(newSettings.useEarlyRecycling);
     }
 
     public void afterCreate() {
@@ -373,8 +373,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.mainmenu_nightmode)
     public void toggleNightMode(final ActionEx action) {
-        SettingsManager.getAppSettings().toggleNightMode();
-        getDocumentController().toggleNightMode(SettingsManager.getAppSettings().getNightMode());
+        SettingsManager.toggleNightMode();
     }
 
     @ActionMethod(ids = R.id.mainmenu_thumbnail)
@@ -527,26 +526,26 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     public void onAppSettingsChanged(final AppSettings oldSettings, final AppSettings newSettings,
             final AppSettings.Diff diff) {
         if (diff.isRotationChanged()) {
-            getManagedComponent().setRequestedOrientation(newSettings.getRotation().getOrientation());
+            getManagedComponent().setRequestedOrientation(newSettings.rotation.getOrientation());
         }
 
         if (diff.isFullScreenChanged()) {
-            IUIManager.instance.setFullScreenMode(getManagedComponent(), newSettings.getFullScreen());
+            IUIManager.instance.setFullScreenMode(getManagedComponent(), newSettings.fullScreen);
         }
 
         if (diff.isKeepScreenOnChanged()) {
-            getManagedComponent().view.getView().setKeepScreenOn(newSettings.isKeepScreenOn());
+            getManagedComponent().view.getView().setKeepScreenOn(newSettings.keepScreenOn);
         }
 
         if (diff.isNightModeChanged()) {
-            getDocumentController().toggleNightMode(newSettings.getNightMode());
+            getDocumentController().toggleNightMode(newSettings.nightMode);
         }
 
         TouchManager.loadFromSettings(newSettings);
         KeyBindingsManager.loadFromSettings(newSettings);
 
-        BitmapManager.setPartSize(newSettings.getBitmapSize());
-        BitmapManager.setUseEarlyRecycling(newSettings.getUseEarlyRecycling());
+        BitmapManager.setPartSize(newSettings.bitmapSize);
+        BitmapManager.setUseEarlyRecycling(newSettings.useEarlyRecycling);
     }
 
     /**

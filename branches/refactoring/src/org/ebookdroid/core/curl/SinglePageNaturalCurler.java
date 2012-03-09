@@ -279,7 +279,7 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
     @Override
     protected void drawExtraObjects(final EventDraw event) {
 
-        if (SettingsManager.getAppSettings().getShowAnimIcon()) {
+        if (SettingsManager.getAppSettings().showAnimIcon) {
             final Canvas canvas = event.canvas;
             canvas.drawBitmap(arrowsBitmap, view.getWidth() - arrowsBitmap.getWidth(),
                     view.getHeight() - arrowsBitmap.getHeight(), PAINT);

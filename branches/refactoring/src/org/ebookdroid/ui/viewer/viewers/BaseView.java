@@ -48,7 +48,7 @@ public final class BaseView extends View implements IView {
         this.base = baseActivity;
         this.scroller = new Scroller(getContext());
 
-        setKeepScreenOn(SettingsManager.getAppSettings().isKeepScreenOn());
+        setKeepScreenOn(SettingsManager.getAppSettings().keepScreenOn);
         setFocusable(true);
         setFocusableInTouchMode(true);
 

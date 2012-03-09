@@ -37,7 +37,7 @@ public enum FB2FontStyle {
     }
 
     int getFontSize() {
-        final FontSize fs = SettingsManager.getAppSettings().getFontSize();
+        final FontSize fs = SettingsManager.getAppSettings().fontSize;
         return (int) FloatMath.ceil(TEXT_SIZE * fs.factor * this.factor);
     }
 }

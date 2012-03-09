@@ -21,7 +21,6 @@ public class ViewState {
     public final RectF viewRect;
     public final float zoom;
     public final PageAlign pageAlign;
-    public final boolean nightMode;
     public final PagePaint paint;
 
     public final Pages pages;
@@ -45,37 +44,34 @@ public class ViewState {
         this.viewRect = new RectF(ctrl.getView().getViewRect());
         this.zoom = zoom;
         this.pageAlign = DocumentViewMode.getPageAlign(book);
-        this.nightMode = app.getNightMode();
-        this.paint = this.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+        this.paint = app.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
 
         this.pages = new Pages();
     }
 
     public ViewState(final ViewState oldState, final IViewController dc) {
-        this.app = SettingsManager.getAppSettings();
-        this.book = SettingsManager.getBookSettings();
+        this.app = oldState.app;
+        this.book = oldState.book;
         this.ctrl = dc;
         this.model = dc.getBase().getDocumentModel();
 
         this.viewRect = oldState.viewRect;
         this.zoom = oldState.zoom;
         this.pageAlign = oldState.pageAlign;
-        this.nightMode = oldState.nightMode;
         this.paint = oldState.paint;
 
         this.pages = new Pages();
     }
 
     public ViewState(final ViewState oldState, final int firstVisiblePage, final int lastVisiblePage) {
-        this.app = SettingsManager.getAppSettings();
-        this.book = SettingsManager.getBookSettings();
+        this.app = oldState.app;
+        this.book = oldState.book;
         this.ctrl = oldState.ctrl;
         this.model = oldState.model;
 
         this.viewRect = oldState.viewRect;
         this.zoom = oldState.zoom;
         this.pageAlign = oldState.pageAlign;
-        this.nightMode = oldState.nightMode;
         this.paint = oldState.paint;
 
         this.pages = new Pages(firstVisiblePage, lastVisiblePage);
@@ -143,7 +139,7 @@ public class ViewState {
             if (model != null) {
                 this.currentIndex = ctrl.calculateCurrentPage(ViewState.this, firstVisible, lastVisible);
 
-                final int inMemory = (int) Math.ceil(SettingsManager.getAppSettings().getPagesInMemory() / 2.0);
+                final int inMemory = (int) Math.ceil(app.pagesInMemory / 2.0);
                 this.firstCached = Math.max(0, this.currentIndex - inMemory);
                 this.lastCached = Math.min(this.currentIndex + inMemory, model.getPageCount());
             } else {
@@ -160,7 +156,7 @@ public class ViewState {
             if (model != null) {
                 this.currentIndex = ctrl.calculateCurrentPage(ViewState.this, firstVisible, lastVisible);
 
-                final int inMemory = (int) Math.ceil(SettingsManager.getAppSettings().getPagesInMemory() / 2.0);
+                final int inMemory = (int) Math.ceil(app.pagesInMemory / 2.0);
                 this.firstCached = Math.max(0, this.currentIndex - inMemory);
                 this.lastCached = Math.min(this.currentIndex + inMemory, model.getPageCount());
             } else {

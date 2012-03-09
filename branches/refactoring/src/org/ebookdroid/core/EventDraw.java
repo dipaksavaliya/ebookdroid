@@ -3,7 +3,6 @@ package org.ebookdroid.core;
 import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;
-import org.ebookdroid.common.settings.SettingsManager;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -139,11 +138,14 @@ public class EventDraw implements IEvent {
     }
 
     protected void drawBrightnessFilter(final Canvas canvas, final RectF tr) {
-        final int brightness = SettingsManager.getAppSettings().getBrightness();
-        if (brightness < 100) {
+        if (viewState.app.brightnessInNightModeOnly && !viewState.app.nightMode) {
+            return;
+        }
+
+        if (viewState.app.brightness < 100) {
             final Paint p = new Paint();
             p.setColor(Color.BLACK);
-            p.setAlpha(255 - brightness * 255 / 100);
+            p.setAlpha(255 - viewState.app.brightness * 255 / 100);
             canvas.drawRect(tr, p);
         }
     }

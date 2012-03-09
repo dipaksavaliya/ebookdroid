@@ -48,7 +48,7 @@ public class HScrollController extends AbstractScrollController {
      */
     @Override
     public final void verticalConfigScroll(final int direction) {
-        final int scrollheight = SettingsManager.getAppSettings().getScrollHeight();
+        final int scrollheight = SettingsManager.getAppSettings().scrollHeight;
         final int dx = (int) (direction * getWidth() * (scrollheight / 100.0));
 
         getView().startPageScroll(dx, 0);

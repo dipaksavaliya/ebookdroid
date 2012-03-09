@@ -38,6 +38,6 @@ public class EventZoomIn extends AbstractEventZoom<EventZoomIn> {
         if (committed) {
             return viewState.zoom != node.bitmapZoom;
         }
-        return (viewState.app.getReloadDuringZoom() && viewState.zoom > 1.2 * node.bitmapZoom);
+        return (viewState.app.reloadDuringZoom && viewState.zoom > 1.2 * node.bitmapZoom);
     }
 }

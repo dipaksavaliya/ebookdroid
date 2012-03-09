@@ -110,7 +110,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
             setActionForView(R.id.ShelfRightButton);
         }
 
-        final boolean shouldLoad = SettingsManager.getAppSettings().isLoadRecentBook();
+        final boolean shouldLoad = SettingsManager.getAppSettings().loadRecent;
         final BookSettings recent = SettingsManager.getRecentBook();
         final File file = (recent != null && recent.fileName != null) ? new File(recent.fileName) : null;
         final boolean found = file != null ? file.exists()
@@ -133,19 +133,19 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
     protected void onResume() {
         super.onResume();
 
-        if (SettingsManager.getAppSettings().getUseBookcase()) {
+        final AppSettings appSettings = SettingsManager.getAppSettings();
+        if (appSettings.getUseBookcase()) {
             if (firstResume) {
                 bookshelfAdapter.startScan();
             }
-            recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), SettingsManager.getAppSettings()
-                    .getAllowedFileTypes());
+            recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), appSettings.getAllowedFileTypes());
         } else {
             if (viewflipper.getDisplayedChild() == VIEW_RECENT) {
                 if (SettingsManager.getRecentBook() == null) {
                     changeLibraryView(VIEW_LIBRARY);
                 } else {
-                    recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), SettingsManager
-                            .getAppSettings().getAllowedFileTypes());
+                    recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(),
+                            appSettings.getAllowedFileTypes());
                 }
 
             }
@@ -330,7 +330,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
         if (diff.isUseBookcaseChanged()) {
             viewflipper.removeAllViews();
 
-            if (SettingsManager.getAppSettings().getUseBookcase() && AndroidVersion.VERSION > 3) {
+            if (SettingsManager.getAppSettings().getUseBookcase()) {
                 libraryButton.setImageResource(R.drawable.actionbar_shelf);
 
                 bookcaseView = new BookcaseView(this, bookshelfAdapter);

@@ -5,9 +5,12 @@ import org.ebookdroid.common.settings.books.DBSettingsManager;
 import org.ebookdroid.core.PageIndex;
 
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.emdev.utils.listeners.ListenerProxy;
@@ -211,6 +214,65 @@ public class SettingsManager {
             books.putAll(books);
             replaceCurrentBookSettings(books.get(fileName));
             return books;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public static void toggleNightMode() {
+        lock.writeLock().lock();
+        try {
+            final Editor edit = appSettings.prefs.edit();
+            AppPreferences.NIGHT_MODE.setPreferenceValue(edit, !appSettings.nightMode);
+            edit.commit();
+            final AppSettings oldSettings = appSettings;
+            appSettings = new AppSettings(ctx);
+            applyAppSettingsChanges(oldSettings, appSettings);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public static void updateTapProfiles(final String profiles) {
+        lock.writeLock().lock();
+        try {
+            final Editor edit = appSettings.prefs.edit();
+            AppPreferences.TAP_PROFILES.setPreferenceValue(edit, profiles);
+            edit.commit();
+            final AppSettings oldSettings = appSettings;
+            appSettings = new AppSettings(ctx);
+            applyAppSettingsChanges(oldSettings, appSettings);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public static void changeAutoScanDirs(final String dir, final boolean add) {
+        lock.writeLock().lock();
+        try {
+            final Set<String> dirs = new HashSet<String>(appSettings.autoScanDirs);
+            if (add && dirs.add(dir) || dirs.remove(dir)) {
+                final Editor edit = appSettings.prefs.edit();
+                AppPreferences.AUTO_SCAN_DIRS.setPreferenceValue(edit, dirs);
+                edit.commit();
+                final AppSettings oldSettings = appSettings;
+                appSettings = new AppSettings(ctx);
+                applyAppSettingsChanges(oldSettings, appSettings);
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public static void updateKeysBinding(final String json) {
+        lock.writeLock().lock();
+        try {
+            final Editor edit = appSettings.prefs.edit();
+            AppPreferences.KEY_BINDINGS.setPreferenceValue(edit, json);
+            edit.commit();
+            final AppSettings oldSettings = appSettings;
+            appSettings = new AppSettings(ctx);
+            applyAppSettingsChanges(oldSettings, appSettings);
         } finally {
             lock.writeLock().unlock();
         }

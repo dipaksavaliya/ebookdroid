@@ -244,7 +244,7 @@ public class SinglePageController extends AbstractViewController {
         final PageAnimationType animationType = SettingsManager.getBookSettings().animationType;
         final PageAnimator newCurler = PageAnimationType.create(animationType, this);
 
-        IUIManager.instance.setHardwareAccelerationEnabled(SettingsManager.getAppSettings().isHWAEnabled());
+        IUIManager.instance.setHardwareAccelerationEnabled(SettingsManager.getAppSettings().hwaEnabled);
         IUIManager.instance.setHardwareAccelerationMode(getView().getView(), animationType.isHardwareAccelSupported());
 
         newCurler.init();

@@ -197,7 +197,7 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
 
     public void startScan() {
         clearData();
-        scanner.startScan(SettingsManager.getAppSettings().getAutoScanDirs());
+        scanner.startScan(SettingsManager.getAppSettings().autoScanDirs);
     }
 
     public void stopScan() {

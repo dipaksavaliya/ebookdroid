@@ -29,7 +29,7 @@ public class KeyBindingsManager {
         actions.clear();
 
         boolean fromJSON = false;
-        final String str = newSettings.getKeysBinding();
+        final String str = newSettings.keysBinding;
         if (LengthUtils.isNotEmpty(str)) {
             try {
                 fromJSON(str);
@@ -50,7 +50,7 @@ public class KeyBindingsManager {
     public static void persist() {
         try {
             final JSONObject json = toJSON();
-            SettingsManager.getAppSettings().updateKeysBinding(json.toString());
+            SettingsManager.updateKeysBinding(json.toString());
         } catch (final JSONException ex) {
             LCTX.e("Unexpected error: ", ex);
         }

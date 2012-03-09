@@ -23,7 +23,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
         }
-        IUIManager.instance.setHardwareAccelerationEnabled(SettingsManager.getAppSettings().isHWAEnabled());
+        IUIManager.instance.setHardwareAccelerationEnabled(SettingsManager.getAppSettings().hwaEnabled);
         IUIManager.instance.setHardwareAccelerationMode(getView().getView(), true);
     }
 
@@ -63,7 +63,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
             }
         }
 
-        if (SettingsManager.getAppSettings().getShowAnimIcon()) {
+        if (eventDraw.viewState.app.showAnimIcon) {
             DragMark.draw(eventDraw.canvas, viewState);
         }
         getView().continueScroll();

@@ -250,8 +250,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         }
 
         public Bitmaps reuse(final String nodeId, final BitmapRef bitmap, final Rect bitmapBounds) {
-            final boolean invert = SettingsManager.getAppSettings().getNightMode();
-            if (SettingsManager.getAppSettings().getTextureReuseEnabled()) {
+            final boolean invert = SettingsManager.getAppSettings().nightMode;
+            if (SettingsManager.getAppSettings().textureReuseEnabled) {
                 final Bitmaps bitmaps = ref.get();
                 if (bitmaps != null) {
                     if (bitmaps.reuse(nodeId, bitmap, bitmapBounds, invert)) {

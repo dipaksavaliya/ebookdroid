@@ -44,7 +44,7 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
         this.base = baseActivity;
         this.scroller = new Scroller(getContext());
 
-        setKeepScreenOn(SettingsManager.getAppSettings().isKeepScreenOn());
+        setKeepScreenOn(SettingsManager.getAppSettings().keepScreenOn);
         setFocusable(true);
         setFocusableInTouchMode(true);
 
@@ -344,7 +344,7 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
     public final void surfaceCreated(final SurfaceHolder holder) {
         drawThread = new DrawThread(getHolder());
 
-        int drawThreadPriority = SettingsManager.getAppSettings().getDrawThreadPriority();
+        int drawThreadPriority = SettingsManager.getAppSettings().drawThreadPriority;
         LCTX.i("Draw thread priority: " + drawThreadPriority);
         drawThread.setPriority(drawThreadPriority);
 

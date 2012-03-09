@@ -52,7 +52,7 @@ public class FileBrowserView extends ListView implements AdapterView.OnItemClick
 
         if (selected.isDirectory()) {
 
-            final Set<String> dirs = SettingsManager.getAppSettings().getAutoScanDirs();
+            final Set<String> dirs = SettingsManager.getAppSettings().autoScanDirs;
             scannedDir = dirs.contains(selected.getPath());
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(base.getActivity());
@@ -74,7 +74,7 @@ public class FileBrowserView extends ListView implements AdapterView.OnItemClick
                 base.setCurrentDir(selected);
                 break;
             case 1:
-                SettingsManager.getAppSettings().changeAutoScanDirs(selected.getPath(), !scannedDir);
+                SettingsManager.changeAutoScanDirs(selected.getPath(), !scannedDir);
                 adapter.notifyDataSetInvalidated();
                 Toast.makeText(base.getActivity().getApplicationContext(), "Done.", Toast.LENGTH_SHORT).show();
                 break;

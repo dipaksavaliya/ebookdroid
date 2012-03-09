@@ -56,7 +56,7 @@ public class FB2TextElement extends AbstractFB2LineElement {
 
     @Override
     public AbstractFB2LineElement[] split(final float remaining) {
-        if (!SettingsManager.getAppSettings().isFb2HyphenEnabled()) {
+        if (!SettingsManager.getAppSettings().fb2HyphenEnabled) {
             return null;
         }
         final int count = HyphenationUtils.hyphenateWord(chars, start, length, starts, lengths);
