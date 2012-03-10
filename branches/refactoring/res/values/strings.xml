@@ -187,12 +187,5 @@
 
 	<string name="msg_loading">Loading&#8230; Please wait</string>
 	<string name="msg_getting_page_size">"Getting page size %1$d/%2$d"</string>
-	
-	<string name="tap_zones_single_tap">Single Tap</string>
-	<string name="tap_zones_double_tap">Double Tap</string>
-	<string name="tap_zones_long_tap">Long tap</string>
-	<string name="tap_zones_two_finger_tap">Two finger tap</string>
-	<string name="tap_zones_reset">Reset</string>
-	<string name="tap_zones_delete">Delete</string>
-	<string name="tap_zones_clear">Clear</string>
+
 </resources>
