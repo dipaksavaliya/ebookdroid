@@ -1,5 +1,6 @@
 package org.ebookdroid.ui.settings;
 
+import org.ebookdroid.common.settings.AppPreferences;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
@@ -24,7 +25,7 @@ import org.emdev.utils.enums.EnumUtils;
  * @author whippet
  * 
  */
-public class PreferencesDecorator implements IPreferenceContainer {
+public class PreferencesDecorator implements IPreferenceContainer, AppPreferences {
 
     private final Map<String, CharSequence> summaries = new HashMap<String, CharSequence>();
 
@@ -51,41 +52,41 @@ public class PreferencesDecorator implements IPreferenceContainer {
     }
 
     public void decorateBooksSettings() {
-        decoratePreferences("book_viewmode", "book_align", "book_animationType");
-        addViewModeListener("book_viewmode", "book_align", "book_animationType");
-        addAnimationTypeListener("book_animationType", "book_align");
+        decoratePreferences(BOOK_VIEW_MODE.key, BOOK_PAGE_ALIGN.key, BOOK_ANIMATION_TYPE.key);
+        addViewModeListener(BOOK_VIEW_MODE.key, BOOK_PAGE_ALIGN.key, BOOK_ANIMATION_TYPE.key);
+        addAnimationTypeListener(BOOK_ANIMATION_TYPE.key, BOOK_PAGE_ALIGN.key);
 
         BookSettings bs = SettingsManager.getBookSettings();
         if (bs != null) {
-            enableSinglePageModeSetting(bs.viewMode, "book_align", "book_animationType");
+            enableSinglePageModeSetting(bs.viewMode, BOOK_PAGE_ALIGN.key, BOOK_ANIMATION_TYPE.key);
         }
     }
 
     public void decorateBrowserSettings() {
-        decoratePreferences("brautoscandir");
+        decoratePreferences(AUTO_SCAN_DIRS.key);
     }
 
     public void decorateMemorySettings() {
-        decoratePreferences("pagesinmemory", "docviewtype", "decodethread_priority", "drawthread_priority", "bitmapsize");
+        decoratePreferences(PAGES_IN_MEMORY.key, VIEW_TYPE.key, DECODE_THREAD_PRIORITY.key, DRAW_THREAD_PRIORITY.key,
+                BITMAP_SIZE.key);
     }
 
     public void decorateRenderSettings() {
-        decoratePreferences("viewmode", "align", "animationType");
-        addViewModeListener("viewmode", "align", "animationType");
-        addAnimationTypeListener("animationType", "align");
+        decoratePreferences(VIEW_MODE.key, PAGE_ALIGN.key, ANIMATION_TYPE.key);
+        addViewModeListener(VIEW_MODE.key, PAGE_ALIGN.key, ANIMATION_TYPE.key);
+        addAnimationTypeListener(ANIMATION_TYPE.key, PAGE_ALIGN.key);
 
-        enableSinglePageModeSetting(SettingsManager.getAppSettings().viewMode, "align", "animationType");
+        enableSinglePageModeSetting(SettingsManager.getAppSettings().viewMode, PAGE_ALIGN.key, ANIMATION_TYPE.key);
 
-        decoratePreferences("djvu_rendering_mode", "xdpi", "ydpi", "fontsize");
+        decoratePreferences(DJVU_RENDERING_MODE.key, PDF_CUSTOM_XDPI.key, PDF_CUSTOM_YDPI.key, FB2_FONT_SIZE.key);
     }
 
     public void decorateScrollSettings() {
-        decoratePreferences("scrollheight", "touchdelay");
+        decoratePreferences(SCROLL_HEIGHT.key, TOUCH_DELAY.key);
     }
 
     public void decorateUISettings() {
-        decoratePreferences("rotation", "brightness");
-        //findPreference("fullscreen").setEnabled(!AndroidVersion.is3x);
+        decoratePreferences(ROTATION.key, BRIGHTNESS.key);
     }
 
     public void setPageAlign(final PageAnimationType type, final String alignPrefKey) {
