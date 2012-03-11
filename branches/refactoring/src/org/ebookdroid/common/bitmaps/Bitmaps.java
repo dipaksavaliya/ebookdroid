@@ -7,15 +7,13 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region.Op;
+import android.util.FloatMath;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.emdev.utils.MatrixUtils;
 
 public class Bitmaps {
 
@@ -209,28 +207,39 @@ public class Bitmaps {
             final Rect orig = canvas.getClipBounds();
             canvas.clipRect(cr.left - vb.x, cr.top - vb.y, cr.right - vb.x, cr.bottom - vb.y, Op.REPLACE);
 
+            final float offsetX = tr.left - vb.x;
+            final float offsetY = tr.top - vb.y;
+
             final float scaleX = tr.width() / bounds.width();
             final float scaleY = tr.height() / bounds.height();
 
-            final Matrix m = MatrixUtils.get();
+            final float sizeX = partSize * scaleX;
+            final float sizeY = partSize * scaleY;
 
-            int top = 0;
+            final RectF rect = new RectF(offsetX, offsetY, offsetX + sizeX, offsetY + sizeY);
+            final RectF r = new RectF();
+
             boolean res = true;
-            for (int row = 0; row < rows; row++, top += partSize) {
-                int left = 0;
-                for (int col = 0; col < columns; col++, left += partSize) {
-                    m.reset();
-                    m.postTranslate(left, top);
-                    m.postScale(scaleX, scaleY);
-                    m.postTranslate(tr.left - vb.x, tr.top - vb.y);
-
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < columns; col++) {
                     final int index = row * columns + col;
                     if (this.bitmaps[index] != null) {
-                        canvas.drawBitmap(this.bitmaps[index].bitmap, m, paint.bitmapPaint);
+                        r.left = FloatMath.floor(rect.left);
+                        r.top = FloatMath.floor(rect.top);
+                        r.right = FloatMath.ceil(rect.right);
+                        r.bottom = FloatMath.ceil(rect.bottom);
+                        canvas.drawBitmap(this.bitmaps[index].bitmap, null, r, paint.bitmapPaint);
                     } else {
                         res = false;
                     }
+                    rect.left += sizeX;
+                    rect.right += sizeX;
                 }
+                rect.left = offsetX;
+                rect.right = offsetX + sizeX;
+
+                rect.top += sizeY;
+                rect.bottom += sizeY;
             }
             canvas.clipRect(orig, Op.REPLACE);
             return res;
