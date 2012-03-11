@@ -34,10 +34,10 @@
 		android:title="@string/menu_thumbnail" />
 	<item
 		android:id="@+id/actions_toggleTouchManagerView"
-		android:title="Tap configuration" />
+		android:title="@string/menu_tap_configuration" />
 	<item
 		android:id="@+id/actions_keyBindings"
-		android:title="Key bindings" />
+		android:title="@string/menu_key_bindings" />
 	<item
 		android:id="@+id/mainmenu_about"
 		android:title="@string/menu_about" />

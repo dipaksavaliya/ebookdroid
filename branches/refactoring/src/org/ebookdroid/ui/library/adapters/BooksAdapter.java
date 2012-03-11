@@ -9,6 +9,7 @@ import org.ebookdroid.ui.library.views.BookshelfView;
 import _android.util.SparseArrayEx;
 
 import android.database.DataSetObserver;
+import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -22,14 +23,25 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.emdev.ui.adapters.BaseViewHolder;
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.StringUtils;
 import org.emdev.utils.filesystem.FileSystemScanner;
 
 public class BooksAdapter extends PagerAdapter implements FileSystemScanner.Listener, Iterable<BookShelfAdapter> {
+
+    public final static int SERVICE_SHELVES = 2;
+
+    public static final int RECENT_INDEX = 0;
+
+    public static final int SEARCH_INDEX = 1;
+
+    private final static AtomicInteger SEQ = new AtomicInteger(SERVICE_SHELVES);
 
     final IBrowserActivity base;
 
@@ -39,8 +51,6 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
 
     final TreeMap<String, BookShelfAdapter> folders = new TreeMap<String, BookShelfAdapter>();
 
-    private final static AtomicInteger SEQ = new AtomicInteger(1);
-
     private final RecentUpdater updater = new RecentUpdater();
 
     private final RecentAdapter recent;
@@ -49,12 +59,15 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
 
     private final List<DataSetObserver> _dsoList = new ArrayList<DataSetObserver>();
 
+    private String searchQuery;
+
     public BooksAdapter(final IBrowserActivity base, final RecentAdapter adapter) {
         this.base = base;
         this.recent = adapter;
         this.recent.registerDataSetObserver(updater);
         this.scanner = new FileSystemScanner(base);
         this.scanner.addListener(this);
+        this.searchQuery = SettingsManager.getAppSettings().searchBookQuery;
     }
 
     @Override
@@ -113,20 +126,28 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         return data.size();
     }
 
+    public synchronized int getListCount(final int currentList) {
+        checkServiceAdapters();
+        if (0 <= currentList && currentList < data.size()) {
+            return getList(currentList).nodes.size();
+        }
+        return 0;
+    }
+
     public String getListName(final int currentList) {
-        createRecent();
+        checkServiceAdapters();
         final BookShelfAdapter list = getList(currentList);
         return list != null ? LengthUtils.safeString(list.name) : "";
     }
 
     public String getListPath(final int currentList) {
-        createRecent();
+        checkServiceAdapters();
         final BookShelfAdapter list = getList(currentList);
         return list != null ? LengthUtils.safeString(list.path) : "";
     }
 
     public synchronized List<String> getListNames() {
-        createRecent();
+        checkServiceAdapters();
 
         final int size = data.size();
 
@@ -143,7 +164,7 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
     }
 
     public synchronized List<String> getListPaths() {
-        createRecent();
+        checkServiceAdapters();
 
         final int size = data.size();
 
@@ -159,8 +180,8 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         return result;
     }
 
-    public BookNode getItem(final int currentList, final int position) {
-        createRecent();
+    public synchronized BookNode getItem(final int currentList, final int position) {
+        checkServiceAdapters();
         if (0 <= currentList && currentList < data.size()) {
             return getList(currentList).nodes.get(position);
         }
@@ -172,25 +193,54 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
     }
 
     public synchronized void clearData() {
-        final BookShelfAdapter oldRecent = data.get(0);
+        getService(SEARCH_INDEX).nodes.clear();
+
+        final BookShelfAdapter[] service = new BookShelfAdapter[SERVICE_SHELVES];
+        for (int i = 0; i < service.length; i++) {
+            service[i] = data.get(i);
+        }
+
         data.clear();
         folders.clear();
-        SEQ.set(1);
+        SEQ.set(SERVICE_SHELVES);
 
-        if (oldRecent != null) {
-            data.append(0, oldRecent);
-        } else {
-            createRecent();
+        for (int i = 0; i < service.length; i++) {
+            if (service[i] != null) {
+                data.append(i, service[i]);
+            } else {
+                getService(i);
+            }
         }
 
         notifyDataSetChanged();
     }
 
-    private synchronized BookShelfAdapter createRecent() {
-        BookShelfAdapter a = data.get(0);
+    public synchronized void clearSearch() {
+        final BookShelfAdapter search = getService(SEARCH_INDEX);
+        search.nodes.clear();
+        search.notifyDataSetChanged();
+    }
+
+    protected synchronized void checkServiceAdapters() {
+        for (int i = 0; i < SERVICE_SHELVES; i++) {
+            getService(i);
+        }
+    }
+
+    protected synchronized BookShelfAdapter getService(final int index) {
+        BookShelfAdapter a = data.get(index);
         if (a == null) {
-            a = new BookShelfAdapter(base, 0, base.getContext().getString(R.string.recent_title), "");
-            data.append(0, a);
+            switch (index) {
+                case RECENT_INDEX:
+                    a = new BookShelfAdapter(base, 0, base.getContext().getString(R.string.recent_title), "");
+                    break;
+                case SEARCH_INDEX:
+                    a = new BookShelfAdapter(base, 0, base.getContext().getString(R.string.search_results_title), "");
+                    break;
+            }
+            if (a != null) {
+                data.append(index, a);
+            }
         }
         return a;
     }
@@ -204,6 +254,34 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         scanner.stopScan();
     }
 
+    public boolean startSearch(final String searchQuery) {
+        this.searchQuery = LengthUtils.safeString(searchQuery).trim();
+        SettingsManager.updateSearchBookQuery(this.searchQuery);
+
+        clearSearch();
+
+        if (LengthUtils.isEmpty(this.searchQuery)) {
+            return false;
+        }
+
+        if (!scanner.isScan()) {
+            new SearchTask().execute("");
+        }
+
+        return true;
+    }
+
+    public String getSearchQuery() {
+        return searchQuery;
+    }
+
+    protected synchronized void onNodesFound(final List<BookNode> nodes) {
+        final BookShelfAdapter search = getService(SEARCH_INDEX);
+        search.nodes.addAll(nodes);
+        Collections.sort(search.nodes);
+        search.notifyDataSetChanged();
+    }
+
     @Override
     public synchronized void onFileScan(final File parent, final File[] files) {
         final String dir = parent.getAbsolutePath();
@@ -213,19 +291,39 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
                 onDirDeleted(parent.getParentFile(), parent);
             }
         } else {
+            final BookShelfAdapter search = getService(SEARCH_INDEX);
             if (a == null) {
                 a = new BookShelfAdapter(base, SEQ.getAndIncrement(), parent.getName(), dir);
                 data.append(a.id, a);
                 folders.put(dir, a);
+                boolean found = false;
                 for (final File f : files) {
-                    a.nodes.add(new BookNode(f));
+                    final BookNode node = new BookNode(f);
+                    a.nodes.add(node);
+                    if (acceptSearch(node)) {
+                        found = true;
+                        search.nodes.add(node);
+                    }
+                }
+                if (found) {
+                    Collections.sort(search.nodes);
                 }
                 notifyDataSetChanged();
             } else {
+                boolean found = false;
                 for (final File f : files) {
-                    a.nodes.add(new BookNode(f));
+                    final BookNode node = new BookNode(f);
+                    a.nodes.add(node);
+                    if (acceptSearch(node)) {
+                        found = true;
+                        search.nodes.add(node);
+                    }
                 }
                 a.notifyDataSetChanged();
+                if (found) {
+                    Collections.sort(search.nodes);
+                    search.notifyDataSetChanged();
+                }
             }
         }
     }
@@ -235,17 +333,28 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         if (f != null) {
             final String dir = parent.getAbsolutePath();
             BookShelfAdapter a = folders.get(dir);
+            final BookShelfAdapter search = getService(SEARCH_INDEX);
+            final BookNode node = new BookNode(f);
             if (a == null) {
                 a = new BookShelfAdapter(base, SEQ.getAndIncrement(), parent.getName(), dir);
                 data.append(a.id, a);
                 folders.put(dir, a);
-                a.nodes.add(new BookNode(f));
+                a.nodes.add(node);
                 Collections.sort(a.nodes);
+                if (acceptSearch(node)) {
+                    search.nodes.add(node);
+                    Collections.sort(search.nodes);
+                }
                 notifyDataSetChanged();
             } else {
-                a.nodes.add(new BookNode(f));
+                a.nodes.add(node);
                 Collections.sort(a.nodes);
                 a.notifyDataSetChanged();
+                if (acceptSearch(node)) {
+                    search.nodes.add(node);
+                    Collections.sort(search.nodes);
+                    search.notifyDataSetChanged();
+                }
             }
         }
     }
@@ -256,6 +365,7 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         final BookShelfAdapter a = folders.get(dir);
         if (a != null) {
             final String path = f.getAbsolutePath();
+            final BookShelfAdapter search = getService(SEARCH_INDEX);
             for (final Iterator<BookNode> i = a.nodes.iterator(); i.hasNext();) {
                 final BookNode node = i.next();
                 if (path.equals(node.path)) {
@@ -266,6 +376,9 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
                         this.notifyDataSetChanged();
                     } else {
                         a.notifyDataSetChanged();
+                    }
+                    if (search.nodes.remove(node)) {
+                        search.notifyDataSetChanged();
                     }
                     return;
                 }
@@ -289,24 +402,20 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         }
     }
 
-    public static class ViewHolder extends BaseViewHolder {
-
-        ImageView imageView;
-        TextView textView;
-
-        @Override
-        public void init(final View convertView) {
-            super.init(convertView);
-            this.imageView = (ImageView) convertView.findViewById(R.id.thumbnailImage);
-            this.textView = (TextView) convertView.findViewById(R.id.thumbnailText);
+    protected boolean acceptSearch(final BookNode node) {
+        if (LengthUtils.isEmpty(searchQuery)) {
+            return false;
         }
+        final String bookTitle = StringUtils.cleanupTitle(node.name).toLowerCase();
+        final int pos = bookTitle.indexOf(searchQuery);
+        return pos >= 0;
     }
 
     public void registerDataSetObserver(final DataSetObserver dataSetObserver) {
         _dsoList.add(dataSetObserver);
     }
 
-    private void notifyDataSetInvalidated() {
+    protected void notifyDataSetInvalidated() {
         for (final DataSetObserver dso : _dsoList) {
             dso.onInvalidated();
         }
@@ -317,6 +426,19 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         super.notifyDataSetChanged();
         for (final DataSetObserver dso : _dsoList) {
             dso.onChanged();
+        }
+    }
+
+    public static class ViewHolder extends BaseViewHolder {
+
+        ImageView imageView;
+        TextView textView;
+
+        @Override
+        public void init(final View convertView) {
+            super.init(convertView);
+            this.imageView = (ImageView) convertView.findViewById(R.id.thumbnailImage);
+            this.textView = (TextView) convertView.findViewById(R.id.thumbnailText);
         }
     }
 
@@ -333,7 +455,7 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         }
 
         private void updateRecentBooks() {
-            final BookShelfAdapter ra = createRecent();
+            final BookShelfAdapter ra = getService(RECENT_INDEX);
             ra.nodes.clear();
             final int count = recent.getCount();
             for (int i = 0; i < count; i++) {
@@ -348,6 +470,51 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
             }
             ra.notifyDataSetChanged();
             BooksAdapter.this.notifyDataSetInvalidated();
+        }
+    }
+
+    class SearchTask extends AsyncTask<String, String, Void> {
+
+        private final BlockingQueue<BookNode> queue = new ArrayBlockingQueue<BookNode>(160, true);
+
+        @Override
+        protected void onPreExecute() {
+            base.showProgress(true);
+        }
+
+        @Override
+        protected Void doInBackground(final String... paths) {
+            int aIndex = SERVICE_SHELVES;
+            while (aIndex < getListCount()) {
+                int nIndex = 0;
+                while (nIndex < getListCount(aIndex)) {
+                    final BookNode node = getItem(aIndex, nIndex);
+                    if (acceptSearch(node)) {
+                        queue.offer(node);
+                        publishProgress("");
+                    }
+                    nIndex++;
+                }
+                aIndex++;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(final String... values) {
+            final ArrayList<BookNode> nodes = new ArrayList<BookNode>();
+            while (!queue.isEmpty()) {
+                nodes.add(queue.poll());
+            }
+            if (!nodes.isEmpty()) {
+                onNodesFound(nodes);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Void v) {
+            onProgressUpdate("");
+            base.showProgress(false);
         }
     }
 }

@@ -60,6 +60,10 @@ public class FileSystemScanner {
         }
     }
 
+    public boolean isScan() {
+        return inScan.get();
+    }
+
     public void stopScan() {
         if (inScan.compareAndSet(true, false)) {
             m_scanTask = null;

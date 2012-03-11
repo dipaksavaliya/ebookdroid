@@ -219,6 +219,20 @@ public class SettingsManager {
         }
     }
 
+    public static void updateSearchBookQuery(final String searchQuery) {
+        lock.writeLock().lock();
+        try {
+            final Editor edit = appSettings.prefs.edit();
+            AppPreferences.SEARCH_BOOK_QUERY.setPreferenceValue(edit, searchQuery);
+            edit.commit();
+            final AppSettings oldSettings = appSettings;
+            appSettings = new AppSettings(ctx);
+            applyAppSettingsChanges(oldSettings, appSettings);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
     public static void toggleNightMode() {
         lock.writeLock().lock();
         try {

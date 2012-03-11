@@ -14,7 +14,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -99,6 +98,8 @@ public class AppSettings implements AppPreferences {
 
     public final Set<String> autoScanDirs;
 
+    public final String searchBookQuery;
+
     AppSettings(final Context context) {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
         /* =============== UI settings =============== */
@@ -118,7 +119,7 @@ public class AppSettings implements AppPreferences {
         touchProcessingDelay = TOUCH_DELAY.getPreferenceValue(prefs);
         /* =============== Tap & Keyboard settings =============== */
         tapProfiles = TAP_PROFILES.getPreferenceValue(prefs);
-        keysBinding = KEY_BINDINGS.getPreferenceValue(prefs);    
+        keysBinding = KEY_BINDINGS.getPreferenceValue(prefs);
         /* =============== Performance settings =============== */
         pagesInMemory = PAGES_IN_MEMORY.getPreferenceValue(prefs);
         viewType = VIEW_TYPE.getPreferenceValue(prefs);
@@ -144,7 +145,8 @@ public class AppSettings implements AppPreferences {
         fb2HyphenEnabled = FB2_HYPHEN.getPreferenceValue(prefs);
         /* =============== Browser settings =============== */
         useBookcase = USE_BOOK_CASE.getPreferenceValue(prefs);
-        autoScanDirs = Collections.unmodifiableSet(AUTO_SCAN_DIRS.getPreferenceValue(prefs));
+        autoScanDirs = AUTO_SCAN_DIRS.getPreferenceValue(prefs);
+        searchBookQuery = SEARCH_BOOK_QUERY.getPreferenceValue(prefs);
     }
 
     /* =============== UI settings =============== */
@@ -280,10 +282,10 @@ public class AppSettings implements AppPreferences {
                 if (firstTime || olds.djvuRenderingMode != news.djvuRenderingMode) {
                     mask |= D_DjvuRenderingMode;
                 }
-                if (firstTime || olds.autoScanDirs.equals(news.autoScanDirs)) {
+                if (firstTime || !olds.autoScanDirs.equals(news.autoScanDirs)) {
                     mask |= D_AutoScanDirs;
                 }
-                if (firstTime || olds.getAllowedFileTypes().equals(news.getAllowedFileTypes())) {
+                if (firstTime || !olds.getAllowedFileTypes().equals(news.getAllowedFileTypes())) {
                     mask |= D_AllowedFileTypes;
                 }
             }

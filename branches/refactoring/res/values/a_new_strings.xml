@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <string name="menu_tap_configuration">Tap configuration</string>
+    <string name="menu_key_bindings">Key bindings</string>
+
     <string name="pref_tapsenabled_title">Enable taps</string>
     <string name="pref_tapsenabled_summary">Use Tap Configuration to define tap regions and actions</string>
 
@@ -86,5 +89,10 @@
     <string name="tap_zones_reset">Reset</string>
     <string name="tap_zones_delete">Delete</string>
     <string name="tap_zones_clear">Clear</string>
+
+    <string name="menu_searchbook">Search</string>
+    <string name="content_description_searchbook">Search books by name...</string>
+    <string name="search_results_title">"Search results"</string>
+    <string name="search_book_dlg_title">"Search..."</string>
 
 </resources>

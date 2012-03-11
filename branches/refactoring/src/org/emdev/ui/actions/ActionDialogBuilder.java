@@ -16,6 +16,15 @@ public class ActionDialogBuilder extends AlertDialog.Builder {
         this.actions = actions;
     }
 
+    public ActionDialogBuilder setPositiveButton(final int resId, final int actionId, final IActionParameter... params) {
+        final ActionEx action = actions.getOrCreateAction(actionId);
+        for (final IActionParameter ap : params) {
+            action.addParameter(ap);
+        }
+        super.setPositiveButton(resId, action);
+        return this;
+    }
+
     public ActionDialogBuilder setPositiveButton(final int actionId, final IActionParameter... params) {
         final ActionEx action = actions.getOrCreateAction(actionId);
         for (final IActionParameter ap : params) {

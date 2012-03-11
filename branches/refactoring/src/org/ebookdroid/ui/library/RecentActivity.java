@@ -24,10 +24,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ViewFlipper;
@@ -42,6 +44,7 @@ import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.ActionMethodDef;
 import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.actions.IActionController;
+import org.emdev.ui.actions.params.EditableValue;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.android.AndroidVersion;
 import org.emdev.utils.filesystem.FileExtensionFilter;
@@ -59,7 +62,9 @@ actions = {
         @ActionMethodDef(id = R.id.ShelfCaption, method = "showSelectShelfDlg"),
         @ActionMethodDef(id = R.id.actions_selectShelf, method = "selectShelf"),
         @ActionMethodDef(id = R.id.ShelfLeftButton, method = "selectPrevShelf"),
-        @ActionMethodDef(id = R.id.ShelfRightButton, method = "selectNextShelf")
+        @ActionMethodDef(id = R.id.ShelfRightButton, method = "selectNextShelf"),
+        @ActionMethodDef(id = R.id.recentmenu_searchBook, method = "showSearchDlg"),
+        @ActionMethodDef(id = R.id.actions_searchBook, method = "searchBook")
 // finish
 })
 public class RecentActivity extends AbstractActionActivity implements IBrowserActivity, ISettingsChangeListener {
@@ -196,6 +201,34 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
             }
         }
 
+    }
+
+    @ActionMethod(ids = R.id.recentmenu_searchBook)
+    public void showSearchDlg(final ActionEx action) {
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getContext(), getController());
+
+        final EditText input = new EditText(this);
+        input.setSingleLine();
+        input.setText(LengthUtils.safeString(bookshelfAdapter.getSearchQuery()));
+        input.selectAll();
+
+        builder.setTitle(R.string.search_book_dlg_title);
+        builder.setView(input);
+        builder.setPositiveButton(android.R.string.search_go, R.id.actions_searchBook,
+                new EditableValue("input", input));
+        builder.setNegativeButton();
+        builder.show();
+    }
+
+    @ActionMethod(ids = R.id.actions_searchBook)
+    public void searchBook(final ActionEx action) {
+        final Editable value = action.getParameter("input");
+        final String searchQuery = value.toString();
+        if (bookshelfAdapter.startSearch(searchQuery)) {
+            if (SettingsManager.getAppSettings().useBookcase) {
+                this.bookcaseView.setCurrentList(BooksAdapter.SEARCH_INDEX);
+            }
+        }
     }
 
     @ActionMethod(ids = R.id.mainmenu_settings)

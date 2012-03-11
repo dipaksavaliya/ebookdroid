@@ -157,4 +157,6 @@ public interface AppPreferences {
     FileListPreferenceDefinition AUTO_SCAN_DIRS = new FileListPreferenceDefinition(pref_brautoscandir_id,
             pref_brautoscandir_defvalue);
 
+    StringPreferenceDefinition SEARCH_BOOK_QUERY = new StringPreferenceDefinition(pref_brsearchbookquery_id, 0);
+
 }

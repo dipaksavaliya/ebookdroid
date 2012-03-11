@@ -7,4 +7,6 @@
     <string name="pref_brautoscandir_id">brautoscandir</string>
     <string name="pref_brautoscandir_defvalue">/sdcard</string>
 
+    <string name="pref_brsearchbookquery_id">brsearchbookquery</string>
+
 </resources>
