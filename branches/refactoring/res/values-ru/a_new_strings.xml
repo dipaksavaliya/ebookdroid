@@ -5,7 +5,7 @@
     <string name="menu_key_bindings">Настройка клавиш</string>
 
     <string name="pref_tapsenabled_title">Разрешить нажатия</string>
-    <string name="pref_tapsenabled_summary">Используйте 'Настройку нажатий' для задания регионов и действий</string>
+    <string name="pref_tapsenabled_summary">Используйте \'Настройку нажати\' для задания регионов и действий</string>
 
     <string name="pref_performance_category">Настроки производительности</string>
     <string name="pref_performance_category_summary">Настроки производительности</string>
