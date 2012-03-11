@@ -8,8 +8,6 @@ import org.ebookdroid.droids.fb2.codec.FB2Context;
 import org.ebookdroid.droids.pdf.codec.PdfContext;
 import org.ebookdroid.droids.xps.codec.XpsContext;
 
-import android.net.Uri;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -60,8 +58,8 @@ public enum CodecType {
         return extensionToActivity.keySet();
     }
 
-    public static CodecType getByUri(final Uri uri) {
-        final String uriString = uri.toString().toLowerCase();
+    public static CodecType getByUri(final String uri) {
+        final String uriString = uri.toLowerCase();
         for (final String ext : extensionToActivity.keySet()) {
             if (uriString.endsWith("." + ext)) {
                 return extensionToActivity.get(ext);

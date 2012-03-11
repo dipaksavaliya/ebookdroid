@@ -32,8 +32,10 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.View;
@@ -101,7 +103,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     private DocumentModel documentModel;
 
-    private String currentFilename;
+    private String bookTitle;
 
     private boolean temporaryBook;
 
@@ -150,12 +152,35 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             LCTX.d("afterCreate()");
         }
 
+        final ViewerActivity activity = getManagedComponent();
+
         createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
-        createAction(R.id.mainmenu_zoom).putValue("view", getManagedComponent().getZoomControls());
-        createAction(R.id.actions_toggleTouchManagerView).putValue("view", getManagedComponent().getTouchView());
+        createAction(R.id.mainmenu_zoom).putValue("view", activity.getZoomControls());
+        createAction(R.id.actions_toggleTouchManagerView).putValue("view", activity.getTouchView());
 
         if (++loadingCount == 1) {
-            codecType = CodecType.getByUri(intent.getData());
+            if (intent.getScheme().equals("content")) {
+                try {
+                    Cursor c = activity.getContentResolver().query(intent.getData(), null, null, null, null);
+                    c.moveToFirst();
+                    final int fileNameColumnId = c.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME);
+                    if (fileNameColumnId >= 0) {
+                        String attachmentFileName = c.getString(fileNameColumnId);
+                        bookTitle = LengthUtils.safeString(attachmentFileName, E_MAIL_ATTACHMENT);
+                        codecType = CodecType.getByUri(attachmentFileName);
+                    } else {
+                        if (LCTX.isDebugEnabled()) {
+                            LCTX.d("No attachment file name returned");
+                        }
+                    }
+                } catch (Throwable th) {
+                    LCTX.e("Unexpected error: ", th);
+                }
+            }
+            if (codecType == null) {
+                codecType = CodecType.getByUri(intent.getData().toString());
+                bookTitle = LengthUtils.safeString(intent.getData().getLastPathSegment(), E_MAIL_ATTACHMENT);
+            }
             if (codecType == null) {
                 throw new RuntimeException("Unknown intent data type: " + intent.getData());
             }
@@ -173,7 +198,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 m_fileName = E_MAIL_ATTACHMENT;
                 CacheManager.clear(m_fileName);
             } else {
-                m_fileName = PathFromUri.retrieve(getManagedComponent().getContentResolver(), uri);
+                m_fileName = PathFromUri.retrieve(activity.getContentResolver(), uri);
             }
 
             SettingsManager.init(m_fileName);
@@ -299,14 +324,13 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         if (pageCount > 0) {
             pageText = (newIndex.viewIndex + 1) + "/" + pageCount;
         }
-        getManagedComponent().currentPageChanged(pageText, currentFilename);
+        getManagedComponent().currentPageChanged(pageText, bookTitle);
         SettingsManager.currentPageChanged(oldIndex, newIndex);
     }
 
     public void setWindowTitle() {
-        currentFilename = LengthUtils.safeString(intent.getData().getLastPathSegment(), E_MAIL_ATTACHMENT);
-        currentFilename = StringUtils.cleanupTitle(currentFilename);
-        getManagedComponent().getWindow().setTitle(currentFilename);
+        bookTitle = StringUtils.cleanupTitle(bookTitle);
+        getManagedComponent().getWindow().setTitle(bookTitle);
     }
 
     @ActionMethod(ids = R.id.actions_openOptionsMenu)

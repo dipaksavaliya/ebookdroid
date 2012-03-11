@@ -195,7 +195,7 @@ public class ViewerActivity extends AbstractActionActivity {
         cancel.setOnClickListener(controller.getOrCreateAction(R.id.mainmenu_close));
     }
 
-    public void currentPageChanged(final String pageText, final String currentFilename) {
+    public void currentPageChanged(final String pageText, final String bookTitle) {
         String prefix = "";
         if (LengthUtils.isNotEmpty(pageText)) {
             if (SettingsManager.getAppSettings().pageInTitle) {
@@ -210,7 +210,7 @@ public class ViewerActivity extends AbstractActionActivity {
                 pageNumberToast.show();
             }
         }
-        getWindow().setTitle(prefix + currentFilename);
+        getWindow().setTitle(prefix + bookTitle);
     }
 
     @Override
