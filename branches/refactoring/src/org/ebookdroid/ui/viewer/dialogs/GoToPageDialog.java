@@ -251,21 +251,21 @@ public class GoToPageDialog extends Dialog {
             for (final Bookmark bookmark : bookmarks) {
                 bookSettings.bookmarks.add(bookmark);
             }
-            SettingsManager.edit(bookSettings).commit();
+            SettingsManager.storeBookSettings();
             notifyDataSetChanged();
         }
 
         public void remove(final Bookmark b) {
             if (!b.service) {
                 bookSettings.bookmarks.remove(b);
-                SettingsManager.edit(bookSettings).commit();
+                SettingsManager.storeBookSettings();
                 notifyDataSetChanged();
             }
         }
 
         public void clear() {
             bookSettings.bookmarks.clear();
-            SettingsManager.edit(bookSettings).commit();
+            SettingsManager.storeBookSettings();
             notifyDataSetChanged();
         }
 

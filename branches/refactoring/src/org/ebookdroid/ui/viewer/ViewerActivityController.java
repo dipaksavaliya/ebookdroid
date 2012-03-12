@@ -264,8 +264,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             if (temporaryBook) {
                 CacheManager.clear(E_MAIL_ATTACHMENT);
             }
+            SettingsManager.removeListener(this);
         }
-        SettingsManager.removeListener(this);
     }
 
     public void afterDestroy() {
@@ -294,7 +294,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             getZoomModel().removeListener(oldDc);
             getZoomModel().addListener(newDc);
 
-            return newDc;
+            return ctrl.get();
         } catch (final Throwable e) {
             throw new RuntimeException(e);
         }
@@ -430,7 +430,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         final String name = value.toString();
         final BookSettings bs = SettingsManager.getBookSettings();
         bs.bookmarks.add(new Bookmark(name, getDocumentModel().getCurrentIndex(), 0, 0));
-        SettingsManager.edit(bs).commit();
+        SettingsManager.storeBookSettings();
     }
 
     @ActionMethod(ids = R.id.actions_keyBindings)

@@ -92,10 +92,6 @@ public class SettingsManager {
         }
     }
 
-    public static BookSettingsEditor edit(final BookSettings bs) {
-        return new BookSettingsEditor(bs);
-    }
-
     public static void clearCurrentBookSettings() {
         lock.writeLock().lock();
         try {
@@ -337,29 +333,23 @@ public class SettingsManager {
             appSettings = new AppSettings(ctx);
 
             final AppSettings.Diff appDiff = applyAppSettingsChanges(oldSettings, appSettings);
-            onBookSettingsChanged(current, appDiff);
+            onBookSettingsChanged(appDiff);
 
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    static void onBookSettingsChanged(final BookSettings bs, final AppSettings.Diff appDiff) {
+    static void onBookSettingsChanged(final AppSettings.Diff appDiff) {
         lock.writeLock().lock();
         try {
             if (current != null) {
-                if (current == bs) {
-                    final BookSettings oldBS = new BookSettings(current);
-                    appSettings.fillBookSettings(current);
-                    db.storeBookSettings(current);
-                    db.updateBookmarks(current);
-
-                    applyBookSettingsChanges(oldBS, current, appDiff);
-                } else {
-                    appSettings.fillBookSettings(current);
-                    db.storeBookSettings(current);
-                    db.updateBookmarks(current);
-                }
+                final BookSettings oldBS = current;
+                current = new BookSettings(oldBS);
+                appSettings.fillBookSettings(current);
+                db.storeBookSettings(current);
+                db.updateBookmarks(current);
+                applyBookSettingsChanges(oldBS, current, appDiff);
             }
         } finally {
             lock.writeLock().unlock();
@@ -387,9 +377,6 @@ public class SettingsManager {
 
     public static void applyBookSettingsChanges(final BookSettings oldSettings, final BookSettings newSettings,
             final AppSettings.Diff appDiff) {
-        if (newSettings == null) {
-            return;
-        }
         final BookSettings.Diff diff = new BookSettings.Diff(oldSettings, newSettings);
         final ISettingsChangeListener l = listeners.getListener();
         l.onBookSettingsChanged(oldSettings, newSettings, diff, appDiff);
@@ -401,27 +388,5 @@ public class SettingsManager {
 
     public static void removeListener(final ISettingsChangeListener l) {
         listeners.removeListener(l);
-    }
-
-    public static class BookSettingsEditor {
-
-        final BookSettings bookSettings;
-
-        BookSettingsEditor(final BookSettings bs) {
-            this.bookSettings = bs;
-            if (bookSettings != null) {
-                getAppSettings().updatePseudoBookSettings(bookSettings);
-            }
-        }
-
-        public void commit() {
-            if (bookSettings != null) {
-                onBookSettingsChanged(bookSettings, null);
-            }
-        }
-
-        public void rollback() {
-            getAppSettings().clearPseudoBookSettings();
-        }
     }
 }

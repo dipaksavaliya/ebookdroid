@@ -239,53 +239,55 @@ public class AppSettings implements AppPreferences {
 
         public Diff(final AppSettings olds, final AppSettings news) {
             firstTime = olds == null;
-            if (news != null) {
-                if (firstTime || olds.nightMode != news.nightMode) {
+            if (firstTime) {
+                mask = 0xFFFFFFFF;
+            } else if (news != null) {
+                if (olds.nightMode != news.nightMode) {
                     mask |= D_NightMode;
                 }
-                if (firstTime || olds.rotation != news.rotation) {
+                if (olds.rotation != news.rotation) {
                     mask |= D_Rotation;
                 }
-                if (firstTime || olds.fullScreen != news.fullScreen) {
+                if (olds.fullScreen != news.fullScreen) {
                     mask |= D_FullScreen;
                 }
-                if (firstTime || olds.showTitle != news.showTitle) {
+                if (olds.showTitle != news.showTitle) {
                     mask |= D_ShowTitle;
                 }
-                if (firstTime || olds.pageInTitle != news.pageInTitle) {
+                if (olds.pageInTitle != news.pageInTitle) {
                     mask |= D_PageInTitle;
                 }
-                if (firstTime || olds.tapsEnabled != news.tapsEnabled) {
+                if (olds.tapsEnabled != news.tapsEnabled) {
                     mask |= D_TapsEnabled;
                 }
-                if (firstTime || olds.scrollHeight != news.scrollHeight) {
+                if (olds.scrollHeight != news.scrollHeight) {
                     mask |= D_ScrollHeight;
                 }
-                if (firstTime || olds.pagesInMemory != news.pagesInMemory) {
+                if (olds.pagesInMemory != news.pagesInMemory) {
                     mask |= D_PagesInMemory;
                 }
-                if (firstTime || olds.brightness != news.brightness) {
+                if (olds.brightness != news.brightness) {
                     mask |= D_Brightness;
                 }
-                if (firstTime || olds.brightnessInNightModeOnly != news.brightnessInNightModeOnly) {
+                if (olds.brightnessInNightModeOnly != news.brightnessInNightModeOnly) {
                     mask |= D_BrightnessInNightMode;
                 }
-                if (firstTime || olds.keepScreenOn != news.keepScreenOn) {
+                if (olds.keepScreenOn != news.keepScreenOn) {
                     mask |= D_KeepScreenOn;
                 }
-                if (firstTime || olds.loadRecent != news.loadRecent) {
+                if (olds.loadRecent != news.loadRecent) {
                     mask |= D_LoadRecent;
                 }
-                if (firstTime || olds.getUseBookcase() != news.getUseBookcase()) {
+                if (olds.getUseBookcase() != news.getUseBookcase()) {
                     mask |= D_UseBookcase;
                 }
-                if (firstTime || olds.djvuRenderingMode != news.djvuRenderingMode) {
+                if (olds.djvuRenderingMode != news.djvuRenderingMode) {
                     mask |= D_DjvuRenderingMode;
                 }
-                if (firstTime || !olds.autoScanDirs.equals(news.autoScanDirs)) {
+                if (!olds.autoScanDirs.equals(news.autoScanDirs)) {
                     mask |= D_AutoScanDirs;
                 }
-                if (firstTime || !olds.getAllowedFileTypes().equals(news.getAllowedFileTypes())) {
+                if (!olds.getAllowedFileTypes().equals(news.getAllowedFileTypes())) {
                     mask |= D_AllowedFileTypes;
                 }
             }

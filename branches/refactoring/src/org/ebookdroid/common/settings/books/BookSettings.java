@@ -9,8 +9,6 @@ import org.ebookdroid.core.events.CurrentPageListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.emdev.utils.CompareUtils;
-
 public class BookSettings implements CurrentPageListener {
 
     public final String fileName;
@@ -77,8 +75,6 @@ public class BookSettings implements CurrentPageListener {
 
     public static class Diff {
 
-        private static final short D_CurrentPage = 0x0001 << 0;
-        private static final short D_Zoom = 0x0001 << 1;
         private static final short D_SplitPages = 0x0001 << 2;
         private static final short D_ViewMode = 0x0001 << 3;
         private static final short D_PageAlign = 0x0001 << 4;
@@ -90,41 +86,29 @@ public class BookSettings implements CurrentPageListener {
 
         public Diff(BookSettings olds, BookSettings news) {
             firstTime = olds == null;
-            if (news != null) {
-                if (firstTime || !CompareUtils.equals(olds.currentPage, news.currentPage)) {
-                    mask |= D_CurrentPage;
-                }
-                if (firstTime || olds.zoom != news.zoom) {
-                    mask |= D_Zoom;
-                }
-                if (firstTime || olds.splitPages != news.splitPages) {
+            if (firstTime) {
+                mask = (short)0xFFFF;
+            } else if (news != null) {
+                if (olds.splitPages != news.splitPages) {
                     mask |= D_SplitPages;
                 }
-                if (firstTime || olds.viewMode != news.viewMode) {
+                if (olds.cropPages != news.cropPages) {
+                    mask |= D_CropPages;
+                }
+                if (olds.viewMode != news.viewMode) {
                     mask |= D_ViewMode;
                 }
-                if (firstTime || olds.pageAlign != news.pageAlign) {
+                if (olds.pageAlign != news.pageAlign) {
                     mask |= D_PageAlign;
                 }
-                if (firstTime || olds.animationType != news.animationType) {
+                if (olds.animationType != news.animationType) {
                     mask |= D_AnimationType;
-                }
-                if (firstTime || olds.cropPages != news.cropPages) {
-                    mask |= D_CropPages;
                 }
             }
         }
 
         public boolean isFirstTime() {
             return firstTime;
-        }
-
-        public boolean isCurrentPageChanged() {
-            return 0 != (mask & D_CurrentPage);
-        }
-
-        public boolean isZoomChanged() {
-            return 0 != (mask & D_Zoom);
         }
 
         public boolean isSplitPagesChanged() {
