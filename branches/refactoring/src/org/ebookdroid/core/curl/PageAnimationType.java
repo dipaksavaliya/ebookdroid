@@ -70,6 +70,6 @@ public enum PageAnimationType implements ResourceConstant {
                     break;
             }
         }
-        return new SinglePageView(singlePageDocumentView);
+        return new SinglePageDefaultSlider(singlePageDocumentView);
     }
 }
