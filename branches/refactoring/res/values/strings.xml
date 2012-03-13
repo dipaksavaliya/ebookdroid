@@ -188,4 +188,98 @@
 	<string name="msg_loading">Loading&#8230; Please wait</string>
 	<string name="msg_getting_page_size">"Getting page size %1$d/%2$d"</string>
 
+    <string name="menu_tap_configuration">Tap configuration</string>
+    <string name="menu_key_bindings">Key bindings</string>
+
+    <string name="pref_tapsenabled_title">Enable taps</string>
+    <string name="pref_tapsenabled_summary">Use Tap Configuration to define tap regions and actions</string>
+
+    <string name="pref_performance_category">"Performance settings"</string>
+    <string name="pref_performance_category_summary">"Performance settings"</string>
+
+    <string name="pref_lowlevel_category">"Low level application preferences (Applied after document reload)"</string>
+    <string name="pref_lowlevel_category_summary">"Low level application preferences (Applied after document reload)"</string>
+
+    <string name="pref_docviewtype_title">"Document viewer implementation"</string>
+    <string name="pref_docviewtype_summary">"Defines viewer class"</string>
+
+    <string name="list_docviewtype_base">"Based on android.view.View"</string>
+    <string name="list_docviewtype_surface">"Based on android.view.SurfaceView"</string>
+
+    <string name="pref_decodethread_priority_title">"Decode thread priority"</string>
+    <string name="pref_decodethread_priority_summary">"Defines decode thread priority"</string>
+
+    <string name="list_thread_priority_lowest">"Lowest"</string>
+    <string name="list_thread_priority_lower">"Lower"</string>
+    <string name="list_thread_priority_normal">"Normal"</string>
+    <string name="list_thread_priority_higher">"Higher"</string>
+    <string name="list_thread_priority_highest">"Highest"</string>
+
+    <string name="pref_drawthread_priority_title">"Surface draw thread priority"</string>
+    <string name="pref_drawthread_priority_summary">"Defines surface draw thread priority"</string>
+
+    <string name="pref_hwa_enabled_title">"Hardware acceleration enabled"</string>
+    <string name="pref_hwa_enabled_summary">"Set if Hardware acceleration can be set by viewer"</string>
+
+    <string name="pref_bitmapsize_title">"Texture bitmap size"</string>
+    <string name="pref_bitmapsize_summary">"Defines size of texture parts"</string>
+
+    <string name="list_bitmapsize_64">"64 * 64"</string>
+    <string name="list_bitmapsize_128">"128 * 128"</string>
+    <string name="list_bitmapsize_256">"256 * 256"</string>
+    <string name="list_bitmapsize_512">"512 * 512"</string>
+    <string name="list_bitmapsize_1024">"1024 * 1024"</string>
+
+    <string name="pref_texturereuse_title">"Reuse texture bitmaps"</string>
+    <string name="pref_texturereuse_summary">"Reuse existing texture bitmaps when page part is decoded again"</string>
+
+    <string name="pref_earlyrecycling_title">Early bitmap recycling</string>
+    <string name="pref_earlyrecycling_summary">Bitmaps are manually recycled when they are removed from pool</string>
+
+    <string name="pref_reloadduringzoom_title">Reload page during zoom</string>
+    <string name="pref_reloadduringzoom_summary">Reload page during zoom if zoom changed more than 20%</string>
+
+    <string name="pref_brfiletypespecificpdf_title">"PDF"</string>
+    <string name="pref_brfiletypespecificpdf_summary">"PDF format specific settings"</string>
+
+    <string name="pref_customdpi_title">"Use custom DPI"</string>
+    <string name="pref_customdpi_summary">"Define custom DPI values below"</string>
+
+    <string name="pref_xdpi_title">X DPI</string>
+    <string name="pref_xdpi_summary">X DPI</string>
+
+    <string name="pref_ydpi_title">Y DPI</string>
+    <string name="pref_ydpi_summary">Y DPI</string>
+
+    <string name="pref_brfiletypespecificfb2_title">FB2</string>
+    <string name="pref_brfiletypespecificfb2_summary">FB2 format specific settings</string>
+
+    <string name="pref_fontsize_title">Font size</string>
+    <string name="pref_fontsize_summary">Base font size</string>
+
+    <string name="list_fontsize_tiny">Tiny</string>
+    <string name="list_fontsize_small">Small</string>
+    <string name="list_fontsize_normal">Normal</string>
+    <string name="list_fontsize_large">Large</string>
+    <string name="list_fontsize_huge">Huge</string>
+
+    <string name="pref_fb2hyphen_title">Enable Hyphenation</string>
+    <string name="pref_fb2hyphen_summary">Experimental Hyphenation implementation</string>
+
+    <string name="pref_touchdelay_title">Touch processing delay</string>
+    <string name="pref_touchdelay_summary">Touch processing delay (in milliseconds)</string>
+
+    <string name="tap_zones_single_tap">Single Tap</string>
+    <string name="tap_zones_double_tap">Double Tap</string>
+    <string name="tap_zones_long_tap">Long tap</string>
+    <string name="tap_zones_two_finger_tap">Two finger tap</string>
+    <string name="tap_zones_reset">Reset</string>
+    <string name="tap_zones_delete">Delete</string>
+    <string name="tap_zones_clear">Clear</string>
+
+    <string name="menu_searchbook">Search</string>
+    <string name="content_description_searchbook">Search books by name...</string>
+    <string name="search_results_title">"Search results"</string>
+    <string name="search_book_dlg_title">"Search..."</string>
+
 </resources>
