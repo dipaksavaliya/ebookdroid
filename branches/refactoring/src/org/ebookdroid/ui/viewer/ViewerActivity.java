@@ -2,6 +2,7 @@ package org.ebookdroid.ui.viewer;
 
 import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.touch.TouchManagerView;
 import org.ebookdroid.ui.viewer.dialogs.GoToPageDialog;
@@ -196,21 +197,24 @@ public class ViewerActivity extends AbstractActionActivity {
     }
 
     public void currentPageChanged(final String pageText, final String bookTitle) {
-        String prefix = "";
-        if (LengthUtils.isNotEmpty(pageText)) {
-            if (SettingsManager.getAppSettings().pageInTitle) {
-                prefix = "(" + pageText + ") ";
-            } else {
-                if (pageNumberToast != null) {
-                    pageNumberToast.setText(pageText);
-                } else {
-                    pageNumberToast = Toast.makeText(this, pageText, 300);
-                }
-                pageNumberToast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);
-                pageNumberToast.show();
-            }
+        if (LengthUtils.isEmpty(pageText)) {
+            return;
         }
-        getWindow().setTitle(prefix + bookTitle);
+
+        AppSettings app = SettingsManager.getAppSettings();
+        if (app.showTitle && app.pageInTitle) {
+            getWindow().setTitle("(" + pageText + ") " + bookTitle);
+            return;
+        }
+
+        if (pageNumberToast != null) {
+            pageNumberToast.setText(pageText);
+        } else {
+            pageNumberToast = Toast.makeText(this, pageText, 300);
+        }
+
+        pageNumberToast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);
+        pageNumberToast.show();
     }
 
     @Override
