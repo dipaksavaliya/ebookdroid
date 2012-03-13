@@ -23,12 +23,14 @@ public class EventDraw implements IEvent {
     public PageTreeLevel level;
     public Canvas canvas;
 
+    Paint brightnessFilter;
     RectF pageBounds;
     PointF viewBase;
     final RectF fixedPageBounds = new RectF();
 
     EventDraw(final Queue<EventDraw> eventQueue) {
         this.eventQueue = eventQueue;
+
     }
 
     void init(final ViewState viewState, final Canvas canvas) {
@@ -36,6 +38,15 @@ public class EventDraw implements IEvent {
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.canvas = canvas;
         this.viewBase = viewState.ctrl.getView().getBase(viewState.viewRect);
+
+        if (viewState.app.brightness < 100) {
+            final int alpha = 255 - viewState.app.brightness * 255 / 100;
+            brightnessFilter = new Paint();
+            brightnessFilter.setColor(Color.BLACK);
+            brightnessFilter.setAlpha(alpha);
+        } else {
+            brightnessFilter = null;
+        }
     }
 
     void init(final EventDraw event, final Canvas canvas) {
@@ -43,6 +54,7 @@ public class EventDraw implements IEvent {
         this.level = event.level;
         this.canvas = canvas;
         this.viewBase = event.viewBase;
+        this.brightnessFilter = event.brightnessFilter;
     }
 
     void release() {
@@ -115,7 +127,7 @@ public class EventDraw implements IEvent {
             return node.page.nodes.paintChildren(this, node, nodeRect);
 
         } finally {
-            drawBrightnessFilter(canvas, nodeRect);
+            drawBrightnessFilter(nodeRect);
         }
     }
 
@@ -137,16 +149,16 @@ public class EventDraw implements IEvent {
         canvas.drawText(text, fixedPageBounds.centerX(), fixedPageBounds.centerY(), textPaint);
     }
 
-    protected void drawBrightnessFilter(final Canvas canvas, final RectF tr) {
+    protected void drawBrightnessFilter(final RectF nodeRect) {
         if (viewState.app.brightnessInNightModeOnly && !viewState.app.nightMode) {
             return;
         }
 
-        if (viewState.app.brightness < 100) {
-            final Paint p = new Paint();
-            p.setColor(Color.BLACK);
-            p.setAlpha(255 - viewState.app.brightness * 255 / 100);
-            canvas.drawRect(tr, p);
+        if (brightnessFilter == null) {
+            return;
         }
+
+        canvas.drawRect(nodeRect.left - viewBase.x, nodeRect.top - viewBase.y, nodeRect.right - viewBase.x,
+                nodeRect.bottom - viewBase.y, brightnessFilter);
     }
 }
