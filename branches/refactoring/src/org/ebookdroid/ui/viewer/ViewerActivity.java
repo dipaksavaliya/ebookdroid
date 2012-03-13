@@ -4,6 +4,7 @@ import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.types.ToastPosition;
 import org.ebookdroid.common.touch.TouchManagerView;
 import org.ebookdroid.ui.viewer.dialogs.GoToPageDialog;
 import org.ebookdroid.ui.viewer.views.PageViewZoomControls;
@@ -207,13 +208,16 @@ public class ViewerActivity extends AbstractActionActivity {
             return;
         }
 
+        if (app.pageNumberToastPosition == ToastPosition.Invisible) {
+            return;
+        }
         if (pageNumberToast != null) {
             pageNumberToast.setText(pageText);
         } else {
-            pageNumberToast = Toast.makeText(this, pageText, 300);
+            pageNumberToast = Toast.makeText(this, pageText, 0);
         }
 
-        pageNumberToast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);
+        pageNumberToast.setGravity(app.pageNumberToastPosition.position, 0, 0);
         pageNumberToast.show();
     }
 

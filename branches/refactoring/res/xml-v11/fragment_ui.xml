@@ -62,6 +62,14 @@
             android:summary="@string/pref_pageintitle_summary"
             android:title="@string/pref_pageintitle_title" />
 
+    <ListPreference
+            android:defaultValue="@string/pref_pagenumbertoastposition_lefttop"
+            android:entries="@array/pref_pagenumbertoastposition_entries"
+            android:entryValues="@array/pref_pagenumbertoastposition_values"
+            android:key="@string/pref_pagenumbertoastposition_id"
+            android:summary="@string/pref_pagenumbertoastposition_summary"
+            android:title="@string/pref_pagenumbertoastposition_title" />
+
     <CheckBoxPreference
             android:defaultValue="@string/pref_showanimicon_defvalue"
             android:key="@string/pref_showanimicon_id"

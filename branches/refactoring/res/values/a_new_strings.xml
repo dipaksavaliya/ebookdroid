@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <string name="pref_pagenumbertoastposition_title">Position of page number toast</string>
+    <string name="pref_pagenumbertoastposition_summary">Position of page number toast</string>
+
+    <string name="list_pagenumbertoastposition_invisible">Invisible</string>
+    <string name="list_pagenumbertoastposition_lefttop">Left top corner</string>
+    <string name="list_pagenumbertoastposition_righttop">Right top corner</string>
+    <string name="list_pagenumbertoastposition_leftbottom">Left bottom corner</string>
+    <string name="list_pagenumbertoastposition_bottom">Bottom of the screeen</string>
+    <string name="list_pagenumbertoastposition_righbottom">Right bottom corner</string>
+
 </resources>

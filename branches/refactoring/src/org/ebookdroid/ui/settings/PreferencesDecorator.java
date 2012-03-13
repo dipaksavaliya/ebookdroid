@@ -86,7 +86,7 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
     }
 
     public void decorateUISettings() {
-        decoratePreferences(ROTATION.key, BRIGHTNESS.key);
+        decoratePreferences(ROTATION.key, BRIGHTNESS.key, PAGE_NUMBER_TOAST_POSITION.key);
     }
 
     public void setPageAlign(final PageAnimationType type, final String alignPrefKey) {

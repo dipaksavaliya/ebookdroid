@@ -7,6 +7,7 @@ import org.ebookdroid.common.settings.types.DocumentViewType;
 import org.ebookdroid.common.settings.types.FontSize;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.common.settings.types.RotationType;
+import org.ebookdroid.common.settings.types.ToastPosition;
 import org.ebookdroid.core.curl.PageAnimationType;
 
 import android.content.Context;
@@ -41,6 +42,8 @@ public class AppSettings implements AppPreferences {
     public final boolean showTitle;
 
     public final boolean pageInTitle;
+
+    public final ToastPosition pageNumberToastPosition;
 
     public final boolean showAnimIcon;
 
@@ -112,6 +115,7 @@ public class AppSettings implements AppPreferences {
         fullScreen = FULLSCREEN.getPreferenceValue(prefs);
         showTitle = SHOW_TITLE.getPreferenceValue(prefs);
         pageInTitle = SHOW_PAGE_IN_TITLE.getPreferenceValue(prefs);
+        pageNumberToastPosition = PAGE_NUMBER_TOAST_POSITION.getPreferenceValue(prefs);
         showAnimIcon = SHOW_ANIM_ICON.getPreferenceValue(prefs);
         /* =============== Tap & Scroll settings =============== */
         tapsEnabled = TAPS_ENABLED.getPreferenceValue(prefs);

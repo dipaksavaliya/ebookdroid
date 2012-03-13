@@ -12,6 +12,7 @@ import org.ebookdroid.common.settings.types.DocumentViewType;
 import org.ebookdroid.common.settings.types.FontSize;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.common.settings.types.RotationType;
+import org.ebookdroid.common.settings.types.ToastPosition;
 import org.ebookdroid.core.curl.PageAnimationType;
 
 public interface AppPreferences {
@@ -42,6 +43,9 @@ public interface AppPreferences {
 
     BooleanPreferenceDefinition SHOW_PAGE_IN_TITLE = new BooleanPreferenceDefinition(pref_pageintitle_id,
             pref_pageintitle_defvalue);
+
+    EnumPreferenceDefinition<ToastPosition> PAGE_NUMBER_TOAST_POSITION = new EnumPreferenceDefinition<ToastPosition>(ToastPosition.class,
+            pref_pagenumbertoastposition_id, pref_pagenumbertoastposition_lefttop);
 
     BooleanPreferenceDefinition SHOW_ANIM_ICON = new BooleanPreferenceDefinition(pref_showanimicon_id,
             pref_showanimicon_defvalue);
