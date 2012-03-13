@@ -278,8 +278,8 @@
     <string name="tap_zones_clear">Clear</string>
 
     <string name="menu_searchbook">Search</string>
-    <string name="content_description_searchbook">Search books by name...</string>
+    <string name="content_description_searchbook">Search books by name&#8230;</string>
     <string name="search_results_title">"Search results"</string>
-    <string name="search_book_dlg_title">"Search..."</string>
+    <string name="search_book_dlg_title">"Search&#8230;"</string>
 
 </resources>

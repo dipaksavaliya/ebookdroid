@@ -277,8 +277,8 @@
     <string name="tap_zones_clear">Очистить</string>
 
     <string name="menu_searchbook">Поиск</string>
-    <string name="content_description_searchbook">Поиск книг по имени...</string>
+    <string name="content_description_searchbook">Поиск книг по имени&#8230;</string>
     <string name="search_results_title">Результаты поиска</string>
-    <string name="search_book_dlg_title">"Поиск..."</string>
+    <string name="search_book_dlg_title">"Поиск&#8230;"</string>
 
 </resources>
