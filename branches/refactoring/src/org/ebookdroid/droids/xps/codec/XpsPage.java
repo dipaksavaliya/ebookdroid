@@ -3,12 +3,16 @@ package org.ebookdroid.droids.xps.codec;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPage;
+import org.ebookdroid.core.codec.PageLink;
 import org.ebookdroid.droids.pdf.codec.PdfContext;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.emdev.utils.MatrixUtils;
 
@@ -22,6 +26,11 @@ public class XpsPage implements CodecPage {
         this.pageHandle = pageHandle;
         this.docHandle = docHandle;
         this.pageBounds = getBounds();
+    }
+
+    @Override
+    public List<PageLink> getPageLinks() {
+        return Collections.emptyList();
     }
 
     @Override

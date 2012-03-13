@@ -56,13 +56,13 @@ static void pdf_free_document(renderdocument_t* doc)
     if (doc)
     {
         if (doc->outline)
-            fz_free_outline(doc->ctx,doc->outline);
+            fz_free_outline(doc->ctx, doc->outline);
         doc->outline = NULL;
 
         if (doc->xref)
             pdf_close_document(doc->xref);
         doc->xref = NULL;
-        
+
         fz_flush_warnings(doc->ctx);
         fz_free_context(doc->ctx);
         doc->ctx = NULL;
@@ -74,7 +74,7 @@ static void pdf_free_document(renderdocument_t* doc)
 
 JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_pdf_codec_PdfDocument_open(JNIEnv *env, jclass clazz, jint storememory, jstring fname,
-                                                    jstring pwd)
+                                                      jstring pwd)
 {
     fz_obj *obj;
     renderdocument_t *doc;
@@ -92,21 +92,20 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_open(JNIEnv *env, jclass clazz,
     {
         throw_exception(env, "Out of Memory");
         goto cleanup;
-    }
-    DEBUG("PdfDocument.nativeOpen(): storememory = %d", storememory);
+    }DEBUG("PdfDocument.nativeOpen(): storememory = %d", storememory);
 
 //    doc->ctx = fz_new_context(&fz_alloc_default, 256<<20);
 //    doc->ctx = fz_new_context(&fz_alloc_default, storememory);
     doc->ctx = fz_new_context(NULL, storememory);
     if (!doc->ctx)
     {
-	free(doc);
+        free(doc);
         throw_exception(env, "Out of Memory");
         goto cleanup;
     }
     doc->xref = NULL;
     doc->outline = NULL;
-    
+
 //    fz_set_aa_level(fz_catch(ctx), alphabits);
 
     /*
@@ -114,11 +113,11 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_open(JNIEnv *env, jclass clazz,
      */
     fz_try(doc->ctx)
     {
-	doc->xref = pdf_open_document(doc->ctx, filename);
+        doc->xref = pdf_open_document(doc->ctx, filename);
     }
     fz_catch(doc->ctx)
     {
-        throw_exception(env, (char*)fz_caught(doc->ctx));
+        throw_exception(env, (char*) fz_caught(doc->ctx));
         pdf_free_document(doc);
 //        throw_exception(env, "PDF file not found or corrupted");
         goto cleanup;
@@ -166,7 +165,7 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_free(JNIEnv *env, jclass clazz,
 
 JNIEXPORT jint JNICALL
 Java_org_ebookdroid_droids_pdf_codec_PdfDocument_getPageInfo(JNIEnv *env, jclass cls, jlong handle, jint pageNumber,
-                                                           jobject cpi)
+                                                             jobject cpi)
 {
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
 
@@ -226,9 +225,9 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_getPageInfo(JNIEnv *env, jclass
     {
         return (-1);
     }
-    
+
     fz_rect bounds = fz_transform_rect(fz_rotate(rotate), mediabox);
-    
+
     int width = bounds.x1 - bounds.x0;
     int height = bounds.y1 - bounds.y0;
 
@@ -250,89 +249,102 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_getPageInfo(JNIEnv *env, jclass
 }
 
 JNIEXPORT jobject JNICALL
-Java_org_ebookdroid_droids_pdf_codec_PdfDocument_getPageLinks(JNIEnv *env, jclass clazz, jlong handle, jint pageno)
+Java_org_ebookdroid_droids_pdf_codec_PdfPage_getPageLinks(JNIEnv *env, jclass clazz, jlong handle, jlong pagehandle)
 {
 
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
+    renderpage_t *page = (renderpage_t*) (long) pagehandle;
 
-    // DEBUG("PdfDocument.getLinks = %p", doc);
+    DEBUG("PdfDocument.getPageLinks(%p, %p)", doc, page);
+
+    if (!page || !page->page)
+    {
+        DEBUG("PdfDocument.getPageLinks(%p, %p): no page loaded.", doc, page);
+        return NULL;
+    }
+    if (!page->page->links)
+    {
+        DEBUG("PdfDocument.getPageLinks(%p, %p)): no links found.", doc, page);
+        return NULL;
+    }
+
+    jclass pagelinkClass = (*env)->FindClass(env, "org/ebookdroid/core/codec/PageLink");
+    if (!pagelinkClass)
+    {
+        DEBUG("PdfDocument.getPageLinks(%p, %p): org.ebookdroid.core.codec.PageLink class not found.", doc, page);
+        return NULL;
+    }
+    jmethodID plInitMethodId = (*env)->GetMethodID(env, pagelinkClass, "<init>", "(Ljava/lang/String;I[I)V");
+    if (!plInitMethodId)
+    {
+        DEBUG(
+            "PdfDocument.getPageLinks(%p, %p): constructor not found in org.ebookdroid.core.codec.PageLink class.", doc, page);
+        return NULL;
+    }
+
+    jclass arrayListClass = (*env)->FindClass(env, "java/util/ArrayList");
+    if (!arrayListClass)
+    {
+        DEBUG("PdfDocument.getPageLinks((%p, %p): java.util.ArrayList class not found.", doc, page);
+        return NULL;
+    }
+
+    jmethodID alInitMethodId = (*env)->GetMethodID(env, arrayListClass, "<init>", "()V");
+    if (!alInitMethodId)
+    {
+        DEBUG("PdfDocument.getPageLinks(%p, %p): default constructor not found in java.util.ArrayList class .", doc, page);
+        return NULL;
+    }
+
+    jmethodID alAddMethodId = (*env)->GetMethodID(env, arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    if (!alAddMethodId)
+    {
+        DEBUG("PdfDocument.getPageLinks(%p, %p): add method not found in java.util.ArrayList class.", doc, page);
+        return NULL;
+    }
+
+    jobject arrayList = (*env)->NewObject(env, arrayListClass, alInitMethodId);
+    if (!arrayList)
+    {
+        DEBUG("PdfDocument.getPageLinks(%p, %p): array could not be created.", doc, page);
+        return NULL;
+    }
 
     fz_link *link;
 
-    jobject arrayList = NULL;
-
-    pdf_page *page = NULL;
-    fz_try(doc->ctx)
+    for (link = page->page->links; link; link = link->next)
     {
-	page = pdf_load_page(doc->xref, pageno - 1);
-    }
-    fz_catch(doc->ctx)
-    {
-	//fz_throw(doc->ctx, "cannot open document: %s", filename);
-	return arrayList;
-    }
+        jint data[4];
+        data[0] = link->rect.x0;
+        data[1] = link->rect.y0;
+        data[2] = link->rect.x1;
+        data[3] = link->rect.y1;
 
-    if (page && page->links)
-    {
-        jclass arrayListClass = (*env)->FindClass(env, "java/util/ArrayList");
-        if (!arrayListClass)
-            return arrayList;
+        jintArray points = (*env)->NewIntArray(env, 4);
+        (*env)->SetIntArrayRegion(env, points, 0, 4, data);
 
-        jmethodID alInitMethodId = (*env)->GetMethodID(env, arrayListClass, "<init>", "()V");
-        if (!alInitMethodId)
-            return arrayList;
+        char linkbuf[128];
+        int number;
 
-        jmethodID alAddMethodId = (*env)->GetMethodID(env, arrayListClass, "add", "(Ljava/lang/Object;)Z");
-        if (!alAddMethodId)
-            return arrayList;
-
-        arrayList = (*env)->NewObject(env, arrayListClass, alInitMethodId);
-        if (!arrayList)
-            return arrayList;
-
-        for (link = page->links; link; link = link->next)
+        if (link->dest.kind == FZ_LINK_URI)
         {
-
-            jclass pagelinkClass = (*env)->FindClass(env, "org/ebookdroid/core/PageLink");
-            if (!pagelinkClass)
-                return arrayList;
-
-            jmethodID plInitMethodId = (*env)->GetMethodID(env, pagelinkClass, "<init>", "(Ljava/lang/String;I[I)V");
-            if (!plInitMethodId)
-                return arrayList;
-
-            jint data[4];
-            data[0] = link->rect.x0;
-            data[1] = link->rect.y0;
-            data[2] = link->rect.x1;
-            data[3] = link->rect.y1;
-            jintArray points = (*env)->NewIntArray(env, 4);
-            (*env)->SetIntArrayRegion(env, points, 0, 4, data);
-
-            char linkbuf[128];
-            int number;
-
-            if (link->dest.kind == FZ_LINK_URI)
-            {
-                snprintf(linkbuf, 128, "%s",  link->dest.ld.uri.uri);
-            }
-            else if (link->dest.kind == FZ_LINK_GOTO)
-            {
-                snprintf(linkbuf, 127, "#%d", link->dest.ld.gotor.page);
-            }
-
-            jstring jstr = (*env)->NewStringUTF(env, linkbuf);
-
-            jobject hl = (*env)->NewObject(env, pagelinkClass, plInitMethodId, jstr, (jint) 1, points);
-
-            (*env)->DeleteLocalRef(env, jstr);
-            (*env)->DeleteLocalRef(env, points);
-
-            if (hl)
-                (*env)->CallBooleanMethod(env, arrayList, alAddMethodId, hl);
-            //jenv->DeleteLocalRef(hl);
+            snprintf(linkbuf, 128, "%s", link->dest.ld.uri.uri);
         }
-        pdf_free_page(doc->ctx, page);
+        else if (link->dest.kind == FZ_LINK_GOTO)
+        {
+            snprintf(linkbuf, 127, "#%d", link->dest.ld.gotor.page);
+        }
+
+        jstring jstr = (*env)->NewStringUTF(env, linkbuf);
+
+        jobject hl = (*env)->NewObject(env, pagelinkClass, plInitMethodId, jstr, (jint) 1, points);
+
+        (*env)->DeleteLocalRef(env, jstr);
+        (*env)->DeleteLocalRef(env, points);
+
+        if (hl)
+            (*env)->CallBooleanMethod(env, arrayList, alAddMethodId, hl);
+        //jenv->DeleteLocalRef(hl);
     }
     return arrayList;
 }
@@ -366,32 +378,32 @@ Java_org_ebookdroid_droids_pdf_codec_PdfPage_open(JNIEnv *env, jclass clazz, jlo
 
     fz_try(doc->ctx)
     {
-	page->page = pdf_load_page(doc->xref, pageno - 1);
+        page->page = pdf_load_page(doc->xref, pageno - 1);
     }
     fz_catch(doc->ctx)
     {
-	//fz_throw(ctx, "cannot load page tree: %s", filename);
-	free(page);
-	page = NULL;
+        //fz_throw(ctx, "cannot load page tree: %s", filename);
+        free(page);
+        page = NULL;
         throw_exception(env, "error loading page");
         goto cleanup;
 
     }
-    
+
     fz_try(doc->ctx)
     {
-	page->pageList = fz_new_display_list(doc->ctx);
-	dev = fz_new_list_device(doc->ctx, page->pageList);
-	pdf_run_page(doc->xref, page->page, dev, fz_identity, NULL);
+        page->pageList = fz_new_display_list(doc->ctx);
+        dev = fz_new_list_device(doc->ctx, page->pageList);
+        pdf_run_page(doc->xref, page->page, dev, fz_identity, NULL);
     }
     fz_catch(doc->ctx)
     {
-	fz_free_device(dev);
-	fz_free_display_list(doc->ctx, page->pageList);
-	pdf_free_page(doc->ctx, page->page);
+        fz_free_device(dev);
+        fz_free_display_list(doc->ctx, page->pageList);
+        pdf_free_page(doc->ctx, page->page);
 //	fz_throw(ctx, "cannot draw page %d",pageno);
-	free(page);
-	page = NULL;
+        free(page);
+        page = NULL;
         throw_exception(env, "error loading page");
         goto cleanup;
     }
@@ -422,7 +434,8 @@ Java_org_ebookdroid_droids_pdf_codec_PdfPage_free(JNIEnv *env, jclass clazz, jlo
 }
 
 JNIEXPORT void JNICALL
-Java_org_ebookdroid_droids_pdf_codec_PdfPage_getBounds(JNIEnv *env, jclass clazz, jlong dochandle, jlong handle, jfloatArray bounds)
+Java_org_ebookdroid_droids_pdf_codec_PdfPage_getBounds(JNIEnv *env, jclass clazz, jlong dochandle, jlong handle,
+                                                       jfloatArray bounds)
 {
     renderdocument_t *doc = (renderdocument_t*) (long) dochandle;
     renderpage_t *page = (renderpage_t*) (long) handle;
@@ -440,8 +453,8 @@ Java_org_ebookdroid_droids_pdf_codec_PdfPage_getBounds(JNIEnv *env, jclass clazz
 
 JNIEXPORT void JNICALL
 Java_org_ebookdroid_droids_pdf_codec_PdfPage_renderPage(JNIEnv *env, jobject this, jlong dochandle, jlong pagehandle,
-                                                      jintArray viewboxarray, jfloatArray matrixarray,
-                                                      jintArray bufferarray)
+                                                        jintArray viewboxarray, jfloatArray matrixarray,
+                                                        jintArray bufferarray)
 {
     renderdocument_t *doc = (renderdocument_t*) (long) dochandle;
     renderpage_t *page = (renderpage_t*) (long) pagehandle;
@@ -509,8 +522,8 @@ Java_org_ebookdroid_droids_pdf_codec_PdfContext_isNativeGraphicsAvailable(JNIEnv
 
 JNIEXPORT jboolean JNICALL
 Java_org_ebookdroid_droids_pdf_codec_PdfPage_renderPageBitmap(JNIEnv *env, jobject this, jlong dochandle,
-                                                            jlong pagehandle, jintArray viewboxarray,
-                                                            jfloatArray matrixarray, jobject bitmap)
+                                                              jlong pagehandle, jintArray viewboxarray,
+                                                              jfloatArray matrixarray, jobject bitmap)
 {
     renderdocument_t *doc = (renderdocument_t*) (long) dochandle;
     renderpage_t *page = (renderpage_t*) (long) pagehandle;
@@ -578,7 +591,7 @@ Java_org_ebookdroid_droids_pdf_codec_PdfPage_renderPageBitmap(JNIEnv *env, jobje
     dev = fz_new_draw_device(doc->ctx, pixmap);
     fz_execute_display_list(page->pageList, dev, ctm, viewbox, NULL);
     fz_free_device(dev);
-    
+
     fz_drop_pixmap(doc->ctx, pixmap);
 
     // DEBUG("PdfView.renderPage() done");
@@ -635,7 +648,7 @@ Java_org_ebookdroid_droids_pdf_codec_PdfOutline_getLink(JNIEnv *env, jclass claz
     char linkbuf[128];
     if (outline->dest.kind == FZ_LINK_URI)
     {
-        snprintf(linkbuf, 128, "%s",  outline->dest.ld.uri.uri);
+        snprintf(linkbuf, 128, "%s", outline->dest.ld.uri.uri);
         // DEBUG("PdfOutline_getLink uri = %s",linkbuf);
     }
     else if (outline->dest.kind == FZ_LINK_GOTO)
@@ -667,6 +680,6 @@ Java_org_ebookdroid_droids_pdf_codec_PdfOutline_getChild(JNIEnv *env, jclass cla
     fz_outline *outline = (fz_outline*) (long) outlinehandle;
 //	DEBUG("PdfOutline_getChild(%p)",outline);
     if (!outline)
-        return 0;                                                   
+        return 0;
     return (jlong) (long) outline->down;
 }

@@ -4,10 +4,7 @@ import org.ebookdroid.core.codec.AbstractCodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
-import org.ebookdroid.core.codec.PageLink;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class PdfDocument extends AbstractCodecDocument {
@@ -23,11 +20,6 @@ public class PdfDocument extends AbstractCodecDocument {
     public List<OutlineLink> getOutline() {
         final PdfOutline ou = new PdfOutline();
         return ou.getOutline(documentHandle);
-    }
-
-    @Override
-    public ArrayList<PageLink> getPageLinks(final int pageNumber) {
-        return getPageLinks(documentHandle, pageNumber);
     }
 
     @Override
@@ -61,8 +53,6 @@ public class PdfDocument extends AbstractCodecDocument {
     }
 
     private native static int getPageInfo(long docHandle, int pageNumber, CodecPageInfo cpi);
-
-    private native static ArrayList<PageLink> getPageLinks(long docHandle, int pageNumber);
 
     private static native long open(int storememory, String fname, String pwd);
 

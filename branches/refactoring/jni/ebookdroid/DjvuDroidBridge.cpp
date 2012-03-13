@@ -341,7 +341,7 @@ extern "C" jlong Java_org_ebookdroid_droids_djvu_codec_DjvuDocument_getPage(JNIE
     return (jlong) ddjvu_page_create_by_pageno((ddjvu_document_t*) docHandle, pageNumber);
 }
 
-extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuDocument_getPageLinks(JNIEnv *env, jclass cls,
+extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageLinks(JNIEnv *env, jclass cls,
                                                                                  jlong docHandle, jint pageNumber)
 {
     DEBUG_PRINT("getPageLinks num: %d", pageNumber);

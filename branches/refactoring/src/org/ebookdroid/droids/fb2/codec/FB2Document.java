@@ -4,7 +4,6 @@ import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
-import org.ebookdroid.core.codec.PageLink;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -220,11 +219,6 @@ public class FB2Document implements CodecDocument {
     @Override
     public CodecPageInfo getPageInfo(final int pageNuber) {
         return FB2Page.CPI;
-    }
-
-    @Override
-    public List<PageLink> getPageLinks(final int pageNuber) {
-        return null;
     }
 
     @Override

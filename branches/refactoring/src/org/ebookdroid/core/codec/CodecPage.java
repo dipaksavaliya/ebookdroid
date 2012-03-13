@@ -4,6 +4,8 @@ import org.ebookdroid.common.bitmaps.BitmapRef;
 
 import android.graphics.RectF;
 
+import java.util.List;
+
 public interface CodecPage {
 
     int getWidth();
@@ -11,6 +13,8 @@ public interface CodecPage {
     int getHeight();
 
     BitmapRef renderBitmap(int width, int height, RectF pageSliceBounds);
+
+    List<PageLink> getPageLinks();
 
     void recycle();
 

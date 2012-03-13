@@ -15,8 +15,6 @@ public interface CodecDocument {
 
     CodecPageInfo getPageInfo(int pageNuber);
 
-    List<PageLink> getPageLinks(int pageNuber);
-
     List<OutlineLink> getOutline();
 
     void recycle();

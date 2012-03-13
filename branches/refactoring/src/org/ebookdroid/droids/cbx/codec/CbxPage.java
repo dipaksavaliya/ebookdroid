@@ -5,6 +5,7 @@ import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.bitmaps.RawBitmap;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
+import org.ebookdroid.core.codec.PageLink;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +18,8 @@ import android.graphics.RectF;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 
 import org.emdev.utils.archives.ArchiveEntry;
 
@@ -97,6 +100,11 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> implements CodecPage
     }
 
     @Override
+    public List<PageLink> getPageLinks() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public boolean isRecycled() {
         return false;
     }
@@ -153,28 +161,28 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> implements CodecPage
                 (int) (pageSliceBounds.right * storedBitmap.getWidth()),
                 (int) (pageSliceBounds.bottom * storedBitmap.getHeight()));
 
-        float scaleFactor = (float)width/(float)srcRect.width();
-        CbxDocument.LCTX.d("Scale factor:"+scaleFactor);
+        float scaleFactor = (float) width / (float) srcRect.width();
+        CbxDocument.LCTX.d("Scale factor:" + scaleFactor);
         if (scaleFactor > 4.5) {
             CbxDocument.LCTX.d("Calling Native HQ4x");
             RawBitmap src = new RawBitmap(storedBitmap, srcRect);
             Bitmap scaled = src.scaleHq4x();
-            c.drawBitmap(scaled, null, new Rect(0,0,width, height), paint);
+            c.drawBitmap(scaled, null, new Rect(0, 0, width, height), paint);
             scaled.recycle();
         } else if (scaleFactor > 3.5) {
             CbxDocument.LCTX.d("Calling Native HQ3x");
             RawBitmap src = new RawBitmap(storedBitmap, srcRect);
             Bitmap scaled = src.scaleHq3x();
-            c.drawBitmap(scaled, null, new Rect(0,0,width, height), paint);
+            c.drawBitmap(scaled, null, new Rect(0, 0, width, height), paint);
             scaled.recycle();
         } else if (scaleFactor > 2.5) {
             CbxDocument.LCTX.d("Calling Native HQ2x");
             RawBitmap src = new RawBitmap(storedBitmap, srcRect);
             Bitmap scaled = src.scaleHq2x();
-            c.drawBitmap(scaled, null, new Rect(0,0,width, height), paint);
+            c.drawBitmap(scaled, null, new Rect(0, 0, width, height), paint);
             scaled.recycle();
         } else {
-            c.drawBitmap(storedBitmap, srcRect, new Rect(0,0,width, height), paint);
+            c.drawBitmap(storedBitmap, srcRect, new Rect(0, 0, width, height), paint);
         }
         return bmp;
     }

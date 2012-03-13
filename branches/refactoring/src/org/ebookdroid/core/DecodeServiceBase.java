@@ -31,6 +31,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.emdev.utils.LengthUtils;
+
 public class DecodeServiceBase implements DecodeService {
 
     public static final LogContext LCTX = LogContext.ROOT.lctx("Decoding", false);
@@ -175,6 +177,13 @@ public class DecodeServiceBase implements DecodeService {
                 }
                 BitmapManager.release(bitmap);
                 return;
+            }
+
+            if (task.node.page.links == null) {
+                task.node.page.links = vuPage.getPageLinks();
+                if (LengthUtils.isNotEmpty(task.node.page.links)) {
+                    LCTX.i("Found links on page " + task.pageNumber + ": " + task.node.page.links);
+                }
             }
 
             finishDecoding(task, vuPage, bitmap, r);

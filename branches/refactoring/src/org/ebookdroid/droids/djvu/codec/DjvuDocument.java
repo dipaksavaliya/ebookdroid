@@ -3,9 +3,7 @@ package org.ebookdroid.droids.djvu.codec;
 import org.ebookdroid.core.codec.AbstractCodecDocument;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
-import org.ebookdroid.core.codec.PageLink;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DjvuDocument extends AbstractCodecDocument {
@@ -21,13 +19,8 @@ public class DjvuDocument extends AbstractCodecDocument {
     }
 
     @Override
-    public ArrayList<PageLink> getPageLinks(final int pageNumber) {
-        return getPageLinks(documentHandle, pageNumber);
-    }
-
-    @Override
     public DjvuPage getPage(final int pageNumber) {
-        return new DjvuPage(getPage(documentHandle, pageNumber));
+        return new DjvuPage(documentHandle, getPage(documentHandle, pageNumber), pageNumber);
     }
 
     @Override
@@ -60,7 +53,5 @@ public class DjvuDocument extends AbstractCodecDocument {
     private native static int getPageCount(long docHandle);
 
     private native static void free(long pageHandle);
-
-    private native static ArrayList<PageLink> getPageLinks(long docHandle, int pageNumber);
 
 }

@@ -4,6 +4,7 @@ import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.core.codec.CodecPageInfo;
+import org.ebookdroid.core.codec.PageLink;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.RectF;
@@ -30,6 +31,8 @@ public class Page {
     RectF zoomedBounds;
 
     int zoomLevel = 1;
+
+    List<PageLink> links;
 
     public Page(final IActivityController base, final PageIndex index, final PageType pt, final CodecPageInfo cpi) {
         this.base = base;

@@ -4,6 +4,7 @@ import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.codec.CodecPage;
+import org.ebookdroid.core.codec.PageLink;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,6 +12,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class DjvuPage implements CodecPage {
 
@@ -20,12 +25,16 @@ public class DjvuPage implements CodecPage {
         useNativeGraphics = isNativeGraphicsAvailable();
     }
 
+    private long docHandle;
     private long pageHandle;
+    private int pageNo;
 
     // TODO: remove all async operations
 
-    DjvuPage(final long pageHandle) {
+    DjvuPage(final long docHandle, final long pageHandle, final int pageNo) {
+        this.docHandle = docHandle;
         this.pageHandle = pageHandle;
+        this.pageNo = pageNo;
     }
 
     private static native int getWidth(long pageHandle);
@@ -103,4 +112,15 @@ public class DjvuPage implements CodecPage {
     public synchronized boolean isRecycled() {
         return pageHandle == 0;
     }
+
+    @Override
+    public List<PageLink> getPageLinks() {
+        final List<PageLink> links = getPageLinks(docHandle, pageNo);
+        if (links != null) {
+            return links;
+        }
+        return Collections.emptyList();
+    }
+
+    private native static ArrayList<PageLink> getPageLinks(long docHandle, int pageNo);
 }

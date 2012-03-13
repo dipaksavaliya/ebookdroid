@@ -3,11 +3,16 @@ package org.ebookdroid.droids.pdf.codec;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPage;
+import org.ebookdroid.core.codec.PageLink;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.emdev.utils.MatrixUtils;
 
@@ -121,6 +126,14 @@ public class PdfPage implements CodecPage {
         return b;
     }
 
+    @Override
+    public List<PageLink> getPageLinks() {
+        final List<PageLink> links = getPageLinks(docHandle, pageHandle);
+        if (links != null) {
+            return links;
+        }
+        return Collections.emptyList();
+    }
 
     private static native void getBounds(long dochandle, long handle, float[] bounds);
 
@@ -133,4 +146,6 @@ public class PdfPage implements CodecPage {
 
     private static native boolean renderPageBitmap(long dochandle, long pagehandle, int[] viewboxarray,
             float[] matrixarray, Bitmap bitmap);
+
+    private native static ArrayList<PageLink> getPageLinks(long docHandle, long pageHandle);
 }
