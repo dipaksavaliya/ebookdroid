@@ -2,6 +2,7 @@ package org.ebookdroid.droids.pdf.codec;
 
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
+import org.ebookdroid.core.codec.AbstractCodecContext;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.PageLink;
 
@@ -10,8 +11,6 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.emdev.utils.MatrixUtils;
@@ -29,8 +28,8 @@ public class PdfPage implements CodecPage {
         this.pageHandle = pageHandle;
         this.docHandle = docHandle;
         this.pageBounds = getBounds();
-        this.actualWidth = PdfContext.getWidthInPixels(pageBounds.width());
-        this.actualHeight = PdfContext.getHeightInPixels(pageBounds.height());
+        this.actualWidth = AbstractCodecContext.getWidthInPixels(pageBounds.width());
+        this.actualHeight = AbstractCodecContext.getHeightInPixels(pageBounds.height());
     }
 
     @Override
@@ -51,7 +50,7 @@ public class PdfPage implements CodecPage {
 
     private float[] calculateFz(final int width, final int height, final RectF pageSliceBounds) {
         final Matrix matrix = MatrixUtils.get();
-        matrix.postScale(width / (float) pageBounds.width(), height / (float) pageBounds.height());
+        matrix.postScale(width / pageBounds.width(), height / pageBounds.height());
         matrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height);
         matrix.postScale(1 / pageSliceBounds.width(), 1 / pageSliceBounds.height());
 
@@ -128,11 +127,7 @@ public class PdfPage implements CodecPage {
 
     @Override
     public List<PageLink> getPageLinks() {
-        final List<PageLink> links = getPageLinks(docHandle, pageHandle);
-        if (links != null) {
-            return links;
-        }
-        return Collections.emptyList();
+        return PdfLinks.getPageLinks(docHandle, pageHandle, pageBounds);
     }
 
     private static native void getBounds(long dochandle, long handle, float[] bounds);
@@ -146,6 +141,4 @@ public class PdfPage implements CodecPage {
 
     private static native boolean renderPageBitmap(long dochandle, long pagehandle, int[] viewboxarray,
             float[] matrixarray, Bitmap bitmap);
-
-    private native static ArrayList<PageLink> getPageLinks(long docHandle, long pageHandle);
 }

@@ -3,6 +3,7 @@ package org.ebookdroid.core;
 import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
 import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.core.codec.PageLink;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,6 +13,8 @@ import android.graphics.RectF;
 import android.text.TextPaint;
 
 import java.util.Queue;
+
+import org.emdev.utils.LengthUtils;
 
 public class EventDraw implements IEvent {
 
@@ -87,7 +90,11 @@ public class EventDraw implements IEvent {
 
         drawPageBackground(page);
 
-        return process(page.nodes);
+        boolean res = process(page.nodes);
+
+        drawPageLinks(page);
+
+        return res;
     }
 
     @Override
@@ -102,7 +109,7 @@ public class EventDraw implements IEvent {
 
     @Override
     public boolean process(final PageTreeNode node) {
-        final RectF nodeRect = node.getTargetRect(viewState, pageBounds);
+        final RectF nodeRect = node.getTargetRect(pageBounds);
         if (LCTX.isDebugEnabled()) {
             LCTX.d("process(" + node.fullId + "): view=" + viewState.viewRect + ", page=" + pageBounds + ", node="
                     + nodeRect);
@@ -118,7 +125,7 @@ public class EventDraw implements IEvent {
             }
 
             if (node.parent != null) {
-                final RectF parentRect = node.parent.getTargetRect(viewState, pageBounds);
+                final RectF parentRect = node.parent.getTargetRect(pageBounds);
                 if (node.parent.holder.drawBitmap(canvas, viewState.paint, viewBase, parentRect, nodeRect)) {
                     return true;
                 }
@@ -132,7 +139,7 @@ public class EventDraw implements IEvent {
     }
 
     public boolean paintChild(final PageTreeNode node, final PageTreeNode child, final RectF nodeRect) {
-        final RectF childRect = child.getTargetRect(viewState, pageBounds);
+        final RectF childRect = child.getTargetRect(pageBounds);
         return child.holder.drawBitmap(canvas, viewState.paint, viewBase, childRect, nodeRect);
     }
 
@@ -147,6 +154,21 @@ public class EventDraw implements IEvent {
 
         final String text = EBookDroidApp.context.getString(R.string.text_page) + " " + (page.index.viewIndex + 1);
         canvas.drawText(text, fixedPageBounds.centerX(), fixedPageBounds.centerY(), textPaint);
+    }
+
+    private void drawPageLinks(Page page) {
+        if (LengthUtils.isEmpty(page.links)) {
+            return;
+        }
+        for (PageLink link : page.links) {
+            RectF rect = Page.getTargetRect(page.type, pageBounds, link.sourceRect);
+            rect.offset(-viewBase.x, -viewBase.y);
+
+            Paint p = new Paint();
+            p.setColor(Color.YELLOW);
+            p.setAlpha(128);
+            canvas.drawRect(rect, p);
+        }
     }
 
     protected void drawBrightnessFilter(final RectF nodeRect) {

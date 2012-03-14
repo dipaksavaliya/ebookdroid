@@ -7,12 +7,14 @@ import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.PageLink;
 import org.ebookdroid.ui.viewer.IActivityController;
 
+import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.util.FloatMath;
 
 import java.util.List;
 
 import org.emdev.utils.MathUtils;
+import org.emdev.utils.MatrixUtils;
 
 public class Page {
 
@@ -117,4 +119,15 @@ public class Page {
         return buf.toString();
     }
 
+    public static RectF getTargetRect(final PageType pageType, final RectF pageBounds, final RectF normalizedRect) {
+        final Matrix tmpMatrix = MatrixUtils.get();
+
+        tmpMatrix.postScale(pageBounds.width() * pageType.getWidthScale(), pageBounds.height());
+        tmpMatrix.postTranslate(pageBounds.left - pageBounds.width() * pageType.getLeftPos(), pageBounds.top);
+
+        final RectF targetRectF = new RectF();
+        tmpMatrix.mapRect(targetRectF, normalizedRect);
+
+        return targetRectF;
+    }
 }

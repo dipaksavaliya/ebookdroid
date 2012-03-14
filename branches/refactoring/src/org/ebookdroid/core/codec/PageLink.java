@@ -1,21 +1,30 @@
 package org.ebookdroid.core.codec;
 
+import android.graphics.PointF;
 import android.graphics.RectF;
 
-public class PageLink extends RectF {
+public class PageLink {
+
+    public String url;
 
     /**
      * 1 - rect
      * 2 - oval
      * 3 - poly
      */
-    public final int rectType;
-    public final String url;
+    public int rectType;
+    public RectF sourceRect;
 
-    PageLink(final String l, final int type, final int[] data) {
-        super(data[0], data[1], data[2], data[3]);
+    public int targetPage;
+    public PointF targetPoint;
+
+    public PageLink() {
+    }
+
+    public PageLink(final String l, final int type, final int[] source) {
         rectType = type;
         url = l;
+        sourceRect = new RectF(source[0], source[1], source[2], source[3]);
     }
 
     @Override
@@ -26,9 +35,8 @@ public class PageLink extends RectF {
         buf.append(", ");
         buf.append("type").append("=").append(rectType);
         buf.append(": ");
-        buf.append(super.toString());
+        buf.append(sourceRect);
         buf.append("]");
         return buf.toString();
     }
-
 }

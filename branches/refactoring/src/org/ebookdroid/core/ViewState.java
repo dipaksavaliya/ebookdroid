@@ -106,7 +106,7 @@ public class ViewState {
     }
 
     public final boolean isNodeVisible(final PageTreeNode node, final RectF pageBounds) {
-        final RectF tr = node.getTargetRect(this, pageBounds);
+        final RectF tr = node.getTargetRect(pageBounds);
         return isNodeVisible(tr);
     }
 

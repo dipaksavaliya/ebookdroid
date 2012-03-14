@@ -167,15 +167,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         }
     }
 
-    public RectF getTargetRect(final ViewState viewState, final RectF pageBounds) {
-        final Matrix tmpMatrix = MatrixUtils.get();
-
-        tmpMatrix.postScale(pageBounds.width() * page.getTargetRectScale(), pageBounds.height());
-        tmpMatrix.postTranslate(pageBounds.left - pageBounds.width() * page.type.getLeftPos(), pageBounds.top);
-
-        final RectF targetRectF = new RectF();
-        tmpMatrix.mapRect(targetRectF, pageSliceBounds);
-        return targetRectF;
+    public RectF getTargetRect(final RectF pageBounds) {
+        return Page.getTargetRect(page.type, pageBounds, pageSliceBounds);
     }
 
     private static RectF evaluatePageSliceBounds(final RectF localPageSliceBounds, final PageTreeNode parent) {

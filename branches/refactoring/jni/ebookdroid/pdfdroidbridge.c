@@ -248,105 +248,112 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_getPageInfo(JNIEnv *env, jclass
     return 0;
 }
 
-JNIEXPORT jobject JNICALL
-Java_org_ebookdroid_droids_pdf_codec_PdfPage_getPageLinks(JNIEnv *env, jclass clazz, jlong handle, jlong pagehandle)
+JNIEXPORT jlong JNICALL
+Java_org_ebookdroid_droids_pdf_codec_PdfLinks_getFirstPageLink(JNIEnv *env, jclass clazz, jlong handle,
+                                                               jlong pagehandle)
 {
 
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
     renderpage_t *page = (renderpage_t*) (long) pagehandle;
 
-    DEBUG("PdfDocument.getPageLinks(%p, %p)", doc, page);
+    return (jlong)(long)(page && page->page ? page->page->links : NULL);
+}
 
-    if (!page || !page->page)
-    {
-        DEBUG("PdfDocument.getPageLinks(%p, %p): no page loaded.", doc, page);
-        return NULL;
-    }
-    if (!page->page->links)
-    {
-        DEBUG("PdfDocument.getPageLinks(%p, %p)): no links found.", doc, page);
-        return NULL;
-    }
+JNIEXPORT jlong JNICALL
+Java_org_ebookdroid_droids_pdf_codec_PdfLinks_getNextPageLink(JNIEnv *env, jclass clazz, jlong linkhandle)
+{
+    fz_link *link = (fz_link*) (long) linkhandle;
 
-    jclass pagelinkClass = (*env)->FindClass(env, "org/ebookdroid/core/codec/PageLink");
-    if (!pagelinkClass)
-    {
-        DEBUG("PdfDocument.getPageLinks(%p, %p): org.ebookdroid.core.codec.PageLink class not found.", doc, page);
-        return NULL;
-    }
-    jmethodID plInitMethodId = (*env)->GetMethodID(env, pagelinkClass, "<init>", "(Ljava/lang/String;I[I)V");
-    if (!plInitMethodId)
-    {
-        DEBUG(
-            "PdfDocument.getPageLinks(%p, %p): constructor not found in org.ebookdroid.core.codec.PageLink class.", doc, page);
-        return NULL;
-    }
+    return (jlong)(long)(link ? link->next : NULL);
+}
 
-    jclass arrayListClass = (*env)->FindClass(env, "java/util/ArrayList");
-    if (!arrayListClass)
+JNIEXPORT jint JNICALL
+Java_org_ebookdroid_droids_pdf_codec_PdfLinks_getPageLinkType(JNIEnv *env, jclass clazz, jlong linkhandle)
+{
+    fz_link *link = (fz_link*) (long) linkhandle;
+
+    return (jint)(link ? link->dest.kind : FZ_LINK_NONE);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_ebookdroid_droids_pdf_codec_PdfLinks_getPageLinkUrl(JNIEnv *env, jclass clazz, jlong linkhandle)
+{
+    fz_link *link = (fz_link*) (long) linkhandle;
+
+    if (!link || link->dest.kind != FZ_LINK_URI)
     {
-        DEBUG("PdfDocument.getPageLinks((%p, %p): java.util.ArrayList class not found.", doc, page);
         return NULL;
     }
 
-    jmethodID alInitMethodId = (*env)->GetMethodID(env, arrayListClass, "<init>", "()V");
-    if (!alInitMethodId)
+    char linkbuf[1024];
+    snprintf(linkbuf, 1023, "%s", link->dest.ld.uri.uri);
+
+    return (*env)->NewStringUTF(env, linkbuf);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_org_ebookdroid_droids_pdf_codec_PdfLinks_fillPageLinkSourceRect(JNIEnv *env, jclass clazz, jlong linkhandle,
+                                                                     jfloatArray boundsArray)
+{
+    fz_link *link = (fz_link*) (long) linkhandle;
+
+    if (!link || link->dest.kind != FZ_LINK_GOTO)
     {
-        DEBUG("PdfDocument.getPageLinks(%p, %p): default constructor not found in java.util.ArrayList class .", doc, page);
-        return NULL;
+        return 0;
     }
 
-    jmethodID alAddMethodId = (*env)->GetMethodID(env, arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    if (!alAddMethodId)
+    jfloat *bounds = (*env)->GetPrimitiveArrayCritical(env, boundsArray, 0);
+    if (!bounds)
     {
-        DEBUG("PdfDocument.getPageLinks(%p, %p): add method not found in java.util.ArrayList class.", doc, page);
-        return NULL;
+        return 0;
     }
 
-    jobject arrayList = (*env)->NewObject(env, arrayListClass, alInitMethodId);
-    if (!arrayList)
+    bounds[0] = link->rect.x0;
+    bounds[1] = link->rect.y0;
+    bounds[2] = link->rect.x1;
+    bounds[3] = link->rect.y1;
+
+    (*env)->ReleasePrimitiveArrayCritical(env, boundsArray, bounds, 0);
+
+    return 1;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_ebookdroid_droids_pdf_codec_PdfLinks_getPageLinkTargetPage(JNIEnv *env, jclass clazz, jlong linkhandle)
+{
+    fz_link *link = (fz_link*) (long) linkhandle;
+
+    if (!link || link->dest.kind != FZ_LINK_GOTO)
     {
-        DEBUG("PdfDocument.getPageLinks(%p, %p): array could not be created.", doc, page);
-        return NULL;
+        return (jint)-1;
     }
 
-    fz_link *link;
+    return (jint)link->dest.ld.gotor.page;
+}
 
-    for (link = page->page->links; link; link = link->next)
+JNIEXPORT jboolean JNICALL
+Java_org_ebookdroid_droids_pdf_codec_PdfLinks_fillPageLinkTargetPoint(JNIEnv *env, jclass clazz, jlong linkhandle,
+                                                                      jfloatArray pointArray)
+{
+    fz_link *link = (fz_link*) (long) linkhandle;
+
+    if (!link || link->dest.kind != FZ_LINK_GOTO)
     {
-        jint data[4];
-        data[0] = link->rect.x0;
-        data[1] = link->rect.y0;
-        data[2] = link->rect.x1;
-        data[3] = link->rect.y1;
-
-        jintArray points = (*env)->NewIntArray(env, 4);
-        (*env)->SetIntArrayRegion(env, points, 0, 4, data);
-
-        char linkbuf[128];
-        int number;
-
-        if (link->dest.kind == FZ_LINK_URI)
-        {
-            snprintf(linkbuf, 128, "%s", link->dest.ld.uri.uri);
-        }
-        else if (link->dest.kind == FZ_LINK_GOTO)
-        {
-            snprintf(linkbuf, 127, "#%d", link->dest.ld.gotor.page);
-        }
-
-        jstring jstr = (*env)->NewStringUTF(env, linkbuf);
-
-        jobject hl = (*env)->NewObject(env, pagelinkClass, plInitMethodId, jstr, (jint) 1, points);
-
-        (*env)->DeleteLocalRef(env, jstr);
-        (*env)->DeleteLocalRef(env, points);
-
-        if (hl)
-            (*env)->CallBooleanMethod(env, arrayList, alAddMethodId, hl);
-        //jenv->DeleteLocalRef(hl);
+        return 0;
     }
-    return arrayList;
+
+    jfloat *point = (*env)->GetPrimitiveArrayCritical(env, pointArray, 0);
+    if (!point)
+    {
+        return 0;
+    }
+
+    point[0] = link->dest.ld.gotor.lt.x;
+    point[1] = link->dest.ld.gotor.lt.y;
+
+    (*env)->ReleasePrimitiveArrayCritical(env, pointArray, point, 0);
+
+    return 1;
 }
 
 JNIEXPORT jint JNICALL
