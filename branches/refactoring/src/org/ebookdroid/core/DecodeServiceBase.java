@@ -182,7 +182,9 @@ public class DecodeServiceBase implements DecodeService {
             if (task.node.page.links == null) {
                 task.node.page.links = vuPage.getPageLinks();
                 if (LengthUtils.isNotEmpty(task.node.page.links)) {
-                    LCTX.i("Found links on page " + task.pageNumber + ": " + task.node.page.links);
+                    if (LCTX.isDebugEnabled()) {
+                        LCTX.d("Found links on page " + task.pageNumber + ": " + task.node.page.links);
+                    }
                 }
             }
 

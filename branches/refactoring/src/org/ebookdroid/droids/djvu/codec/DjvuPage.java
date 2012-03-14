@@ -117,6 +117,24 @@ public class DjvuPage implements CodecPage {
     public List<PageLink> getPageLinks() {
         final List<PageLink> links = getPageLinks(docHandle, pageNo);
         if (links != null) {
+            final float width = getWidth();
+            final float height = getHeight();
+            for (PageLink link : links) {
+                link.sourceRect.left = link.sourceRect.left / width;
+                link.sourceRect.right = link.sourceRect.right / width;
+                link.sourceRect.top = link.sourceRect.top / height;
+                link.sourceRect.bottom = link.sourceRect.bottom / height;
+
+                if (link.url != null && link.url.startsWith("#")) {
+                    try {
+                        link.targetPage = Integer.parseInt(link.url.substring(1)) - 1;
+                        link.url = null;
+                    } catch (NumberFormatException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
             return links;
         }
         return Collections.emptyList();

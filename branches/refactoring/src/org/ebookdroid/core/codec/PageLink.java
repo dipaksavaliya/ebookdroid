@@ -31,11 +31,16 @@ public class PageLink {
         final StringBuilder buf = new StringBuilder(this.getClass().getSimpleName());
         buf.append("[");
         buf.append("source").append("=").append(sourceRect);
-        buf.append(", ");
         if (url != null) {
+            buf.append(", ");
             buf.append("url").append("=").append(url);
-        } else if (targetPage != -1 && targetRect != null) {
-            buf.append("target").append("=").append(targetPage).append(" ").append(targetRect);
+        } 
+        if (targetPage != -1) {
+            buf.append(", ");
+            buf.append("target").append("=").append(targetPage);
+            if (targetRect != null) {
+                buf.append(" ").append(targetRect);
+            }
         }
         buf.append("]");
         return buf.toString();

@@ -447,20 +447,27 @@ public abstract class AbstractViewController extends AbstractComponentController
                         if (link.sourceRect != null) {
                             final RectF linkRect = Page.getTargetRect(page.type, bounds, link.sourceRect);
                             if (RectF.intersects(linkRect, rect)) {
-                                LCTX.i("Page link found under tap: " + link);
-                                if (link.targetRect != null) {
+                                if (LCTX.isDebugEnabled()) {
+                                    LCTX.d("Page link found under tap: " + link);
+                                }
+                                float offsetX = 0;
+                                float offsetY = 0;
+                                if (link.targetPage >= 0) {
                                     Page target = model.getPageByDocIndex(link.targetPage);
-                                    float offsetX = link.targetRect.left;
-                                    float offsetY = link.targetRect.top;
-                                    
-                                    if (target.type == PageType.LEFT_PAGE && offsetX >= 0.5f) {
-                                        target = model.getPageObject(target.index.viewIndex + 1);
-                                        offsetX -= 0.5f;
+                                    if (link.targetRect != null) {
+                                        offsetX = link.targetRect.left;
+                                        offsetY = link.targetRect.top;
+                                        if (target.type == PageType.LEFT_PAGE && offsetX >= 0.5f) {
+                                            target = model.getPageObject(target.index.viewIndex + 1);
+                                            offsetX -= 0.5f;
+                                        }
                                     }
-                                    LCTX.i("Target page found: " + target);
+                                    if (LCTX.isDebugEnabled()) {
+                                        LCTX.d("Target page found: " + target);
+                                    }
                                     if (target != null) {
                                         goToPage(target.index.viewIndex, offsetX, offsetY);
-                                    } 
+                                    }
                                 }
                                 return true;
                             }
