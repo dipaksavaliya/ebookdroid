@@ -50,11 +50,11 @@ public class PdfLinks {
                     float top = link.targetRect.top;
 
                     if (((cpi.rotation / 90) % 2) != 0) {
-                        link.targetRect.bottom = link.targetRect.top = top / cpi.width;
                         link.targetRect.right = link.targetRect.left = left / cpi.height;
+                        link.targetRect.bottom = link.targetRect.top = 1.0f - top / cpi.width;
                     } else {
                         link.targetRect.right = link.targetRect.left = left / cpi.width;
-                        link.targetRect.bottom = link.targetRect.top = top / cpi.height;
+                        link.targetRect.bottom = link.targetRect.top = 1.0f - top / cpi.height;
                     }
                 }
 
