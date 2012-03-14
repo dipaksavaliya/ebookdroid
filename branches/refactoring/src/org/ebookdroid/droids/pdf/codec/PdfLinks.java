@@ -1,8 +1,8 @@
 package org.ebookdroid.droids.pdf.codec;
 
+import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.PageLink;
 
-import android.graphics.PointF;
 import android.graphics.RectF;
 
 import java.util.ArrayList;
@@ -38,10 +38,24 @@ public class PdfLinks {
                 }
 
                 link.targetPage = getPageLinkTargetPage(linkHandle);
-                if (fillPageLinkTargetPoint(linkHandle, temp)) {
-                    link.targetPoint = new PointF();
-                    link.targetPoint.x = temp[0];
-                    link.targetPoint.y = temp[1];
+                if (link.targetPage != -1 && fillPageLinkTargetPoint(linkHandle, temp)) {
+                    link.targetRect = new RectF();
+                    link.targetRect.left = temp[0];
+                    link.targetRect.top = temp[1];
+
+                    CodecPageInfo cpi = new CodecPageInfo();
+                    PdfDocument.getPageInfo(docHandle, link.targetPage, cpi);
+
+                    float left = link.targetRect.left;
+                    float top = link.targetRect.top;
+
+                    if (((cpi.rotation / 90) % 2) != 0) {
+                        link.targetRect.bottom = link.targetRect.top = top / cpi.width;
+                        link.targetRect.right = link.targetRect.left = left / cpi.height;
+                    } else {
+                        link.targetRect.right = link.targetRect.left = left / cpi.width;
+                        link.targetRect.bottom = link.targetRect.top = top / cpi.height;
+                    }
                 }
 
                 links.add(link);

@@ -18,6 +18,6 @@ public class CodecPageInfo {
 
     @Override
     public String toString() {
-        return new StringBuilder("[").append(width).append(", ").append(height).append("]").toString();
+        return new StringBuilder("[").append(width).append(", ").append(height).append(", ").append(rotation).append("]").toString();
     }
 }

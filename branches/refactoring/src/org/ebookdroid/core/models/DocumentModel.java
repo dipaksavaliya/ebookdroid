@@ -107,6 +107,15 @@ public class DocumentModel extends ListenerProxy {
         return pages != null && 0 <= viewIndex && viewIndex < pages.length ? pages[viewIndex] : null;
     }
 
+    public Page getPageByDocIndex(final int docIndex) {
+        for(Page page  : pages) {
+            if (page.index.docIndex == docIndex) {
+                return page;
+            }
+        }
+        return null;
+    }
+
     /**
      * Gets the current page object.
      * 

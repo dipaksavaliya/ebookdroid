@@ -52,7 +52,7 @@ public class PdfDocument extends AbstractCodecDocument {
         free(documentHandle);
     }
 
-    private native static int getPageInfo(long docHandle, int pageNumber, CodecPageInfo cpi);
+    native static int getPageInfo(long docHandle, int pageNumber, CodecPageInfo cpi);
 
     private static native long open(int storememory, String fname, String pwd);
 

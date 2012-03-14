@@ -7,11 +7,14 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
+import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.common.touch.DefaultGestureDetector;
 import org.ebookdroid.common.touch.IGestureDetector;
 import org.ebookdroid.common.touch.IMultiTouchListener;
 import org.ebookdroid.common.touch.MultiTouchGestureDetectorFactory;
 import org.ebookdroid.common.touch.TouchManager;
+import org.ebookdroid.common.touch.TouchManager.Touch;
+import org.ebookdroid.core.codec.PageLink;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
@@ -35,6 +38,7 @@ import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.ActionMethodDef;
 import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.actions.params.Constant;
+import org.emdev.utils.LengthUtils;
 
 @ActionTarget(
 // action list
@@ -253,7 +257,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                 }
             }
         } else if (event.getAction() == KeyEvent.ACTION_UP) {
-            Integer id = KeyBindingsManager.getAction(event);
+            final Integer id = KeyBindingsManager.getAction(event);
             if (id != null) {
                 return true;
             }
@@ -269,7 +273,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final boolean onTouchEvent(final MotionEvent ev) {
-        int delay = SettingsManager.getAppSettings().touchProcessingDelay;
+        final int delay = SettingsManager.getAppSettings().touchProcessingDelay;
         if (delay > 0) {
             try {
                 Thread.sleep(Math.min(250, delay));
@@ -326,6 +330,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      * 
      * @see org.ebookdroid.ui.viewer.IViewController#invalidateScroll()
      */
+    @Override
     public final void invalidateScroll() {
         if (!isShown) {
             return;
@@ -400,7 +405,20 @@ public abstract class AbstractViewController extends AbstractComponentController
     }
 
     protected final boolean processTap(final TouchManager.Touch type, final MotionEvent e) {
-        final Integer actionId = TouchManager.getAction(type, e.getX(), e.getY(), getWidth(), getHeight());
+        final float x = e.getX();
+        final float y = e.getY();
+
+        if (type == Touch.SingleTap) {
+            if (processLinkTap(x, y)) {
+                return true;
+            }
+        }
+
+        return processActionTap(type, x, y);
+    }
+
+    protected boolean processActionTap(final TouchManager.Touch type, final float x, final float y) {
+        final Integer actionId = TouchManager.getAction(type, x, y, getWidth(), getHeight());
         final ActionEx action = actionId != null ? getOrCreateAction(actionId) : null;
         if (action != null) {
             if (LCTX.isDebugEnabled()) {
@@ -411,6 +429,45 @@ public abstract class AbstractViewController extends AbstractComponentController
         } else {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Touch action not found");
+            }
+        }
+        return false;
+    }
+
+    protected final boolean processLinkTap(final float x, final float y) {
+        final float zoom = base.getZoomModel().getZoom();
+        final RectF rect = new RectF(x, y, x, y);
+        rect.offset(getScrollX(), getScrollY());
+
+        for (final Page page : model.getPages(firstVisiblePage, lastVisiblePage + 1)) {
+            final RectF bounds = page.getBounds(zoom);
+            if (RectF.intersects(bounds, rect)) {
+                if (LengthUtils.isNotEmpty(page.links)) {
+                    for (final PageLink link : page.links) {
+                        if (link.sourceRect != null) {
+                            final RectF linkRect = Page.getTargetRect(page.type, bounds, link.sourceRect);
+                            if (RectF.intersects(linkRect, rect)) {
+                                LCTX.i("Page link found under tap: " + link);
+                                if (link.targetRect != null) {
+                                    Page target = model.getPageByDocIndex(link.targetPage);
+                                    float offsetX = link.targetRect.left;
+                                    float offsetY = link.targetRect.top;
+                                    
+                                    if (target.type == PageType.LEFT_PAGE && offsetX >= 0.5f) {
+                                        target = model.getPageObject(target.index.viewIndex + 1);
+                                        offsetX -= 0.5f;
+                                    }
+                                    LCTX.i("Target page found: " + target);
+                                    if (target != null) {
+                                        goToPage(target.index.viewIndex, offsetX, offsetY);
+                                    } 
+                                }
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
             }
         }
         return false;

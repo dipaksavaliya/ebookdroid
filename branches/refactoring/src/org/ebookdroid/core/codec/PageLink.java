@@ -1,6 +1,5 @@
 package org.ebookdroid.core.codec;
 
-import android.graphics.PointF;
 import android.graphics.RectF;
 
 public class PageLink {
@@ -15,8 +14,8 @@ public class PageLink {
     public int rectType;
     public RectF sourceRect;
 
-    public int targetPage;
-    public PointF targetPoint;
+    public int targetPage = -1;
+    public RectF targetRect;
 
     public PageLink() {
     }
@@ -31,11 +30,13 @@ public class PageLink {
     public String toString() {
         final StringBuilder buf = new StringBuilder(this.getClass().getSimpleName());
         buf.append("[");
-        buf.append("url").append("=").append(url);
+        buf.append("source").append("=").append(sourceRect);
         buf.append(", ");
-        buf.append("type").append("=").append(rectType);
-        buf.append(": ");
-        buf.append(sourceRect);
+        if (url != null) {
+            buf.append("url").append("=").append(url);
+        } else if (targetPage != -1 && targetRect != null) {
+            buf.append("target").append("=").append(targetPage).append(" ").append(targetRect);
+        }
         buf.append("]");
         return buf.toString();
     }
