@@ -89,6 +89,9 @@ public interface AppPreferences {
     IntegerPreferenceDefinition BITMAP_SIZE = new IntegerPreferenceDefinition(pref_bitmapsize_id, pref_bitmapsize_128,
             pref_bitmapsize_64, pref_bitmapsize_1024);
 
+    BooleanPreferenceDefinition BITMAP_FILTERING = new BooleanPreferenceDefinition(pref_bitmapfilering_enabled_id,
+            pref_bitmapfilering_enabled_defvalue);
+
     BooleanPreferenceDefinition REUSE_TEXTURES = new BooleanPreferenceDefinition(pref_texturereuse_id,
             pref_texturereuse_defvalue);
 

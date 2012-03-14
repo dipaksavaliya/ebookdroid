@@ -11,4 +11,7 @@
     <string name="list_pagenumbertoastposition_bottom">Bottom of the screeen</string>
     <string name="list_pagenumbertoastposition_righbottom">Right bottom corner</string>
 
+    <string name="pref_bitmapfilering_enabled_title">Texture filtering</string>
+    <string name="pref_bitmapfilering_enabled_summary">Enable bilinear texture filtering</string>
+
 </resources>

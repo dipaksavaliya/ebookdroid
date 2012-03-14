@@ -69,6 +69,8 @@ public class AppSettings implements AppPreferences {
 
     public final int bitmapSize;
 
+    public final boolean bitmapFileringEnabled;
+
     public final boolean textureReuseEnabled;
 
     public final boolean reloadDuringZoom;
@@ -131,6 +133,7 @@ public class AppSettings implements AppPreferences {
         drawThreadPriority = DRAW_THREAD_PRIORITY.getPreferenceValue(prefs);
         hwaEnabled = HWA_ENABLED.getPreferenceValue(prefs);
         bitmapSize = 1 << BITMAP_SIZE.getPreferenceValue(prefs);
+        bitmapFileringEnabled = BITMAP_FILTERING.getPreferenceValue(prefs);
         textureReuseEnabled = REUSE_TEXTURES.getPreferenceValue(prefs);
         useEarlyRecycling = EARLY_RECYCLING.getPreferenceValue(prefs);
         reloadDuringZoom = RELOAD_DURING_ZOOM.getPreferenceValue(prefs);

@@ -71,6 +71,9 @@
         <item>@string/pref_bitmapsize_1024</item>
     </string-array>
 
+    <string name="pref_bitmapfilering_enabled_id">bitmapfilering_enabled</string>
+    <string name="pref_bitmapfilering_enabled_defvalue">false</string>
+
     <string name="pref_texturereuse_id">texturereuse</string>
     <string name="pref_texturereuse_defvalue">true</string>
 

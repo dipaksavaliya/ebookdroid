@@ -53,6 +53,12 @@
                 android:title="@string/pref_bitmapsize_title" />
 
             <CheckBoxPreference
+                android:defaultValue="@string/pref_bitmapfilering_enabled_defvalue"
+                android:key="@string/pref_bitmapfilering_enabled_id"
+                android:summary="@string/pref_bitmapfilering_enabled_summary"
+                android:title="@string/pref_bitmapfilering_enabled_title" />
+
+            <CheckBoxPreference
                 android:defaultValue="@string/pref_texturereuse_defvalue"
                 android:key="@string/pref_texturereuse_id"
                 android:summary="@string/pref_texturereuse_summary"

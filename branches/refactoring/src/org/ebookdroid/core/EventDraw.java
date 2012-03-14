@@ -33,7 +33,6 @@ public class EventDraw implements IEvent {
 
     EventDraw(final Queue<EventDraw> eventQueue) {
         this.eventQueue = eventQueue;
-
     }
 
     void init(final ViewState viewState, final Canvas canvas) {
