@@ -39,6 +39,15 @@ public class ActionDialogBuilder extends AlertDialog.Builder {
         return this;
     }
 
+    public ActionDialogBuilder setNegativeButton(final int actionId, final IActionParameter... params) {
+        final ActionEx action = actions.getOrCreateAction(actionId);
+        for (final IActionParameter ap : params) {
+            action.addParameter(ap);
+        }
+        super.setNegativeButton(android.R.string.cancel, action);
+        return this;
+    }
+
     public ActionDialogBuilder setMultiChoiceItems(int itemsId, int actionId, boolean... checkedItems) {
         final ActionEx action = actions.getOrCreateAction(actionId);
         super.setMultiChoiceItems(itemsId, LengthUtils.isNotEmpty(checkedItems) ? checkedItems : null, action);

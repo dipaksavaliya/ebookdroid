@@ -6,6 +6,7 @@ import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.keysbinding.KeyBindingsDialog;
 import org.ebookdroid.common.keysbinding.KeyBindingsManager;
+import org.ebookdroid.common.log.EmergencyHandler;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.ISettingsChangeListener;
@@ -40,6 +41,7 @@ import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -69,7 +71,7 @@ actions = {
         @ActionMethodDef(id = R.id.actions_addBookmark, method = "addBookmark"),
         @ActionMethodDef(id = R.id.mainmenu_close, method = "closeActivity"),
         @ActionMethodDef(id = R.id.actions_gotoOutlineItem, method = "gotoOutlineItem"),
-        @ActionMethodDef(id = R.id.actions_redecodingWithPassord, method = "redecodingWithPassord"),
+        @ActionMethodDef(id = R.id.actions_redecodingWithPassword, method = "redecodingWithPassword"),
         @ActionMethodDef(id = R.id.mainmenu_settings, method = "showAppSettings"),
         @ActionMethodDef(id = R.id.mainmenu_bookmark, method = "showBookmarkDialog"),
         @ActionMethodDef(id = R.id.mainmenu_booksettings, method = "showBookSettings"),
@@ -275,12 +277,31 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         getDocumentController().onDestroy();
     }
 
-    @ActionMethod(ids = R.id.actions_redecodingWithPassord)
-    public void redecodingWithPassord(final ActionEx action) {
-        final EditText te = (EditText) getManagedComponent().findViewById(R.id.pass_req);
-        final String fileName = action.getParameter("fileName");
+    public void askPassword(final String fileName, final String promt) {
+        final EditText input = new EditText(getManagedComponent());
+        input.setSingleLine(true);
+        input.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
 
-        startDecoding(fileName, te.getText().toString());
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+        builder.setTitle(fileName).setMessage(promt).setView(input);
+        builder.setPositiveButton(R.id.actions_redecodingWithPassword, new EditableValue("input", input), new Constant(
+                "fileName", fileName));
+        builder.setNegativeButton(R.id.mainmenu_close).show();
+    }
+
+    public void showErrorDlg(final String msg) {
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+        builder.setTitle("Application error").setMessage(LengthUtils.safeString(msg, "Unexpected error occured!"));
+        builder.setPositiveButton(R.string.error_close, R.id.mainmenu_close);
+        builder.show();
+    }
+
+    @ActionMethod(ids = R.id.actions_redecodingWithPassword)
+    public void redecodingWithPassword(final ActionEx action) {
+        final Editable value = action.getParameter("input");
+        final String password = value.toString();
+        final String fileName = action.getParameter("fileName");
+        startDecoding(fileName, password);
     }
 
     @Override
@@ -615,7 +636,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         currentPageChanged(PageIndex.NULL, documentModel.getCurrentIndex());
     }
 
-    final class BookLoadTask extends AsyncTask<String, String, Exception> implements IBookLoadTask, Runnable {
+    final class BookLoadTask extends AsyncTask<String, String, Throwable> implements IBookLoadTask, Runnable {
 
         private String m_fileName;
         private final String m_password;
@@ -646,7 +667,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         @Override
-        protected Exception doInBackground(final String... params) {
+        protected Throwable doInBackground(final String... params) {
             LCTX.d("BookLoadTask.doInBackground(): start");
             try {
                 if (intent.getScheme().equals("content")) {
@@ -662,27 +683,36 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 return e;
             } catch (final Throwable th) {
                 LCTX.e("BookLoadTask.doInBackground(): Unexpected error", th);
-                return new Exception(th.getMessage());
+                return th;
             } finally {
                 LCTX.d("BookLoadTask.doInBackground(): finish");
             }
         }
 
         @Override
-        protected void onPostExecute(final Exception result) {
+        protected void onPostExecute(Throwable result) {
             LCTX.d("BookLoadTask.onPostExecute(): start");
             try {
                 if (result == null) {
-                    getDocumentController().show();
-
-                    final DocumentModel dm = getDocumentModel();
-                    currentPageChanged(PageIndex.NULL, dm.getCurrentIndex());
-
                     try {
-                        progressDialog.dismiss();
-                    } catch (final Throwable th) {
+                        getDocumentController().show();
+
+                        final DocumentModel dm = getDocumentModel();
+                        currentPageChanged(PageIndex.NULL, dm.getCurrentIndex());
+
+                        throw new RuntimeException("Test exception");
+
+                    } catch (Throwable th) {
+                        result = th;
                     }
-                } else {
+                }
+
+                try {
+                    progressDialog.dismiss();
+                } catch (final Throwable th) {
+                }
+
+                if (result != null) {
                     try {
                         progressDialog.dismiss();
                     } catch (final Throwable th) {
@@ -690,13 +720,18 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
                     final String msg = result.getMessage();
                     if ("PDF needs a password!".equals(msg)) {
-                        getManagedComponent().askPassword(m_fileName);
-                    } else {
-                        getManagedComponent().showErrorDlg(msg);
+                        askPassword(m_fileName, "Enter password...");
+                    } else if ("Wrong password given".equals(msg)) {
+                        askPassword(m_fileName, msg + "...");
+                    }
+                    else {
+                        EmergencyHandler.onUnexpectedError(result);
+                        showErrorDlg(msg);
                     }
                 }
             } catch (final Throwable th) {
                 LCTX.e("BookLoadTask.onPostExecute(): Unexpected error", th);
+                EmergencyHandler.onUnexpectedError(result);
             } finally {
                 LCTX.d("BookLoadTask.onPostExecute(): finish");
             }

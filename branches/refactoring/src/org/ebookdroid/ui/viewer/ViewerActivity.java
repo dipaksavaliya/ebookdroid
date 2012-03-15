@@ -20,9 +20,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -172,29 +170,6 @@ public class ViewerActivity extends AbstractActionActivity {
             touchView = new TouchManagerView(controller);
         }
         return touchView;
-    }
-
-    public void askPassword(final String fileName) {
-        setContentView(R.layout.password);
-        final Button ok = (Button) findViewById(R.id.pass_ok);
-
-        ok.setOnClickListener(getController().getOrCreateAction(R.id.actions_redecodingWithPassord).putValue(
-                "fileName", fileName));
-
-        final Button cancel = (Button) findViewById(R.id.pass_cancel);
-        cancel.setOnClickListener(getController().getOrCreateAction(R.id.mainmenu_close));
-    }
-
-    public void showErrorDlg(final String msg) {
-        setContentView(R.layout.error);
-        final TextView errortext = (TextView) findViewById(R.id.error_text);
-        if (msg != null && msg.length() > 0) {
-            errortext.setText(msg);
-        } else {
-            errortext.setText("Unexpected error occured!");
-        }
-        final Button cancel = (Button) findViewById(R.id.error_close);
-        cancel.setOnClickListener(controller.getOrCreateAction(R.id.mainmenu_close));
     }
 
     public void currentPageChanged(final String pageText, final String bookTitle) {
