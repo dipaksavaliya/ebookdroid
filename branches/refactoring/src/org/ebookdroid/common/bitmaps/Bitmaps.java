@@ -15,6 +15,8 @@ import android.util.FloatMath;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.emdev.utils.LengthUtils;
+
 public class Bitmaps {
 
     private static final LogContext LCTX = BitmapManager.LCTX;
@@ -88,6 +90,7 @@ public class Bitmaps {
             }
 
             final BitmapRef[] oldBitmaps = this.bitmaps;
+            final int oldBitmapsLength =LengthUtils.length(oldBitmaps);
 
             this.bounds = bitmapBounds;
             this.columns = (int) Math.ceil(bitmapBounds.width() / (float) partSize);
@@ -98,7 +101,7 @@ public class Bitmaps {
 
             int i = 0;
             for (; i < newsize; i++) {
-                if (i < oldBitmaps.length) {
+                if (i < oldBitmapsLength) {
                     this.bitmaps[i] = oldBitmaps[i];
                     if (this.bitmaps[i] != null && this.bitmaps[i].isRecycled()) {
                         BitmapManager.release(this.bitmaps[i]);
@@ -114,7 +117,7 @@ public class Bitmaps {
                 }
                 this.bitmaps[i].getBitmap().eraseColor(Color.CYAN);
             }
-            for (; i < oldBitmaps.length; i++) {
+            for (; i < oldBitmapsLength; i++) {
                 BitmapManager.release(oldBitmaps[i]);
             }
 
