@@ -168,6 +168,11 @@ Java_org_ebookdroid_droids_pdf_codec_PdfDocument_getPageInfo(JNIEnv *env, jclass
                                                              jobject cpi)
 {
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
+    
+    if(!doc)
+	return -1;
+
+    DEBUG("getPageInfo: %d", pageNumber);
 
     jclass clazz;
     jfieldID fid;
@@ -252,7 +257,6 @@ JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_pdf_codec_PdfLinks_getFirstPageLink(JNIEnv *env, jclass clazz, jlong handle,
                                                                jlong pagehandle)
 {
-
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
     renderpage_t *page = (renderpage_t*) (long) pagehandle;
 

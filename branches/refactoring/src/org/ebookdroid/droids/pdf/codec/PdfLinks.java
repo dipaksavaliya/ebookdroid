@@ -38,7 +38,7 @@ public class PdfLinks {
                 }
 
                 link.targetPage = getPageLinkTargetPage(linkHandle);
-                if (link.targetPage != -1 && fillPageLinkTargetPoint(linkHandle, temp)) {
+                if (link.targetPage > 0 && fillPageLinkTargetPoint(linkHandle, temp)) {
                     link.targetRect = new RectF();
                     link.targetRect.left = temp[0];
                     link.targetRect.top = temp[1];
