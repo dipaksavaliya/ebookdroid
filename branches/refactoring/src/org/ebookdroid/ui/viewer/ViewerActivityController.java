@@ -700,8 +700,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                         final DocumentModel dm = getDocumentModel();
                         currentPageChanged(PageIndex.NULL, dm.getCurrentIndex());
 
-                        throw new RuntimeException("Test exception");
-
                     } catch (Throwable th) {
                         result = th;
                     }
@@ -723,8 +721,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                         askPassword(m_fileName, "Enter password...");
                     } else if ("Wrong password given".equals(msg)) {
                         askPassword(m_fileName, msg + "...");
-                    }
-                    else {
+                    } else {
                         EmergencyHandler.onUnexpectedError(result);
                         showErrorDlg(msg);
                     }

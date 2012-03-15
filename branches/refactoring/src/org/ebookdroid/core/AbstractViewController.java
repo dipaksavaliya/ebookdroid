@@ -444,33 +444,8 @@ public abstract class AbstractViewController extends AbstractComponentController
             if (RectF.intersects(bounds, rect)) {
                 if (LengthUtils.isNotEmpty(page.links)) {
                     for (final PageLink link : page.links) {
-                        if (link.sourceRect != null) {
-                            final RectF linkRect = page.getLinkSourceRect(bounds, link);
-                            if (RectF.intersects(linkRect, rect)) {
-                                if (LCTX.isDebugEnabled()) {
-                                    LCTX.d("Page link found under tap: " + link);
-                                }
-                                float offsetX = 0;
-                                float offsetY = 0;
-                                if (link.targetPage >= 0) {
-                                    Page target = model.getPageByDocIndex(link.targetPage);
-                                    if (link.targetRect != null) {
-                                        offsetX = link.targetRect.left;
-                                        offsetY = link.targetRect.top;
-                                        if (target.type == PageType.LEFT_PAGE && offsetX >= 0.5f) {
-                                            target = model.getPageObject(target.index.viewIndex + 1);
-                                            offsetX -= 0.5f;
-                                        }
-                                    }
-                                    if (LCTX.isDebugEnabled()) {
-                                        LCTX.d("Target page found: " + target);
-                                    }
-                                    if (target != null) {
-                                        goToPage(target.index.viewIndex, offsetX, offsetY);
-                                    }
-                                }
-                                return true;
-                            }
+                        if (processLinkTap(page, link, bounds, rect)) {
+                            return true;
                         }
                     }
                 }
@@ -478,6 +453,38 @@ public abstract class AbstractViewController extends AbstractComponentController
             }
         }
         return false;
+    }
+
+    protected final boolean processLinkTap(Page page, PageLink link, RectF pageBounds, RectF tapRect) {
+        final RectF linkRect = page.getLinkSourceRect(pageBounds, link);
+        if (linkRect == null || !RectF.intersects(linkRect, tapRect)) {
+            return false;
+        }
+
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Page link found under tap: " + link);
+        }
+
+        if (link.targetPage >= 0) {
+            Page target = model.getPageByDocIndex(link.targetPage);
+            float offsetX = 0;
+            float offsetY = 0;
+            if (link.targetRect != null) {
+                offsetX = link.targetRect.left;
+                offsetY = link.targetRect.top;
+                if (target.type == PageType.LEFT_PAGE && offsetX >= 0.5f) {
+                    target = model.getPageObject(target.index.viewIndex + 1);
+                    offsetX -= 0.5f;
+                }
+            }
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Target page found: " + target);
+            }
+            if (target != null) {
+                goToPage(target.index.viewIndex, offsetX, offsetY);
+            }
+        }
+        return true;
     }
 
     protected class GestureListener extends SimpleOnGestureListener implements IMultiTouchListener {

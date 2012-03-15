@@ -92,11 +92,11 @@ public class Page {
     }
 
     public RectF getBounds(final float zoom) {
-//        if (zoom != storedZoom) {
-//            storedZoom = zoom;
-//            zoomedBounds = MathUtils.zoom(bounds, zoom);
-//        }
-//        return zoomedBounds;
+        // if (zoom != storedZoom) {
+        // storedZoom = zoom;
+        // zoomedBounds = MathUtils.zoom(bounds, zoom);
+        // }
+        // return zoomedBounds;
         return MathUtils.zoom(bounds, zoom);
     }
 
@@ -136,6 +136,9 @@ public class Page {
 
     public RectF getLinkSourceRect(final RectF pageBounds, final PageLink link) {
         RectF sourceRect = link.sourceRect;
+        if (sourceRect == null) {
+            return null;
+        }
         final RectF cb = nodes.root.croppedBounds;
         if (SettingsManager.getBookSettings().cropPages && cb != null) {
             final Matrix m = MatrixUtils.get();
@@ -146,7 +149,14 @@ public class Page {
             m.mapRect(sourceRect);
         }
 
-        final RectF rect = getTargetRect(type, pageBounds, sourceRect);
-        return rect;
+        if (type == PageType.LEFT_PAGE && sourceRect.left >= 0.5f) {
+            return null;
+        }
+
+        if (type == PageType.RIGHT_PAGE && sourceRect.right < 0.5f) {
+            return null;
+        }
+
+        return getTargetRect(type, pageBounds, sourceRect);
     }
 }

@@ -161,12 +161,13 @@ public class EventDraw implements IEvent {
         }
         for (PageLink link : page.links) {
             RectF rect = page.getLinkSourceRect(pageBounds, link);
-            rect.offset(-viewBase.x, -viewBase.y);
-
-            Paint p = new Paint();
-            p.setColor(Color.YELLOW);
-            p.setAlpha(128);
-            canvas.drawRect(rect, p);
+            if (rect != null) {
+                rect.offset(-viewBase.x, -viewBase.y);
+                Paint p = new Paint();
+                p.setColor(Color.YELLOW);
+                p.setAlpha(128);
+                canvas.drawRect(rect, p);
+            }
         }
     }
 
