@@ -11,11 +11,11 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region.Op;
-import android.util.FloatMath;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.MathUtils;
 
 public class Bitmaps {
 
@@ -227,11 +227,8 @@ public class Bitmaps {
                 for (int col = 0; col < columns; col++) {
                     final int index = row * columns + col;
                     if (this.bitmaps[index] != null) {
-                        r.left = FloatMath.floor(rect.left);
-                        r.top = FloatMath.floor(rect.top);
-                        r.right = FloatMath.ceil(rect.right);
-                        r.bottom = FloatMath.ceil(rect.bottom);
-                        canvas.drawBitmap(this.bitmaps[index].bitmap, null, r, paint.bitmapPaint);
+                        r.set(rect);
+                        canvas.drawBitmap(this.bitmaps[index].bitmap, null, MathUtils.round(r), paint.bitmapPaint);
                     } else {
                         res = false;
                     }
