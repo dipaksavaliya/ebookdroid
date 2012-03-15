@@ -2,6 +2,7 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.PageLink;
@@ -47,7 +48,7 @@ public class Page {
         nodes = new PageTree(this);
     }
 
-    public void recycle(List<Bitmaps> bitmapsToRecycle) {
+    public void recycle(final List<Bitmaps> bitmapsToRecycle) {
         recycled = true;
         nodes.recycleAll(bitmapsToRecycle, true);
     }
@@ -57,7 +58,7 @@ public class Page {
     }
 
     private boolean setAspectRatio(final float aspectRatio) {
-        int newAspectRatio = (int)FloatMath.floor(aspectRatio * 128);
+        final int newAspectRatio = (int) FloatMath.floor(aspectRatio * 128);
         if (this.aspectRatio != newAspectRatio) {
             this.aspectRatio = newAspectRatio;
             return true;
@@ -129,5 +130,21 @@ public class Page {
         tmpMatrix.mapRect(targetRectF, normalizedRect);
 
         return targetRectF;
+    }
+
+    public RectF getLinkSourceRect(final RectF pageBounds, final PageLink link) {
+        RectF sourceRect = link.sourceRect;
+        final RectF cb = nodes.root.croppedBounds;
+        if (SettingsManager.getBookSettings().cropPages && cb != null) {
+            final Matrix m = MatrixUtils.get();
+            final RectF psb = nodes.root.pageSliceBounds;
+            m.postTranslate(psb.left - cb.left, psb.top - cb.top);
+            m.postScale(psb.width() / cb.width(), psb.height() / cb.height());
+            sourceRect = new RectF(link.sourceRect);
+            m.mapRect(sourceRect);
+        }
+
+        final RectF rect = getTargetRect(type, pageBounds, sourceRect);
+        return rect;
     }
 }

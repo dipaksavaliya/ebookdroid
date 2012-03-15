@@ -445,7 +445,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                 if (LengthUtils.isNotEmpty(page.links)) {
                     for (final PageLink link : page.links) {
                         if (link.sourceRect != null) {
-                            final RectF linkRect = Page.getTargetRect(page.type, bounds, link.sourceRect);
+                            final RectF linkRect = page.getLinkSourceRect(bounds, link);
                             if (RectF.intersects(linkRect, rect)) {
                                 if (LCTX.isDebugEnabled()) {
                                     LCTX.d("Page link found under tap: " + link);

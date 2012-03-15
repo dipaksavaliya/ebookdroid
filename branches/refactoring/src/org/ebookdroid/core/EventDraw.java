@@ -160,7 +160,7 @@ public class EventDraw implements IEvent {
             return;
         }
         for (PageLink link : page.links) {
-            RectF rect = Page.getTargetRect(page.type, pageBounds, link.sourceRect);
+            RectF rect = page.getLinkSourceRect(pageBounds, link);
             rect.offset(-viewBase.x, -viewBase.y);
 
             Paint p = new Paint();
