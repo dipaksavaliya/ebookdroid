@@ -10,6 +10,7 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.crop.PageCropper;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.ui.viewer.IViewController;
+import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -122,13 +123,34 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             if (bs != null && bs.cropPages) {
                 if (id == 0 && croppedBounds == null) {
                     croppedBounds = PageCropper.getCropBounds(bitmap, bitmapBounds, pageSliceBounds);
+
+                    final ViewState viewState = new ViewState(PageTreeNode.this);
+                    final PageIndex currentPage = viewState.book.getCurrentPage();
+                    final float offsetX = viewState.book.offsetX;
+                    final float offsetY = viewState.book.offsetY;
+
+                    final RectF pageBounds = viewState.getBounds(page);
+                    final float pageWidth = pageBounds.width() * croppedBounds.width();
+                    final float pageHeight = pageBounds.height() * croppedBounds.height();
+
+                    page.setAspectRatio(pageWidth, pageHeight);
+                    viewState.ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
+
                     final DecodeService decodeService = page.base.getDecodeService();
                     if (decodeService != null) {
                         if (LCTX.isDebugEnabled()) {
                             LCTX.d(fullId + ": cropped image requested: " + croppedBounds);
                         }
-                        decodeService.decodePage(new ViewState(PageTreeNode.this), PageTreeNode.this);
+                        decodeService.decodePage(viewState, PageTreeNode.this);
                     }
+
+                    page.base.getActivity().runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            viewState.ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
+                        }
+                    });
                 }
             }
 
@@ -144,7 +166,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
                     final IViewController dc = page.base.getDocumentController();
                     if (dc instanceof AbstractViewController) {
-                        EventPool.newEventChildLoaded((AbstractViewController) dc, PageTreeNode.this, bitmapBounds).process();
+                        EventPool.newEventChildLoaded((AbstractViewController) dc, PageTreeNode.this, bitmapBounds)
+                                .process();
                     }
 
                     // System.out.println("decodeComplete(): " + (System.currentTimeMillis() - t0) + " ms");

@@ -5,7 +5,6 @@ import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.log.EmergencyHandler;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
-import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.codec.CodecContext;
 import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
@@ -209,46 +208,11 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     Rect getScaledSize(final DecodeTask task, final CodecPage vuPage) {
-        final int pageWidth = vuPage.getWidth();
-        final int pageHeight = vuPage.getHeight();
-        final RectF nodeBounds = task.pageSliceBounds;
+        final float zoom = task.viewState.zoom;
 
-        return getScaledSize(task.viewState, pageWidth, pageHeight, nodeBounds, task.node.page.getTargetRectScale(),
-                task.node.level.zoom);
-    }
+        final RectF r = Page.getTargetRect(task.node.page.type, task.node.page.getBounds(zoom), task.node.pageSliceBounds);
 
-    @Override
-    public Rect getScaledSize(final ViewState viewState, final float pageWidth, final float pageHeight,
-            final RectF nodeBounds, final float pageTypeWidthScale, final float levelZoom) {
-
-        final float viewWidth = viewState.viewRect.width();
-        final float viewHeight = viewState.viewRect.height();
-
-        final float nodeWidth = pageWidth * nodeBounds.width();
-        final float nodeHeight = pageHeight * nodeBounds.height();
-
-        final int scaledWidth;
-        final int scaledHeight;
-        // &&
-
-        PageAlign effectiveAlign = viewState.pageAlign;
-        if (effectiveAlign == PageAlign.AUTO) {
-            final float viewAspect = viewWidth / viewHeight;
-            final float nodeAspect = nodeWidth / nodeHeight;
-            effectiveAlign = nodeAspect < viewAspect ? PageAlign.HEIGHT : PageAlign.WIDTH;
-        }
-
-        if (effectiveAlign == PageAlign.WIDTH) {
-            final float scale = 1.0f * (viewWidth / pageWidth) * viewState.zoom / levelZoom;
-            scaledWidth = Math.round((scale * pageWidth));
-            scaledHeight = Math.round((scale * nodeHeight) / nodeBounds.width());
-        } else {
-            final float scale = 1.0f * (viewHeight / pageHeight) * viewState.zoom / levelZoom;
-            scaledHeight = Math.round((scale * pageHeight));
-            scaledWidth = Math.round((scale * nodeWidth) / nodeBounds.height());
-        }
-
-        return new Rect(0, 0, scaledWidth, scaledHeight);
+        return new Rect(0, 0, (int)r.width(), (int)r.height());
     }
 
     void finishDecoding(final DecodeTask currentDecodeTask, final CodecPage page, final BitmapRef bitmap,

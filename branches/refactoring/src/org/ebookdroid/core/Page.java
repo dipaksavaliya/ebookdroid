@@ -129,7 +129,7 @@ public class Page {
         final RectF targetRectF = new RectF();
         tmpMatrix.mapRect(targetRectF, normalizedRect);
 
-        //MathUtils.round(targetRectF);
+        MathUtils.floor(targetRectF);
 
         return targetRectF;
     }

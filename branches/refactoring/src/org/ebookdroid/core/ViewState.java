@@ -9,7 +9,6 @@ import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.RectF;
-import android.util.SparseArray;
 
 public class ViewState {
 
@@ -24,8 +23,6 @@ public class ViewState {
     public final PagePaint paint;
 
     public final Pages pages;
-
-    public final SparseArray<RectF> cachedBounds = new SparseArray<RectF>();
 
     public ViewState(final PageTreeNode node) {
         this(node.page.base.getDocumentController());
@@ -79,12 +76,6 @@ public class ViewState {
     }
 
     public RectF getBounds(final Page page) {
-//        RectF bounds = cachedBounds.get(page.index.viewIndex);
-//        if (bounds == null) {
-//            bounds = page.getBounds(zoom);
-//            cachedBounds.append(page.index.viewIndex, bounds);
-//        }
-//        return bounds;
         return page.getBounds(zoom);
     }
 

@@ -2,7 +2,6 @@ package org.ebookdroid.core;
 
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.Bitmaps;
-import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -57,28 +56,15 @@ public class EventChildLoaded extends AbstractEvent {
                 return null;
             }
 
-            final PageIndex currentPage = viewState.book.getCurrentPage();
-            final float offsetX = viewState.book.offsetX;
-            final float offsetY = viewState.book.offsetY;
-
-            final boolean changed = page.setAspectRatio(bitmapBounds.width(), bitmapBounds.height());
-
-            if (changed) {
-                ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-                viewState = ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
-            } else {
-                final RectF bounds = viewState.getBounds(page);
-                final PageTreeNode parent = child.parent;
-                if (parent != null) {
-                    recycleParent(parent, bounds);
-                }
-                recycleChildren();
+            final RectF bounds = viewState.getBounds(page);
+            final PageTreeNode parent = child.parent;
+            if (parent != null) {
+                recycleParent(parent, bounds);
             }
+            recycleChildren();
 
-            if (viewState != null) {
-                ctrl.pageUpdated(viewState, page);
-                ctrl.redrawView(viewState);
-            }
+            ctrl.pageUpdated(viewState, page);
+            ctrl.redrawView(viewState);
 
             return viewState;
         } finally {
