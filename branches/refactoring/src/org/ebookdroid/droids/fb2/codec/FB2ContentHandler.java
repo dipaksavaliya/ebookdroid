@@ -125,7 +125,6 @@ public class FB2ContentHandler extends FB2BaseHandler {
                 markup.add(setSubtitleStyle().jm);
                 markup.add(emptyLine(crs.textSize));
                 markup.add(FB2MarkupParagraphEnd.E);
-                markup.add(crs.paint.pOffset);
             }
         } else if ("text-author".equals(qName) || "date".equals(qName)) {
             if (!parsingNotes) {
