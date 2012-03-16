@@ -95,14 +95,14 @@ public class HScrollController extends AbstractScrollController {
             for (final Page page : model.getPages()) {
                 final float pageWidth = height * page.getAspectRatio();
                 page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, height));
-                widthAccum += pageWidth + 1;
+                widthAccum += pageWidth + 3;
             }
         } else {
             float widthAccum = changedPage.getBounds(1.0f).left;
             for (final Page page : model.getPages(changedPage.index.viewIndex)) {
                 final float pageWidth = height * page.getAspectRatio();
                 page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, height));
-                widthAccum += pageWidth + 1;
+                widthAccum += pageWidth + 3;
             }
         }
     }

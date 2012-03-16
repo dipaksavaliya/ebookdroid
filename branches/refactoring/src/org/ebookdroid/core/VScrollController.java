@@ -95,14 +95,14 @@ public class VScrollController extends AbstractScrollController {
             for (final Page page : model.getPages()) {
                 final float pageHeight = width / page.getAspectRatio();
                 page.setBounds(0, heightAccum, width, heightAccum + pageHeight);
-                heightAccum += pageHeight + 1;
+                heightAccum += pageHeight + 3;
             }
         } else {
             float heightAccum = changedPage.getBounds(1.0f).top;
             for (final Page page : model.getPages(changedPage.index.viewIndex)) {
                 final float pageHeight = width / page.getAspectRatio();
                 page.setBounds(0, heightAccum, width, heightAccum + pageHeight);
-                heightAccum += pageHeight + 1;
+                heightAccum += pageHeight + 3;
             }
         }
     }
