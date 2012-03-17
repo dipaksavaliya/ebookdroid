@@ -336,7 +336,6 @@ public final class SurfaceView extends android.view.SurfaceView implements IView
             if (ds != null) {
                 ds.updateViewState(viewState);
             }
-            base.getDecodeService().updateViewState(viewState);
         }
     }
 
