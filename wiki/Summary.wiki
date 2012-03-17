@@ -12,4 +12,4 @@ Supported the file in following formats:
 This software contain:
  * [http://www.mupdf.com/ MuPDF]
  * [http://djvu.sourceforge.net/ DjVuLibre]
- * [https://github.com/edmund-wagner/junrar/ JUnRar]
+ * [http://www.rarlab.com/ unrar]
