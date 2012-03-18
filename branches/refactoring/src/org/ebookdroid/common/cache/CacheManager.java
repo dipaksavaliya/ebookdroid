@@ -67,6 +67,7 @@ public class CacheManager {
             while (in.read(buf) > 0) {
                 buf.flip();
                 out.write(buf);
+                buf.flip();
             }
         } finally {
             try {

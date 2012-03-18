@@ -11,6 +11,7 @@ import org.ebookdroid.ui.viewer.views.PageViewZoomControls;
 import org.ebookdroid.ui.viewer.views.ViewEffects;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
@@ -78,13 +79,22 @@ public class ViewerActivity extends AbstractActionActivity {
         return controller;
     }
 
+    
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("onNewIntent(): " + intent);
+        }
+    }
+
     /**
      * Called when the activity is first created.
      */
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         if (LCTX.isDebugEnabled()) {
-            LCTX.d("onCreate()");
+            LCTX.d("onCreate(): " + getIntent());
         }
 
         Object last = this.getLastNonConfigurationInstance();
