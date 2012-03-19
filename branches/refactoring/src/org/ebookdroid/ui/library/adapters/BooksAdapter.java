@@ -1,6 +1,7 @@
 package org.ebookdroid.ui.library.adapters;
 
 import org.ebookdroid.R;
+import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.ui.library.IBrowserActivity;
@@ -247,7 +248,8 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
 
     public void startScan() {
         clearData();
-        scanner.startScan(SettingsManager.getAppSettings().autoScanDirs);
+        final AppSettings appSettings = SettingsManager.getAppSettings();
+        scanner.startScan(appSettings.allowedFileTypes, appSettings.autoScanDirs);
     }
 
     public void stopScan() {
@@ -388,7 +390,8 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
 
     @Override
     public void onDirAdded(final File parent, final File f) {
-        scanner.startScan(f.getAbsolutePath());
+        final AppSettings appSettings = SettingsManager.getAppSettings();
+        scanner.startScan(appSettings.allowedFileTypes, f.getAbsolutePath());
     }
 
     @Override

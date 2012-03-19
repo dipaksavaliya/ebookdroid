@@ -53,8 +53,8 @@ public class BrowserActivity extends AbstractActionActivity implements IBrowserA
     private TextView header;
 
     public BrowserActivity() {
-        this.filter = new CompositeFilter(false, DirectoryFilter.NOT_HIDDEN, SettingsManager.getAppSettings()
-                .getAllowedFileTypes());
+        this.filter = new CompositeFilter(false, DirectoryFilter.NOT_HIDDEN,
+                SettingsManager.getAppSettings().allowedFileTypes);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.ebookdroid.common.settings.base;
 import org.ebookdroid.EBookDroidApp;
 
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 import org.emdev.utils.MathUtils;
 
@@ -48,4 +49,7 @@ public class IntegerPreferenceDefinition extends BasePreferenceDefinition {
         return MathUtils.adjust(value, minValue, maxValue);
     }
 
+    public void setPreferenceValue(final Editor edit, final int value) {
+        edit.putString(key, Integer.toString(value));
+    }
 }

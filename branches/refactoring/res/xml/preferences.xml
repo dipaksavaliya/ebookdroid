@@ -431,13 +431,13 @@
                 android:title="@string/pref_brfiletypecbr_title" />
 
             <CheckBoxPreference
-                android:defaultValue="false"
+                android:defaultValue="true"
                 android:key="brfiletypefb2"
                 android:summary="@string/pref_brfiletypefb2_summary"
                 android:title="@string/pref_brfiletypefb2_title" />
 
             <CheckBoxPreference
-                android:defaultValue="false"
+                android:defaultValue="true"
                 android:key="brfiletypefb2.zip"
                 android:summary="@string/pref_brfiletypefb2.zip_summary"
                 android:title="@string/pref_brfiletypefb2.zip_title" />

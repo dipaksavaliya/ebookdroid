@@ -145,7 +145,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         TouchManager.loadFromSettings(newSettings);
         KeyBindingsManager.loadFromSettings(newSettings);
 
-        BitmapManager.setPartSize(newSettings.bitmapSize);
+        BitmapManager.setPartSize(1 << newSettings.bitmapSize);
         BitmapManager.setUseEarlyRecycling(newSettings.useEarlyRecycling);
     }
 
@@ -589,7 +589,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         TouchManager.loadFromSettings(newSettings);
         KeyBindingsManager.loadFromSettings(newSettings);
 
-        BitmapManager.setPartSize(newSettings.bitmapSize);
+        BitmapManager.setPartSize(1 << newSettings.bitmapSize);
         BitmapManager.setUseEarlyRecycling(newSettings.useEarlyRecycling);
     }
 

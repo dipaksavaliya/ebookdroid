@@ -2,7 +2,7 @@
     android:summary="@string/pref_scroll_category_summary"
     android:title="@string/pref_scroll_category" >
 
-    <SwitchPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_tapsenabled_defvalue"
             android:key="@string/pref_tapsenabled_id"
             android:summary="@string/pref_tapsenabled_summary"

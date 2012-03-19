@@ -4,13 +4,13 @@
 	android:summary="@string/pref_book_category_summary"
 	android:title="@string/pref_book_category">
 
-	<SwitchPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_splitpages_defvalue"
             android:key="@string/pref_book_splitpages_id"
             android:summary="@string/pref_splitpages_summary"
             android:title="@string/pref_splitpages_title" />
 
-	<SwitchPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_croppages_defvalue"
             android:key="@string/pref_book_croppages_id"
             android:summary="@string/pref_croppages_summary"

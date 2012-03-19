@@ -119,7 +119,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
         final BookSettings recent = SettingsManager.getRecentBook();
         final File file = (recent != null && recent.fileName != null) ? new File(recent.fileName) : null;
         final boolean found = file != null ? file.exists()
-                && SettingsManager.getAppSettings().getAllowedFileTypes().accept(file) : false;
+                && SettingsManager.getAppSettings().allowedFileTypes.accept(file) : false;
 
         if (LCTX.isDebugEnabled()) {
             LCTX.d("Last book: " + (file != null ? file.getAbsolutePath() : "") + ", found: " + found
@@ -143,14 +143,14 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
             if (firstResume) {
                 bookshelfAdapter.startScan();
             }
-            recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), appSettings.getAllowedFileTypes());
+            recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(), appSettings.allowedFileTypes);
         } else {
             if (viewflipper.getDisplayedChild() == VIEW_RECENT) {
                 if (SettingsManager.getRecentBook() == null) {
                     changeLibraryView(VIEW_LIBRARY);
                 } else {
                     recentAdapter.setBooks(SettingsManager.getAllBooksSettings().values(),
-                            appSettings.getAllowedFileTypes());
+                            appSettings.allowedFileTypes);
                 }
 
             }
@@ -272,7 +272,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
 
     private void changeLibraryView(final int view) {
         if (!SettingsManager.getAppSettings().getUseBookcase()) {
-            final FileExtensionFilter filter = SettingsManager.getAppSettings().getAllowedFileTypes();
+            final FileExtensionFilter filter = SettingsManager.getAppSettings().allowedFileTypes;
 
             if (view == VIEW_LIBRARY) {
                 viewflipper.setDisplayedChild(VIEW_LIBRARY);
@@ -359,7 +359,7 @@ public class RecentActivity extends AbstractActionActivity implements IBrowserAc
 
     @Override
     public void onAppSettingsChanged(final AppSettings oldSettings, final AppSettings newSettings, final Diff diff) {
-        final FileExtensionFilter filter = newSettings.getAllowedFileTypes();
+        final FileExtensionFilter filter = newSettings.allowedFileTypes;
         if (diff.isUseBookcaseChanged()) {
             viewflipper.removeAllViews();
 

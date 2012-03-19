@@ -5,6 +5,7 @@ import static org.ebookdroid.R.string.*;
 import org.ebookdroid.common.settings.base.BooleanPreferenceDefinition;
 import org.ebookdroid.common.settings.base.EnumPreferenceDefinition;
 import org.ebookdroid.common.settings.base.FileListPreferenceDefinition;
+import org.ebookdroid.common.settings.base.FileTypeFilterPreferenceDefinition;
 import org.ebookdroid.common.settings.base.IntegerPreferenceDefinition;
 import org.ebookdroid.common.settings.base.StringPreferenceDefinition;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
@@ -44,8 +45,8 @@ public interface AppPreferences {
     BooleanPreferenceDefinition SHOW_PAGE_IN_TITLE = new BooleanPreferenceDefinition(pref_pageintitle_id,
             pref_pageintitle_defvalue);
 
-    EnumPreferenceDefinition<ToastPosition> PAGE_NUMBER_TOAST_POSITION = new EnumPreferenceDefinition<ToastPosition>(ToastPosition.class,
-            pref_pagenumbertoastposition_id, pref_pagenumbertoastposition_lefttop);
+    EnumPreferenceDefinition<ToastPosition> PAGE_NUMBER_TOAST_POSITION = new EnumPreferenceDefinition<ToastPosition>(
+            ToastPosition.class, pref_pagenumbertoastposition_id, pref_pagenumbertoastposition_lefttop);
 
     BooleanPreferenceDefinition SHOW_ANIM_ICON = new BooleanPreferenceDefinition(pref_showanimicon_id,
             pref_showanimicon_defvalue);
@@ -134,8 +135,7 @@ public interface AppPreferences {
     EnumPreferenceDefinition<FontSize> FB2_FONT_SIZE = new EnumPreferenceDefinition<FontSize>(FontSize.class,
             pref_fontsize_id, pref_fontsize_normal);
 
-    BooleanPreferenceDefinition FB2_HYPHEN = new BooleanPreferenceDefinition(pref_fb2hyphen_id,
-            pref_fb2hyphen_defvalue);
+    BooleanPreferenceDefinition FB2_HYPHEN = new BooleanPreferenceDefinition(pref_fb2hyphen_id, pref_fb2hyphen_defvalue);
 
     /* =============== Book rendering settings =============== */
 
@@ -144,7 +144,8 @@ public interface AppPreferences {
     BooleanPreferenceDefinition BOOK_SPLIT_PAGES = new BooleanPreferenceDefinition(pref_book_splitpages_id,
             pref_splitpages_defvalue);
 
-    BooleanPreferenceDefinition BOOK_CROP_PAGES = new BooleanPreferenceDefinition(pref_book_croppages_id, pref_croppages_defvalue);
+    BooleanPreferenceDefinition BOOK_CROP_PAGES = new BooleanPreferenceDefinition(pref_book_croppages_id,
+            pref_croppages_defvalue);
 
     EnumPreferenceDefinition<DocumentViewMode> BOOK_VIEW_MODE = new EnumPreferenceDefinition<DocumentViewMode>(
             DocumentViewMode.class, pref_book_viewmode_id, pref_viewmode_vertical_scroll);
@@ -155,7 +156,6 @@ public interface AppPreferences {
     EnumPreferenceDefinition<PageAnimationType> BOOK_ANIMATION_TYPE = new EnumPreferenceDefinition<PageAnimationType>(
             PageAnimationType.class, pref_book_animation_type_id, pref_animation_type_none);
 
-
     /* =============== Browser settings =============== */
 
     BooleanPreferenceDefinition USE_BOOK_CASE = new BooleanPreferenceDefinition(pref_usebookcase_id,
@@ -165,5 +165,7 @@ public interface AppPreferences {
             pref_brautoscandir_defvalue);
 
     StringPreferenceDefinition SEARCH_BOOK_QUERY = new StringPreferenceDefinition(pref_brsearchbookquery_id, 0);
+
+    FileTypeFilterPreferenceDefinition FILE_TYPE_FILTER = new FileTypeFilterPreferenceDefinition("brfiletype");
 
 }

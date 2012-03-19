@@ -5,7 +5,6 @@ import static android.os.FileObserver.DELETE;
 import static android.os.FileObserver.MOVED_FROM;
 import static android.os.FileObserver.MOVED_TO;
 
-import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.ui.library.IBrowserActivity;
 
 import android.os.AsyncTask;
@@ -41,19 +40,19 @@ public class FileSystemScanner {
         this.listeners = new EventDispatcher(base.getActivity(), InvokationType.AsyncUI, Listener.class);
     }
 
-    public void startScan(final String... paths) {
+    public void startScan(final FileExtensionFilter filter, final String... paths) {
         if (inScan.compareAndSet(false, true)) {
-            m_scanTask = new ScanTask(SettingsManager.getAppSettings().getAllowedFileTypes());
+            m_scanTask = new ScanTask(filter);
             m_scanTask.execute(paths);
         } else {
             m_scanTask.addPaths(paths);
         }
     }
 
-    public void startScan(final Collection<String> paths) {
+    public void startScan(final FileExtensionFilter filter, final Collection<String> paths) {
         final String[] arr = paths.toArray(new String[paths.size()]);
         if (inScan.compareAndSet(false, true)) {
-            m_scanTask = new ScanTask(SettingsManager.getAppSettings().getAllowedFileTypes());
+            m_scanTask = new ScanTask(filter);
             m_scanTask.execute(arr);
         } else {
             m_scanTask.addPaths(arr);

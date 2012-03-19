@@ -64,6 +64,19 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
 
     public void decorateBrowserSettings() {
         decoratePreferences(AUTO_SCAN_DIRS.key);
+
+        // OnPreferenceChangeListener l = new OnPreferenceChangeListener() {
+        // @Override
+        // public boolean onPreferenceChange(Preference preference, Object newValue) {
+        // System.out.println(preference.getKey() + ": " + newValue);
+        // return true;
+        // }
+        // };
+        //
+        // findPreference(USE_BOOK_CASE.key).setOnPreferenceChangeListener(l);
+        // for(String key : FILE_TYPE_FILTER.keys.values()) {
+        // findPreference(key).setOnPreferenceChangeListener(l);
+        // }
     }
 
     public void decorateMemorySettings() {
