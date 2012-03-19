@@ -11,6 +11,7 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
 import org.ebookdroid.core.crop.PageCropper;
+import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -259,19 +260,30 @@ public class DecodeServiceBase implements DecodeService {
             BitmapManager.release(rootBitmap);
 
             final ViewState viewState = task.viewState;
-            final RectF pageBounds = viewState.getBounds(root.page);
-            final float pageWidth = pageBounds.width() * root.croppedBounds.width();
-            final float pageHeight = pageBounds.height() * root.croppedBounds.height();
+            final float pageWidth = vuPage.getWidth() * root.croppedBounds.width();
+            final float pageHeight = vuPage.getHeight() * root.croppedBounds.height();
 
-            final float pageAspectRatio = pageWidth / pageHeight;
-            final RectF viewRect = task.viewState.viewRect;
+            final PageIndex currentPage = viewState.book.getCurrentPage();
+            final float offsetX = viewState.book.offsetX;
+            final float offsetY = viewState.book.offsetY;
 
-            croppedPageBounds = task.viewState.ctrl.calcPageBounds(task.viewState.pageAlign, pageAspectRatio,
-                    (int) viewRect.width(), (int) task.viewState.viewRect.height());
+            root.page.setAspectRatio(pageWidth, pageHeight);
+            viewState.ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, task.node.page);
+
+            croppedPageBounds = root.page.getBounds(task.viewState.zoom);
 
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Task " + task.id + ": cropping page bounds: " + croppedPageBounds);
             }
+
+            task.node.page.base.getActivity().runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    viewState.ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
+                }
+            });
+
         }
 
         if (task.node != root) {

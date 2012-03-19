@@ -8,7 +8,6 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.ui.viewer.IViewController;
-import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -116,24 +115,6 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                     }
                 });
                 return;
-            }
-
-            if (croppedPageBounds != null) {
-                final ViewState viewState = new ViewState(PageTreeNode.this);
-                final PageIndex currentPage = viewState.book.getCurrentPage();
-                final float offsetX = viewState.book.offsetX;
-                final float offsetY = viewState.book.offsetY;
-
-                page.setAspectRatio(croppedPageBounds.width(), croppedPageBounds.height());
-                viewState.ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-
-                page.base.getActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        viewState.ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
-                    }
-                });
             }
 
             final Bitmaps bitmaps = holder.reuse(fullId, bitmap, bitmapBounds);
