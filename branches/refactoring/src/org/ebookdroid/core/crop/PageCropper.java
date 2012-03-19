@@ -10,7 +10,7 @@ import android.graphics.RectF;
 
 public class PageCropper {
 
-    private static final int BMP_SIZE = 400;
+    public static final int BMP_SIZE = 400;
 
     private final static int V_LINE_SIZE = 5;
 

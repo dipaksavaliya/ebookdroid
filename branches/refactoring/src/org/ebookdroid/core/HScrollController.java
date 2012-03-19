@@ -1,7 +1,9 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Rect;
@@ -89,21 +91,31 @@ public class HScrollController extends AbstractScrollController {
         }
 
         final int height = getHeight();
+        final int width = getWidth();
+        final BookSettings bookSettings = SettingsManager.getBookSettings();
+        final PageAlign pageAlign = DocumentViewMode.getPageAlign(bookSettings);
 
         if (changedPage == null) {
             float widthAccum = 0;
             for (final Page page : model.getPages()) {
-                final float pageWidth = height * page.getAspectRatio();
-                page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, height));
-                widthAccum += pageWidth + 3;
+                final RectF pageBounds = calcPageBounds(pageAlign, page.getAspectRatio(), width, height);
+                pageBounds.offset(widthAccum, 0);
+                page.setBounds(pageBounds);
+                widthAccum += pageBounds.width() + 3;
             }
         } else {
             float widthAccum = changedPage.getBounds(1.0f).left;
             for (final Page page : model.getPages(changedPage.index.viewIndex)) {
-                final float pageWidth = height * page.getAspectRatio();
-                page.setBounds(new RectF(widthAccum, 0, widthAccum + pageWidth, height));
-                widthAccum += pageWidth + 3;
+                final RectF pageBounds = calcPageBounds(pageAlign, page.getAspectRatio(), width, height);
+                pageBounds.offset(widthAccum, 0);
+                page.setBounds(pageBounds);
+                widthAccum += pageBounds.width() + 3;
             }
         }
+    }
+
+    @Override
+    public RectF calcPageBounds(final PageAlign pageAlign, final float pageAspectRatio, final int width, final int height) {
+        return new RectF(0, 0, height * pageAspectRatio, height);
     }
 }

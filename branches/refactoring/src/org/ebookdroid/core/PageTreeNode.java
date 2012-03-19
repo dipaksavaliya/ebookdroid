@@ -5,9 +5,7 @@ import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
-import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.core.codec.CodecPage;
-import org.ebookdroid.core.crop.PageCropper;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.ui.viewer.IViewController;
 import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
@@ -105,7 +103,8 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     @Override
-    public void decodeComplete(final CodecPage codecPage, final BitmapRef bitmap, final Rect bitmapBounds) {
+    public void decodeComplete(final CodecPage codecPage, final BitmapRef bitmap, final Rect bitmapBounds,
+            final RectF croppedPageBounds) {
 
         try {
             if (bitmap == null || bitmapBounds == null) {
@@ -119,39 +118,22 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                 return;
             }
 
-            final BookSettings bs = SettingsManager.getBookSettings();
-            if (bs != null && bs.cropPages) {
-                if (id == 0 && croppedBounds == null) {
-                    croppedBounds = PageCropper.getCropBounds(bitmap, bitmapBounds, pageSliceBounds);
+            if (croppedPageBounds != null) {
+                final ViewState viewState = new ViewState(PageTreeNode.this);
+                final PageIndex currentPage = viewState.book.getCurrentPage();
+                final float offsetX = viewState.book.offsetX;
+                final float offsetY = viewState.book.offsetY;
 
-                    final ViewState viewState = new ViewState(PageTreeNode.this);
-                    final PageIndex currentPage = viewState.book.getCurrentPage();
-                    final float offsetX = viewState.book.offsetX;
-                    final float offsetY = viewState.book.offsetY;
+                page.setAspectRatio(croppedPageBounds.width(), croppedPageBounds.height());
+                viewState.ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
 
-                    final RectF pageBounds = viewState.getBounds(page);
-                    final float pageWidth = pageBounds.width() * croppedBounds.width();
-                    final float pageHeight = pageBounds.height() * croppedBounds.height();
+                page.base.getActivity().runOnUiThread(new Runnable() {
 
-                    page.setAspectRatio(pageWidth, pageHeight);
-                    viewState.ctrl.invalidatePageSizes(InvalidateSizeReason.PAGE_LOADED, page);
-
-                    final DecodeService decodeService = page.base.getDecodeService();
-                    if (decodeService != null) {
-                        if (LCTX.isDebugEnabled()) {
-                            LCTX.d(fullId + ": cropped image requested: " + croppedBounds);
-                        }
-                        decodeService.decodePage(viewState, PageTreeNode.this);
+                    @Override
+                    public void run() {
+                        viewState.ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
                     }
-
-                    page.base.getActivity().runOnUiThread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            viewState.ctrl.goToPage(currentPage.viewIndex, offsetX, offsetY);
-                        }
-                    });
-                }
+                });
             }
 
             final Bitmaps bitmaps = holder.reuse(fullId, bitmap, bitmapBounds);
@@ -194,7 +176,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return Page.getTargetRect(page.type, pageBounds, pageSliceBounds);
     }
 
-    private static RectF evaluatePageSliceBounds(final RectF localPageSliceBounds, final PageTreeNode parent) {
+    public static RectF evaluatePageSliceBounds(final RectF localPageSliceBounds, final PageTreeNode parent) {
         final Matrix tmpMatrix = MatrixUtils.get();
 
         tmpMatrix.postScale(parent.pageSliceBounds.width(), parent.pageSliceBounds.height());
@@ -204,16 +186,24 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         return sliceBounds;
     }
 
-    private static RectF evaluateCroppedPageSliceBounds(final RectF localPageSliceBounds, final PageTreeNode parent) {
-        if (parent.croppedBounds == null) {
+    public static RectF evaluateCroppedPageSliceBounds(final RectF localPageSliceBounds, final PageTreeNode parent) {
+        if (parent == null) {
             return null;
         }
+        if (parent.croppedBounds == null) {
+            parent.croppedBounds = evaluateCroppedPageSliceBounds(parent.pageSliceBounds, parent.parent);
+            if (parent.croppedBounds == null) {
+                return null;
+            }
+        }
+
         final Matrix tmpMatrix = MatrixUtils.get();
 
         tmpMatrix.postScale(parent.croppedBounds.width(), parent.croppedBounds.height());
         tmpMatrix.postTranslate(parent.croppedBounds.left, parent.croppedBounds.top);
         final RectF sliceBounds = new RectF();
         tmpMatrix.mapRect(sliceBounds, localPageSliceBounds);
+
         return sliceBounds;
     }
 

@@ -10,6 +10,7 @@ import org.ebookdroid.ui.viewer.IView;
 import org.ebookdroid.ui.viewer.IViewController;
 
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -140,5 +141,9 @@ public class ViewContollerStub implements IViewController {
 
     @Override
     public final void onDestroy() {
+    }
+
+    public RectF calcPageBounds(final PageAlign pageAlign, final float pageAspectRatio, final int width, final int height) {
+        return new RectF();
     }
 }

@@ -8,6 +8,7 @@ import org.ebookdroid.core.events.ZoomListener;
 import org.ebookdroid.ui.viewer.IActivityController.IBookLoadTask;
 
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -21,6 +22,8 @@ public interface IViewController extends ZoomListener {
     ViewState goToPage(int page);
 
     ViewState goToPage(int page, float offsetX, float offsetY);
+
+    RectF calcPageBounds(PageAlign pageAlign, float pageAspectRatio, int width, int height);
 
     void invalidatePageSizes(InvalidateSizeReason reason, Page changedPage);
 

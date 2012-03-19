@@ -1,7 +1,9 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
+import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.graphics.Rect;
@@ -88,22 +90,36 @@ public class VScrollController extends AbstractScrollController {
         }
 
         final int width = getWidth();
-        System.out.println("VScrollController.invalidatePageSizes(): " + width);
-        
+        final int height = getHeight();
+        final BookSettings bookSettings = SettingsManager.getBookSettings();
+        final PageAlign pageAlign = DocumentViewMode.getPageAlign(bookSettings);
+
         if (changedPage == null) {
             float heightAccum = 0;
             for (final Page page : model.getPages()) {
-                final float pageHeight = width / page.getAspectRatio();
-                page.setBounds(0, heightAccum, width, heightAccum + pageHeight);
-                heightAccum += pageHeight + 3;
+                final RectF pageBounds = calcPageBounds(pageAlign, page.getAspectRatio(), width, height);
+                pageBounds.offset(0, heightAccum);
+                page.setBounds(pageBounds);
+                heightAccum += pageBounds.height() + 3;
             }
         } else {
             float heightAccum = changedPage.getBounds(1.0f).top;
             for (final Page page : model.getPages(changedPage.index.viewIndex)) {
-                final float pageHeight = width / page.getAspectRatio();
-                page.setBounds(0, heightAccum, width, heightAccum + pageHeight);
-                heightAccum += pageHeight + 3;
+                final RectF pageBounds = calcPageBounds(pageAlign, page.getAspectRatio(), width, height);
+                pageBounds.offset(0, heightAccum);
+                page.setBounds(pageBounds);
+                heightAccum += pageBounds.height() + 3;
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.ui.viewer.IViewController#calcPageBounds(org.ebookdroid.core.Page, int, int)
+     */
+    @Override
+    public RectF calcPageBounds(final PageAlign pageAlign, final float pageAspectRatio, final int width, final int height) {
+        return new RectF(0, 0, width, width / pageAspectRatio);
     }
 }

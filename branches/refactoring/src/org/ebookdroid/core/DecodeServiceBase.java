@@ -10,6 +10,7 @@ import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
+import org.ebookdroid.core.crop.PageCropper;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -31,6 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.MathUtils;
 
 public class DecodeServiceBase implements DecodeService {
 
@@ -121,8 +123,7 @@ public class DecodeServiceBase implements DecodeService {
 
     @Override
     public void decodePage(final ViewState viewState, final PageTreeNode node) {
-        final RectF nodeBounds = node.croppedBounds != null ? node.croppedBounds : node.pageSliceBounds;
-        final DecodeTask decodeTask = new DecodeTask(viewState, node, nodeBounds);
+        final DecodeTask decodeTask = new DecodeTask(viewState, node);
         updateViewState(viewState);
 
         if (isRecycled.get()) {
@@ -154,6 +155,8 @@ public class DecodeServiceBase implements DecodeService {
 
         CodecPage vuPage = null;
         Rect r = null;
+        RectF croppedPageBounds = null;
+
         try {
             vuPage = getPage(task.pageNumber);
 
@@ -164,11 +167,23 @@ public class DecodeServiceBase implements DecodeService {
                 return;
             }
 
-            r = getScaledSize(task, vuPage);
+            croppedPageBounds = checkCropping(task, vuPage);
+            if (executor.isTaskDead(task)) {
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d("Task " + task.id + ": Abort dead decode task for " + task.node);
+                }
+                return;
+            }
+
+            r = getScaledSize(task.node, task.viewState.zoom, croppedPageBounds, vuPage);
+
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Task " + task.id + ": Rendering rect: " + r);
             }
-            final BitmapRef bitmap = vuPage.renderBitmap(r.width(), r.height(), task.pageSliceBounds);
+
+            final RectF actualSliceBounds = task.node.croppedBounds != null ? task.node.croppedBounds
+                    : task.node.pageSliceBounds;
+            final BitmapRef bitmap = vuPage.renderBitmap(r.width(), r.height(), actualSliceBounds);
 
             if (executor.isTaskDead(task)) {
                 if (LCTX.isDebugEnabled()) {
@@ -187,7 +202,7 @@ public class DecodeServiceBase implements DecodeService {
                 }
             }
 
-            finishDecoding(task, vuPage, bitmap, r);
+            finishDecoding(task, vuPage, bitmap, r, croppedPageBounds);
         } catch (final OutOfMemoryError ex) {
             LCTX.e("Task " + task.id + ": No memory to decode " + task.node);
 
@@ -195,8 +210,9 @@ public class DecodeServiceBase implements DecodeService {
                 pages.put(Integer.MAX_VALUE - i, null);
             }
             pages.clear();
-            if (vuPage != null)
+            if (vuPage != null) {
                 vuPage.recycle();
+            }
 
             BitmapManager.clear("DecodeService OutOfMemoryError: ");
 
@@ -207,23 +223,84 @@ public class DecodeServiceBase implements DecodeService {
         }
     }
 
-    Rect getScaledSize(final DecodeTask task, final CodecPage vuPage) {
-        final float zoom = task.viewState.zoom;
+    RectF checkCropping(final DecodeTask task, final CodecPage vuPage) {
+        // Checks if cropping setting is not set
+        if (task.viewState.book == null || !task.viewState.book.cropPages) {
+            return null;
+        }
+        // Checks if page has been cropped before
+        if (task.node.croppedBounds != null) {
+            // Page size is actuall now
+            return null;
+        }
 
-        final RectF r = Page.getTargetRect(task.node.page.type, task.node.page.getBounds(zoom), task.node.pageSliceBounds);
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Task " + task.id + ": no cropping bounds for task node");
+        }
 
-        return new Rect(0, 0, (int)r.width(), (int)r.height());
+        RectF croppedPageBounds = null;
+
+        // Checks if page root node has been cropped before
+        final PageTreeNode root = task.node.page.nodes.root;
+        if (root.croppedBounds == null) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Task " + task.id + ": Decode full page to crop");
+            }
+            final Rect rootRect = new Rect(0, 0, PageCropper.BMP_SIZE, PageCropper.BMP_SIZE);
+            final RectF rootBounds = root.pageSliceBounds;
+
+            final BitmapRef rootBitmap = vuPage.renderBitmap(rootRect.width(), rootRect.height(), rootBounds);
+            root.croppedBounds = PageCropper.getCropBounds(rootBitmap, rootRect, root.pageSliceBounds);
+
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Task " + task.id + ": cropping root bounds: " + root.croppedBounds);
+            }
+
+            BitmapManager.release(rootBitmap);
+
+            final ViewState viewState = task.viewState;
+            final RectF pageBounds = viewState.getBounds(root.page);
+            final float pageWidth = pageBounds.width() * root.croppedBounds.width();
+            final float pageHeight = pageBounds.height() * root.croppedBounds.height();
+
+            final float pageAspectRatio = pageWidth / pageHeight;
+            final RectF viewRect = task.viewState.viewRect;
+
+            croppedPageBounds = task.viewState.ctrl.calcPageBounds(task.viewState.pageAlign, pageAspectRatio,
+                    (int) viewRect.width(), (int) task.viewState.viewRect.height());
+
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Task " + task.id + ": cropping page bounds: " + croppedPageBounds);
+            }
+        }
+
+        if (task.node != root) {
+            task.node.croppedBounds = PageTreeNode.evaluateCroppedPageSliceBounds(task.node.pageSliceBounds,
+                    task.node.parent);
+        }
+
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("Task " + task.id + ": cropping bounds for task node: " + task.node.croppedBounds);
+        }
+
+        return croppedPageBounds;
+    }
+
+    Rect getScaledSize(final PageTreeNode node, final float zoom, final RectF croppedPageBounds, final CodecPage vuPage) {
+        final RectF pageBounds = MathUtils.zoom(croppedPageBounds != null ? croppedPageBounds : node.page.bounds, zoom);
+        final RectF r = Page.getTargetRect(node.page.type, pageBounds, node.pageSliceBounds);
+        return new Rect(0, 0, (int) r.width(), (int) r.height());
     }
 
     void finishDecoding(final DecodeTask currentDecodeTask, final CodecPage page, final BitmapRef bitmap,
-            final Rect bitmapBounds) {
+            final Rect bitmapBounds, final RectF croppedPageBounds) {
         stopDecoding(currentDecodeTask.node, "complete");
-        updateImage(currentDecodeTask, page, bitmap, bitmapBounds);
+        updateImage(currentDecodeTask, page, bitmap, bitmapBounds, croppedPageBounds);
     }
 
     void abortDecoding(final DecodeTask currentDecodeTask, final CodecPage page, final BitmapRef bitmap) {
         stopDecoding(currentDecodeTask.node, "failed");
-        updateImage(currentDecodeTask, page, bitmap, null);
+        updateImage(currentDecodeTask, page, bitmap, null, null);
     }
 
     CodecPage getPage(final int pageIndex) {
@@ -256,8 +333,8 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     void updateImage(final DecodeTask currentDecodeTask, final CodecPage page, final BitmapRef bitmap,
-            final Rect bitmapBounds) {
-        currentDecodeTask.node.decodeComplete(page, bitmap, bitmapBounds);
+            final Rect bitmapBounds, final RectF croppedPageBounds) {
+        currentDecodeTask.node.decodeComplete(page, bitmap, bitmapBounds, croppedPageBounds);
     }
 
     @Override
@@ -291,13 +368,13 @@ public class DecodeServiceBase implements DecodeService {
 
         final Map<PageTreeNode, DecodeTask> decodingTasks = new IdentityHashMap<PageTreeNode, DecodeTask>();
 
-        final ArrayList<Runnable> queue;
+        final ArrayList<Runnable> tasks;
         final Thread thread;
         final ReentrantLock lock = new ReentrantLock();
         final AtomicBoolean run = new AtomicBoolean(true);
 
         Executor() {
-            queue = new ArrayList<Runnable>();
+            tasks = new ArrayList<Runnable>();
             thread = new Thread(this);
 
             final int decodingThreadPriority = SettingsManager.getAppSettings().decodingThreadPriority;
@@ -329,29 +406,35 @@ public class DecodeServiceBase implements DecodeService {
         Runnable nextTask() {
             lock.lock();
             try {
-                if (!queue.isEmpty()) {
+                if (!tasks.isEmpty()) {
                     final TaskComparator comp = new TaskComparator(viewState.get());
                     Runnable candidate = null;
                     int cindex = 0;
 
                     int index = 0;
-                    while (index < queue.size() && candidate == null) {
-                        candidate = queue.get(index);
+                    while (index < tasks.size() && candidate == null) {
+                        candidate = tasks.get(index);
                         cindex = index;
                         index++;
                     }
                     if (candidate == null) {
-                        queue.clear();
+                        if (LCTX.isDebugEnabled()) {
+                            LCTX.d("No tasks in queue");
+                        }
+                        tasks.clear();
                     } else {
-                        while (index < queue.size()) {
-                            final Runnable next = queue.get(index);
+                        while (index < tasks.size()) {
+                            final Runnable next = tasks.get(index);
                             if (next != null && comp.compare(next, candidate) < 0) {
                                 candidate = next;
                                 cindex = index;
                             }
                             index++;
                         }
-                        queue.set(cindex, null);
+                        if (LCTX.isDebugEnabled()) {
+                            LCTX.d("<<<: " + cindex + "/" + tasks.size() + ": " + candidate);
+                        }
+                        tasks.set(cindex, null);
                     }
                     return candidate;
                 }
@@ -360,7 +443,7 @@ public class DecodeServiceBase implements DecodeService {
             }
             synchronized (run) {
                 try {
-                    run.wait(1000);
+                    run.wait(60000);
                 } catch (final InterruptedException ex) {
                     Thread.interrupted();
                 }
@@ -388,15 +471,23 @@ public class DecodeServiceBase implements DecodeService {
                 }
 
                 decodingTasks.put(task.node, task);
+
                 boolean added = false;
-                for (int index = 0; index < queue.size() && !added; index++) {
-                    if (null == queue.get(index)) {
-                        queue.set(index, task);
+                for (int index = 0; index < tasks.size(); index++) {
+                    if (null == tasks.get(index)) {
+                        tasks.set(index, task);
+                        if (LCTX.isDebugEnabled()) {
+                            LCTX.d(">>>: " + index + "/" + tasks.size() + ": " + task);
+                        }
                         added = true;
+                        break;
                     }
                 }
                 if (!added) {
-                    queue.add(task);
+                    if (LCTX.isDebugEnabled()) {
+                        LCTX.d("+++: " + tasks.size() + "/" + tasks.size() + ": " + task);
+                    }
+                    tasks.add(task);
                 }
 
                 synchronized (run) {
@@ -418,7 +509,15 @@ public class DecodeServiceBase implements DecodeService {
 
                 if (removed != null) {
                     removed.cancelled.set(true);
-                    queue.remove(removed);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        if (removed == tasks.get(i)) {
+                            if (LCTX.isDebugEnabled()) {
+                                LCTX.d("---: " + i + "/" + tasks.size() + " " + removed);
+                            }
+                            tasks.set(i, null);
+                            break;
+                        }
+                    }
                     if (LCTX.isDebugEnabled()) {
                         LCTX.d("Task " + removed.id + ": Stop decoding task with reason: " + reason + " for "
                                 + removed.node);
@@ -440,7 +539,7 @@ public class DecodeServiceBase implements DecodeService {
                     stopDecoding(task, null, "recycling");
                 }
 
-                queue.add(new Runnable() {
+                tasks.add(new Runnable() {
 
                     @Override
                     public void run() {
@@ -510,13 +609,11 @@ public class DecodeServiceBase implements DecodeService {
         final PageTreeNode node;
         final ViewState viewState;
         final int pageNumber;
-        final RectF pageSliceBounds;
 
-        DecodeTask(final ViewState viewState, final PageTreeNode node, final RectF nodeBounds) {
+        DecodeTask(final ViewState viewState, final PageTreeNode node) {
             this.pageNumber = node.page.index.docIndex;
             this.viewState = viewState;
             this.node = node;
-            this.pageSliceBounds = nodeBounds;
         }
 
         @Override
@@ -531,7 +628,7 @@ public class DecodeServiceBase implements DecodeService {
             }
             if (obj instanceof DecodeTask) {
                 final DecodeTask that = (DecodeTask) obj;
-                return this.pageNumber == that.pageNumber && this.pageSliceBounds.equals(that.pageSliceBounds)
+                return this.pageNumber == that.pageNumber
                         && this.viewState.viewRect.width() == that.viewState.viewRect.width()
                         && this.viewState.zoom == that.viewState.zoom;
             }
@@ -550,8 +647,6 @@ public class DecodeServiceBase implements DecodeService {
             buf.append("width").append("=").append((int) viewState.viewRect.width());
             buf.append(", ");
             buf.append("zoom").append("=").append(viewState.zoom);
-            buf.append(", ");
-            buf.append("bounds").append("=").append(pageSliceBounds);
 
             buf.append("]");
             return buf.toString();

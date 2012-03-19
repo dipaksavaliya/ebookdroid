@@ -31,10 +31,6 @@ public interface DecodeService {
 
     void updateViewState(ViewState viewState);
 
-    interface DecodeCallback {
-        void decodeComplete(CodecPage codecPage, BitmapRef bitmap, Rect bitmapBounds);
-    }
-
     BitmapRef createThumbnail(int width, int height, int pageNo, RectF region);
 
     boolean isPageSizeCacheable();
@@ -42,4 +38,10 @@ public interface DecodeService {
     int getPixelFormat();
 
     Bitmap.Config getBitmapConfig();
+
+    interface DecodeCallback {
+
+        void decodeComplete(CodecPage codecPage, BitmapRef bitmap, Rect bitmapBounds, RectF croppedPageBounds);
+
+    }
 }

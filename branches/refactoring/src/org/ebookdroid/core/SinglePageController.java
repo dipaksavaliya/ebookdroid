@@ -167,7 +167,7 @@ public class SinglePageController extends AbstractViewController {
      * @see org.ebookdroid.ui.viewer.IViewController#drawView(org.ebookdroid.core.EventDraw)
      */
     @Override
-    public void drawView(EventDraw eventDraw) {
+    public void drawView(final EventDraw eventDraw) {
         curler.draw(eventDraw);
     }
 
@@ -188,38 +188,44 @@ public class SinglePageController extends AbstractViewController {
         }
         final int width = getWidth();
         final int height = getHeight();
+        final BookSettings bookSettings = SettingsManager.getBookSettings();
+        final PageAlign pageAlign = DocumentViewMode.getPageAlign(bookSettings);
 
         if (changedPage == null) {
             for (final Page page : model.getPages()) {
-                invalidatePageSize(page, width, height);
+                invalidatePageSize(pageAlign, page, width, height);
             }
         } else {
-            invalidatePageSize(changedPage, width, height);
+            invalidatePageSize(pageAlign, changedPage, width, height);
         }
 
         curler.setViewDrawn(false);
     }
 
-    private void invalidatePageSize(final Page page, final int width, final int height) {
-        final BookSettings bookSettings = SettingsManager.getBookSettings();
-        if (bookSettings == null) {
-            return;
+    private void invalidatePageSize(final PageAlign pageAlign, final Page page, final int width, final int height) {
+        final RectF pageBounds = calcPageBounds(pageAlign, page.getAspectRatio(), width, height);
+        final float pageWidth = pageBounds.width();
+        if (width > pageWidth) {
+            final float widthDelta = (width - pageWidth) / 2;
+            pageBounds.offset(widthDelta, 0);
         }
-        PageAlign effectiveAlign = bookSettings.pageAlign;
-        if (effectiveAlign == null) {
-            effectiveAlign = PageAlign.WIDTH;
-        } else if (effectiveAlign == PageAlign.AUTO) {
-            final float pageHeight = width / page.getAspectRatio();
-            effectiveAlign = pageHeight > height ? PageAlign.HEIGHT : PageAlign.WIDTH;
+        page.setBounds(pageBounds);
+    }
+
+    @Override
+    public RectF calcPageBounds(final PageAlign pageAlign, final float pageAspectRatio, final int width, final int height) {
+        PageAlign effective = pageAlign;
+        if (effective == PageAlign.AUTO) {
+            final float pageHeight = width / pageAspectRatio;
+            effective = pageHeight > height ? PageAlign.HEIGHT : PageAlign.WIDTH;
         }
 
-        if (effectiveAlign == PageAlign.WIDTH) {
-            final float pageHeight = width / page.getAspectRatio();
-            page.setBounds(new RectF(0, 0, width, pageHeight));
+        if (effective == PageAlign.WIDTH) {
+            final float pageHeight = width / pageAspectRatio;
+            return new RectF(0, 0, width, pageHeight);
         } else {
-            final float pageWidth = height * page.getAspectRatio();
-            final float widthDelta = (width - pageWidth) / 2;
-            page.setBounds(new RectF(widthDelta, 0, pageWidth + widthDelta, height));
+            final float pageWidth = height * pageAspectRatio;
+            return new RectF(0, 0, pageWidth, height);
         }
     }
 
