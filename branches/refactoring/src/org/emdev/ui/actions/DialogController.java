@@ -67,7 +67,7 @@ public class DialogController<ManagedComponent extends Dialog> extends AbstractC
         View view = getManagedComponent().findViewById(viewId);
         if (view != null) {
             view.setOnClickListener(action1);
-            view.setOnClickListener(action2);
+            view.setOnLongClickListener(action2);
         }
     }
 
@@ -75,6 +75,6 @@ public class DialogController<ManagedComponent extends Dialog> extends AbstractC
         ActionEx action1 = getOrCreateAction(onClickActionId);
         ActionEx action2 = getOrCreateAction(onLongClickActionId);
         view.setOnClickListener(action1);
-        view.setOnClickListener(action2);
+        view.setOnLongClickListener(action2);
     }
 }
