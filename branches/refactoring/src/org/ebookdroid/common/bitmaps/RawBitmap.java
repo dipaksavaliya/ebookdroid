@@ -63,8 +63,10 @@ public final class RawBitmap {
         bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
     }
 
-    public Bitmap toBitmap() {
-        return Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
+    public BitmapRef toBitmap() {
+        BitmapRef bitmap = BitmapManager.getBitmap("RawBitmap", width, height, Bitmap.Config.RGB_565);
+        bitmap.getBitmap().setPixels(pixels, 0, width, 0, 0, width, height);
+        return bitmap;
     }
 
     public boolean hasAlpha() {
@@ -81,19 +83,19 @@ public final class RawBitmap {
         nativeInvert(pixels, width, height);
     }
 
-    public Bitmap scaleHq4x() {
+    public BitmapRef scaleHq4x() {
         return scaleHq4x(this);
     }
 
-    public Bitmap scaleHq3x() {
+    public BitmapRef scaleHq3x() {
         return scaleHq3x(this);
     }
 
-    public Bitmap scaleHq2x() {
+    public BitmapRef scaleHq2x() {
         return scaleHq2x(this);
     }
 
-    public static Bitmap scaleHq4x(RawBitmap src) {
+    public static BitmapRef scaleHq4x(RawBitmap src) {
         RawBitmap dest = new RawBitmap(src.getWidth() * 4, src.getHeight() * 4, src.hasAlpha());
         src.fillAlpha(0x00);
 
@@ -102,7 +104,7 @@ public final class RawBitmap {
         return dest.toBitmap();
     }
 
-    public static Bitmap scaleHq3x(RawBitmap src) {
+    public static BitmapRef scaleHq3x(RawBitmap src) {
         RawBitmap dest = new RawBitmap(src.getWidth() * 3, src.getHeight() * 3, src.hasAlpha());
         src.fillAlpha(0x00);
 
@@ -111,7 +113,7 @@ public final class RawBitmap {
         return dest.toBitmap();
     }
 
-    public static Bitmap scaleHq2x(RawBitmap src) {
+    public static BitmapRef scaleHq2x(RawBitmap src) {
         RawBitmap dest = new RawBitmap(src.getWidth() * 2, src.getHeight() * 2, src.hasAlpha());
         src.fillAlpha(0x00);
 
@@ -128,10 +130,10 @@ public final class RawBitmap {
 
     private static native void nativeInvert(int[] src, int width, int height);
 
-    /* contrast value 256 - normal*/
+    /* contrast value 256 - normal */
     private static native void nativeContrast(int[] src, int width, int height, int contrast);
 
-    /* Exposure correction values -128...+128*/
+    /* Exposure correction values -128...+128 */
     private static native void nativeExposure(int[] src, int width, int height, int exposure);
 
 }
