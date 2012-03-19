@@ -207,6 +207,10 @@ public abstract class AbstractViewController extends AbstractComponentController
         inZoom.set(!committed);
 
         EventPool.newEventZoom(this, oldZoom, newZoom, committed).process();
+
+        if (committed) {
+            base.getManagedComponent().zoomChanged(newZoom);
+        }
     }
 
     /**

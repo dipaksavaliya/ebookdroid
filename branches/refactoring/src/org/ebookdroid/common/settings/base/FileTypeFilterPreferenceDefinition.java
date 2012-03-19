@@ -3,7 +3,6 @@ package org.ebookdroid.common.settings.base;
 import org.ebookdroid.CodecType;
 
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -26,22 +25,20 @@ public class FileTypeFilterPreferenceDefinition {
         }
     }
 
-    public FileExtensionFilter getPreferenceValue(final SharedPreferences prefs, final boolean defValue) {
+    public FileExtensionFilter getPreferenceValue(final SharedPreferences prefs) {
         final Set<String> res = new HashSet<String>();
         for (Map.Entry<String, String> entry : keys.entrySet()) {
             final String ext = entry.getKey();
             final String key = entry.getValue();
-            if (prefs.getBoolean(key, defValue)) {
+
+            if (!prefs.contains(key)) {
+                prefs.edit().putBoolean(key, true).commit();
+            }
+
+            if (prefs.getBoolean(key, true)) {
                 res.add(ext);
             }
         }
         return new FileExtensionFilter(res);
     }
-
-    public void setPreferenceValue(final Editor edit, final boolean value) {
-        for (final String key : keys.values()) {
-            edit.putBoolean(key, value);
-        }
-    }
-
 }

@@ -66,12 +66,20 @@
             android:title="@string/pref_pageintitle_title" />
 
         <ListPreference
-            android:defaultValue="@string/pref_pagenumbertoastposition_lefttop"
-            android:entries="@array/pref_pagenumbertoastposition_entries"
-            android:entryValues="@array/pref_pagenumbertoastposition_values"
+            android:defaultValue="@string/pref_toastposition_lefttop"
+            android:entries="@array/pref_toastposition_entries"
+            android:entryValues="@array/pref_toastposition_values"
             android:key="@string/pref_pagenumbertoastposition_id"
             android:summary="@string/pref_pagenumbertoastposition_summary"
             android:title="@string/pref_pagenumbertoastposition_title" />
+
+        <ListPreference
+            android:defaultValue="@string/pref_toastposition_leftbottom"
+            android:entries="@array/pref_toastposition_entries"
+            android:entryValues="@array/pref_toastposition_values"
+            android:key="@string/pref_zoomtoastposition_id"
+            android:summary="@string/pref_zoomtoastposition_summary"
+            android:title="@string/pref_zoomtoastposition_title" />
 
         <CheckBoxPreference
             android:defaultValue="@string/pref_showanimicon_defvalue"

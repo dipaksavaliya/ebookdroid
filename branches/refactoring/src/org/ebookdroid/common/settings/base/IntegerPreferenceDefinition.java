@@ -30,17 +30,14 @@ public class IntegerPreferenceDefinition extends BasePreferenceDefinition {
     }
 
     public int getPreferenceValue(final SharedPreferences prefs) {
-        final String str = prefs.getString(key, "" + defValue);
-        int value = defValue;
-        try {
-            value = Integer.parseInt(str);
-        } catch (final NumberFormatException e) {
-        }
-        return MathUtils.adjust(value, minValue, maxValue);
+        return getPreferenceValue(prefs, defValue);
     }
 
     public int getPreferenceValue(final SharedPreferences prefs, final int defValue) {
-        final String str = prefs.getString(key, "" + defValue);
+        if (!prefs.contains(key)) {
+            prefs.edit().putString(key, Integer.toString(defValue)).commit();
+        }
+        final String str = prefs.getString(key, "");
         int value = defValue;
         try {
             value = Integer.parseInt(str);

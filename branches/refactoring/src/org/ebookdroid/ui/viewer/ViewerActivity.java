@@ -48,6 +48,8 @@ public class ViewerActivity extends AbstractActionActivity {
 
     private Toast pageNumberToast;
 
+    private Toast zoomToast;
+
     private PageViewZoomControls zoomControls;
 
     private FrameLayout frameLayout;
@@ -79,7 +81,6 @@ public class ViewerActivity extends AbstractActionActivity {
         return controller;
     }
 
-    
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -204,6 +205,29 @@ public class ViewerActivity extends AbstractActionActivity {
 
         pageNumberToast.setGravity(app.pageNumberToastPosition.position, 0, 0);
         pageNumberToast.show();
+    }
+
+    public void zoomChanged(final float zoom) {
+        if (getZoomControls().isShown()) {
+            return;
+        }
+
+        AppSettings app = SettingsManager.getAppSettings();
+
+        if (app.zoomToastPosition == ToastPosition.Invisible) {
+            return;
+        }
+
+        String zoomText = String.format("%.2f", zoom) + "x";
+
+        if (zoomToast != null) {
+            zoomToast.setText(zoomText);
+        } else {
+            zoomToast = Toast.makeText(this, zoomText, 0);
+        }
+
+        zoomToast.setGravity(app.zoomToastPosition.position, 0, 0);
+        zoomToast.show();
     }
 
     @Override

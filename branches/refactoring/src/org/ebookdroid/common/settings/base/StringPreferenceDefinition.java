@@ -15,10 +15,13 @@ public class StringPreferenceDefinition extends BasePreferenceDefinition {
     }
 
     public String getPreferenceValue(final SharedPreferences prefs) {
-        return prefs.getString(key, defValue);
+        return getPreferenceValue(prefs, defValue);
     }
 
     public String getPreferenceValue(final SharedPreferences prefs, final String defValue) {
+        if (!prefs.contains(key)) {
+            prefs.edit().putString(key, defValue).commit();
+        }
         return prefs.getString(key, defValue);
     }
 

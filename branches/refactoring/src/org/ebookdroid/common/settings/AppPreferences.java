@@ -46,7 +46,10 @@ public interface AppPreferences {
             pref_pageintitle_defvalue);
 
     EnumPreferenceDefinition<ToastPosition> PAGE_NUMBER_TOAST_POSITION = new EnumPreferenceDefinition<ToastPosition>(
-            ToastPosition.class, pref_pagenumbertoastposition_id, pref_pagenumbertoastposition_lefttop);
+            ToastPosition.class, pref_pagenumbertoastposition_id, pref_toastposition_lefttop);
+
+    EnumPreferenceDefinition<ToastPosition> ZOOM_TOAST_POSITION = new EnumPreferenceDefinition<ToastPosition>(
+            ToastPosition.class, pref_zoomtoastposition_id, pref_toastposition_leftbottom);
 
     BooleanPreferenceDefinition SHOW_ANIM_ICON = new BooleanPreferenceDefinition(pref_showanimicon_id,
             pref_showanimicon_defvalue);

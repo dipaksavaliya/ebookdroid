@@ -20,10 +20,13 @@ public class EnumPreferenceDefinition<E extends Enum<E> & ResourceConstant> exte
     }
 
     public E getPreferenceValue(final SharedPreferences prefs) {
-        return EnumUtils.getByResValue(enumClass, prefs.getString(key, null), defValue);
+        return getPreferenceValue(prefs, defValue);
     }
 
     public E getPreferenceValue(final SharedPreferences prefs, E defValue) {
+        if (!prefs.contains(key)) {
+            prefs.edit().putString(key, defValue.getResValue()).commit();
+        }
         return EnumUtils.getByResValue(enumClass, prefs.getString(key, null), defValue);
     }
 

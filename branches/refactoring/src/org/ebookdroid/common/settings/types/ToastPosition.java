@@ -12,27 +12,27 @@ public enum ToastPosition implements ResourceConstant {
     /**
      * 
      */
-    Invisible(pref_pagenumbertoastposition_invisible, 0),
+    Invisible(pref_toastposition_invisible, 0),
     /**
      * 
      */
-    LeftTop(pref_pagenumbertoastposition_lefttop, LEFT | TOP),
+    LeftTop(pref_toastposition_lefttop, LEFT | TOP),
     /**
      * 
      */
-    RightTop(pref_pagenumbertoastposition_righttop, RIGHT | TOP),
+    RightTop(pref_toastposition_righttop, RIGHT | TOP),
     /**
      * 
      */
-    LeftBottom(pref_pagenumbertoastposition_leftbottom, LEFT | BOTTOM),
+    LeftBottom(pref_toastposition_leftbottom, LEFT | BOTTOM),
     /**
      * 
      */
-    Bottom(pref_pagenumbertoastposition_bottom, CENTER | BOTTOM),
+    Bottom(pref_toastposition_bottom, CENTER | BOTTOM),
     /**
      * 
      */
-    RightBottom(pref_pagenumbertoastposition_righbottom, RIGHT | BOTTOM);
+    RightBottom(pref_toastposition_righbottom, RIGHT | BOTTOM);
 
     public final int position;
     private final String resValue;

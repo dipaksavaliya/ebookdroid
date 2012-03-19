@@ -4,12 +4,15 @@
     <string name="pref_pagenumbertoastposition_title">Position of page number toast</string>
     <string name="pref_pagenumbertoastposition_summary">Position of page number toast</string>
 
-    <string name="list_pagenumbertoastposition_invisible">Invisible</string>
-    <string name="list_pagenumbertoastposition_lefttop">Left top corner</string>
-    <string name="list_pagenumbertoastposition_righttop">Right top corner</string>
-    <string name="list_pagenumbertoastposition_leftbottom">Left bottom corner</string>
-    <string name="list_pagenumbertoastposition_bottom">Bottom of the screeen</string>
-    <string name="list_pagenumbertoastposition_righbottom">Right bottom corner</string>
+    <string name="pref_zoomtoastposition_title">Position of zoom toast</string>
+    <string name="pref_zoomtoastposition_summary">Position of zoom toast</string>
+
+    <string name="list_toastposition_invisible">Invisible</string>
+    <string name="list_toastposition_lefttop">Left top corner</string>
+    <string name="list_toastposition_righttop">Right top corner</string>
+    <string name="list_toastposition_leftbottom">Left bottom corner</string>
+    <string name="list_toastposition_bottom">Bottom of the screeen</string>
+    <string name="list_toastposition_righbottom">Right bottom corner</string>
 
     <string name="pref_bitmapfilering_enabled_title">Texture filtering</string>
     <string name="pref_bitmapfilering_enabled_summary">Enable bilinear texture filtering</string>

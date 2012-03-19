@@ -21,8 +21,6 @@ import org.emdev.utils.filesystem.FileExtensionFilter;
 
 public class AppSettings implements AppPreferences {
 
-    private static boolean firstLoad = true;
-
     final SharedPreferences prefs;
 
     public final boolean loadRecent;
@@ -44,6 +42,8 @@ public class AppSettings implements AppPreferences {
     public final boolean pageInTitle;
 
     public final ToastPosition pageNumberToastPosition;
+
+    public final ToastPosition zoomToastPosition;
 
     public final boolean showAnimIcon;
 
@@ -120,6 +120,7 @@ public class AppSettings implements AppPreferences {
         showTitle = SHOW_TITLE.getPreferenceValue(prefs);
         pageInTitle = SHOW_PAGE_IN_TITLE.getPreferenceValue(prefs);
         pageNumberToastPosition = PAGE_NUMBER_TOAST_POSITION.getPreferenceValue(prefs);
+        zoomToastPosition = ZOOM_TOAST_POSITION.getPreferenceValue(prefs);
         showAnimIcon = SHOW_ANIM_ICON.getPreferenceValue(prefs);
         /* =============== Tap & Scroll settings =============== */
         tapsEnabled = TAPS_ENABLED.getPreferenceValue(prefs);
@@ -156,70 +157,7 @@ public class AppSettings implements AppPreferences {
         useBookcase = USE_BOOK_CASE.getPreferenceValue(prefs);
         autoScanDirs = AUTO_SCAN_DIRS.getPreferenceValue(prefs);
         searchBookQuery = SEARCH_BOOK_QUERY.getPreferenceValue(prefs);
-        allowedFileTypes = FILE_TYPE_FILTER.getPreferenceValue(prefs, true);
-
-        if (firstLoad) {
-            firstLoad = false;
-            boolean initialStoring = false;
-            try {
-                initialStoring = prefs.getString(PAGES_IN_MEMORY.key, null) == null;
-            } catch (Exception ex) {
-                initialStoring = true;
-            }
-            if (initialStoring) {
-                final Editor edit = prefs.edit();
-
-                LOAD_RECENT.setPreferenceValue(edit, loadRecent);
-                NIGHT_MODE.setPreferenceValue(edit, nightMode);
-                BRIGHTNESS_NIGHT_MODE_ONLY.setPreferenceValue(edit, brightnessInNightModeOnly);
-                BRIGHTNESS.setPreferenceValue(edit, brightness);
-                KEEP_SCREEN_ON.setPreferenceValue(edit, keepScreenOn);
-                ROTATION.setPreferenceValue(edit, rotation);
-                FULLSCREEN.setPreferenceValue(edit, fullScreen);
-                SHOW_TITLE.setPreferenceValue(edit, showTitle);
-                SHOW_PAGE_IN_TITLE.setPreferenceValue(edit, pageInTitle);
-                PAGE_NUMBER_TOAST_POSITION.setPreferenceValue(edit, pageNumberToastPosition);
-                SHOW_ANIM_ICON.setPreferenceValue(edit, showAnimIcon);
-                /* =============== Tap & Scroll settings =============== */
-                TAPS_ENABLED.setPreferenceValue(edit, tapsEnabled);
-                SCROLL_HEIGHT.setPreferenceValue(edit, scrollHeight);
-                TOUCH_DELAY.setPreferenceValue(edit, touchProcessingDelay);
-                /* =============== Tap & Keyboard settings =============== */
-                TAP_PROFILES.setPreferenceValue(edit, tapProfiles);
-                KEY_BINDINGS.setPreferenceValue(edit, keysBinding);
-                /* =============== Performance settings =============== */
-                PAGES_IN_MEMORY.setPreferenceValue(edit, pagesInMemory);
-                VIEW_TYPE.setPreferenceValue(edit, viewType);
-                DECODE_THREAD_PRIORITY.setPreferenceValue(edit, decodingThreadPriority);
-                DRAW_THREAD_PRIORITY.setPreferenceValue(edit, drawThreadPriority);
-                HWA_ENABLED.setPreferenceValue(edit, hwaEnabled);
-                BITMAP_SIZE.setPreferenceValue(edit, bitmapSize);
-                BITMAP_FILTERING.setPreferenceValue(edit, bitmapFileringEnabled);
-                REUSE_TEXTURES.setPreferenceValue(edit, textureReuseEnabled);
-                EARLY_RECYCLING.setPreferenceValue(edit, useEarlyRecycling);
-                RELOAD_DURING_ZOOM.setPreferenceValue(edit, reloadDuringZoom);
-                /* =============== Default rendering settings =============== */
-                SPLIT_PAGES.setPreferenceValue(edit, splitPages);
-                CROP_PAGES.setPreferenceValue(edit, cropPages);
-                VIEW_MODE.setPreferenceValue(edit, viewMode);
-                PAGE_ALIGN.setPreferenceValue(edit, pageAlign);
-                ANIMATION_TYPE.setPreferenceValue(edit, animationType);
-                /* =============== Format-specific settings =============== */
-                DJVU_RENDERING_MODE.setPreferenceValue(edit, djvuRenderingMode);
-                PDF_CUSTOM_DPI.setPreferenceValue(edit, useCustomDpi);
-                PDF_CUSTOM_XDPI.setPreferenceValue(edit, xDpi);
-                PDF_CUSTOM_YDPI.setPreferenceValue(edit, yDpi);
-                FB2_FONT_SIZE.setPreferenceValue(edit, fontSize);
-                FB2_HYPHEN.setPreferenceValue(edit, fb2HyphenEnabled);
-                /* =============== Browser settings =============== */
-                USE_BOOK_CASE.setPreferenceValue(edit, useBookcase);
-                AUTO_SCAN_DIRS.setPreferenceValue(edit, autoScanDirs);
-                SEARCH_BOOK_QUERY.setPreferenceValue(edit, searchBookQuery);
-                FILE_TYPE_FILTER.setPreferenceValue(edit, true);
-
-                edit.commit();
-            }
-        }
+        allowedFileTypes = FILE_TYPE_FILTER.getPreferenceValue(prefs);
     }
 
     /* =============== UI settings =============== */

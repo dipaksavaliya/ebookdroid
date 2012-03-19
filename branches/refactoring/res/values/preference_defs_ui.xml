@@ -45,29 +45,31 @@
     <string name="pref_pageintitle_defvalue">true</string>
 
     <string name="pref_pagenumbertoastposition_id">pagenumbertoastposition</string>
-    <string name="pref_pagenumbertoastposition_invisible">Invisible</string>
-    <string name="pref_pagenumbertoastposition_lefttop">LeftTop</string>
-    <string name="pref_pagenumbertoastposition_righttop">RightTop</string>
-    <string name="pref_pagenumbertoastposition_leftbottom">LeftBottom</string>
-    <string name="pref_pagenumbertoastposition_bottom">Bottom</string>
-    <string name="pref_pagenumbertoastposition_righbottom">RightBottom</string>
+    <string name="pref_zoomtoastposition_id">zoomtoastposition</string>
+    
+    <string name="pref_toastposition_invisible">Invisible</string>
+    <string name="pref_toastposition_lefttop">LeftTop</string>
+    <string name="pref_toastposition_righttop">RightTop</string>
+    <string name="pref_toastposition_leftbottom">LeftBottom</string>
+    <string name="pref_toastposition_bottom">Bottom</string>
+    <string name="pref_toastposition_righbottom">RightBottom</string>
         
-    <string-array name="pref_pagenumbertoastposition_entries" translatable="false">
-        <item>@string/list_pagenumbertoastposition_invisible</item>
-        <item>@string/list_pagenumbertoastposition_lefttop</item>
-        <item>@string/list_pagenumbertoastposition_righttop</item>
-        <item>@string/list_pagenumbertoastposition_leftbottom</item>
-        <item>@string/list_pagenumbertoastposition_bottom</item>
-        <item>@string/list_pagenumbertoastposition_righbottom</item>
+    <string-array name="pref_toastposition_entries" translatable="false">
+        <item>@string/list_toastposition_invisible</item>
+        <item>@string/list_toastposition_lefttop</item>
+        <item>@string/list_toastposition_righttop</item>
+        <item>@string/list_toastposition_leftbottom</item>
+        <item>@string/list_toastposition_bottom</item>
+        <item>@string/list_toastposition_righbottom</item>
     </string-array>
 
-    <string-array name="pref_pagenumbertoastposition_values" translatable="false">
-        <item>@string/pref_pagenumbertoastposition_invisible</item>
-        <item>@string/pref_pagenumbertoastposition_lefttop</item>
-        <item>@string/pref_pagenumbertoastposition_righttop</item>
-        <item>@string/pref_pagenumbertoastposition_leftbottom</item>
-        <item>@string/pref_pagenumbertoastposition_bottom</item>
-        <item>@string/pref_pagenumbertoastposition_righbottom</item>
+    <string-array name="pref_toastposition_values" translatable="false">
+        <item>@string/pref_toastposition_invisible</item>
+        <item>@string/pref_toastposition_lefttop</item>
+        <item>@string/pref_toastposition_righttop</item>
+        <item>@string/pref_toastposition_leftbottom</item>
+        <item>@string/pref_toastposition_bottom</item>
+        <item>@string/pref_toastposition_righbottom</item>
     </string-array>
 
     <string name="pref_showanimicon_id">showanimicon</string>

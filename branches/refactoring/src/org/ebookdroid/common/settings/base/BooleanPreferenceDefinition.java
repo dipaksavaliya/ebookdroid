@@ -15,10 +15,13 @@ public class BooleanPreferenceDefinition extends BasePreferenceDefinition {
     }
 
     public boolean getPreferenceValue(final SharedPreferences prefs) {
-        return prefs.getBoolean(key, defValue);
+        return getPreferenceValue(prefs, defValue);
     }
 
     public boolean getPreferenceValue(final SharedPreferences prefs, boolean defValue) {
+        if (!prefs.contains(key)) {
+            prefs.edit().putBoolean(key, defValue).commit();
+        }
         return prefs.getBoolean(key, defValue);
     }
 
