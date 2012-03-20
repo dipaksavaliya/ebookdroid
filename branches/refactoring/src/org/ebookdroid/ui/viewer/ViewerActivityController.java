@@ -23,13 +23,12 @@ import org.ebookdroid.core.events.DecodingProgressListener;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.models.ZoomModel;
-import org.ebookdroid.ui.library.adapters.OutlineAdapter;
 import org.ebookdroid.ui.settings.SettingsUI;
+import org.ebookdroid.ui.viewer.dialogs.OutlineDialog;
 import org.ebookdroid.ui.viewer.stubs.ViewContollerStub;
 import org.ebookdroid.ui.viewer.views.ViewEffects;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -38,10 +37,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -163,11 +162,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         if (++loadingCount == 1) {
             if (intent.getScheme().equals("content")) {
                 try {
-                    Cursor c = activity.getContentResolver().query(intent.getData(), null, null, null, null);
+                    final Cursor c = activity.getContentResolver().query(intent.getData(), null, null, null, null);
                     c.moveToFirst();
                     final int fileNameColumnId = c.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME);
                     if (fileNameColumnId >= 0) {
-                        String attachmentFileName = c.getString(fileNameColumnId);
+                        final String attachmentFileName = c.getString(fileNameColumnId);
                         bookTitle = LengthUtils.safeString(attachmentFileName, E_MAIL_ATTACHMENT);
                         codecType = CodecType.getByUri(attachmentFileName);
                     } else {
@@ -175,7 +174,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                             LCTX.d("No attachment file name returned");
                         }
                     }
-                } catch (Throwable th) {
+                } catch (final Throwable th) {
                     LCTX.e("Unexpected error: ", th);
                 }
             }
@@ -280,7 +279,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     public void askPassword(final String fileName, final String promt) {
         final EditText input = new EditText(getManagedComponent());
         input.setSingleLine(true);
-        input.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
         final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
         builder.setTitle(fileName).setMessage(promt).setView(input);
@@ -361,24 +360,24 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.actions_gotoOutlineItem)
     public void gotoOutlineItem(final ActionEx action) {
-        final Integer item = action.getParameter(IActionController.DIALOG_ITEM_PROPERTY);
-        final List<OutlineLink> outline = action.getParameter("outline");
+        final OutlineLink outlineItem = action.getParameter(IActionController.ADAPTER_SELECTED_ITEM_PROPERTY);
+        if (outlineItem == null) {
+            return;
+        }
 
-        final String link = outline.get(item).getLink();
-        if (link.startsWith("#")) {
-            int pageNumber = 0;
-            try {
-                pageNumber = Integer.parseInt(link.substring(1).replace(" ", ""));
-            } catch (final Exception e) {
-                pageNumber = 0;
+        final int pageNumber = outlineItem.getPageIndex();
+        if (pageNumber != -1) {
+            final int pageCount = documentModel.getDecodeService().getPageCount();
+            if (pageNumber < 1 || pageNumber > pageCount) {
+                getManagedComponent().showToastText(2000, R.string.error_page_out_of_rande, pageCount);
+            } else {
+                getDocumentController().goToPage(pageNumber - 1);
             }
-            if (pageNumber < 1 || pageNumber > documentModel.getPageCount()) {
-                getManagedComponent().showToastText(2000, R.string.error_page_out_of_rande,
-                        documentModel.getDecodeService().getPageCount());
-                return;
-            }
-            getDocumentController().goToPage(pageNumber - 1);
-        } else if (link.startsWith("http:")) {
+            return;
+        }
+
+        final String link = outlineItem.getLink();
+        if (link != null) {
             final Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(link));
             getManagedComponent().startActivity(i);
@@ -389,12 +388,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     public void showOutline(final ActionEx action) {
         final List<OutlineLink> outline = documentModel.getDecodeService().getOutline();
         if ((outline != null) && (outline.size() > 0)) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getManagedComponent());
-            builder.setTitle(R.string.outline_title);
-            builder.setAdapter(new OutlineAdapter(getManagedComponent(), outline),
-                    this.getOrCreateAction(R.id.actions_gotoOutlineItem).putValue("outline", outline));
-            final AlertDialog alert = builder.create();
-            alert.show();
+            final OutlineDialog dlg = new OutlineDialog(this, outline);
+            dlg.show();
         } else {
             getManagedComponent().showToastText(Toast.LENGTH_SHORT, R.string.outline_missed);
         }
@@ -456,7 +451,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.actions_keyBindings)
     public void showKeyBindingsDialog(final ActionEx action) {
-        KeyBindingsDialog dlg = new KeyBindingsDialog(this);
+        final KeyBindingsDialog dlg = new KeyBindingsDialog(this);
         dlg.show();
     }
 
@@ -659,7 +654,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         @Override
         protected void onPreExecute() {
-            ViewerActivity activity = getManagedComponent();
+            final ViewerActivity activity = getManagedComponent();
             LCTX.d("BookLoadTask.onPreExecute(" + activity.LCTX + "): start");
             try {
                 final String message = activity.getString(R.string.msg_loading);
@@ -705,7 +700,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                         final DocumentModel dm = getDocumentModel();
                         currentPageChanged(PageIndex.NULL, dm.getCurrentIndex());
 
-                    } catch (Throwable th) {
+                    } catch (final Throwable th) {
                         result = th;
                     }
                 }
@@ -749,7 +744,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         protected void onProgressUpdate(final String... values) {
             if (values != null && values.length > 0) {
                 if (!progressDialog.isShowing()) {
-                    ViewerActivity activity = getManagedComponent();
+                    final ViewerActivity activity = getManagedComponent();
                     progressDialog = ProgressDialog.show(activity, "", values[0], true);
                 } else {
                     progressDialog.setMessage(values[0]);

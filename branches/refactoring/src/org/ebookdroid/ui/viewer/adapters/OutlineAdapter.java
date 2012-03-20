@@ -1,4 +1,4 @@
-package org.ebookdroid.ui.library.adapters;
+package org.ebookdroid.ui.viewer.adapters;
 
 import org.ebookdroid.R;
 import org.ebookdroid.core.codec.OutlineLink;

@@ -23,6 +23,8 @@ public interface IActionController<ManagedComponent> {
      */
     String VIEW_PROPERTY = "View";
 
+    String ADAPTER_SELECTED_ITEM_PROPERTY = "AdapterSelectedItem";
+
     String DIALOG_PROPERTY = "Dialog";
 
     String DIALOG_ITEM_PROPERTY = "DialogItem";

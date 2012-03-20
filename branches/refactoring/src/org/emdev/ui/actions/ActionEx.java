@@ -8,6 +8,7 @@ import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import java.lang.reflect.Field;
@@ -21,7 +22,8 @@ import java.util.Map.Entry;
 import org.emdev.utils.LengthUtils;
 
 public class ActionEx implements Runnable, View.OnClickListener, View.OnLongClickListener,
-        DialogInterface.OnClickListener, OnMultiChoiceClickListener, TextView.OnEditorActionListener {
+        AdapterView.OnItemClickListener, DialogInterface.OnClickListener, OnMultiChoiceClickListener,
+        TextView.OnEditorActionListener {
 
     private static final LogContext LCTX = LogContext.ROOT.lctx("Actions");
 
@@ -230,6 +232,13 @@ public class ActionEx implements Runnable, View.OnClickListener, View.OnLongClic
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        this.putValue(IActionController.VIEW_PROPERTY, parent);
+        this.putValue(IActionController.ADAPTER_SELECTED_ITEM_PROPERTY, parent.getAdapter().getItem(position));
+        run();
     }
 
     /**
