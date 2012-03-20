@@ -220,16 +220,18 @@ public class AppSettings implements AppPreferences {
         private static final int D_ShowTitle = 0x0001 << 3;
         private static final int D_PageInTitle = 0x0001 << 4;
         private static final int D_TapsEnabled = 0x0001 << 5;
-        private static final int D_ScrollHeight = 0x0001 << 7;
-        private static final int D_PagesInMemory = 0x0001 << 8;
-        private static final int D_Brightness = 0x0001 << 10;
-        private static final int D_BrightnessInNightMode = 0x0001 << 11;
-        private static final int D_KeepScreenOn = 0x0001 << 12;
-        private static final int D_LoadRecent = 0x0001 << 13;
-        private static final int D_UseBookcase = 0x0001 << 15;
-        private static final int D_DjvuRenderingMode = 0x0001 << 16;
-        private static final int D_AutoScanDirs = 0x0001 << 17;
-        private static final int D_AllowedFileTypes = 0x0001 << 18;
+        private static final int D_ScrollHeight = 0x0001 << 6;
+        private static final int D_PagesInMemory = 0x0001 << 7;
+        private static final int D_Brightness = 0x0001 << 8;
+        private static final int D_BrightnessInNightMode = 0x0001 << 9;
+        private static final int D_KeepScreenOn = 0x0001 << 10;
+        private static final int D_LoadRecent = 0x0001 << 11;
+        private static final int D_UseBookcase = 0x0001 << 12;
+        private static final int D_DjvuRenderingMode = 0x0001 << 13;
+        private static final int D_AutoScanDirs = 0x0001 << 14;
+        private static final int D_AllowedFileTypes = 0x0001 << 15;
+        private static final int D_TapConfigChanged = 0x0001 << 16;
+        private static final int D_KeyBindingChanged = 0x0001 << 17;
 
         private int mask;
         private final boolean firstTime;
@@ -286,6 +288,12 @@ public class AppSettings implements AppPreferences {
                 }
                 if (!olds.allowedFileTypes.equals(news.allowedFileTypes)) {
                     mask |= D_AllowedFileTypes;
+                }
+                if (!olds.tapProfiles.equals(news.tapProfiles)) {
+                    mask |= D_TapConfigChanged;
+                }
+                if (!olds.keysBinding.equals(news.keysBinding)) {
+                    mask |= D_KeyBindingChanged;
                 }
             }
         }
@@ -356,6 +364,14 @@ public class AppSettings implements AppPreferences {
 
         public boolean isAllowedFileTypesChanged() {
             return 0 != (mask & D_AllowedFileTypes);
+        }
+
+        public boolean isTapConfigChanged() {
+            return 0 != (mask & D_TapConfigChanged);
+        }
+
+        public boolean isKeyBindingChanged() {
+            return 0 != (mask & D_KeyBindingChanged);
         }
     }
 }

@@ -51,6 +51,9 @@ public class TouchManager {
         }
 
         if (!fromJSON) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Creating default tap configuration...");
+            }
             final TouchProfile def = addProfile(DEFAULT_PROFILE);
             {
                 final Region r = def.addRegion(0, 0, 100, 100);
@@ -259,7 +262,7 @@ public class TouchManager {
             for (int rIndex = 0; rIndex < regions.length(); rIndex++) {
                 final JSONObject r = regions.getJSONObject(rIndex);
                 final Region region = Region.fromJSON(r);
-                profile.addRegion(region);
+                profile.regions.add(region);
             }
             return profile;
         }

@@ -586,8 +586,13 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             getDocumentController().toggleNightMode(newSettings.nightMode);
         }
 
-        TouchManager.loadFromSettings(newSettings);
-        KeyBindingsManager.loadFromSettings(newSettings);
+        if (diff.isTapConfigChanged()) {
+            TouchManager.loadFromSettings(newSettings);
+        }
+
+        if (diff.isKeyBindingChanged()) {
+            KeyBindingsManager.loadFromSettings(newSettings);
+        }
 
         BitmapManager.setPartSize(1 << newSettings.bitmapSize);
         BitmapManager.setUseEarlyRecycling(newSettings.useEarlyRecycling);

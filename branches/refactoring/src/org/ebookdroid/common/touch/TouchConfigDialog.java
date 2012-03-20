@@ -39,6 +39,7 @@ public class TouchConfigDialog extends Dialog {
     private final Spinner dtList;
     private final Spinner ltList;
     private final Spinner tftList;
+    private Spinner regionList;
 
     public TouchConfigDialog(final IActivityController base, final TouchManagerView view, final TouchProfile profile,
             final Region region) {
@@ -75,21 +76,17 @@ public class TouchConfigDialog extends Dialog {
         tftList.setOnItemSelectedListener(actionListener);
 
         adapter = new RegionsAdapter(getContext(), wraps(profile.regions));
-        final Spinner regionsList = (Spinner) this.findViewById(R.id.tapZonesConfigRegions);
-        regionsList.setAdapter(adapter);
-        regionsList.setSelection(profile.regions.indexOf(region));
-        regionsList.setOnItemSelectedListener(new RegionSelectionListener());
+        regionList = (Spinner) this.findViewById(R.id.tapZonesConfigRegions);
+        regionList.setAdapter(adapter);
+        regionList.setSelection(profile.regions.indexOf(region));
+        regionList.setOnItemSelectedListener(new RegionSelectionListener());
 
         actions.connectViewToAction(R.id.tapZonesConfigClear);
         actions.connectViewToAction(R.id.tapZonesConfigDelete);
         actions.connectViewToAction(R.id.tapZonesConfigReset);
 
-        print();
-    }
-
-    public void print() {
         // for (Region r : this.profile.regions) {
-        // System.out.println(r);
+        // System.out.println("TouchConfigDialog.TouchConfigDialog(): " + r);
         // }
     }
 
@@ -102,7 +99,9 @@ public class TouchConfigDialog extends Dialog {
             profile.regions.add(adapter.getItem(i).r);
         }
 
-        print();
+        // for (Region r : this.profile.regions) {
+        // System.out.println("TouchConfigDialog.onStop(): " + r);
+        // }
 
         TouchManager.persist();
 
@@ -153,7 +152,7 @@ public class TouchConfigDialog extends Dialog {
     public void deleteRegion(final ActionEx action) {
         if (wrapper != null) {
             adapter.remove(wrapper);
-            wrapper = null;
+            wrapper = (RegionWrapper) regionList.getSelectedItem();
         }
     }
 
@@ -170,7 +169,7 @@ public class TouchConfigDialog extends Dialog {
         @Override
         public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
             wrapper = adapter.getItem(position);
-            System.out.println("onItemSelected(): " + wrapper);
+            // System.out.println("onItemSelected(): " + wrapper);
             updateAction(stList);
             updateAction(dtList);
             updateAction(ltList);

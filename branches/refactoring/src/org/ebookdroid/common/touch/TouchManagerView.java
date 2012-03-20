@@ -153,7 +153,9 @@ public class TouchManagerView extends View {
             if (startPoint != null && endPoint != null) {
                 current = getOrCreareRegion(startPoint, endPoint);
             }
-            LCTX.e("processRegion(): " + current);
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("processRegion(): " + current);
+            }
             if (current != null) {
                 final TouchConfigDialog dlg = new TouchConfigDialog(base, this, profile, current);
                 dlg.show();
@@ -184,7 +186,9 @@ public class TouchManagerView extends View {
             Thread.interrupted();
         }
 
-        LCTX.e("onTouchEvent(): " + ev);
+        if (LCTX.isDebugEnabled()) {
+            LCTX.d("onTouchEvent(): " + ev);
+        }
         boolean res = detector.onTouchEvent(ev);
 
         int action = ev.getAction();
@@ -235,13 +239,17 @@ public class TouchManagerView extends View {
             startPoint = new PointF(e.getX(), e.getY());
             endPoint = startPoint;
             current = getRegion(startPoint, endPoint);
-            LCTX.e("onDown(): " + current);
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onDown(): " + current);
+            }
             return true;
         }
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            LCTX.e("onSingleTapUp(): " + current);
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onSingleTapUp(): " + current);
+            }
             endPoint = null;
             return true;
         }
@@ -251,7 +259,9 @@ public class TouchManagerView extends View {
             final float x = e2.getX(), y = e2.getY();
             endPoint = new PointF(x, y);
             current = getRegion(startPoint, endPoint);
-            LCTX.e("onScroll(): " + current);
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("onScroll(): " + current);
+            }
             invalidate();
             return true;
         }
@@ -260,7 +270,9 @@ public class TouchManagerView extends View {
         public boolean onSingleTapConfirmed(final MotionEvent e) {
             if (profile != null) {
                 current = profile.getRegion(e.getX(), e.getY(), getWidth(), getHeight());
-                LCTX.e("onSingleTapConfirmed(): " + current);
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d("onSingleTapConfirmed(): " + current);
+                }
                 processRegion();
             }
             return true;
