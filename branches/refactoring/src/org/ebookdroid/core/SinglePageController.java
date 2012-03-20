@@ -118,7 +118,26 @@ public class SinglePageController extends AbstractViewController {
      */
     @Override
     public final void verticalConfigScroll(final int direction) {
-        curler.animate(direction);
+        if (curler.enabled()) {
+            curler.animate(direction);
+        } else {
+            final float diff = SettingsManager.getAppSettings().scrollHeight / 100.0f;
+            final float oldOffset = SettingsManager.getBookSettings().offsetY;
+            final float newOffset = oldOffset + (direction < 0 ? -diff : diff);
+            final Page page = model.getCurrentPageObject();
+            final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
+            final int height = base.getView().getHeight();
+            final float newTop = bounds.top + newOffset * height;
+            final float newBottom = newTop + height;
+
+            if (oldOffset == 0 && newOffset < 0) {
+                goToPage(page.index.viewIndex - 1, 0, 1);
+            } else if (newBottom > bounds.bottom) {
+                goToPage(page.index.viewIndex + 1, 0, 0);
+            } else {
+                goToPage(model.getCurrentViewPageIndex(), 0, newOffset);
+            }
+        }
     }
 
     /**
@@ -213,7 +232,8 @@ public class SinglePageController extends AbstractViewController {
     }
 
     @Override
-    public RectF calcPageBounds(final PageAlign pageAlign, final float pageAspectRatio, final int width, final int height) {
+    public RectF calcPageBounds(final PageAlign pageAlign, final float pageAspectRatio, final int width,
+            final int height) {
         PageAlign effective = pageAlign;
         if (effective == PageAlign.AUTO) {
             final float pageHeight = width / pageAspectRatio;
