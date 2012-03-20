@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -109,7 +110,8 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
             backIndex = 0;
         }
 
-        return view.invalidatePages(viewState, viewState.model.getPageObject(foreIndex), viewState.model.getPageObject(backIndex));
+        return view.invalidatePages(viewState, viewState.model.getPageObject(foreIndex),
+                viewState.model.getPageObject(backIndex));
     }
 
     /**
@@ -126,7 +128,8 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
             foreIndex = viewState.model.getPageCount() - 1;
         }
 
-        return view.invalidatePages(viewState, viewState.model.getPageObject(foreIndex), viewState.model.getPageObject(backIndex));
+        return view.invalidatePages(viewState, viewState.model.getPageObject(foreIndex),
+                viewState.model.getPageObject(backIndex));
     }
 
     /**
@@ -227,7 +230,7 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
      * @see org.ebookdroid.core.curl.SinglePageView#draw(org.ebookdroid.core.EventDraw)
      */
     @Override
-    public final synchronized void draw(EventDraw event) {
+    public final synchronized void draw(final EventDraw event) {
         final Canvas canvas = event.canvas;
         final ViewState viewState = event.viewState;
 
@@ -266,7 +269,7 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         }
     }
 
-    protected void drawInternal(EventDraw event) {
+    protected void drawInternal(final EventDraw event) {
         drawForeground(event);
         if (foreIndex != backIndex) {
             drawBackground(event);
@@ -281,8 +284,9 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
      * @see org.ebookdroid.core.curl.SinglePageView#enabled()
      */
     @Override
-    public boolean enabled() {
-        return view.getScrollLimits().width() <= 0;
+    public final boolean enabled() {
+        final Rect limits = view.getScrollLimits();
+        return limits.width() <= 0 && limits.height() <= 0;
     }
 
     /**
@@ -411,12 +415,12 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
      * @see org.ebookdroid.core.curl.SinglePageView#animate(int)
      */
     @Override
-    public void animate(int direction) {
+    public void animate(final int direction) {
         resetClipEdge();
         mMovement = new Vector2D(direction < 0 ? 7 * view.getWidth() / 8 : view.getWidth() / 8, mInitialEdgeOffset);
         bFlipping = true;
         bFlipRight = direction > 0;
-        ViewState viewState = new ViewState(view);
+        final ViewState viewState = new ViewState(view);
         if (bFlipRight) {
             nextView(viewState);
         } else {

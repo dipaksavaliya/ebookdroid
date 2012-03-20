@@ -8,6 +8,7 @@ import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.ui.viewer.IViewController;
 
+import android.graphics.PointF;
 import android.graphics.RectF;
 
 public class ViewState {
@@ -18,6 +19,8 @@ public class ViewState {
     public final DocumentModel model;
 
     public final RectF viewRect;
+    public final PointF viewBase;
+
     public final float zoom;
     public final PageAlign pageAlign;
     public final PagePaint paint;
@@ -39,24 +42,11 @@ public class ViewState {
         this.model = dc.getBase().getDocumentModel();
 
         this.viewRect = new RectF(ctrl.getView().getViewRect());
+        this.viewBase = ctrl.getView().getBase(viewRect);
         this.zoom = zoom;
         this.pageAlign = DocumentViewMode.getPageAlign(book);
         this.paint = app.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
         this.paint.bitmapPaint.setFilterBitmap(app.bitmapFileringEnabled);
-
-        this.pages = new Pages();
-    }
-
-    public ViewState(final ViewState oldState, final IViewController dc) {
-        this.app = oldState.app;
-        this.book = oldState.book;
-        this.ctrl = dc;
-        this.model = dc.getBase().getDocumentModel();
-
-        this.viewRect = oldState.viewRect;
-        this.zoom = oldState.zoom;
-        this.pageAlign = oldState.pageAlign;
-        this.paint = oldState.paint;
 
         this.pages = new Pages();
     }
@@ -68,6 +58,7 @@ public class ViewState {
         this.model = oldState.model;
 
         this.viewRect = oldState.viewRect;
+        this.viewBase = oldState.viewBase;
         this.zoom = oldState.zoom;
         this.pageAlign = oldState.pageAlign;
         this.paint = oldState.paint;

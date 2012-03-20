@@ -8,7 +8,6 @@ import org.ebookdroid.core.codec.PageLink;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.graphics.RectF;
 import android.text.TextPaint;
 
@@ -28,7 +27,6 @@ public class EventDraw implements IEvent {
 
     Paint brightnessFilter;
     RectF pageBounds;
-    PointF viewBase;
     final RectF fixedPageBounds = new RectF();
 
     EventDraw(final Queue<EventDraw> eventQueue) {
@@ -39,7 +37,6 @@ public class EventDraw implements IEvent {
         this.viewState = viewState;
         this.level = PageTreeLevel.getLevel(viewState.zoom);
         this.canvas = canvas;
-        this.viewBase = viewState.ctrl.getView().getBase(viewState.viewRect);
 
         if (viewState.app.brightness < 100) {
             final int alpha = 255 - viewState.app.brightness * 255 / 100;
@@ -55,7 +52,6 @@ public class EventDraw implements IEvent {
         this.viewState = event.viewState;
         this.level = event.level;
         this.canvas = canvas;
-        this.viewBase = event.viewBase;
         this.brightnessFilter = event.brightnessFilter;
     }
 
@@ -63,7 +59,6 @@ public class EventDraw implements IEvent {
         this.canvas = null;
         this.level = null;
         this.pageBounds = null;
-        this.viewBase = null;
         this.viewState = null;
         eventQueue.offer(this);
     }
@@ -89,7 +84,7 @@ public class EventDraw implements IEvent {
 
         drawPageBackground(page);
 
-        boolean res = process(page.nodes);
+        final boolean res = process(page.nodes);
 
         drawPageLinks(page);
 
@@ -119,13 +114,13 @@ public class EventDraw implements IEvent {
         }
 
         try {
-            if (node.holder.drawBitmap(canvas, viewState.paint, viewBase, nodeRect, nodeRect)) {
+            if (node.holder.drawBitmap(canvas, viewState.paint, viewState.viewBase, nodeRect, nodeRect)) {
                 return true;
             }
 
             if (node.parent != null) {
                 final RectF parentRect = node.parent.getTargetRect(pageBounds);
-                if (node.parent.holder.drawBitmap(canvas, viewState.paint, viewBase, parentRect, nodeRect)) {
+                if (node.parent.holder.drawBitmap(canvas, viewState.paint, viewState.viewBase, parentRect, nodeRect)) {
                     return true;
                 }
             }
@@ -139,12 +134,12 @@ public class EventDraw implements IEvent {
 
     public boolean paintChild(final PageTreeNode node, final PageTreeNode child, final RectF nodeRect) {
         final RectF childRect = child.getTargetRect(pageBounds);
-        return child.holder.drawBitmap(canvas, viewState.paint, viewBase, childRect, nodeRect);
+        return child.holder.drawBitmap(canvas, viewState.paint, viewState.viewBase, childRect, nodeRect);
     }
 
     protected void drawPageBackground(final Page page) {
         fixedPageBounds.set(pageBounds);
-        fixedPageBounds.offset(-viewBase.x, -viewBase.y);
+        fixedPageBounds.offset(-viewState.viewBase.x, -viewState.viewBase.y);
 
         canvas.drawRect(fixedPageBounds, viewState.paint.fillPaint);
 
@@ -155,15 +150,15 @@ public class EventDraw implements IEvent {
         canvas.drawText(text, fixedPageBounds.centerX(), fixedPageBounds.centerY(), textPaint);
     }
 
-    private void drawPageLinks(Page page) {
+    private void drawPageLinks(final Page page) {
         if (LengthUtils.isEmpty(page.links)) {
             return;
         }
-        for (PageLink link : page.links) {
-            RectF rect = page.getLinkSourceRect(pageBounds, link);
+        for (final PageLink link : page.links) {
+            final RectF rect = page.getLinkSourceRect(pageBounds, link);
             if (rect != null) {
-                rect.offset(-viewBase.x, -viewBase.y);
-                Paint p = new Paint();
+                rect.offset(-viewState.viewBase.x, -viewState.viewBase.y);
+                final Paint p = new Paint();
                 p.setColor(Color.YELLOW);
                 p.setAlpha(128);
                 canvas.drawRect(rect, p);
@@ -180,7 +175,9 @@ public class EventDraw implements IEvent {
             return;
         }
 
-        canvas.drawRect(nodeRect.left - viewBase.x, nodeRect.top - viewBase.y, nodeRect.right - viewBase.x,
-                nodeRect.bottom - viewBase.y, brightnessFilter);
+        final float offX = viewState.viewBase.x;
+        final float offY = viewState.viewBase.y;
+        canvas.drawRect(nodeRect.left - offX, nodeRect.top - offY, nodeRect.right - offX, nodeRect.bottom - offY,
+                brightnessFilter);
     }
 }

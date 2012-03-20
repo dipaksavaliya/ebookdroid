@@ -25,8 +25,8 @@ public class DragMark {
         final Rect l = viewState.ctrl.getScrollLimits();
         if (l.width() + l.height() > 0) {
             final IView view = viewState.ctrl.getView();
-            final float x = view.getScrollX() + view.getWidth() - dragBitmap.getWidth() - 1;
-            final float y = view.getScrollY() + view.getHeight() - dragBitmap.getHeight() - 1;
+            final float x = view.getScrollX() - viewState.viewBase.x + view.getWidth() - dragBitmap.getWidth() - 1;
+            final float y = view.getScrollY() - viewState.viewBase.y + view.getHeight() - dragBitmap.getHeight() - 1;
 
             canvas.drawBitmap(dragBitmap, x, y, PAINT);
         }
