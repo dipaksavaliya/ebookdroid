@@ -42,7 +42,7 @@ public class OutlineDialog extends Dialog implements OnItemClickListener {
         setTitle(R.string.outline_title);
 
         final ListView listView = new ListView(getContext());
-        listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         setContentView(listView);
 

@@ -10,8 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -50,8 +50,8 @@ public class OutlineAdapter extends ArrayAdapter<OutlineLink> {
 
         boolean selected = false;
         for (ViewParent p = parent; p != null; p = p.getParent()) {
-            if (p instanceof AbsListView) {
-                selected = ((AbsListView) p).isItemChecked(position);
+            if (p instanceof ListView) {
+                selected = ((ListView) p).isItemChecked(position);
                 break;
             }
         }
