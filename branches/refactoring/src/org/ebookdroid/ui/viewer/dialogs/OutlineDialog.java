@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -41,11 +42,14 @@ public class OutlineDialog extends Dialog implements OnItemClickListener {
         setTitle(R.string.outline_title);
 
         final ListView listView = new ListView(getContext());
+        listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+
         setContentView(listView);
 
         final OutlineAdapter adapter = new OutlineAdapter(getContext(), outline);
 
         listView.setAdapter(adapter);
+
         final BookSettings bs = SettingsManager.getBookSettings();
         if (bs != null) {
             final int current = bs.currentPage.docIndex;
@@ -53,6 +57,7 @@ public class OutlineDialog extends Dialog implements OnItemClickListener {
                 final OutlineLink item = adapter.getItem(i);
                 final int pageIndex = item.getPageIndex();
                 if (current <= pageIndex) {
+                    listView.setItemChecked(i, true);
                     listView.setSelection(i);
                     break;
                 }
