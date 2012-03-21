@@ -206,14 +206,17 @@ public class AppSettings implements AppPreferences {
     /* =============== */
 
     void clearPseudoBookSettings() {
-        final Editor editor = prefs.edit();
-        editor.remove(BOOK.key);
-        editor.remove(BOOK_SPLIT_PAGES.key);
-        editor.remove(BOOK_CROP_PAGES.key);
-        editor.remove(BOOK_VIEW_MODE.key);
-        editor.remove(BOOK_PAGE_ALIGN.key);
-        editor.remove(BOOK_ANIMATION_TYPE.key);
-        editor.commit();
+        final Editor edit = prefs.edit();
+        edit.remove(BOOK.key);
+        edit.remove(BOOK_NIGHT_MODE.key);
+        edit.remove(BOOK_CONTRAST.key);
+        edit.remove(BOOK_EXPOSURE.key);
+        edit.remove(BOOK_SPLIT_PAGES.key);
+        edit.remove(BOOK_CROP_PAGES.key);
+        edit.remove(BOOK_VIEW_MODE.key);
+        edit.remove(BOOK_PAGE_ALIGN.key);
+        edit.remove(BOOK_ANIMATION_TYPE.key);
+        edit.commit();
     }
 
     void updatePseudoBookSettings(final BookSettings bs) {
