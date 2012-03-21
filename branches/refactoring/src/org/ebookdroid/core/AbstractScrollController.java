@@ -18,7 +18,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
 
     protected static volatile Bitmap dragBitmap;
 
-    protected AbstractScrollController(final IActivityController base, DocumentViewMode mode) {
+    protected AbstractScrollController(final IActivityController base, final DocumentViewMode mode) {
         super(base, mode);
         if (dragBitmap == null) {
             dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(), R.drawable.drag);
@@ -32,6 +32,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
      * 
      * @see org.ebookdroid.ui.viewer.IViewController#goToPage(int)
      */
+    @Override
     public final ViewState goToPage(final int toPage) {
         return new EventGotoPage(this, toPage).process();
     }
@@ -41,6 +42,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
      * 
      * @see org.ebookdroid.ui.viewer.IViewController#goToPage(int, float, float)
      */
+    @Override
     public final ViewState goToPage(final int toPage, final float offsetX, final float offsetY) {
         return new EventGotoPage(this, toPage, offsetX, offsetY).process();
     }
@@ -52,7 +54,7 @@ public abstract class AbstractScrollController extends AbstractViewController {
      */
     @Override
     public final void drawView(final EventDraw eventDraw) {
-        ViewState viewState = eventDraw.viewState;
+        final ViewState viewState = eventDraw.viewState;
         if (viewState.model == null) {
             return;
         }
@@ -79,16 +81,12 @@ public abstract class AbstractScrollController extends AbstractViewController {
     public final boolean onLayoutChanged(final boolean layoutChanged, final boolean layoutLocked, final Rect oldLaout,
             final Rect newLayout) {
         final BookSettings bs = SettingsManager.getBookSettings();
-        if (bs == null) {
-            return false;
-        }
-
-        int page = model.getCurrentViewPageIndex();
-        float offsetX = bs.offsetX;
-        float offsetY = bs.offsetY;
+        final int page = model != null ? model.getCurrentViewPageIndex() : -1;
+        final float offsetX = bs != null ? bs.offsetX : 0;
+        final float offsetY = bs != null ? bs.offsetY : 0;
 
         if (super.onLayoutChanged(layoutChanged, layoutLocked, oldLaout, newLayout)) {
-            if (isShown && layoutChanged) {
+            if (isShown && layoutChanged && page != -1) {
                 goToPage(page, offsetX, offsetY);
             }
             return true;
