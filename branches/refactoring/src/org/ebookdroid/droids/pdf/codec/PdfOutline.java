@@ -2,10 +2,14 @@ package org.ebookdroid.droids.pdf.codec;
 
 import org.ebookdroid.core.codec.OutlineLink;
 
+import android.graphics.RectF;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class PdfOutline {
+
+    private static final float[] temp = new float[4];
 
     private long docHandle;
 
@@ -18,13 +22,22 @@ public class PdfOutline {
         return ls;
     }
 
-    private void ttOutline(final List<OutlineLink> ls, long outline, int level) {
+    private void ttOutline(final List<OutlineLink> ls, long outline, final int level) {
         while (outline > 0) {
 
             final String title = getTitle(outline);
             final String link = getLink(outline, docHandle);
             if (title != null) {
-                ls.add(new OutlineLink(title, link, level));
+                final OutlineLink outlineLink = new OutlineLink(title, link, level);
+                if (outlineLink.targetPage != -1) {
+                    if (fillLinkTargetPoint(outline, temp)) {
+                        outlineLink.targetRect = new RectF();
+                        outlineLink.targetRect.left = temp[0];
+                        outlineLink.targetRect.top = temp[1];
+                        PdfDocument.normalizeLinkTargetRect(docHandle, outlineLink.targetPage, outlineLink.targetRect);
+                    }
+                }
+                ls.add(outlineLink);
             }
 
             final long child = getChild(outline);
@@ -37,6 +50,8 @@ public class PdfOutline {
     private static native String getTitle(long outlinehandle);
 
     private static native String getLink(long outlinehandle, long dochandle);
+
+    private static native boolean fillLinkTargetPoint(long outlinehandle, float[] point);
 
     private static native long getNext(long outlinehandle);
 

@@ -13,6 +13,7 @@ import org.ebookdroid.common.settings.ISettingsChangeListener;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
+import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.common.touch.TouchManager;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.NavigationHistory;
@@ -365,26 +366,40 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.actions_gotoOutlineItem)
     public void gotoOutlineItem(final ActionEx action) {
-        final OutlineLink outlineItem = action.getParameter(IActionController.ADAPTER_SELECTED_ITEM_PROPERTY);
-        if (outlineItem == null) {
+        final OutlineLink link = action.getParameter(IActionController.ADAPTER_SELECTED_ITEM_PROPERTY);
+        if (link == null) {
             return;
         }
 
-        final int pageNumber = outlineItem.getPageIndex();
-        if (pageNumber != -1) {
+        if (link.targetPage != -1) {
             final int pageCount = documentModel.getDecodeService().getPageCount();
-            if (pageNumber < 1 || pageNumber > pageCount) {
+            if (link.targetPage < 1 || link.targetPage > pageCount) {
                 getManagedComponent().showToastText(2000, R.string.error_page_out_of_rande, pageCount);
             } else {
-                jumpToPage(pageNumber, 0, 0);
+                Page target = documentModel.getPageByDocIndex(link.targetPage - 1);
+                float offsetX = 0;
+                float offsetY = 0;
+                if (link.targetRect != null) {
+                    offsetX = link.targetRect.left;
+                    offsetY = link.targetRect.top;
+                    if (target.type == PageType.LEFT_PAGE && offsetX >= 0.5f) {
+                        target = documentModel.getPageObject(target.index.viewIndex + 1);
+                        offsetX -= 0.5f;
+                    }
+                }
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d("Target page found: " + target);
+                }
+                if (target != null) {
+                    jumpToPage(target.index.viewIndex, offsetX, offsetY);
+                }
             }
             return;
         }
 
-        final String link = outlineItem.getLink();
-        if (link != null) {
+        if (link.targetUrl != null) {
             final Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(link));
+            i.setData(Uri.parse(link.targetUrl));
             getManagedComponent().startActivity(i);
         }
     }

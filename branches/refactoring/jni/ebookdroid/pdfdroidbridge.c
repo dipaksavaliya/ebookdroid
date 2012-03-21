@@ -675,6 +675,31 @@ Java_org_ebookdroid_droids_pdf_codec_PdfOutline_getLink(JNIEnv *env, jclass claz
     return (*env)->NewStringUTF(env, linkbuf);
 }
 
+JNIEXPORT jboolean JNICALL
+Java_org_ebookdroid_droids_pdf_codec_PdfOutline_fillLinkTargetPoint(JNIEnv *env, jclass clazz, jlong outlinehandle,
+                                                                      jfloatArray pointArray)
+{
+    fz_outline *outline = (fz_outline*) (long) outlinehandle;
+
+    if (!outline || outline->dest.kind != FZ_LINK_GOTO)
+    {
+        return 0;
+    }
+
+    jfloat *point = (*env)->GetPrimitiveArrayCritical(env, pointArray, 0);
+    if (!point)
+    {
+        return 0;
+    }
+
+    point[0] = outline->dest.ld.gotor.lt.x;
+    point[1] = outline->dest.ld.gotor.lt.y;
+
+    (*env)->ReleasePrimitiveArrayCritical(env, pointArray, point, 0);
+
+    return 1;
+}
+
 JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_pdf_codec_PdfOutline_getNext(JNIEnv *env, jclass clazz, jlong outlinehandle)
 {

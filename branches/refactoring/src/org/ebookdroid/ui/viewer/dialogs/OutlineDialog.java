@@ -11,7 +11,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -55,8 +54,7 @@ public class OutlineDialog extends Dialog implements OnItemClickListener {
             final int current = bs.currentPage.docIndex;
             for (int i = 0; i < adapter.getCount(); i++) {
                 final OutlineLink item = adapter.getItem(i);
-                final int pageIndex = item.getPageIndex();
-                if (current <= pageIndex) {
+                if (current <= item.targetPage) {
                     listView.setItemChecked(i, true);
                     listView.setSelection(i);
                     break;

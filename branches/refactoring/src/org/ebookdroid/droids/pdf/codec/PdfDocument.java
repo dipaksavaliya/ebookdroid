@@ -5,12 +5,14 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
 
+import android.graphics.RectF;
+
 import java.util.List;
 
 public class PdfDocument extends AbstractCodecDocument {
 
-    //TODO: Must be configurable
-    private static final int STOREMEMORY = 64<<20;
+    // TODO: Must be configurable
+    private static final int STOREMEMORY = 64 << 20;
 
     PdfDocument(final PdfContext context, final String fname, final String pwd) {
         super(context, open(STOREMEMORY, fname, pwd));
@@ -40,7 +42,7 @@ public class PdfDocument extends AbstractCodecDocument {
             return null;
         } else {
             // Check rotation
-            info.rotation = (360 + info.rotation) %360;
+            info.rotation = (360 + info.rotation) % 360;
             info.width = (PdfContext.getWidthInPixels(info.width));
             info.height = (PdfContext.getHeightInPixels(info.height));
             return info;
@@ -50,6 +52,22 @@ public class PdfDocument extends AbstractCodecDocument {
     @Override
     protected void freeDocument() {
         free(documentHandle);
+    }
+
+    static void normalizeLinkTargetRect(final long docHandle, final int targetPage, final RectF targetRect) {
+        final CodecPageInfo cpi = new CodecPageInfo();
+        PdfDocument.getPageInfo(docHandle, targetPage, cpi);
+
+        final float left = targetRect.left;
+        final float top = targetRect.top;
+
+        if (((cpi.rotation / 90) % 2) != 0) {
+            targetRect.right = targetRect.left = left / cpi.height;
+            targetRect.bottom = targetRect.top = 1.0f - top / cpi.width;
+        } else {
+            targetRect.right = targetRect.left = left / cpi.width;
+            targetRect.bottom = targetRect.top = 1.0f - top / cpi.height;
+        }
     }
 
     native static int getPageInfo(long docHandle, int pageNumber, CodecPageInfo cpi);
