@@ -1,5 +1,6 @@
 package org.ebookdroid.common.settings.books;
 
+import org.ebookdroid.common.settings.AppPreferences;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.PageIndex;
@@ -35,6 +36,12 @@ public class BookSettings implements CurrentPageListener {
 
     public float offsetY;
 
+    public boolean nightMode;
+
+    public int contrast = AppPreferences.CONTRAST.defValue;
+
+    public int exposure = AppPreferences.EXPOSURE.defValue;
+
     public BookSettings(BookSettings current) {
         this.fileName = current.fileName;
         this.currentPage = current.currentPage;
@@ -48,6 +55,9 @@ public class BookSettings implements CurrentPageListener {
         this.cropPages = current.cropPages;
         this.offsetX = current.offsetX;
         this.offsetY = current.offsetY;
+        this.nightMode = current.nightMode;
+        this.contrast = current.contrast;
+        this.exposure = current.exposure;
     }
 
     public BookSettings(final String fileName) {
@@ -80,6 +90,9 @@ public class BookSettings implements CurrentPageListener {
         private static final short D_PageAlign = 0x0001 << 4;
         private static final short D_AnimationType = 0x0001 << 5;
         private static final short D_CropPages = 0x0001 << 6;
+        private static final short D_Contrast = 0x0001 << 7;
+        private static final short D_Exposure = 0x0001 << 8;
+        private static final short D_NightMode = 0x0001 << 9;
 
         private short mask;
         private final boolean firstTime;
@@ -87,7 +100,7 @@ public class BookSettings implements CurrentPageListener {
         public Diff(BookSettings olds, BookSettings news) {
             firstTime = olds == null;
             if (firstTime) {
-                mask = (short)0xFFFF;
+                mask = (short) 0xFFFF;
             } else if (news != null) {
                 if (olds.splitPages != news.splitPages) {
                     mask |= D_SplitPages;
@@ -103,6 +116,15 @@ public class BookSettings implements CurrentPageListener {
                 }
                 if (olds.animationType != news.animationType) {
                     mask |= D_AnimationType;
+                }
+                if (olds.contrast != news.contrast) {
+                    mask |= D_Contrast;
+                }
+                if (olds.exposure != news.exposure) {
+                    mask |= D_Exposure;
+                }
+                if (olds.nightMode != news.nightMode) {
+                    mask |= D_NightMode;
                 }
             }
         }
@@ -129,6 +151,18 @@ public class BookSettings implements CurrentPageListener {
 
         public boolean isCropPagesChanged() {
             return 0 != (mask & D_CropPages);
+        }
+
+        public boolean isContrastChanged() {
+            return 0 != (mask & D_Contrast);
+        }
+
+        public boolean isExposureChanged() {
+            return 0 != (mask & D_Exposure);
+        }
+
+        public boolean isNightModeChanged() {
+            return 0 != (mask & D_NightMode);
         }
     }
 }

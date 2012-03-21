@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <string name="pref_contrast_id">contrast</string>
+    <string name="pref_contrast_defvalue">100</string>
+    <string name="pref_contrast_minvalue">0</string>
+    <string name="pref_contrast_maxvalue">1000</string>
+
+    <string name="pref_exposure_id">exposure</string>
+    <string name="pref_exposure_defvalue">100</string>
+    <string name="pref_exposure_minvalue">0</string>
+    <string name="pref_exposure_maxvalue">200</string>
+
     <string name="pref_splitpages_id">splitpages</string>
     <string name="pref_splitpages_defvalue">false</string>
 

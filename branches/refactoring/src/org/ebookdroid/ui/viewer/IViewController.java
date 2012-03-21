@@ -67,7 +67,7 @@ public interface IViewController extends ZoomListener {
 
     boolean dispatchKeyEvent(final KeyEvent event);
 
-    void toggleNightMode(boolean nightMode);
+    void toggleRenderingEffects();
 
     void drawView(EventDraw eventDraw);
 

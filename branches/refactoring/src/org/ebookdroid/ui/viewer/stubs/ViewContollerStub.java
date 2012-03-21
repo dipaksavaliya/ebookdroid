@@ -119,7 +119,7 @@ public class ViewContollerStub implements IViewController {
     }
 
     @Override
-    public void toggleNightMode(final boolean nightMode) {
+    public void toggleRenderingEffects() {
     }
 
     @Override

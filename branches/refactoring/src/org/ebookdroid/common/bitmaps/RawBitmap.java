@@ -83,6 +83,14 @@ public final class RawBitmap {
         nativeInvert(pixels, width, height);
     }
 
+    public void contrast(final int contrast) {
+        nativeContrast(pixels, width, height, contrast * 256 / 100);
+    }
+
+    public void exposure(final int exposure) {
+        nativeExposure(pixels, width, height, exposure * 128 / 100);
+    }
+
     public BitmapRef scaleHq4x() {
         return scaleHq4x(this);
     }

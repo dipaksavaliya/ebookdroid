@@ -3,12 +3,17 @@ package org.ebookdroid.core;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.RawBitmap;
 import org.ebookdroid.common.log.LogContext;
+import org.ebookdroid.common.settings.AppPreferences;
+import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.ui.viewer.IViewController;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
@@ -115,6 +120,24 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                     }
                 });
                 return;
+            }
+
+            final BookSettings bs = SettingsManager.getBookSettings();
+            if (bs != null) {
+                final boolean correctContrast = bs.contrast != AppPreferences.CONTRAST.defValue;
+                final boolean correctExposure = bs.exposure != AppPreferences.EXPOSURE.defValue;
+
+                if (correctContrast || correctExposure) {
+                    final Bitmap origBitmap = bitmap.getBitmap();
+                    final RawBitmap bmp = new RawBitmap(origBitmap, bitmapBounds);
+                    if (correctContrast) {
+                        bmp.contrast(bs.contrast);
+                    }
+                    if (correctExposure) {
+                        bmp.exposure(bs.exposure - AppPreferences.EXPOSURE.defValue);
+                    }
+                    bmp.toBitmap(origBitmap);
+                }
             }
 
             final Bitmaps bitmaps = holder.reuse(fullId, bitmap, bitmapBounds);
@@ -237,7 +260,9 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         }
 
         public Bitmaps reuse(final String nodeId, final BitmapRef bitmap, final Rect bitmapBounds) {
-            final boolean invert = SettingsManager.getAppSettings().nightMode;
+            final BookSettings bs = SettingsManager.getBookSettings();
+            final AppSettings app = SettingsManager.getAppSettings();
+            final boolean invert = bs != null ? bs.nightMode : app.nightMode;
             if (SettingsManager.getAppSettings().textureReuseEnabled) {
                 final Bitmaps bitmaps = ref.get();
                 if (bitmaps != null) {

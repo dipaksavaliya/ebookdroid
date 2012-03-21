@@ -23,11 +23,11 @@ public class AppSettings implements AppPreferences {
 
     final SharedPreferences prefs;
 
+    /* =============== UI settings =============== */
+
     public final boolean loadRecent;
 
     public final boolean confirmClose;
-
-    public final boolean nightMode;
 
     public final boolean brightnessInNightModeOnly;
 
@@ -49,15 +49,21 @@ public class AppSettings implements AppPreferences {
 
     public final boolean showAnimIcon;
 
+    /* =============== Tap & Scroll settings =============== */
+
     public final boolean tapsEnabled;
 
     public final int scrollHeight;
 
     public final int touchProcessingDelay;
 
+    /* =============== Tap & Keyboard settings =============== */
+
     public final String tapProfiles;
 
     public final String keysBinding;
+
+    /* =============== Performance settings =============== */
 
     public final int pagesInMemory;
 
@@ -79,6 +85,14 @@ public class AppSettings implements AppPreferences {
 
     public final boolean useEarlyRecycling;
 
+    /* =============== Default rendering settings =============== */
+
+    public final boolean nightMode;
+
+    final int contrast;
+
+    final int exposure;
+
     final boolean splitPages;
 
     final boolean cropPages;
@@ -88,6 +102,8 @@ public class AppSettings implements AppPreferences {
     final PageAlign pageAlign;
 
     final PageAnimationType animationType;
+
+    /* =============== Format-specific settings =============== */
 
     public final int djvuRenderingMode;
 
@@ -100,6 +116,8 @@ public class AppSettings implements AppPreferences {
     public final FontSize fontSize;
 
     public final boolean fb2HyphenEnabled;
+
+    /* =============== Browser settings =============== */
 
     public final boolean useBookcase;
 
@@ -114,7 +132,6 @@ public class AppSettings implements AppPreferences {
         /* =============== UI settings =============== */
         loadRecent = LOAD_RECENT.getPreferenceValue(prefs);
         confirmClose = CONFIRM_CLOSE.getPreferenceValue(prefs);
-        nightMode = NIGHT_MODE.getPreferenceValue(prefs);
         brightnessInNightModeOnly = BRIGHTNESS_NIGHT_MODE_ONLY.getPreferenceValue(prefs);
         brightness = BRIGHTNESS.getPreferenceValue(prefs);
         keepScreenOn = KEEP_SCREEN_ON.getPreferenceValue(prefs);
@@ -144,6 +161,9 @@ public class AppSettings implements AppPreferences {
         useEarlyRecycling = EARLY_RECYCLING.getPreferenceValue(prefs);
         reloadDuringZoom = RELOAD_DURING_ZOOM.getPreferenceValue(prefs);
         /* =============== Default rendering settings =============== */
+        nightMode = NIGHT_MODE.getPreferenceValue(prefs);
+        contrast = CONTRAST.getPreferenceValue(prefs);
+        exposure = EXPOSURE.getPreferenceValue(prefs);
         splitPages = SPLIT_PAGES.getPreferenceValue(prefs);
         cropPages = CROP_PAGES.getPreferenceValue(prefs);
         viewMode = VIEW_MODE.getPreferenceValue(prefs);
@@ -199,6 +219,9 @@ public class AppSettings implements AppPreferences {
     void updatePseudoBookSettings(final BookSettings bs) {
         final Editor edit = prefs.edit();
         BOOK.setPreferenceValue(edit, bs.fileName);
+        BOOK_NIGHT_MODE.setPreferenceValue(edit, bs.nightMode);
+        BOOK_CONTRAST.setPreferenceValue(edit, bs.contrast);
+        BOOK_EXPOSURE.setPreferenceValue(edit, bs.exposure);
         BOOK_SPLIT_PAGES.setPreferenceValue(edit, bs.splitPages);
         BOOK_CROP_PAGES.setPreferenceValue(edit, bs.cropPages);
         BOOK_VIEW_MODE.setPreferenceValue(edit, bs.viewMode);
@@ -208,6 +231,9 @@ public class AppSettings implements AppPreferences {
     }
 
     void fillBookSettings(final BookSettings bs) {
+        bs.nightMode = BOOK_NIGHT_MODE.getPreferenceValue(prefs, nightMode);
+        bs.contrast = BOOK_CONTRAST.getPreferenceValue(prefs, contrast);
+        bs.exposure = BOOK_EXPOSURE.getPreferenceValue(prefs, exposure);
         bs.splitPages = BOOK_SPLIT_PAGES.getPreferenceValue(prefs, splitPages);
         bs.cropPages = BOOK_CROP_PAGES.getPreferenceValue(prefs, cropPages);
         bs.viewMode = BOOK_VIEW_MODE.getPreferenceValue(prefs, viewMode);
@@ -217,7 +243,7 @@ public class AppSettings implements AppPreferences {
 
     public static class Diff {
 
-        private static final int D_NightMode = 0x0001 << 0;
+        // private static final int D_NightMode = 0x0001 << 0;
         private static final int D_Rotation = 0x0001 << 1;
         private static final int D_FullScreen = 0x0001 << 2;
         private static final int D_ShowTitle = 0x0001 << 3;
@@ -244,9 +270,9 @@ public class AppSettings implements AppPreferences {
             if (firstTime) {
                 mask = 0xFFFFFFFF;
             } else if (news != null) {
-                if (olds.nightMode != news.nightMode) {
-                    mask |= D_NightMode;
-                }
+                // if (olds.nightMode != news.nightMode) {
+                // mask |= D_NightMode;
+                // }
                 if (olds.rotation != news.rotation) {
                     mask |= D_Rotation;
                 }
@@ -305,9 +331,9 @@ public class AppSettings implements AppPreferences {
             return firstTime;
         }
 
-        public boolean isNightModeChanged() {
-            return 0 != (mask & D_NightMode);
-        }
+        // public boolean isNightModeChanged() {
+        // return 0 != (mask & D_NightMode);
+        // }
 
         public boolean isRotationChanged() {
             return 0 != (mask & D_Rotation);

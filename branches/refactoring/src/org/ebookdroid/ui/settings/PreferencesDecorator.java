@@ -52,6 +52,7 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
     }
 
     public void decorateBooksSettings() {
+        decoratePreferences(BOOK_CONTRAST.key, BOOK_EXPOSURE.key);
         decoratePreferences(BOOK_VIEW_MODE.key, BOOK_PAGE_ALIGN.key, BOOK_ANIMATION_TYPE.key);
         addViewModeListener(BOOK_VIEW_MODE.key, BOOK_PAGE_ALIGN.key, BOOK_ANIMATION_TYPE.key);
         addAnimationTypeListener(BOOK_ANIMATION_TYPE.key, BOOK_PAGE_ALIGN.key);
@@ -64,19 +65,6 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
 
     public void decorateBrowserSettings() {
         decoratePreferences(AUTO_SCAN_DIRS.key);
-
-        // OnPreferenceChangeListener l = new OnPreferenceChangeListener() {
-        // @Override
-        // public boolean onPreferenceChange(Preference preference, Object newValue) {
-        // System.out.println(preference.getKey() + ": " + newValue);
-        // return true;
-        // }
-        // };
-        //
-        // findPreference(USE_BOOK_CASE.key).setOnPreferenceChangeListener(l);
-        // for(String key : FILE_TYPE_FILTER.keys.values()) {
-        // findPreference(key).setOnPreferenceChangeListener(l);
-        // }
     }
 
     public void decorateMemorySettings() {
@@ -85,6 +73,7 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
     }
 
     public void decorateRenderSettings() {
+        decoratePreferences(CONTRAST.key, EXPOSURE.key);
         decoratePreferences(VIEW_MODE.key, PAGE_ALIGN.key, ANIMATION_TYPE.key);
         addViewModeListener(VIEW_MODE.key, PAGE_ALIGN.key, ANIMATION_TYPE.key);
         addAnimationTypeListener(ANIMATION_TYPE.key, PAGE_ALIGN.key);

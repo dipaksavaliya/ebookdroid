@@ -322,10 +322,10 @@ public abstract class AbstractViewController extends AbstractComponentController
     /**
      * {@inheritDoc}
      * 
-     * @see org.ebookdroid.ui.viewer.IViewController#toggleNightMode(boolean)
+     * @see org.ebookdroid.ui.viewer.IViewController#toggleRenderingEffects()
      */
     @Override
-    public final void toggleNightMode(final boolean nightMode) {
+    public final void toggleRenderingEffects() {
         EventPool.newEventReset(this, null, true).process();
     }
 

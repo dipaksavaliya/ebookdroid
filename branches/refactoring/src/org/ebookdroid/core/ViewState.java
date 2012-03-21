@@ -21,6 +21,7 @@ public class ViewState {
     public final RectF viewRect;
     public final PointF viewBase;
 
+    public final boolean nightMode;
     public final float zoom;
     public final PageAlign pageAlign;
     public final PagePaint paint;
@@ -43,9 +44,10 @@ public class ViewState {
 
         this.viewRect = new RectF(ctrl.getView().getViewRect());
         this.viewBase = ctrl.getView().getBase(viewRect);
+        this.nightMode = book != null ? book.nightMode : app.nightMode;
         this.zoom = zoom;
         this.pageAlign = DocumentViewMode.getPageAlign(book);
-        this.paint = app.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
+        this.paint = this.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
         this.paint.bitmapPaint.setFilterBitmap(app.bitmapFileringEnabled);
 
         this.pages = new Pages();
@@ -59,6 +61,7 @@ public class ViewState {
 
         this.viewRect = oldState.viewRect;
         this.viewBase = oldState.viewBase;
+        this.nightMode = oldState.nightMode;
         this.zoom = oldState.zoom;
         this.pageAlign = oldState.pageAlign;
         this.paint = oldState.paint;

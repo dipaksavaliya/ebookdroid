@@ -56,7 +56,7 @@ public class EventReset extends AbstractEvent {
                 BitmapManager.release(bitmapsToRecycle);
             }
             if (reason != null) {
-                ctrl.invalidatePageSizes(InvalidateSizeReason.LAYOUT, null);
+                ctrl.invalidatePageSizes(reason, null);
                 ctrl.invalidateScroll();
                 viewState = new ViewState(ctrl);
             }

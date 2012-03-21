@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class DBSettingsManager extends SQLiteOpenHelper implements IDBAdapter {
 
-    public static final int DB_VERSION = 5;
+    public static final int DB_VERSION = 6;
 
     private final IDBAdapter adapter;
 
@@ -19,6 +19,12 @@ public class DBSettingsManager extends SQLiteOpenHelper implements IDBAdapter {
     public DBSettingsManager(final Context context) {
         super(context, context.getPackageName() + ".settings", null, DB_VERSION);
         adapter = createAdapter(DB_VERSION);
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            db.close();
+        } catch (Exception ex) {
+            LCTX.e("Unexpected DB error: ", ex);
+        }
     }
 
     @Override
@@ -42,8 +48,10 @@ public class DBSettingsManager extends SQLiteOpenHelper implements IDBAdapter {
             case DBAdapterV4.VERSION:
                 return new DBAdapterV4(this);
             case DBAdapterV5.VERSION:
-            default:
                 return new DBAdapterV5(this);
+            case DBAdapterV6.VERSION:
+            default:
+                return new DBAdapterV6(this);
         }
     }
 

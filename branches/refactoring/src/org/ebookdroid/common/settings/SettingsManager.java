@@ -207,7 +207,7 @@ public class SettingsManager {
             final String fileName = current != null ? current.fileName : null;
             final Map<String, BookSettings> books = db.getBookSettings(true);
             bookSettings.clear();
-            books.putAll(books);
+            bookSettings.putAll(books);
             replaceCurrentBookSettings(books.get(fileName));
             return books;
         } finally {
@@ -220,20 +220,6 @@ public class SettingsManager {
         try {
             final Editor edit = appSettings.prefs.edit();
             AppPreferences.SEARCH_BOOK_QUERY.setPreferenceValue(edit, searchQuery);
-            edit.commit();
-            final AppSettings oldSettings = appSettings;
-            appSettings = new AppSettings(ctx);
-            applyAppSettingsChanges(oldSettings, appSettings);
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
-    public static void toggleNightMode() {
-        lock.writeLock().lock();
-        try {
-            final Editor edit = appSettings.prefs.edit();
-            AppPreferences.NIGHT_MODE.setPreferenceValue(edit, !appSettings.nightMode);
             edit.commit();
             final AppSettings oldSettings = appSettings;
             appSettings = new AppSettings(ctx);
@@ -283,6 +269,22 @@ public class SettingsManager {
             final AppSettings oldSettings = appSettings;
             appSettings = new AppSettings(ctx);
             applyAppSettingsChanges(oldSettings, appSettings);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public static void toggleNightMode() {
+        lock.writeLock().lock();
+        try {
+            if (current != null) {
+                BookSettings olds = new BookSettings(current);
+
+                current.nightMode = !current.nightMode;
+                db.storeBookSettings(current);
+
+                applyBookSettingsChanges(olds, current, null);
+            }
         } finally {
             lock.writeLock().unlock();
         }
@@ -340,7 +342,7 @@ public class SettingsManager {
         }
     }
 
-    static void onBookSettingsChanged(final AppSettings.Diff appDiff) {
+    public static void onBookSettingsChanged(final AppSettings.Diff appDiff) {
         lock.writeLock().lock();
         try {
             if (current != null) {

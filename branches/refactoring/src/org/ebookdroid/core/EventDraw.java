@@ -167,7 +167,7 @@ public class EventDraw implements IEvent {
     }
 
     protected void drawBrightnessFilter(final RectF nodeRect) {
-        if (viewState.app.brightnessInNightModeOnly && !viewState.app.nightMode) {
+        if (viewState.app.brightnessInNightModeOnly && !viewState.nightMode) {
             return;
         }
 

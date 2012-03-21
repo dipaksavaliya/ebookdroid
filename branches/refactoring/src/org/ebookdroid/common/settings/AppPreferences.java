@@ -26,8 +26,6 @@ public interface AppPreferences {
     BooleanPreferenceDefinition CONFIRM_CLOSE = new BooleanPreferenceDefinition(pref_confirmclose_id,
             pref_confirmclose_defvalue);
 
-    BooleanPreferenceDefinition NIGHT_MODE = new BooleanPreferenceDefinition(pref_nightmode_id, pref_nightmode_defvalue);
-
     BooleanPreferenceDefinition BRIGHTNESS_NIGHT_MODE_ONLY = new BooleanPreferenceDefinition(
             pref_brightnessnightmodeonly_id, pref_brightnessnightmodeonly_defvalue);
 
@@ -110,6 +108,14 @@ public interface AppPreferences {
 
     /* =============== Default rendering settings =============== */
 
+    BooleanPreferenceDefinition NIGHT_MODE = new BooleanPreferenceDefinition(pref_nightmode_id, pref_nightmode_defvalue);
+
+    IntegerPreferenceDefinition CONTRAST = new IntegerPreferenceDefinition(pref_contrast_id,
+            pref_contrast_defvalue, pref_contrast_minvalue, pref_contrast_maxvalue);
+
+    IntegerPreferenceDefinition EXPOSURE = new IntegerPreferenceDefinition(pref_exposure_id,
+            pref_exposure_defvalue, pref_exposure_minvalue, pref_exposure_maxvalue);
+
     BooleanPreferenceDefinition SPLIT_PAGES = new BooleanPreferenceDefinition(pref_splitpages_id,
             pref_splitpages_defvalue);
 
@@ -146,6 +152,14 @@ public interface AppPreferences {
     /* =============== Book rendering settings =============== */
 
     StringPreferenceDefinition BOOK = new StringPreferenceDefinition(pref_book_id, 0);
+
+    BooleanPreferenceDefinition BOOK_NIGHT_MODE = new BooleanPreferenceDefinition(pref_book_nightmode_id, pref_nightmode_defvalue);
+
+    IntegerPreferenceDefinition BOOK_CONTRAST = new IntegerPreferenceDefinition(pref_book_contrast_id,
+            pref_contrast_defvalue, pref_contrast_minvalue, pref_contrast_maxvalue);
+
+    IntegerPreferenceDefinition BOOK_EXPOSURE = new IntegerPreferenceDefinition(pref_book_exposure_id,
+            pref_exposure_defvalue, pref_exposure_minvalue, pref_exposure_maxvalue);
 
     BooleanPreferenceDefinition BOOK_SPLIT_PAGES = new BooleanPreferenceDefinition(pref_book_splitpages_id,
             pref_splitpages_defvalue);
