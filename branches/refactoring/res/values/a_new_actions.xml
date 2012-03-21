@@ -31,7 +31,7 @@
         <item>@string/menu_thumbnail</item>
         <item>@string/menu_about</item>
         <item>@string/menu_close</item>
-        <item>Tap configuration</item>
+        <item>@string/menu_tap_configuration</item>
         <item>Show options menu</item>
         <item>Scroll Up</item>
         <item>Scroll Down</item>

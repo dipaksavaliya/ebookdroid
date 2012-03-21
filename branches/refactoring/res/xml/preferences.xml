@@ -13,6 +13,12 @@
             android:title="@string/pref_loadrecent_title" />
 
         <CheckBoxPreference
+            android:defaultValue="@string/pref_confirmclose_defvalue"
+            android:key="@string/pref_confirmclose_id"
+            android:summary="@string/pref_confirmclose_summary"
+            android:title="@string/pref_confirmclose_title" />
+
+        <CheckBoxPreference
             android:defaultValue="@string/pref_nightmode_id"
             android:key="@string/pref_nightmode_id"
             android:summary="@string/pref_nightmode_summary"

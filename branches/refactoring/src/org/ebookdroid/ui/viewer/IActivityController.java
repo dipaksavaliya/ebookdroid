@@ -32,6 +32,8 @@ public interface IActivityController extends IActionController<ViewerActivity> {
 
     IViewController switchDocumentController();
 
+    void jumpToPage(int viewIndex, float offsetX, float offsetY);
+
     static interface IBookLoadTask {
 
         void setProgressDialogMessage(int resourceID, Object... args);

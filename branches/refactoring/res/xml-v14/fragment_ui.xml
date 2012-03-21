@@ -10,6 +10,12 @@
             android:title="@string/pref_loadrecent_title" />
 
     <org.emdev.ui.preference.SwitchPreferenceEx
+            android:defaultValue="@string/pref_confirmclose_defvalue"
+            android:key="@string/pref_confirmclose_id"
+            android:summary="@string/pref_confirmclose_summary"
+            android:title="@string/pref_confirmclose_title" />
+
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_nightmode_id"
             android:key="@string/pref_nightmode_id"
             android:summary="@string/pref_nightmode_summary"

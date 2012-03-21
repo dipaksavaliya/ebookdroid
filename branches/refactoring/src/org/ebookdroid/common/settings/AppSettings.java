@@ -25,6 +25,8 @@ public class AppSettings implements AppPreferences {
 
     public final boolean loadRecent;
 
+    public final boolean confirmClose;
+
     public final boolean nightMode;
 
     public final boolean brightnessInNightModeOnly;
@@ -111,6 +113,7 @@ public class AppSettings implements AppPreferences {
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
         /* =============== UI settings =============== */
         loadRecent = LOAD_RECENT.getPreferenceValue(prefs);
+        confirmClose = CONFIRM_CLOSE.getPreferenceValue(prefs);
         nightMode = NIGHT_MODE.getPreferenceValue(prefs);
         brightnessInNightModeOnly = BRIGHTNESS_NIGHT_MODE_ONLY.getPreferenceValue(prefs);
         brightness = BRIGHTNESS.getPreferenceValue(prefs);

@@ -15,6 +15,7 @@ import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
 import org.ebookdroid.common.touch.TouchManager;
 import org.ebookdroid.core.DecodeService;
+import org.ebookdroid.core.NavigationHistory;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.codec.OutlineLink;
@@ -116,6 +117,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     private String m_fileName;
 
+    private final NavigationHistory history;
+
     /**
      * Instantiates a new base viewer activity.
      */
@@ -124,6 +127,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         LCTX = LogContext.ROOT.lctx("Controller", true).lctx("" + SEQ.getAndIncrement(), true);
         this.intent = activity.getIntent();
         SettingsManager.addListener(this);
+
+        history = new NavigationHistory(this);
     }
 
     public void beforeCreate(final ViewerActivity activity) {
@@ -371,7 +376,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             if (pageNumber < 1 || pageNumber > pageCount) {
                 getManagedComponent().showToastText(2000, R.string.error_page_out_of_rande, pageCount);
             } else {
-                getDocumentController().goToPage(pageNumber - 1);
+                jumpToPage(pageNumber, 0, 0);
             }
             return;
         }
@@ -382,6 +387,17 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             i.setData(Uri.parse(link));
             getManagedComponent().startActivity(i);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ebookdroid.ui.viewer.IActivityController#jumpToPage(int, float, float)
+     */
+    @Override
+    public void jumpToPage(final int viewIndex, final float offsetX, final float offsetY) {
+        history.update();
+        getDocumentController().goToPage(viewIndex, offsetX, offsetY);
     }
 
     @ActionMethod(ids = R.id.mainmenu_outline)
@@ -531,7 +547,19 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                         if (getManagedComponent().getTouchView().isShown()) {
                             ViewEffects.toggleControls(getManagedComponent().getTouchView());
                         } else {
-                            closeActivity(null);
+                            if (history.goBack()) {
+                                return true;
+                            }
+
+                            if (SettingsManager.getAppSettings().confirmClose) {
+                                final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+                                builder.setTitle(R.string.confirmclose_title);
+                                builder.setMessage(R.string.confirmclose_msg);
+                                builder.setPositiveButton(R.id.mainmenu_close);
+                                builder.setNegativeButton().show();
+                            } else {
+                                getOrCreateAction(R.id.mainmenu_close).run();
+                            }
                         }
                     }
                     return true;

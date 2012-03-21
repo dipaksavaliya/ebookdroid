@@ -23,6 +23,9 @@ public interface AppPreferences {
     BooleanPreferenceDefinition LOAD_RECENT = new BooleanPreferenceDefinition(pref_loadrecent_id,
             pref_loadrecent_defvalue);
 
+    BooleanPreferenceDefinition CONFIRM_CLOSE = new BooleanPreferenceDefinition(pref_confirmclose_id,
+            pref_confirmclose_defvalue);
+
     BooleanPreferenceDefinition NIGHT_MODE = new BooleanPreferenceDefinition(pref_nightmode_id, pref_nightmode_defvalue);
 
     BooleanPreferenceDefinition BRIGHTNESS_NIGHT_MODE_ONLY = new BooleanPreferenceDefinition(

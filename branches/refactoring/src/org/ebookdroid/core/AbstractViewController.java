@@ -485,7 +485,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                 LCTX.d("Target page found: " + target);
             }
             if (target != null) {
-                goToPage(target.index.viewIndex, offsetX, offsetY);
+                base.jumpToPage(target.index.viewIndex, offsetX, offsetY);
             }
         }
         return true;
