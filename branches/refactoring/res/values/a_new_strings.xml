@@ -18,7 +18,7 @@
     <string name="pref_bitmapfilering_enabled_summary">Enable bilinear texture filtering</string>
 
     <string name="pref_confirmclose_title">Confirm closing</string>
-    <string name="pref_confirmclose_summary">Ask confirmation before closing viewer</string>
+    <string name="pref_confirmclose_summary">Ask close confirmation on Back pressed</string>
 
     <string name="confirmclose_title">Closing viewer...</string>
     <string name="confirmclose_msg">Do you really want to leave viewer?</string>
