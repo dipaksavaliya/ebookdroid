@@ -39,6 +39,8 @@ public class TouchManagerView extends View {
 
     private TouchProfile profile;
 
+    private final Paint rPaint = new Paint();
+
     public TouchManagerView(final IActivityController base) {
         super(base.getContext());
         this.base = base;
@@ -83,8 +85,6 @@ public class TouchManagerView extends View {
 
         final float xStep = width / GRID_X;
         final float yStep = height / GRID_Y;
-
-        final Paint rPaint = new Paint();
 
         int cIndex = 0;
         final ListIterator<Region> regions = profile.regions();

@@ -1,5 +1,6 @@
 package org.emdev.ui.preference;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.preference.SwitchPreference;
 import android.util.AttributeSet;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.CompoundButton;
 
+@TargetApi(15)
 public class SwitchPreferenceEx extends SwitchPreference {
 
     private final Listener mListener = new Listener();

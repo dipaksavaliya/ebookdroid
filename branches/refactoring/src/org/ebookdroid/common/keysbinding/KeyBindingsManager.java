@@ -5,7 +5,6 @@ import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.SettingsManager;
 
-import _android.util.SparseArrayEx;
 
 import android.view.KeyEvent;
 
@@ -13,6 +12,7 @@ import java.lang.reflect.Field;
 
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.collections.SparseArrayEx;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

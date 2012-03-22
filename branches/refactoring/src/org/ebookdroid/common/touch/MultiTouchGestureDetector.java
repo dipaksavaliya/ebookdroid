@@ -2,10 +2,12 @@ package org.ebookdroid.common.touch;
 
 import org.ebookdroid.common.log.LogContext;
 
+import android.annotation.TargetApi;
 import android.graphics.PointF;
 import android.util.FloatMath;
 import android.view.MotionEvent;
 
+@TargetApi(5)
 public class MultiTouchGestureDetector implements IGestureDetector {
 
     protected static final LogContext LCTX = LogContext.ROOT.lctx("Gesture", false);

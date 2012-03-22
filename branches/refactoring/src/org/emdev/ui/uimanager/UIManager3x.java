@@ -2,6 +2,7 @@ package org.emdev.ui.uimanager;
 
 import org.ebookdroid.EBookDroidApp;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@TargetApi(11)
 public class UIManager3x implements IUIManager {
 
     private static final String SYS_UI_CLS = "com.android.systemui.SystemUIService";

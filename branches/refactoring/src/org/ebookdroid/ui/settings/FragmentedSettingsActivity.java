@@ -4,9 +4,12 @@ import org.ebookdroid.R;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.ui.settings.fragments.BookFragment;
 
+import android.annotation.TargetApi;
+
 import java.util.Iterator;
 import java.util.List;
 
+@TargetApi(11)
 public class FragmentedSettingsActivity extends SettingsActivity {
 
     @Override

@@ -52,10 +52,6 @@
 	<property name="wexler.apk" value="apk/${package.name}-wexler.t7007-${manifest.version}.apk" />
 	<property name="mips.apk" value="apk/${package.name}-mips-${manifest.version}.apk" />
 
-	<path id="project.libraries">
-		<pathelement path="thirdparty/android" />
-	</path>
-
 	<path id="project.libraries.jars" />
 	<path id="project.libraries.libs" />
 

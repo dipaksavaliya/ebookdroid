@@ -1,7 +1,5 @@
 package org.ebookdroid.droids.fb2.codec;
 
-import _android.util.Base64;
-import _android.util.Base64InputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +11,9 @@ import android.graphics.RectF;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.emdev.utils.base64.Base64;
+import org.emdev.utils.base64.Base64InputStream;
 
 public class FB2Image extends AbstractFB2LineElement {
 

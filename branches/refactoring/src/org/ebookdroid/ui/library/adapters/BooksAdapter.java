@@ -7,7 +7,6 @@ import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.ui.library.IBrowserActivity;
 import org.ebookdroid.ui.library.views.BookshelfView;
 
-import _android.util.SparseArrayEx;
 
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
@@ -32,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.emdev.ui.adapters.BaseViewHolder;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.StringUtils;
+import org.emdev.utils.collections.SparseArrayEx;
 import org.emdev.utils.filesystem.FileSystemScanner;
 
 public class BooksAdapter extends PagerAdapter implements FileSystemScanner.Listener, Iterable<BookShelfAdapter> {

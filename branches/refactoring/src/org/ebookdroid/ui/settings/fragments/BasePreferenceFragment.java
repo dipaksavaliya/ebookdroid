@@ -3,9 +3,11 @@ package org.ebookdroid.ui.settings.fragments;
 import org.ebookdroid.ui.settings.IPreferenceContainer;
 import org.ebookdroid.ui.settings.PreferencesDecorator;
 
+import android.annotation.TargetApi;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
+@TargetApi(11)
 public class BasePreferenceFragment extends PreferenceFragment implements IPreferenceContainer {
 
     protected final PreferencesDecorator decorator;

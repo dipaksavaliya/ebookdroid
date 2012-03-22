@@ -1,9 +1,11 @@
 package org.emdev.ui.uimanager;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.view.View;
 import android.view.Window;
 
+@TargetApi(14)
 public class UIManager4x implements IUIManager {
 
     private boolean hwaEnabled = false;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package _android.util;
+package org.emdev.utils.base64;
 
 import java.io.FilterInputStream;
 import java.io.IOException;

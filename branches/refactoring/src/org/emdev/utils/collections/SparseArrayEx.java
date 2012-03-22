@@ -1,4 +1,4 @@
-package _android.util;
+package org.emdev.utils.collections;
 
 import android.util.SparseArray;
 
