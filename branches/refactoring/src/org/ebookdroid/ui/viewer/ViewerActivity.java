@@ -29,11 +29,20 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.emdev.ui.AbstractActionActivity;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
+import org.emdev.ui.actions.ActionMethodDef;
+import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.uimanager.IUIManager;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
+@ActionTarget(
+// action list
+actions = {
+// start
+@ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout")
+// finish
+})
 public class ViewerActivity extends AbstractActionActivity {
 
     private static final int DIALOG_GOTO = 0;

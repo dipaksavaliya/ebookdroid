@@ -81,7 +81,6 @@ actions = {
         @ActionMethodDef(id = R.id.mainmenu_nightmode, method = "toggleNightMode"),
         @ActionMethodDef(id = R.id.mainmenu_zoom, method = "toggleControls"),
         @ActionMethodDef(id = R.id.mainmenu_thumbnail, method = "setCurrentPageAsThumbnail"),
-        @ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout"),
         @ActionMethodDef(id = R.id.actions_toggleTouchManagerView, method = "toggleControls"),
         @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu"),
         @ActionMethodDef(id = R.id.actions_keyBindings, method = "showKeyBindingsDialog")

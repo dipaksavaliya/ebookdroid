@@ -139,37 +139,45 @@ public class ActionControllerMethod {
         final Map<Integer, Method> result = new HashMap<Integer, Method>();
 
         if (AndroidVersion.VERSION < 8) {
-            if (clazz.isAnnotationPresent(ActionTarget.class)) {
-                ActionTarget a = clazz.getAnnotation(ActionTarget.class);
-                for(ActionMethodDef def : a.actions()) {
-                    try {
-                        Method m = clazz.getMethod(def.method(), ActionEx.class);
-                        result.put(def.id(), m);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+            getActionsMethodsFromClassAnnotation(clazz, result);
+        } else {
+            getActionMethodsFromMethodAnnotations(clazz, result);
+        }
+        return result;
+    }
+
+    private static void getActionsMethodsFromClassAnnotation(final Class<?> clazz, final Map<Integer, Method> result) {
+        if (clazz.isAnnotationPresent(ActionTarget.class)) {
+            ActionTarget a = clazz.getAnnotation(ActionTarget.class);
+            for(ActionMethodDef def : a.actions()) {
+                try {
+                    Method m = clazz.getMethod(def.method(), ActionEx.class);
+                    result.put(def.id(), m);
+                } catch (Exception ex) {
+                    LCTX.e("No action method found: " + clazz.getSimpleName() + "." + ex.getMessage());
                 }
             }
-        } else {
-            final Method[] methods = clazz.getMethods();
-            for (final Method method : methods) {
-                final int modifiers = method.getModifiers();
-                if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
-                    final Class<?>[] args = method.getParameterTypes();
-                    if (LengthUtils.length(args) == 1 && ActionEx.class.equals(args[0])) {
-                        if (method.isAnnotationPresent(ActionMethod.class)) {
-                            final ActionMethod annotation = method.getAnnotation(ActionMethod.class);
-                            if (annotation != null) {
-                                for (int id : annotation.ids()) {
-                                    result.put(id, method);
-                                }
+        }
+    }
+
+    private static void getActionMethodsFromMethodAnnotations(final Class<?> clazz, final Map<Integer, Method> result) {
+        final Method[] methods = clazz.getMethods();
+        for (final Method method : methods) {
+            final int modifiers = method.getModifiers();
+            if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
+                final Class<?>[] args = method.getParameterTypes();
+                if (LengthUtils.length(args) == 1 && ActionEx.class.equals(args[0])) {
+                    if (method.isAnnotationPresent(ActionMethod.class)) {
+                        final ActionMethod annotation = method.getAnnotation(ActionMethod.class);
+                        if (annotation != null) {
+                            for (int id : annotation.ids()) {
+                                result.put(id, method);
                             }
                         }
                     }
                 }
             }
         }
-        return result;
     }
 
     @Override
