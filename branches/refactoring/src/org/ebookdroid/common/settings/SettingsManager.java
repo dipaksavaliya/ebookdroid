@@ -282,6 +282,7 @@ public class SettingsManager {
 
                 current.nightMode = !current.nightMode;
                 db.storeBookSettings(current);
+                appSettings.updatePseudoBookSettings(current);
 
                 applyBookSettingsChanges(olds, current, null);
             }
