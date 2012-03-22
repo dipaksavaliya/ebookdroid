@@ -17,6 +17,9 @@
     <string name="pref_bitmapfilering_enabled_title">Texture filtering</string>
     <string name="pref_bitmapfilering_enabled_summary">Enable bilinear texture filtering</string>
 
+    <string name="pref_bitmaphack_title">Bitmap allocation hack</string>
+    <string name="pref_bitmaphack_summary">Use bitmap allocation tracking hack</string>
+
     <string name="pref_confirmclose_title">Confirm closing</string>
     <string name="pref_confirmclose_summary">Ask close confirmation on Back pressed</string>
 

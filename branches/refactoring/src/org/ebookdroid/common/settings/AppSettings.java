@@ -81,9 +81,11 @@ public class AppSettings implements AppPreferences {
 
     public final boolean textureReuseEnabled;
 
-    public final boolean reloadDuringZoom;
+    public final boolean useBitmapHack;
 
     public final boolean useEarlyRecycling;
+
+    public final boolean reloadDuringZoom;
 
     /* =============== Default rendering settings =============== */
 
@@ -158,6 +160,7 @@ public class AppSettings implements AppPreferences {
         bitmapSize = BITMAP_SIZE.getPreferenceValue(prefs);
         bitmapFileringEnabled = BITMAP_FILTERING.getPreferenceValue(prefs);
         textureReuseEnabled = REUSE_TEXTURES.getPreferenceValue(prefs);
+        useBitmapHack = USE_BITMAP_HACK.getPreferenceValue(prefs);
         useEarlyRecycling = EARLY_RECYCLING.getPreferenceValue(prefs);
         reloadDuringZoom = RELOAD_DURING_ZOOM.getPreferenceValue(prefs);
         /* =============== Default rendering settings =============== */

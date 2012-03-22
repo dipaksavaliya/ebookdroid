@@ -633,6 +633,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         BitmapManager.setPartSize(1 << newSettings.bitmapSize);
         BitmapManager.setUseEarlyRecycling(newSettings.useEarlyRecycling);
+        BitmapManager.setUseBitmapHack(newSettings.useBitmapHack);
     }
 
     /**

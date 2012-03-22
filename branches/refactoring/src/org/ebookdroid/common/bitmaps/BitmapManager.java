@@ -50,6 +50,8 @@ public class BitmapManager {
 
     static boolean useEarlyRecycling = false;
 
+    static boolean useBitmapHack = false;
+
     public static Bitmap getResource(final int resourceId) {
         synchronized (resources) {
             Bitmap bitmap = resources.get(resourceId);
@@ -306,6 +308,10 @@ public class BitmapManager {
 
     public static void setUseEarlyRecycling(final boolean useEarlyRecycling) {
         BitmapManager.useEarlyRecycling = useEarlyRecycling;
+    }
+
+    public static void setUseBitmapHack(final boolean useBitmapHack) {
+        BitmapManager.useBitmapHack = useBitmapHack;
     }
 
     public static int getPixelSizeInBytes(final Bitmap.Config config) {

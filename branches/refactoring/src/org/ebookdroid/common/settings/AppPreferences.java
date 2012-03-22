@@ -100,6 +100,9 @@ public interface AppPreferences {
     BooleanPreferenceDefinition REUSE_TEXTURES = new BooleanPreferenceDefinition(pref_texturereuse_id,
             pref_texturereuse_defvalue);
 
+    BooleanPreferenceDefinition USE_BITMAP_HACK = new BooleanPreferenceDefinition(pref_bitmaphack_id,
+            pref_bitmaphack_defvalue);
+
     BooleanPreferenceDefinition EARLY_RECYCLING = new BooleanPreferenceDefinition(pref_earlyrecycling_id,
             pref_earlyrecycling_defvalue);
 
