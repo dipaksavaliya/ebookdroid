@@ -121,22 +121,31 @@ public class SinglePageController extends AbstractViewController {
         if (curler.enabled()) {
             curler.animate(direction);
         } else {
-            final float diff = SettingsManager.getAppSettings().scrollHeight / 100.0f;
-            final float oldOffset = SettingsManager.getBookSettings().offsetY;
-            final float newOffset = oldOffset + (direction < 0 ? -diff : diff);
-            final Page page = model.getCurrentPageObject();
-            final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
-            final int height = base.getView().getHeight();
-            final float newTop = bounds.top + newOffset * height;
-            final float newBottom = newTop + height;
+            final BookSettings bs = SettingsManager.getBookSettings();
+            final float offsetX = bs != null ? bs.offsetX : 0;
 
-            if (oldOffset == 0 && newOffset < 0) {
-                goToPage(page.index.viewIndex - 1, 0, 1);
-            } else if (newBottom > bounds.bottom) {
-                goToPage(page.index.viewIndex + 1, 0, 0);
-            } else {
-                goToPage(model.getCurrentViewPageIndex(), 0, newOffset);
+            final Page page = model.getCurrentPageObject();
+            final RectF viewRect = base.getView().getViewRect();
+            final RectF bounds = page.getBounds(getBase().getZoomModel().getZoom());
+
+            if (Math.abs(viewRect.top - bounds.top) < 5 && direction < 0) {
+                goToPage(page.index.viewIndex - 1, offsetX, 1);
+                return;
             }
+
+            if (Math.abs(viewRect.bottom - bounds.bottom) < 5 && direction > 0) {
+                goToPage(page.index.viewIndex + 1, offsetX, 0);
+                return;
+            }
+
+            final float pageHeight = bounds.height();
+            final float viewHeight = viewRect.height();
+
+            final float diff = direction * viewHeight * SettingsManager.getAppSettings().scrollHeight / 100.0f;
+            final float oldTop = getScrollY();
+            final float newTop = oldTop + diff;
+
+            goToPage(model.getCurrentViewPageIndex(), offsetX, newTop / pageHeight);
         }
     }
 
