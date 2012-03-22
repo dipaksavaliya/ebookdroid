@@ -10,7 +10,6 @@ import org.ebookdroid.ui.viewer.adapters.OutlineAdapter;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -18,6 +17,7 @@ import android.widget.ListView;
 import java.util.List;
 
 import org.emdev.ui.actions.ActionController;
+import org.emdev.utils.LayoutUtils;
 
 public class OutlineDialog extends Dialog implements OnItemClickListener {
 
@@ -36,7 +36,7 @@ public class OutlineDialog extends Dialog implements OnItemClickListener {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().setLayout(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+        LayoutUtils.maximizeWindow(getWindow());
 
         setTitle(R.string.outline_title);
 

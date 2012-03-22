@@ -17,11 +17,11 @@ public class NavigationHistory {
     }
 
     public void update() {
-        history.push(new Position(SettingsManager.getBookSettings()));
+        history.addFirst(new Position(SettingsManager.getBookSettings()));
     }
 
     public boolean goBack() {
-        final Position position = history.pollFirst();
+        final Position position = history.isEmpty() ? null : history.removeFirst();
         if (position != null) {
             base.getDocumentController().goToPage(position.index.viewIndex, position.offsetX, position.offsetY);
             return true;

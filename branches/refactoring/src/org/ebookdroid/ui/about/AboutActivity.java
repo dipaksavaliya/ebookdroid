@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.BaseExpandableListAdapter;
@@ -21,6 +20,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.wiki.Wiki;
 
@@ -42,7 +42,7 @@ public class AboutActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.about);
 
-        getWindow().setLayout(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+        LayoutUtils.maximizeWindow(getWindow());
 
         String name = "EBookDroid";
         String version = "";

@@ -18,7 +18,7 @@ public class UnrarBridge {
 
     public static boolean init() {
         unrar = new File(EBookDroidApp.context.getFilesDir(), "unrar");
-        if (unrar != null && unrar.isFile() && unrar.canExecute()) {
+        if (unrar != null && unrar.isFile()) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Unrar executable found");
             }

@@ -2,6 +2,7 @@ package org.emdev.utils;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -24,6 +25,10 @@ public final class LayoutUtils {
             view.setLayoutParams(new ViewGroup.LayoutParams(FILL_PARENT, FILL_PARENT));
         }
         return view;
+    }
+
+    public static void maximizeWindow(final Window window) {
+        window.setLayout(FILL_PARENT, FILL_PARENT);
     }
 
 }

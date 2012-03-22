@@ -15,7 +15,6 @@ import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +34,7 @@ import org.emdev.ui.actions.DialogController;
 import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.actions.params.EditableValue;
+import org.emdev.utils.LayoutUtils;
 
 @ActionTarget(
 // action
@@ -95,7 +95,7 @@ public class GoToPageDialog extends Dialog {
     protected void onStart() {
         super.onStart();
 
-        getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        LayoutUtils.maximizeWindow(getWindow());
 
         final DocumentModel dm = base.getDocumentModel();
         final Page lastPage = dm != null ? dm.getLastPageObject() : null;

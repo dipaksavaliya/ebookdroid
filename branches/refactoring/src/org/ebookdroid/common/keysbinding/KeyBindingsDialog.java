@@ -8,7 +8,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseExpandableListAdapter;
@@ -25,6 +24,7 @@ import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.adapters.ActionsAdapter;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.android.AndroidVersion;
 
 public class KeyBindingsDialog extends Dialog {
 
@@ -64,8 +64,11 @@ public class KeyBindingsDialog extends Dialog {
         keyboard.add(KeyEvent.KEYCODE_TAB, KeyEvent.KEYCODE_SPACE);
         keyboard.addInterval(KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_AT);
         keyboard.add(KeyEvent.KEYCODE_TAB, KeyEvent.KEYCODE_SPACE);
-        keyboard.addInterval(KeyEvent.KEYCODE_PAGE_UP, KeyEvent.KEYCODE_PAGE_DOWN);
-        keyboard.addInterval(KeyEvent.KEYCODE_MOVE_HOME, KeyEvent.KEYCODE_NUMPAD_RIGHT_PAREN);
+
+        if (!AndroidVersion.lessThan3x) {
+            keyboard.addInterval(/* KeyEvent.KEYCODE_PAGE_UP */92, /* (KeyEvent.KEYCODE_PAGE_DOWN */93);
+            keyboard.addInterval(/* KeyEvent.KEYCODE_MOVE_HOME */122, /* KeyEvent.KEYCODE_NUMPAD_RIGHT_PAREN */163);
+        }
 
         final KeyGroup camera = groups.add("Camera keys");
         camera.add(KeyEvent.KEYCODE_CAMERA, KeyEvent.KEYCODE_CLEAR);
@@ -77,7 +80,7 @@ public class KeyBindingsDialog extends Dialog {
 
     @Override
     protected void onStart() {
-        getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        LayoutUtils.maximizeWindow(getWindow());
     }
 
     @Override
