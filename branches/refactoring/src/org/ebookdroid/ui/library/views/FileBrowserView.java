@@ -85,7 +85,7 @@ public class FileBrowserView extends ListView implements AdapterView.OnItemClick
         final AlertDialog alertDialog = new AlertDialog.Builder(base.getContext()).create();
         alertDialog.setTitle("Info");
         alertDialog.setMessage(msg);
-        alertDialog.setButton("OK", (DialogInterface.OnClickListener) null);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (DialogInterface.OnClickListener) null);
         alertDialog.setIcon(R.drawable.icon);
         alertDialog.show();
     }
