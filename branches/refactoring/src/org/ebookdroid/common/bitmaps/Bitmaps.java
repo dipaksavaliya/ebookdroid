@@ -11,6 +11,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region.Op;
+import android.util.FloatMath;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -41,8 +42,8 @@ public class Bitmaps {
 
         this.partSize = BitmapManager.partSize;
         this.bounds = bitmapBounds;
-        this.columns = (int) Math.ceil(bounds.width() / (float) partSize);
-        this.rows = (int) Math.ceil(bounds.height() / (float) partSize);
+        this.columns = (int) FloatMath.ceil(bounds.width() / (float) partSize);
+        this.rows = (int) FloatMath.ceil(bounds.height() / (float) partSize);
         this.config = useDefaultBitmapType ? DEF_BITMAP_TYPE : origBitmap.getConfig();
         this.bitmaps = new BitmapRef[columns * rows];
 
@@ -93,8 +94,8 @@ public class Bitmaps {
             final int oldBitmapsLength =LengthUtils.length(oldBitmaps);
 
             this.bounds = bitmapBounds;
-            this.columns = (int) Math.ceil(bitmapBounds.width() / (float) partSize);
-            this.rows = (int) Math.ceil(bitmapBounds.height() / (float) partSize);
+            this.columns = (int) FloatMath.ceil(bitmapBounds.width() / (float) partSize);
+            this.rows = (int) FloatMath.ceil(bitmapBounds.height() / (float) partSize);
             this.bitmaps = new BitmapRef[columns * rows];
 
             final int newsize = this.columns * this.rows;
