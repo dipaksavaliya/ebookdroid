@@ -14,9 +14,9 @@ class DBAdapterV5 extends DBAdapterV4 {
 
     public static final int VERSION = 5;
 
-    public static final long F_SPLIT_PAGES = 0x01;
+    public static final long F_SPLIT_PAGES = 1 << 0;
 
-    public static final long F_CROP_PAGES = 0x02;
+    public static final long F_CROP_PAGES = 1 << 1;
 
     public static final float OFFSET_FACTOR = 100000.0f;
 

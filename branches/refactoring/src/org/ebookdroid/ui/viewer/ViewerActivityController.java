@@ -619,10 +619,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             getManagedComponent().view.getView().setKeepScreenOn(newSettings.keepScreenOn);
         }
 
-        // if (diff.isNightModeChanged()) {
-        // getDocumentController().toggleRenderingEffects();
-        // }
-
         if (diff.isTapConfigChanged()) {
             TouchManager.loadFromSettings(newSettings);
         }
@@ -663,10 +659,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         final IViewController dc = getDocumentController();
 
-        // if (appDiff != null && appDiff.isNightModeChanged()) {
-        // redrawn = true;
-        // }
-        if (!redrawn && (diff.isNightModeChanged() || diff.isContrastChanged() || diff.isExposureChanged())) {
+        if (!redrawn && (diff.isEffectsChanged())) {
             redrawn = true;
             dc.toggleRenderingEffects();
         }

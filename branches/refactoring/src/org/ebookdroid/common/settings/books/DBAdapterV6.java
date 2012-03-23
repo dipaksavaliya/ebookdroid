@@ -16,6 +16,8 @@ class DBAdapterV6 extends DBAdapterV5 {
 
     public static final long F_NIGHT_MODE = 1 << 2;
 
+    public static final long F_AUTO_LEVELS = 1 << 3;
+
     public static final String DB_BOOK_CREATE = "create table book_settings ("
     // Book file path
             + "book varchar(1024) primary key, "
@@ -96,7 +98,7 @@ class DBAdapterV6 extends DBAdapterV5 {
                 // Page animation type
                 bs.animationType.ordinal(),
                 // Flags
-                (bs.splitPages ? F_SPLIT_PAGES : 0) | (bs.cropPages ? F_CROP_PAGES : 0) | (bs.nightMode ? F_NIGHT_MODE : 0),
+                (bs.splitPages ? F_SPLIT_PAGES : 0) | (bs.cropPages ? F_CROP_PAGES : 0) | (bs.nightMode ? F_NIGHT_MODE : 0) | (bs.autoLevels ? F_AUTO_LEVELS : 0),
                 // Offset x
                 (int) (bs.offsetX * OFFSET_FACTOR),
                 // Offset y
@@ -129,6 +131,7 @@ class DBAdapterV6 extends DBAdapterV5 {
         bs.splitPages = (flags & F_SPLIT_PAGES) != 0;
         bs.cropPages = (flags & F_CROP_PAGES) != 0;
         bs.nightMode = (flags & F_NIGHT_MODE) != 0;
+        bs.autoLevels = (flags & F_AUTO_LEVELS) != 0;
 
         bs.offsetX = c.getInt(index++) / OFFSET_FACTOR;
         bs.offsetY = c.getInt(index++) / OFFSET_FACTOR;

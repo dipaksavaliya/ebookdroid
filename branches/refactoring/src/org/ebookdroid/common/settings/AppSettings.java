@@ -95,6 +95,8 @@ public class AppSettings implements AppPreferences {
 
     final int exposure;
 
+    final boolean autoLevels;
+
     final boolean splitPages;
 
     final boolean cropPages;
@@ -167,6 +169,7 @@ public class AppSettings implements AppPreferences {
         nightMode = NIGHT_MODE.getPreferenceValue(prefs);
         contrast = CONTRAST.getPreferenceValue(prefs);
         exposure = EXPOSURE.getPreferenceValue(prefs);
+        autoLevels = AUTO_LEVELS.getPreferenceValue(prefs);
         splitPages = SPLIT_PAGES.getPreferenceValue(prefs);
         cropPages = CROP_PAGES.getPreferenceValue(prefs);
         viewMode = VIEW_MODE.getPreferenceValue(prefs);
@@ -214,6 +217,7 @@ public class AppSettings implements AppPreferences {
         edit.remove(BOOK_NIGHT_MODE.key);
         edit.remove(BOOK_CONTRAST.key);
         edit.remove(BOOK_EXPOSURE.key);
+        edit.remove(BOOK_AUTO_LEVELS.key);
         edit.remove(BOOK_SPLIT_PAGES.key);
         edit.remove(BOOK_CROP_PAGES.key);
         edit.remove(BOOK_VIEW_MODE.key);
@@ -228,6 +232,7 @@ public class AppSettings implements AppPreferences {
         BOOK_NIGHT_MODE.setPreferenceValue(edit, bs.nightMode);
         BOOK_CONTRAST.setPreferenceValue(edit, bs.contrast);
         BOOK_EXPOSURE.setPreferenceValue(edit, bs.exposure);
+        BOOK_AUTO_LEVELS.setPreferenceValue(edit, bs.autoLevels);
         BOOK_SPLIT_PAGES.setPreferenceValue(edit, bs.splitPages);
         BOOK_CROP_PAGES.setPreferenceValue(edit, bs.cropPages);
         BOOK_VIEW_MODE.setPreferenceValue(edit, bs.viewMode);
@@ -240,6 +245,7 @@ public class AppSettings implements AppPreferences {
         bs.nightMode = BOOK_NIGHT_MODE.getPreferenceValue(prefs, nightMode);
         bs.contrast = BOOK_CONTRAST.getPreferenceValue(prefs, contrast);
         bs.exposure = BOOK_EXPOSURE.getPreferenceValue(prefs, exposure);
+        bs.autoLevels = BOOK_AUTO_LEVELS.getPreferenceValue(prefs, autoLevels);
         bs.splitPages = BOOK_SPLIT_PAGES.getPreferenceValue(prefs, splitPages);
         bs.cropPages = BOOK_CROP_PAGES.getPreferenceValue(prefs, cropPages);
         bs.viewMode = BOOK_VIEW_MODE.getPreferenceValue(prefs, viewMode);

@@ -42,6 +42,8 @@ public class BookSettings implements CurrentPageListener {
 
     public int exposure = AppPreferences.EXPOSURE.defValue;
 
+    public boolean autoLevels;
+
     public BookSettings(BookSettings current) {
         this.fileName = current.fileName;
         this.currentPage = current.currentPage;
@@ -58,6 +60,7 @@ public class BookSettings implements CurrentPageListener {
         this.nightMode = current.nightMode;
         this.contrast = current.contrast;
         this.exposure = current.exposure;
+        this.autoLevels = current.autoLevels;
     }
 
     public BookSettings(final String fileName) {
@@ -93,6 +96,9 @@ public class BookSettings implements CurrentPageListener {
         private static final short D_Contrast = 0x0001 << 7;
         private static final short D_Exposure = 0x0001 << 8;
         private static final short D_NightMode = 0x0001 << 9;
+        private static final short D_AutoLevels = 0x0001 << 10;
+
+        private static final short D_Effects = D_Contrast | D_Exposure | D_NightMode | D_AutoLevels;
 
         private short mask;
         private final boolean firstTime;
@@ -125,6 +131,9 @@ public class BookSettings implements CurrentPageListener {
                 }
                 if (olds.nightMode != news.nightMode) {
                     mask |= D_NightMode;
+                }
+                if (olds.autoLevels != news.autoLevels) {
+                    mask |= D_AutoLevels;
                 }
             }
         }
@@ -163,6 +172,14 @@ public class BookSettings implements CurrentPageListener {
 
         public boolean isNightModeChanged() {
             return 0 != (mask & D_NightMode);
+        }
+        
+        public boolean isAutoLevelsChanged() {
+            return 0 != (mask & D_AutoLevels);
+        }
+        
+        public boolean isEffectsChanged() {
+            return 0 != (mask & (D_Effects));
         }
     }
 }

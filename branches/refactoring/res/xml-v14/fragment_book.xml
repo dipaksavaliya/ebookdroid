@@ -5,28 +5,6 @@
 	android:title="@string/pref_book_category">
 
     <org.emdev.ui.preference.SwitchPreferenceEx
-            android:defaultValue="@string/pref_nightmode_defvalue"
-            android:key="@string/pref_book_nightmode_id"
-            android:summary="@string/pref_nightmode_summary"
-            android:title="@string/pref_nightmode_title" />
-
-    <EditTextPreference
-            android:defaultValue="@string/pref_contrast_defvalue"
-            android:key="@string/pref_book_contrast_id"
-            android:maxLength="4"
-            android:numeric="integer"
-            android:summary="@string/pref_contrast_summary"
-            android:title="@string/pref_contrast_title" />
-
-    <EditTextPreference
-            android:defaultValue="@string/pref_exposure_defvalue"
-            android:key="@string/pref_book_exposure_id"
-            android:maxLength="3"
-            android:numeric="integer"
-            android:summary="@string/pref_exposure_summary"
-            android:title="@string/pref_exposure_title" />
-
-    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_splitpages_defvalue"
             android:key="@string/pref_book_splitpages_id"
             android:summary="@string/pref_splitpages_summary"
@@ -66,4 +44,40 @@
                 android:summary="@string/pref_animationtype_summary"
                 android:title="@string/pref_animationtype_title" />
 	</PreferenceCategory>
+	
+    <PreferenceCategory
+        android:summary="@string/pref_postprocessing_summary"
+        android:title="@string/pref_postprocessing_category" >
+
+        <org.emdev.ui.preference.SwitchPreferenceEx
+            android:defaultValue="@string/pref_nightmode_defvalue"
+            android:key="@string/pref_book_nightmode_id"
+            android:summary="@string/pref_nightmode_summary"
+            android:title="@string/pref_nightmode_title" />
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_contrast_defvalue"
+            android:key="@string/pref_book_contrast_id"
+            android:maxLength="4"
+            android:numeric="integer"
+            android:summary="@string/pref_contrast_summary"
+            android:title="@string/pref_contrast_title" />
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_exposure_defvalue"
+            android:key="@string/pref_book_exposure_id"
+            android:maxLength="3"
+            android:numeric="integer"
+            android:summary="@string/pref_exposure_summary"
+            android:title="@string/pref_exposure_title" />
+
+        <org.emdev.ui.preference.SwitchPreferenceEx
+            android:defaultValue="@string/pref_autolevels_defvalue"
+            android:key="@string/pref_book_autolevels_id"
+            android:summary="@string/pref_autolevels_summary"
+            android:title="@string/pref_autolevels_title" />
+
+    </PreferenceCategory>
+
+	
 </PreferenceScreen>

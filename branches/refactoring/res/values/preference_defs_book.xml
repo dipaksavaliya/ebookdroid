@@ -9,6 +9,8 @@
 
     <string name="pref_book_exposure_id">book_exposure</string>
 
+    <string name="pref_book_autolevels_id">book_autolevels</string>
+
     <string name="pref_book_splitpages_id">book_splitpages</string>
 
     <string name="pref_book_croppages_id">book_croppages</string>

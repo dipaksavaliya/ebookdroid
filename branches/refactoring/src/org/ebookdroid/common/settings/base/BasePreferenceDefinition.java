@@ -1,8 +1,11 @@
 package org.ebookdroid.common.settings.base;
 
 import org.ebookdroid.EBookDroidApp;
+import org.ebookdroid.common.log.LogContext;
 
 public class BasePreferenceDefinition {
+
+    public static final LogContext LCTX = LogContext.ROOT.lctx("Settigns");
 
     public final String key;
 

@@ -127,7 +127,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                 final boolean correctContrast = bs.contrast != AppPreferences.CONTRAST.defValue;
                 final boolean correctExposure = bs.exposure != AppPreferences.EXPOSURE.defValue;
 
-                if (correctContrast || correctExposure) {
+                if (correctContrast || correctExposure || bs.autoLevels) {
                     final Bitmap origBitmap = bitmap.getBitmap();
                     final RawBitmap bmp = new RawBitmap(origBitmap, bitmapBounds);
                     if (correctContrast) {
@@ -135,6 +135,9 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                     }
                     if (correctExposure) {
                         bmp.exposure(bs.exposure - AppPreferences.EXPOSURE.defValue);
+                    }
+                    if (bs.autoLevels) {
+                        bmp.autoLevels();
                     }
                     bmp.toBitmap(origBitmap);
                 }

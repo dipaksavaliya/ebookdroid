@@ -119,6 +119,8 @@ public interface AppPreferences {
     IntegerPreferenceDefinition EXPOSURE = new IntegerPreferenceDefinition(pref_exposure_id,
             pref_exposure_defvalue, pref_exposure_minvalue, pref_exposure_maxvalue);
 
+    BooleanPreferenceDefinition AUTO_LEVELS = new BooleanPreferenceDefinition(pref_autolevels_id, pref_autolevels_defvalue);
+
     BooleanPreferenceDefinition SPLIT_PAGES = new BooleanPreferenceDefinition(pref_splitpages_id,
             pref_splitpages_defvalue);
 
@@ -163,6 +165,8 @@ public interface AppPreferences {
 
     IntegerPreferenceDefinition BOOK_EXPOSURE = new IntegerPreferenceDefinition(pref_book_exposure_id,
             pref_exposure_defvalue, pref_exposure_minvalue, pref_exposure_maxvalue);
+
+    BooleanPreferenceDefinition BOOK_AUTO_LEVELS = new BooleanPreferenceDefinition(pref_book_autolevels_id, pref_autolevels_defvalue);
 
     BooleanPreferenceDefinition BOOK_SPLIT_PAGES = new BooleanPreferenceDefinition(pref_book_splitpages_id,
             pref_splitpages_defvalue);

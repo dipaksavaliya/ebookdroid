@@ -5,6 +5,7 @@ import org.ebookdroid.EBookDroidApp;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import org.emdev.utils.LengthUtils;
 import org.emdev.utils.MathUtils;
 
 public class IntegerPreferenceDefinition extends BasePreferenceDefinition {
@@ -37,11 +38,14 @@ public class IntegerPreferenceDefinition extends BasePreferenceDefinition {
         if (!prefs.contains(key)) {
             prefs.edit().putString(key, Integer.toString(defValue)).commit();
         }
-        final String str = prefs.getString(key, "");
         int value = defValue;
         try {
-            value = Integer.parseInt(str);
-        } catch (final NumberFormatException e) {
+            final String str = prefs.getString(key, "");
+            if (LengthUtils.isNotEmpty(str)) {
+                value = Integer.parseInt(str);
+            }
+        } catch (final Exception e) {
+            LCTX.e("Settings processing error: [" + key + "] " + e.getMessage());
         }
         return MathUtils.adjust(value, minValue, maxValue);
     }
