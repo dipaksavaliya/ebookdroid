@@ -91,6 +91,10 @@ public final class RawBitmap {
         nativeExposure(pixels, width, height, exposure * 128 / 100);
     }
 
+    public void autoLevels() {
+        nativeAutoLevels(pixels, width, height);
+    }
+
     public BitmapRef scaleHq4x() {
         return scaleHq4x(this);
     }
@@ -143,5 +147,7 @@ public final class RawBitmap {
 
     /* Exposure correction values -128...+128 */
     private static native void nativeExposure(int[] src, int width, int height, int exposure);
+
+    private static native void nativeAutoLevels(int[] src, int width, int height);
 
 }

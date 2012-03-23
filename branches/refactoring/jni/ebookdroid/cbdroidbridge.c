@@ -134,3 +134,50 @@ JNIEXPORT void JNICALL
 
     (*env)->ReleaseIntArrayElements(env, srcArray, src, 0);
 }
+
+JNIEXPORT void JNICALL
+ Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeAutoLevels(JNIEnv* env, jclass classObject, jintArray srcArray,
+                                                          jint width, jint height)
+{
+    jint* src;
+    int i;
+    unsigned char* src1;
+    int histoR[256];
+    int cumulativeFreqR[256];
+    int histoG[256];
+    int cumulativeFreqG[256];
+    int histoB[256];
+    int cumulativeFreqB[256];
+
+    int numpixels = width * height;
+    src = (*env)->GetIntArrayElements(env, srcArray, 0);
+
+    src1 = (unsigned char*)src;
+    for (i = 0; i < 256; i++) {
+        histoR[i] = 0;
+        histoG[i] = 0;
+        histoB[i] = 0;
+    }
+    for (i = 0; i < numpixels * 4; i += 4) {
+        histoR[src1[i]]++;
+        histoG[src1[i+1]]++;
+        histoB[src1[i+2]]++;
+    }
+
+    for (i = 0; i < 256; i++) {
+        cumulativeFreqR[i] = histoR[i] + (i > 0 ? cumulativeFreqR[i-1] : 0);
+        cumulativeFreqG[i] = histoG[i] + (i > 0 ? cumulativeFreqG[i-1] : 0);
+        cumulativeFreqB[i] = histoB[i] + (i > 0 ? cumulativeFreqB[i-1] : 0);
+    }
+
+    for (i = 0; i < numpixels * 4; i += 4) {
+        src1[i] = MIN(MAX(cumulativeFreqR[src1[i]] * 255 / numpixels, 0), 255);
+        src1[i+1] = MIN(MAX(cumulativeFreqG[src1[i+1]] * 255 / numpixels, 0), 255);
+        src1[i+2] = MIN(MAX(cumulativeFreqB[src1[i+2]] * 255 / numpixels, 0), 255);
+    }
+
+
+
+    (*env)->ReleaseIntArrayElements(env, srcArray, src, 0);
+}
+
