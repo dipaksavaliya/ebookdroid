@@ -92,7 +92,7 @@ public final class RawBitmap {
     }
 
     public void autoLevels() {
-        nativeAutoLevels(pixels, width, height);
+        nativeAutoLevels2(pixels, width, height);
     }
 
     public BitmapRef scaleHq4x() {
@@ -149,5 +149,6 @@ public final class RawBitmap {
     private static native void nativeExposure(int[] src, int width, int height, int exposure);
 
     private static native void nativeAutoLevels(int[] src, int width, int height);
+    private static native void nativeAutoLevels2(int[] src, int width, int height);
 
 }

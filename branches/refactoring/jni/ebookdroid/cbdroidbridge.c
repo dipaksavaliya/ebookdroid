@@ -181,3 +181,76 @@ JNIEXPORT void JNICALL
     (*env)->ReleaseIntArrayElements(env, srcArray, src, 0);
 }
 
+JNIEXPORT void JNICALL
+ Java_org_ebookdroid_common_bitmaps_RawBitmap_nativeAutoLevels2(JNIEnv* env, jclass classObject, jintArray srcArray,
+                                                          jint width, jint height)
+{
+    jint* src;
+    int i;
+    unsigned char* src1;
+    int histoR[256];
+    int histoG[256];
+    int histoB[256];
+
+    int numpixels = width * height;
+    int minR = 0, minG = 0, minB = 0;
+    int maxR = 0, maxG = 0, maxB = 0;
+
+    src = (*env)->GetIntArrayElements(env, srcArray, 0);
+
+    src1 = (unsigned char*)src;
+    for (i = 0; i < 256; i++) {
+        histoR[i] = 0;
+        histoG[i] = 0;
+        histoB[i] = 0;
+    }
+    for (i = 0; i < numpixels * 4; i += 4) {
+        histoR[src1[i]]++;
+        histoG[src1[i+1]]++;
+        histoB[src1[i+2]]++;
+    }
+
+    for (i = 0; i < 256; i++) {
+        if (histoR[i] > numpixels / 100 && minR == 0) {
+            minR = i;
+        }
+        if (histoG[i] > numpixels / 100 && minG == 0) {
+            minG = i;
+        }
+        if (histoB[i] > numpixels / 100 && minB == 0) {
+            minB = i;
+        }
+    }
+
+    for (i = 255; i >= 0; i--) {
+        if (histoR[i] > numpixels / 100 && maxR == 0) {
+            maxR = i;
+        }
+        if (histoG[i] > numpixels / 100 && maxG == 0) {
+            maxG = i;
+        }
+        if (histoB[i] > numpixels / 100 && maxB == 0) {
+            maxB = i;
+        }
+    }
+    if (minR == maxR) {
+        maxR = minR + 1;
+    }
+    if (minG == maxG) {
+        maxG = minG + 1;
+    }
+    if (minB == maxB) {
+        maxB = minB + 1;
+    }
+
+    for (i = 0; i < numpixels * 4; i += 4) {
+        src1[i] = MIN(MAX((src1[i] - minR) * 255 / (maxR - minR), 0), 255);
+        src1[i+1] = MIN(MAX((src1[i+1] - minG) * 255 / (maxG - minG), 0), 255);
+        src1[i+2] = MIN(MAX((src1[i+2] - minB) * 255 / (maxB - minB), 0), 255);
+    }
+
+
+
+    (*env)->ReleaseIntArrayElements(env, srcArray, src, 0);
+}
+
