@@ -2,15 +2,21 @@ package org.emdev.ui.uimanager;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 
 @TargetApi(14)
 public class UIManager4x implements IUIManager {
 
+    private static final int FLAG_FULLSCREEN = WindowManager.LayoutParams.FLAG_FULLSCREEN;
+
     private boolean hwaEnabled = false;
 
     private boolean titleVisible;
+
+    private boolean statusBarHidden = false;
 
     @Override
     public void setTitleVisible(final Activity activity, final boolean visible) {
@@ -34,6 +40,15 @@ public class UIManager4x implements IUIManager {
 
     @Override
     public void setFullScreenMode(final Activity activity, final boolean fullScreen) {
+        if (!isTabletUi(activity)) {
+            this.statusBarHidden = fullScreen;
+            final Window w = activity.getWindow();
+            if (fullScreen) {
+                w.setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN);
+            } else {
+                w.clearFlags(FLAG_FULLSCREEN);
+            }
+        }
     }
 
     @Override
@@ -59,10 +74,20 @@ public class UIManager4x implements IUIManager {
 
     @Override
     public void onMenuOpened(final Activity activity) {
+        if (!isTabletUi(activity)) {
+            if (statusBarHidden) {
+                activity.getWindow().clearFlags(FLAG_FULLSCREEN);
+            }
+        }
     }
 
     @Override
     public void onMenuClosed(final Activity activity) {
+        if (!isTabletUi(activity)) {
+            if (statusBarHidden) {
+                activity.getWindow().setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN);
+            }
+        }
     }
 
     @Override
@@ -75,5 +100,10 @@ public class UIManager4x implements IUIManager {
 
     @Override
     public void onDestroy(final Activity activity) {
+    }
+
+    private boolean isTabletUi(final Activity activity) {
+        final Configuration c = activity.getResources().getConfiguration();
+        return 0 != (Configuration.SCREENLAYOUT_SIZE_XLARGE & c.screenLayout);
     }
 }
