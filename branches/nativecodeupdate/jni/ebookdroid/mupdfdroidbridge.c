@@ -42,38 +42,31 @@ void mupdf_throw_exception(JNIEnv *env, char *message)
 {
     jthrowable new_exception = (*env)->FindClass(env, RUNTIME_EXCEPTION);
     if (new_exception == NULL)
-    {
-        return;
-    }
-    else
-    {
-        DEBUG("Exception '%s', Message: '%s'", RUNTIME_EXCEPTION, message);
-    }
+	return;
+    DEBUG("Exception '%s', Message: '%s'", RUNTIME_EXCEPTION, message);
     (*env)->ThrowNew(env, new_exception, message);
 }
 
 static void mupdf_free_document(renderdocument_t* doc)
 {
-    if (doc)
-    {
-        if (doc->outline)
-            fz_free_outline(doc->ctx, doc->outline);
-        doc->outline = NULL;
+    if (!doc)
+	return;
 
-        if (doc->document)
-            fz_close_document(doc->document);
-        doc->document = NULL;
+    if (doc->outline)
+        fz_free_outline(doc->ctx, doc->outline);
+    doc->outline = NULL;
 
-        fz_flush_warnings(doc->ctx);
-        fz_free_context(doc->ctx);
-        doc->ctx = NULL;
+    if (doc->document)
+        fz_close_document(doc->document);
+    doc->document = NULL;
 
-        free(doc);
-        doc = NULL;
-    }
+    fz_flush_warnings(doc->ctx);
+    fz_free_context(doc->ctx);
+    doc->ctx = NULL;
+
+    free(doc);
+    doc = NULL;
 }
-
-//extern struct pdf_document *pdf_open_document(fz_context *ctx, char *filename);
 
 JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_open(JNIEnv *env, jclass clazz, jint storememory, jstring fname,
@@ -94,10 +87,9 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_open(JNIEnv *env, jclass cl
     {
         mupdf_throw_exception(env, "Out of Memory");
         goto cleanup;
-    }DEBUG("PdfDocument.nativeOpen(): storememory = %d", storememory);
+    }
+    DEBUG("MuPdfDocument.nativeOpen(): storememory = %d", storememory);
 
-//    doc->ctx = fz_new_context(&fz_alloc_default, 256<<20);
-//    doc->ctx = fz_new_context(&fz_alloc_default, storememory);
     doc->ctx = fz_new_context(NULL, NULL, storememory);
     if (!doc->ctx)
     {
@@ -110,13 +102,9 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_open(JNIEnv *env, jclass cl
 
 //    fz_set_aa_level(fz_catch(ctx), alphabits);
 
-    /*
-     * Open PDF and load xref table
-     */
     fz_try(doc->ctx)
     {
         doc->document = fz_open_document(doc->ctx, filename);
-//        doc->document = (fz_document*) pdf_open_document(doc->ctx, filename);
     }
     fz_catch(doc->ctx)
     {
@@ -145,7 +133,7 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_open(JNIEnv *env, jclass cl
         else
         {
             mupdf_free_document(doc);
-            mupdf_throw_exception(env, "PDF needs a password!");
+            mupdf_throw_exception(env, "Document needs a password!");
             goto cleanup;
         }
     }
@@ -155,7 +143,7 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_open(JNIEnv *env, jclass cl
     (*env)->ReleaseStringUTFChars(env, fname, filename);
     (*env)->ReleaseStringUTFChars(env, pwd, password);
 
-    // DEBUG("PdfDocument.nativeOpen(): return handle = %p", doc);
+    // DEBUG("MuPdfDocument.nativeOpen(): return handle = %p", doc);
     return (jlong) (long) doc;
 }
 
@@ -171,9 +159,8 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_getPageInfo(JNIEnv *env, jc
                                                              jobject cpi)
 {
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
-
-//    return -1;
-
+    
+    //TODO: Review this. Possible broken
 
     fz_page *page = NULL;
     fz_rect bounds;
@@ -226,14 +213,13 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfLinks_getFirstPageLink(JNIEnv *env, 
 {
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
     renderpage_t *page = (renderpage_t*) (long) pagehandle;
-    return (jlong)(long)(page?fz_load_links(doc->document, page->page):NULL);
+    return (jlong)(long)((page && doc)?fz_load_links(doc->document, page->page):NULL);
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_mupdf_codec_MuPdfLinks_getNextPageLink(JNIEnv *env, jclass clazz, jlong linkhandle)
 {
     fz_link *link = (fz_link*) (long) linkhandle;
-
     return (jlong)(long)(link ? link->next : NULL);
 }
 
@@ -241,7 +227,6 @@ JNIEXPORT jint JNICALL
 Java_org_ebookdroid_droids_mupdf_codec_MuPdfLinks_getPageLinkType(JNIEnv *env, jclass clazz, jlong linkhandle)
 {
     fz_link *link = (fz_link*) (long) linkhandle;
-
     return (jint)(link ? link->dest.kind : FZ_LINK_NONE);
 }
 

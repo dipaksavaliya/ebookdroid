@@ -762,7 +762,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                     }
 
                     final String msg = result.getMessage();
-                    if ("PDF needs a password!".equals(msg)) {
+                    if ("Document needs a password!".equals(msg)) {
                         askPassword(m_fileName, "Enter password...");
                     } else if ("Wrong password given".equals(msg)) {
                         askPassword(m_fileName, msg + "...");
