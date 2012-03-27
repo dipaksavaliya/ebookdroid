@@ -106,6 +106,7 @@ MY_JBIG2DEC_SRC_FILES := \
 MY_OPENJPEG_SRC_FILES := \
 	openjpeg/bio.c \
 	openjpeg/cio.c \
+	openjpeg/cidx_manager.c \
 	openjpeg/dwt.c \
 	openjpeg/event.c \
 	openjpeg/image.c \
@@ -116,12 +117,16 @@ MY_OPENJPEG_SRC_FILES := \
 	openjpeg/mct.c \
 	openjpeg/mqc.c \
 	openjpeg/openjpeg.c \
+	openjpeg/phix_manager.c \
 	openjpeg/pi.c \
+	openjpeg/ppix_manager.c \
 	openjpeg/raw.c \
 	openjpeg/t1.c \
 	openjpeg/t2.c \
 	openjpeg/tcd.c \
-	openjpeg/tgt.c
+	openjpeg/tgt.c \
+	openjpeg/thix_manager.c \
+	openjpeg/tpix_manager.c
 
 
 # mupdf
