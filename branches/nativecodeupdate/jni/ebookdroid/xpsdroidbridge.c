@@ -23,14 +23,14 @@ typedef struct renderdocument_s renderdocument_t;
 struct renderdocument_s
 {
     fz_context* ctx;
-    xps_document* xpsdoc;
+    fz_document* xpsdoc;
     fz_outline* outline;
 };
 
 typedef struct renderpage_s renderpage_t;
 struct renderpage_s
 {
-    xps_page* page;
+    fz_page* page;
     fz_display_list* pageList;
 };
 
@@ -59,7 +59,7 @@ static void xps_free_document(renderdocument_t* doc)
         doc->outline = NULL;
 
 	if(doc->xpsdoc)
-	    xps_close_document(doc->xpsdoc);
+	    fz_close_document(doc->xpsdoc);
 	doc->xpsdoc = NULL;
         
         fz_flush_warnings(doc->ctx);
@@ -74,7 +74,6 @@ static void xps_free_document(renderdocument_t* doc)
 JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_xps_codec_XpsDocument_open(JNIEnv *env, jclass clazz, jint storememory, jstring fname)
 {
-    fz_obj *obj;
     renderdocument_t *doc;
     jboolean iscopy;
     jclass cls;
@@ -92,7 +91,7 @@ Java_org_ebookdroid_droids_xps_codec_XpsDocument_open(JNIEnv *env, jclass clazz,
     DEBUG("XpsDocument.nativeOpen(): storememory = %d", storememory);
 //    doc->ctx = fz_new_context(&fz_alloc_default, 256<<20);
 //    doc->ctx = fz_new_context(&fz_alloc_default, storememory);
-    doc->ctx = fz_new_context(NULL, storememory);
+    doc->ctx = fz_new_context(NULL, NULL, storememory);
     if (!doc->ctx)
     {
 	free(doc);
@@ -105,7 +104,7 @@ Java_org_ebookdroid_droids_xps_codec_XpsDocument_open(JNIEnv *env, jclass clazz,
     
     fz_try(doc->ctx)
     {
-	doc->xpsdoc = xps_open_document(doc->ctx, filename);
+	doc->xpsdoc = fz_open_document(doc->ctx, filename);
     }
     fz_catch(doc->ctx)
     {
@@ -136,17 +135,62 @@ Java_org_ebookdroid_droids_xps_codec_XpsDocument_getPageInfo(JNIEnv *env, jclass
 {
 
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
+//    return -1;
+
+    fz_page *page = NULL;
+    fz_rect bounds;
+    
+    jclass clazz;
+    jfieldID fid;
+
+    fz_try(doc->ctx)
+    {
+	page = fz_load_page(doc->xpsdoc, pageNumber - 1);
+	bounds = fz_bound_page(doc->xpsdoc, page);
+    }
+    fz_catch(doc->ctx)
+    {
+        return -1;
+    }
+
+    if (page)
+    {
+        clazz = (*env)->GetObjectClass(env, cpi);
+        if (0 == clazz)
+        {
+            return (-1);
+        }
+
+        fid = (*env)->GetFieldID(env, clazz, "width", "I");
+        (*env)->SetIntField(env, cpi, fid, bounds.x1-bounds.x0);
+
+        fid = (*env)->GetFieldID(env, clazz, "height", "I");
+        (*env)->SetIntField(env, cpi, fid, bounds.y1-bounds.y0);
+
+        fid = (*env)->GetFieldID(env, clazz, "dpi", "I");
+        (*env)->SetIntField(env, cpi, fid, 0);
+
+        fid = (*env)->GetFieldID(env, clazz, "rotation", "I");
+        (*env)->SetIntField(env, cpi, fid, 0);
+
+        fid = (*env)->GetFieldID(env, clazz, "version", "I");
+        (*env)->SetIntField(env, cpi, fid, 0);
+
+        fz_free_page(doc->xpsdoc, page);
+        return 0;
+    }
+    return -1;
 
 //	DEBUG("XpsDocument.getPageInfo = %p", doc);
-
-    xps_page *page = NULL;
+/*
+    fz_page *page = NULL;
 
     jclass clazz;
     jfieldID fid;
 
     fz_try(doc->ctx)
     {
-	page = xps_load_page(doc->xpsdoc, pageNumber - 1);
+	page = fz_load_page(doc->xpsdoc, pageNumber - 1);
     }
     fz_catch(doc->ctx)
     {
@@ -176,17 +220,18 @@ Java_org_ebookdroid_droids_xps_codec_XpsDocument_getPageInfo(JNIEnv *env, jclass
         fid = (*env)->GetFieldID(env, clazz, "version", "I");
         (*env)->SetIntField(env, cpi, fid, 0);
 
-        xps_free_page(doc->xpsdoc, page);
+        fz_free_page(doc->xpsdoc, page);
         return 0;
     }
     return (-1);
+*/
 }
 
 JNIEXPORT jint JNICALL
 Java_org_ebookdroid_droids_xps_codec_XpsDocument_getPageCount(JNIEnv *env, jclass clazz, jlong handle)
 {
     renderdocument_t *doc = (renderdocument_t*) (long) handle;
-    return (xps_count_pages(doc->xpsdoc));
+    return (fz_count_pages(doc->xpsdoc));
 }
 
 JNIEXPORT jlong JNICALL
@@ -194,7 +239,6 @@ Java_org_ebookdroid_droids_xps_codec_XpsPage_open(JNIEnv *env, jclass clazz, jlo
 {
     renderdocument_t *doc = (renderdocument_t*) (long) dochandle;
     renderpage_t *page;
-    fz_obj *obj;
     jclass cls;
     jfieldID fid;
 
@@ -207,7 +251,7 @@ Java_org_ebookdroid_droids_xps_codec_XpsPage_open(JNIEnv *env, jclass clazz, jlo
 
     fz_try(doc->ctx)
     {
-	page->page = xps_load_page(doc->xpsdoc, pageno - 1);
+	page->page = fz_load_page(doc->xpsdoc, pageno - 1);
     }
     fz_catch(doc->ctx)
     {
@@ -219,7 +263,7 @@ Java_org_ebookdroid_droids_xps_codec_XpsPage_open(JNIEnv *env, jclass clazz, jlo
 //New draw page
     page->pageList = fz_new_display_list(doc->ctx);
     fz_device *dev = fz_new_list_device(doc->ctx, page->pageList);
-    xps_run_page(doc->xpsdoc, page->page, dev, fz_identity, NULL);
+    fz_run_page(doc->xpsdoc, page->page, dev, fz_identity, NULL);
     fz_free_device(dev);
 //
 
@@ -242,7 +286,7 @@ Java_org_ebookdroid_droids_xps_codec_XpsPage_free(JNIEnv *env, jclass clazz, jlo
     if (page)
     {
         if (page->page)
-            xps_free_page(doc->xpsdoc, page->page);
+            fz_free_page(doc->xpsdoc, page->page);
 
         if (page->pageList)
             fz_free_display_list(doc->ctx, page->pageList);
@@ -260,7 +304,7 @@ Java_org_ebookdroid_droids_xps_codec_XpsPage_getBounds(JNIEnv *env, jclass clazz
     jfloat *bbox = (*env)->GetPrimitiveArrayCritical(env, bounds, 0);
     if (!bbox)
         return;
-    fz_rect page_bounds = xps_bound_page(doc->xpsdoc, page->page);
+    fz_rect page_bounds = fz_bound_page(doc->xpsdoc, page->page);
     DEBUG("Bounds: %f %f %f %f", page_bounds.x0, page_bounds.y0, page_bounds.x1, page_bounds.y1);
     bbox[0] = page_bounds.x0;
     bbox[1] = page_bounds.y0;
@@ -320,10 +364,10 @@ Java_org_ebookdroid_droids_xps_codec_XpsPage_renderPage(JNIEnv *env, jobject thi
 
     DEBUG("doing the rendering...");
 
-    fz_clear_pixmap_with_color(pixmap, 0xff);
+    fz_clear_pixmap_with_value(doc->ctx, pixmap, 0xff);
 
     dev = fz_new_draw_device(doc->ctx, pixmap);
-    fz_execute_display_list(page->pageList, dev, ctm, viewbox, NULL);
+    fz_run_display_list(page->pageList, dev, ctm, viewbox, NULL);
     fz_free_device(dev);
 
     (*env)->ReleasePrimitiveArrayCritical(env, bufferarray, buffer, 0);
@@ -411,13 +455,13 @@ Java_org_ebookdroid_droids_xps_codec_XpsPage_renderPageBitmap(JNIEnv *env, jobje
 
     DEBUG("doing the rendering...");
 
-    fz_clear_pixmap_with_color(pixmap, 0xff);
+    fz_clear_pixmap_with_value(doc->ctx, pixmap, 0xff);
     DEBUG("doing the rendering...0");
 
     dev = fz_new_draw_device(doc->ctx, pixmap);
     DEBUG("doing the rendering...1");
 
-    fz_execute_display_list(page->pageList, dev, ctm, viewbox, NULL);
+    fz_run_display_list(page->pageList, dev, ctm, viewbox, NULL);
 
     DEBUG("doing the rendering...2");
 
@@ -441,7 +485,7 @@ Java_org_ebookdroid_droids_xps_codec_XpsOutline_open(JNIEnv *env, jclass clazz, 
     renderdocument_t *doc = (renderdocument_t*) (long) dochandle;
 
     if (!doc->outline)
-        doc->outline = xps_load_outline(doc->xpsdoc);
+        doc->outline = fz_load_outline(doc->xpsdoc);
 
     DEBUG("XpsOutline.open(): return handle = %p", doc->outline);
     return (jlong) (long) doc->outline;

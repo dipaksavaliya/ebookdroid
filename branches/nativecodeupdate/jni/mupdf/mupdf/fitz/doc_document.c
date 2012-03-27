@@ -3,7 +3,7 @@
 /* Yuck! Promiscuous we are. */
 extern struct pdf_document *pdf_open_document(fz_context *ctx, char *filename);
 extern struct xps_document *xps_open_document(fz_context *ctx, char *filename);
-extern struct cbz_document *cbz_open_document(fz_context *ctx, char *filename);
+//extern struct cbz_document *cbz_open_document(fz_context *ctx, char *filename);
 
 static inline int fz_tolower(int c)
 {
@@ -31,8 +31,8 @@ fz_open_document(fz_context *ctx, char *filename)
 		return (fz_document*) pdf_open_document(ctx, filename);
 	if (ext && !fz_strcasecmp(ext, ".xps"))
 		return (fz_document*) xps_open_document(ctx, filename);
-	if (ext && !fz_strcasecmp(ext, ".cbz"))
-		return (fz_document*) cbz_open_document(ctx, filename);
+//	if (ext && !fz_strcasecmp(ext, ".cbz"))
+//		return (fz_document*) cbz_open_document(ctx, filename);
 	fz_throw(ctx, "unknown document type: '%s'", filename);
 	return NULL;
 }
