@@ -4,10 +4,9 @@
 
 #include <nativebitmap.h>
 
-#include <errno.h>
+//nclude <errno.h>
 
 #include <fitz.h>
-//#include <mupdf.h>
 
 /* Debugging helper */
 
@@ -254,13 +253,13 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfLinks_fillPageLinkSourceRect(JNIEnv 
 
     if (!link || link->dest.kind != FZ_LINK_GOTO)
     {
-        return 0;
+        return JNI_FALSE;
     }
 
     jfloat *bounds = (*env)->GetPrimitiveArrayCritical(env, boundsArray, 0);
     if (!bounds)
     {
-        return 0;
+        return JNI_FALSE;
     }
 
     bounds[0] = link->rect.x0;
@@ -270,7 +269,7 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfLinks_fillPageLinkSourceRect(JNIEnv 
 
     (*env)->ReleasePrimitiveArrayCritical(env, boundsArray, bounds, 0);
 
-    return 1;
+    return JNI_TRUE;
 }
 
 JNIEXPORT jint JNICALL
@@ -294,13 +293,13 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfLinks_fillPageLinkTargetPoint(JNIEnv
 
     if (!link || link->dest.kind != FZ_LINK_GOTO)
     {
-        return 0;
+        return JNI_FALSE;
     }
 
     jfloat *point = (*env)->GetPrimitiveArrayCritical(env, pointArray, 0);
     if (!point)
     {
-        return 0;
+        return JNI_FALSE;
     }
 
     point[0] = link->dest.ld.gotor.lt.x;
@@ -308,7 +307,7 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfLinks_fillPageLinkTargetPoint(JNIEnv
 
     (*env)->ReleasePrimitiveArrayCritical(env, pointArray, point, 0);
 
-    return 1;
+    return JNI_TRUE;
 }
 
 JNIEXPORT jint JNICALL
@@ -505,22 +504,22 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPageBitmap(JNIEnv *env, j
 
     if ((ret = NativeBitmap_getInfo(env, bitmap, &info)) < 0)
     {
-        ERROR("AndroidBitmap_getInfo() failed ! error=%d", ret);
-        return 0;
+        ERROR("NativeBitmap_getInfo() failed ! error=%d", ret);
+        return JNI_FALSE;
     }
 
     // DEBUG("Checking format\n");
     if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888)
     {
         ERROR("Bitmap format is not RGBA_8888 !");
-        return 0;
+        return JNI_FALSE;
     }
 
     // DEBUG("locking pixels\n");
     if ((ret = NativeBitmap_lockPixels(env, bitmap, &pixels)) < 0)
     {
         ERROR("AndroidBitmap_lockPixels() failed ! error=%d", ret);
-        return 0;
+        return JNI_FALSE;
     }
 
     ctm = fz_identity;
@@ -559,7 +558,7 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPageBitmap(JNIEnv *env, j
 
     NativeBitmap_unlockPixels(env, bitmap);
 
-    return 1;
+    return JNI_TRUE;
 }
 
 //Outline
@@ -633,13 +632,13 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfOutline_fillLinkTargetPoint(JNIEnv *
 
     if (!outline || outline->dest.kind != FZ_LINK_GOTO)
     {
-        return 0;
+        return JNI_FALSE;
     }
 
     jfloat *point = (*env)->GetPrimitiveArrayCritical(env, pointArray, 0);
     if (!point)
     {
-        return 0;
+        return JNI_FALSE;
     }
 
     point[0] = outline->dest.ld.gotor.lt.x;
@@ -647,25 +646,21 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfOutline_fillLinkTargetPoint(JNIEnv *
 
     (*env)->ReleasePrimitiveArrayCritical(env, pointArray, point, 0);
 
-    return 1;
+    return JNI_TRUE;
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_mupdf_codec_MuPdfOutline_getNext(JNIEnv *env, jclass clazz, jlong outlinehandle)
 {
     fz_outline *outline = (fz_outline*) (long) outlinehandle;
-//	DEBUG("PdfOutline_getNext(%p)",outline);
-    if (!outline)
-        return 0;
-    return (jlong) (long) outline->next;
+//	DEBUG("MuPdfOutline_getNext(%p)",outline);
+    return (jlong)(long)(outline?outline->next:NULL);
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_mupdf_codec_MuPdfOutline_getChild(JNIEnv *env, jclass clazz, jlong outlinehandle)
 {
     fz_outline *outline = (fz_outline*) (long) outlinehandle;
-//	DEBUG("PdfOutline_getChild(%p)",outline);
-    if (!outline)
-        return 0;
-    return (jlong) (long) outline->down;
+//	DEBUG("MuPdfOutline_getChild(%p)",outline);
+    return (jlong)(long)(outline?outline->down:NULL);
 }
