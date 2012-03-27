@@ -71,6 +71,8 @@ static void xps_free_document(renderdocument_t* doc)
     }
 }
 
+//extern struct xps_document *xps_open_document(fz_context *ctx, char *filename);
+
 JNIEXPORT jlong JNICALL
 Java_org_ebookdroid_droids_xps_codec_XpsDocument_open(JNIEnv *env, jclass clazz, jint storememory, jstring fname)
 {
@@ -104,7 +106,8 @@ Java_org_ebookdroid_droids_xps_codec_XpsDocument_open(JNIEnv *env, jclass clazz,
     
     fz_try(doc->ctx)
     {
-	doc->xpsdoc = fz_open_document(doc->ctx, filename);
+//	doc->xpsdoc = fz_open_document(doc->ctx, filename);
+	doc->xpsdoc = (fz_document*) xps_open_document(doc->ctx, filename);
     }
     fz_catch(doc->ctx)
     {
