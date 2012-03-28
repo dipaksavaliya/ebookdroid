@@ -5,6 +5,7 @@ import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.PageLink;
+import org.ebookdroid.core.codec.PageTextBox;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.emdev.utils.LengthUtils;
+
 public class DjvuPage implements CodecPage {
 
     private static final boolean useNativeGraphics;
@@ -25,13 +28,15 @@ public class DjvuPage implements CodecPage {
         useNativeGraphics = isNativeGraphicsAvailable();
     }
 
+    private long contextHandle;
     private long docHandle;
     private long pageHandle;
     private int pageNo;
 
     // TODO: remove all async operations
 
-    DjvuPage(final long docHandle, final long pageHandle, final int pageNo) {
+    DjvuPage(final long contextHandle, final long docHandle, final long pageHandle, final int pageNo) {
+        this.contextHandle = contextHandle;
         this.docHandle = docHandle;
         this.pageHandle = pageHandle;
         this.pageNo = pageNo;
@@ -140,5 +145,19 @@ public class DjvuPage implements CodecPage {
         return Collections.emptyList();
     }
 
+    @Override
+    public List<PageTextBox> getPageText() {
+        List<PageTextBox> list = getPageText(docHandle, pageNo, contextHandle);
+        if (LengthUtils.isNotEmpty(list)) {
+            for (PageTextBox pageTextBox : list) {
+                System.out.println("" + pageTextBox);
+            }
+        }
+        return list;
+    }
+
     private native static ArrayList<PageLink> getPageLinks(long docHandle, int pageNo);
+
+    private native static List<PageTextBox> getPageText(long docHandle, int pageNo, long contextHandle);
+
 }

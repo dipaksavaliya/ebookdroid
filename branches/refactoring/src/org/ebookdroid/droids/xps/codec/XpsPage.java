@@ -4,6 +4,7 @@ import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.PageLink;
+import org.ebookdroid.core.codec.PageTextBox;
 import org.ebookdroid.droids.pdf.codec.PdfContext;
 
 import android.graphics.Bitmap;
@@ -118,6 +119,11 @@ public class XpsPage implements CodecPage {
         return b;
     }
     
+    @Override
+    public List<PageTextBox> getPageText() {
+        return Collections.emptyList();
+    }
+
     private static native void getBounds(long dochandle, long handle, float[] bounds);
 
     private static native void free(long dochandle, long handle);

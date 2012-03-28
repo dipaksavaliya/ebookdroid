@@ -339,6 +339,9 @@ public class DecodeServiceBase implements DecodeService {
             // before opening new native page
             pages.put(pageIndex, null);
             page = document.getPage(pageIndex);
+
+            // !!! For debug purpose only
+            page.getPageText();
         }
         pages.put(pageIndex, new SoftReference<CodecPage>(page));
         return page;

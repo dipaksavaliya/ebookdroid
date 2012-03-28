@@ -20,7 +20,7 @@ public class DjvuDocument extends AbstractCodecDocument {
 
     @Override
     public DjvuPage getPage(final int pageNumber) {
-        return new DjvuPage(documentHandle, getPage(documentHandle, pageNumber), pageNumber);
+        return new DjvuPage(context.getContextHandle(), documentHandle, getPage(documentHandle, pageNumber), pageNumber);
     }
 
     @Override

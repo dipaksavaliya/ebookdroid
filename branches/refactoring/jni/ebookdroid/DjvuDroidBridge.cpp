@@ -348,6 +348,143 @@ extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageLinks(J
     return djvu_links_get_links(env, (ddjvu_document_t*) docHandle, pageNumber);
 }
 
+void djvu_get_djvu_words(JNIEnv *env, jmethodID alAddMethodId, jclass ptbClass, jmethodID ptbInitMethodId, jobject list, miniexp_t expr)
+{
+    int coords[4];
+
+    if (!miniexp_consp(expr))
+    {
+        return;
+    }
+
+    miniexp_t head = miniexp_car(expr);
+    expr = miniexp_cdr(expr);
+    if (!miniexp_symbolp(head))
+    {
+        return;
+    }
+
+    int i;
+    for (i = 0; i < 4 && miniexp_consp(expr); i++)
+    {
+        head = miniexp_car(expr);
+        expr = miniexp_cdr(expr);
+
+        if (!miniexp_numberp(head))
+        {
+            return;
+        }
+        coords[i] = miniexp_to_int(head);
+    }
+
+    while (miniexp_consp(expr))
+    {
+        head = miniexp_car(expr);
+
+        if (miniexp_stringp(head))
+        {
+            const char* text = miniexp_to_str(head);
+
+            DEBUG_PRINT("%d, %d, %d, %d: %s", coords[0], coords[1], coords[2], coords[3], text);
+
+            // add to list
+
+            jfieldID fid;
+            jobject ptb = env->NewObject(ptbClass, ptbInitMethodId);
+
+            fid = env->GetFieldID(ptbClass, "left", "F");
+            if (!fid)
+            {
+                DEBUG_PRINT("No left field found", fid);
+                return;
+            }
+            env->SetFloatField(ptb, fid, (jfloat)(float)coords[0]);
+
+            fid = env->GetFieldID(ptbClass, "top", "F");
+            if (!fid)
+            {
+                DEBUG_PRINT("No top field found", fid);
+                return;
+            }
+            env->SetFloatField(ptb, fid, (jfloat)(float)coords[1]);
+
+            fid = env->GetFieldID(ptbClass, "right", "F");
+            if (!fid)
+            {
+                DEBUG_PRINT("No right field found", fid);
+                return;
+            }
+            env->SetFloatField(ptb, fid, (jfloat)(float)coords[2]);
+
+            fid = env->GetFieldID(ptbClass, "bottom", "F");
+            if (!fid)
+            {
+                DEBUG_PRINT("No bottom field found", fid);
+                return;
+            }
+            env->SetFloatField(ptb, fid, (jfloat)(float)coords[3]);
+
+            fid = env->GetFieldID(ptbClass, "text", "Ljava/lang/String;");
+            if (!fid)
+            {
+                DEBUG_PRINT("No text field found", fid);
+                return;
+            }
+            env->SetObjectField(ptb, fid, env->NewStringUTF(text));
+
+            env->CallBooleanMethod(list, alAddMethodId, ptb);
+
+        }
+        else if (miniexp_consp(head))
+        {
+            djvu_get_djvu_words(env, alAddMethodId, ptbClass, ptbInitMethodId, list, head);
+        }
+
+        expr = miniexp_cdr(expr);
+    }
+}
+
+extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageText(JNIEnv *jenv, jclass cls,
+                                                                                 jlong docHandle, jint pageNumber, jlong contextHandle)
+{
+    miniexp_t r = miniexp_nil;
+
+    while ((r = ddjvu_document_get_pagetext((ddjvu_document_t*) docHandle, pageNumber, "word")) == miniexp_dummy)
+    {
+        Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(jenv, cls, contextHandle);
+    }
+
+    if (r == miniexp_nil || !miniexp_consp(r))
+    {
+        DEBUG_PRINT("getPageLinks(%d): no text on page", pageNumber);
+        return NULL;
+    }
+
+    DEBUG_PRINT("getPageLinks(%d): text on page found", pageNumber);
+
+    jclass arrayListClass = jenv->FindClass("java/util/ArrayList");
+    if (!arrayListClass) return NULL;
+
+    jmethodID alInitMethodId = jenv->GetMethodID(arrayListClass, "<init>", "()V");
+    if (!alInitMethodId) return NULL;
+
+    jmethodID alAddMethodId = jenv->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    if (!alAddMethodId) return NULL;
+
+    jclass ptbClass = jenv->FindClass("org/ebookdroid/core/codec/PageTextBox");
+    if (!ptbClass) return NULL;
+
+    jmethodID ptbInitMethodId = jenv->GetMethodID(ptbClass, "<init>", "()V");
+    if (!ptbInitMethodId) return NULL;
+
+    jobject arrayList = jenv->NewObject(arrayListClass, alInitMethodId);
+    if (!arrayList) return NULL;
+
+    djvu_get_djvu_words(jenv, alAddMethodId, ptbClass, ptbInitMethodId, arrayList, r);
+
+    return arrayList;
+}
+
 extern "C" jint Java_org_ebookdroid_droids_djvu_codec_DjvuDocument_getPageInfo(JNIEnv *env, jclass cls, jlong docHandle,
                                                                              jint pageNumber, jlong contextHandle,
                                                                              jobject cpi)

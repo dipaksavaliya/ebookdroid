@@ -16,6 +16,8 @@ public interface CodecPage {
 
     List<PageLink> getPageLinks();
 
+    List<PageTextBox> getPageText();
+
     void recycle();
 
     boolean isRecycled();
