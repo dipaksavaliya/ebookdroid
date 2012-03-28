@@ -11,11 +11,14 @@ import java.util.List;
 
 public class MuPdfDocument extends AbstractCodecDocument {
 
+    public static final int FORMAT_PDF = 0;
+    public static final int FORMAT_XPS = 1;
+    
     // TODO: Must be configurable
     private static final int STOREMEMORY = 64 << 20;
 
-    MuPdfDocument(final MuPdfContext context, final String fname, final String pwd) {
-        super(context, open(STOREMEMORY, fname, pwd));
+    MuPdfDocument(final MuPdfContext context, int format, final String fname, final String pwd) {
+        super(context, open(STOREMEMORY, format, fname, pwd));
     }
 
     @Override
@@ -72,7 +75,7 @@ public class MuPdfDocument extends AbstractCodecDocument {
 
     native static int getPageInfo(long docHandle, int pageNumber, CodecPageInfo cpi);
 
-    private static native long open(int storememory, String fname, String pwd);
+    private static native long open(int storememory, int format, String fname, String pwd);
 
     private static native void free(long handle);
 

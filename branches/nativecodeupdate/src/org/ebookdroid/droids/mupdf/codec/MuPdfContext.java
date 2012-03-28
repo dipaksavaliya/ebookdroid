@@ -24,10 +24,12 @@ public class MuPdfContext extends AbstractCodecContext {
         return useNativeGraphics ? NATIVE_BITMAP_CFG : BITMAP_CFG;
     }
 
-    @Override
-    public CodecDocument openDocument(final String fileName, final String password) {
-        return new MuPdfDocument(this, fileName, password);
-    }
 
+    @Override
+    public CodecDocument openDocument(String fileName, String password) {
+        return null;
+    }
+    
     private static native boolean isNativeGraphicsAvailable();
+
 }

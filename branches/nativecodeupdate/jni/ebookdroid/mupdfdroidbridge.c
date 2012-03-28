@@ -4,9 +4,12 @@
 
 #include <nativebitmap.h>
 
-//nclude <errno.h>
-
 #include <fitz.h>
+#include <mupdf.h>
+#include <muxps.h>
+
+#define FORMAT_PDF 0
+#define FORMAT_XPS 1
 
 /* Debugging helper */
 
@@ -25,6 +28,7 @@ struct renderdocument_s
     fz_context *ctx;
     fz_document *document;
     fz_outline *outline;
+    unsigned char format; // save current document format.
 };
 
 typedef struct renderpage_s renderpage_t;
@@ -68,7 +72,7 @@ static void mupdf_free_document(renderdocument_t* doc)
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_open(JNIEnv *env, jclass clazz, jint storememory, jstring fname,
+Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_open(JNIEnv *env, jclass clazz, jint storememory, jint format, jstring fname,
                                                       jstring pwd)
 {
     renderdocument_t *doc;
@@ -100,10 +104,15 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfDocument_open(JNIEnv *env, jclass cl
     doc->outline = NULL;
 
 //    fz_set_aa_level(fz_catch(ctx), alphabits);
-
+    doc->format = format;
     fz_try(doc->ctx)
     {
-        doc->document = fz_open_document(doc->ctx, filename);
+	if(format == FORMAT_XPS)
+	    doc->document = (fz_document*) xps_open_document(doc->ctx, filename);
+	else // FORMAT_PDF
+	    doc->document = (fz_document*) pdf_open_document(doc->ctx, filename);
+
+//        doc->document = fz_open_document(doc->ctx, filename);
     }
     fz_catch(doc->ctx)
     {
