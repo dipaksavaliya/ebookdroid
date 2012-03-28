@@ -28,8 +28,10 @@ public class MuPdfPage implements CodecPage {
         this.pageHandle = pageHandle;
         this.docHandle = docHandle;
         this.pageBounds = getBounds();
-        this.actualWidth = AbstractCodecContext.getWidthInPixels(pageBounds.width());
-        this.actualHeight = AbstractCodecContext.getHeightInPixels(pageBounds.height());
+        //this.actualWidth = AbstractCodecContext.getWidthInPixels(pageBounds.width());
+        //this.actualHeight = AbstractCodecContext.getHeightInPixels(pageBounds.height());
+        this.actualWidth = (int) pageBounds.width();
+        this.actualHeight = (int) pageBounds.height();
     }
 
     @Override

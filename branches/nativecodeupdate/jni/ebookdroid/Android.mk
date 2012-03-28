@@ -14,8 +14,6 @@ LOCAL_CFLAGS :=
 
 LOCAL_SRC_FILES := \
 	ebookdroidjni.c \
-	pdfdroidbridge.c \
-	xpsdroidbridge.c \
 	DjvuDroidBridge.cpp \
 	cbdroidbridge.c \
 	mupdfdroidbridge.c \

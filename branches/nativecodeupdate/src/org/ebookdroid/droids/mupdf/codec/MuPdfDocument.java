@@ -43,8 +43,8 @@ public class MuPdfDocument extends AbstractCodecDocument {
         } else {
             // Check rotation
             info.rotation = (360 + info.rotation) % 360;
-            info.width = (MuPdfContext.getWidthInPixels(info.width));
-            info.height = (MuPdfContext.getHeightInPixels(info.height));
+            //info.width = (MuPdfContext.getWidthInPixels(info.width));
+            //info.height = (MuPdfContext.getHeightInPixels(info.height));
             return info;
         }
     }
