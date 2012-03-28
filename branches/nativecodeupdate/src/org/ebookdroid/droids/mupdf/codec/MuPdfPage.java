@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
 import java.util.List;
 
@@ -131,6 +132,17 @@ public class MuPdfPage implements CodecPage {
     public List<PageLink> getPageLinks() {
         return MuPdfLinks.getPageLinks(docHandle, pageHandle, pageBounds);
     }
+    
+    RectF[] searchText(String text)
+    {
+//        RectF[] rrr = search(docHandle, pageHandle, "te");
+//        if(rrr != null)
+//        {
+//            for(int i = 0;i< rrr.length; i++)
+//                Log.i("Search", "[" +rrr[i].bottom +"," + rrr[i].left + "]");
+//        }
+        return search(docHandle, pageHandle, text);
+    }
 
     private static native void getBounds(long dochandle, long handle, float[] bounds);
 
@@ -143,4 +155,6 @@ public class MuPdfPage implements CodecPage {
 
     private static native boolean renderPageBitmap(long dochandle, long pagehandle, int[] viewboxarray,
             float[] matrixarray, Bitmap bitmap);
+    
+    private static native RectF[] search(long dochandle, long pagehandle, String text);
 }
