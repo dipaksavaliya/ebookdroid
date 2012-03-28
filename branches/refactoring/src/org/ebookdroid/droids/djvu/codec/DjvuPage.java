@@ -139,7 +139,7 @@ public class DjvuPage implements CodecPage {
 
     @Override
     public List<? extends RectF> searchText(final String pattern) {
-        final List<PageTextBox> list = getPageText(docHandle, pageNo, contextHandle, pattern);
+        final List<PageTextBox> list = getPageText(docHandle, pageNo, contextHandle, pattern.toLowerCase());
         if (LengthUtils.isNotEmpty(list)) {
             final float width = getWidth();
             final float height = getHeight();
