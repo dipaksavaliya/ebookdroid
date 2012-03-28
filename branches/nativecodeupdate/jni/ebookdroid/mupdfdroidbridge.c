@@ -572,6 +572,7 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPageBitmap(JNIEnv *env, j
     return JNI_TRUE;
 }
 
+/*
 #define MAX_SEARCH_HITS 500
 
 static fz_text_char textcharat(fz_text_page *page, int idx)
@@ -589,7 +590,6 @@ static fz_text_char textcharat(fz_text_page *page, int idx)
 			{
 				if (idx < ofs + span->len)
 					return span->text[idx - ofs];
-				/* pseudo-newline */
 				if (span + 1 == line->spans + line->len)
 				{
 					if (idx == ofs + span->len)
@@ -628,7 +628,7 @@ textlen(fz_text_page *page)
 		{
 			for (span = line->spans; span < line->spans + line->len; span++)
 				len += span->len;
-			len++; /* pseudo-newline */
+			len++;
 		}
 	}
 	return len;
@@ -752,9 +752,7 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_search(JNIEnv * env, jobject th
 
     return arr;
 }
-
-
-
+*/
 
 //Outline
 JNIEXPORT jlong JNICALL
