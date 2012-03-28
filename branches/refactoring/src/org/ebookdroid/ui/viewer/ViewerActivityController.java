@@ -83,7 +83,9 @@ actions = {
         @ActionMethodDef(id = R.id.mainmenu_thumbnail, method = "setCurrentPageAsThumbnail"),
         @ActionMethodDef(id = R.id.actions_toggleTouchManagerView, method = "toggleControls"),
         @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu"),
-        @ActionMethodDef(id = R.id.actions_keyBindings, method = "showKeyBindingsDialog")
+        @ActionMethodDef(id = R.id.actions_keyBindings, method = "showKeyBindingsDialog"),
+        @ActionMethodDef(id = R.id.mainmenu_search, method = "showSearchDialog"),
+        @ActionMethodDef(id = R.id.actions_doSearch, method = "doSearch")
 // finish
 })
 public class ViewerActivityController extends ActionController<ViewerActivity> implements IActivityController,
@@ -423,6 +425,25 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         } else {
             getManagedComponent().showToastText(Toast.LENGTH_SHORT, R.string.outline_missed);
         }
+    }
+
+    @ActionMethod(ids = R.id.mainmenu_search)
+    public final void showSearchDialog(final ActionEx action) {
+        final EditText input = new EditText(getManagedComponent());
+        input.setText("");
+        input.selectAll();
+
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+        builder.setTitle("Search...").setMessage("Enter text to search").setView(input);
+        builder.setPositiveButton(R.id.actions_doSearch, new EditableValue("input", input));
+        builder.setNegativeButton().show();
+    }
+
+    @ActionMethod(ids = R.id.actions_doSearch)
+    public final void doSearch(final ActionEx action) {
+        final Editable value = action.getParameter("input");
+        final String text = value.toString();
+        new SearchTask().execute(text);
     }
 
     @ActionMethod(ids = R.id.mainmenu_goto_page)
@@ -795,6 +816,33 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                     progressDialog.setMessage(values[0]);
                 }
             }
+        }
+    }
+
+    final class SearchTask extends AsyncTask<String, String, String> {
+
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected String doInBackground(final String... params) {
+            String pattern = LengthUtils.isNotEmpty(params) ? params[0] : null;
+            if (LengthUtils.isEmpty(pattern)) {
+                for(Page page : getDocumentModel().getPages()) {
+                    page.clearHighlights();
+                }
+                getDocumentController().redrawView();
+            } else {
+                Page page = getDocumentModel().getCurrentPageObject();
+                if (page != null) {
+                    getDocumentModel().getDecodeService().searchText(page, pattern);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
         }
     }
 }

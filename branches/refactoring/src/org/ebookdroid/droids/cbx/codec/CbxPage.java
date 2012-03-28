@@ -114,6 +114,11 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> implements CodecPage
     }
 
     @Override
+    public List<? extends RectF> searchText(String pattern) {
+        return Collections.emptyList();
+    }
+
+    @Override
     public boolean isRecycled() {
         return false;
     }
@@ -150,9 +155,9 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> implements CodecPage
         final Canvas c = new Canvas(bmp.getBitmap());
 
         final Rect srcRect = new Rect((int) (pageSliceBounds.left * storedBitmap.getWidth()),
-                (int) (pageSliceBounds.top * storedBitmap.getHeight()),
-                (int)FloatMath.ceil(pageSliceBounds.right * storedBitmap.getWidth()),
-                (int)FloatMath.ceil(pageSliceBounds.bottom * storedBitmap.getHeight()));
+                (int) (pageSliceBounds.top * storedBitmap.getHeight()), (int) FloatMath.ceil(pageSliceBounds.right
+                        * storedBitmap.getWidth()), (int) FloatMath.ceil(pageSliceBounds.bottom
+                        * storedBitmap.getHeight()));
 
         if (CbxDocument.LCTX.isDebugEnabled()) {
             CbxDocument.LCTX.d("source ratio=" + (srcRect.width() / (float) srcRect.height()) + ", target ratio="

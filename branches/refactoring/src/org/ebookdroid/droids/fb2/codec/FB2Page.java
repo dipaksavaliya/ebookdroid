@@ -61,6 +61,11 @@ public class FB2Page implements CodecPage {
     }
 
     @Override
+    public List<? extends RectF> searchText(String pattern) {
+        return Collections.emptyList();
+    }
+
+    @Override
     public void recycle() {
     }
 

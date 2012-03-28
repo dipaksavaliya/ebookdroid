@@ -17,6 +17,8 @@ public interface DecodeService {
 
     void decodePage(ViewState viewState, PageTreeNode node);
 
+    void searchText(Page page, String pattern);
+
     void stopDecoding(PageTreeNode node, String reason);
 
     int getPageCount();
@@ -44,4 +46,11 @@ public interface DecodeService {
         void decodeComplete(CodecPage codecPage, BitmapRef bitmap, Rect bitmapBounds, RectF croppedPageBounds);
 
     }
+
+    interface SearchCallback {
+
+        void searchComplete(List<? extends RectF> regions);
+
+    }
+
 }

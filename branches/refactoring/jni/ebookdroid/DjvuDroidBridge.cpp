@@ -348,7 +348,7 @@ extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageLinks(J
     return djvu_links_get_links(env, (ddjvu_document_t*) docHandle, pageNumber);
 }
 
-void djvu_get_djvu_words(JNIEnv *env, jmethodID alAddMethodId, jclass ptbClass, jmethodID ptbInitMethodId, jobject list, miniexp_t expr)
+void djvu_get_djvu_words(JNIEnv *env, jmethodID alAddMethodId, jclass ptbClass, jmethodID ptbInitMethodId, jobject list, miniexp_t expr, const char* pattern)
 {
     int coords[4];
 
@@ -387,57 +387,59 @@ void djvu_get_djvu_words(JNIEnv *env, jmethodID alAddMethodId, jclass ptbClass, 
 
             DEBUG_PRINT("%d, %d, %d, %d: %s", coords[0], coords[1], coords[2], coords[3], text);
 
-            // add to list
-
-            jfieldID fid;
-            jobject ptb = env->NewObject(ptbClass, ptbInitMethodId);
-
-            fid = env->GetFieldID(ptbClass, "left", "F");
-            if (!fid)
+            if (!pattern || (pattern && strcasestr(text, pattern)))
             {
-                DEBUG_PRINT("No left field found", fid);
-                return;
+                // add to list
+
+                jfieldID fid;
+                jobject ptb = env->NewObject(ptbClass, ptbInitMethodId);
+
+                fid = env->GetFieldID(ptbClass, "left", "F");
+                if (!fid)
+                {
+                    DEBUG_PRINT("No left field found", fid);
+                    return;
+                }
+                env->SetFloatField(ptb, fid, (jfloat) (float) coords[0]);
+
+                fid = env->GetFieldID(ptbClass, "top", "F");
+                if (!fid)
+                {
+                    DEBUG_PRINT("No top field found", fid);
+                    return;
+                }
+                env->SetFloatField(ptb, fid, (jfloat) (float) coords[1]);
+
+                fid = env->GetFieldID(ptbClass, "right", "F");
+                if (!fid)
+                {
+                    DEBUG_PRINT("No right field found", fid);
+                    return;
+                }
+                env->SetFloatField(ptb, fid, (jfloat) (float) coords[2]);
+
+                fid = env->GetFieldID(ptbClass, "bottom", "F");
+                if (!fid)
+                {
+                    DEBUG_PRINT("No bottom field found", fid);
+                    return;
+                }
+                env->SetFloatField(ptb, fid, (jfloat) (float) coords[3]);
+
+                fid = env->GetFieldID(ptbClass, "text", "Ljava/lang/String;");
+                if (!fid)
+                {
+                    DEBUG_PRINT("No text field found", fid);
+                    return;
+                }
+                env->SetObjectField(ptb, fid, env->NewStringUTF(text));
+
+                env->CallBooleanMethod(list, alAddMethodId, ptb);
             }
-            env->SetFloatField(ptb, fid, (jfloat)(float)coords[0]);
-
-            fid = env->GetFieldID(ptbClass, "top", "F");
-            if (!fid)
-            {
-                DEBUG_PRINT("No top field found", fid);
-                return;
-            }
-            env->SetFloatField(ptb, fid, (jfloat)(float)coords[1]);
-
-            fid = env->GetFieldID(ptbClass, "right", "F");
-            if (!fid)
-            {
-                DEBUG_PRINT("No right field found", fid);
-                return;
-            }
-            env->SetFloatField(ptb, fid, (jfloat)(float)coords[2]);
-
-            fid = env->GetFieldID(ptbClass, "bottom", "F");
-            if (!fid)
-            {
-                DEBUG_PRINT("No bottom field found", fid);
-                return;
-            }
-            env->SetFloatField(ptb, fid, (jfloat)(float)coords[3]);
-
-            fid = env->GetFieldID(ptbClass, "text", "Ljava/lang/String;");
-            if (!fid)
-            {
-                DEBUG_PRINT("No text field found", fid);
-                return;
-            }
-            env->SetObjectField(ptb, fid, env->NewStringUTF(text));
-
-            env->CallBooleanMethod(list, alAddMethodId, ptb);
-
         }
         else if (miniexp_consp(head))
         {
-            djvu_get_djvu_words(env, alAddMethodId, ptbClass, ptbInitMethodId, list, head);
+            djvu_get_djvu_words(env, alAddMethodId, ptbClass, ptbInitMethodId, list, head, pattern);
         }
 
         expr = miniexp_cdr(expr);
@@ -445,7 +447,7 @@ void djvu_get_djvu_words(JNIEnv *env, jmethodID alAddMethodId, jclass ptbClass, 
 }
 
 extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageText(JNIEnv *jenv, jclass cls,
-                                                                                 jlong docHandle, jint pageNumber, jlong contextHandle)
+                                                                                 jlong docHandle, jint pageNumber, jlong contextHandle, jstring pattern)
 {
     miniexp_t r = miniexp_nil;
 
@@ -480,7 +482,14 @@ extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageText(JN
     jobject arrayList = jenv->NewObject(arrayListClass, alInitMethodId);
     if (!arrayList) return NULL;
 
-    djvu_get_djvu_words(jenv, alAddMethodId, ptbClass, ptbInitMethodId, arrayList, r);
+    const char* patternStr = pattern ? jenv->GetStringUTFChars(pattern, NULL) : NULL;
+
+    djvu_get_djvu_words(jenv, alAddMethodId, ptbClass, ptbInitMethodId, arrayList, r, patternStr);
+
+    if(patternStr)
+    {
+        jenv->ReleaseStringUTFChars(pattern, patternStr);
+    }
 
     return arrayList;
 }

@@ -137,6 +137,11 @@ public class PdfPage implements CodecPage {
         return Collections.emptyList();
     }
 
+    @Override
+    public List<? extends RectF> searchText(String pattern) {
+        return Collections.emptyList();
+    }
+
     private static native void getBounds(long dochandle, long handle, float[] bounds);
 
     private static native void free(long dochandle, long handle);

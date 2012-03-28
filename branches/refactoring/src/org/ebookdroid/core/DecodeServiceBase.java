@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.emdev.utils.CompareUtils;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.MathUtils;
 
@@ -122,11 +123,20 @@ public class DecodeServiceBase implements DecodeService {
         this.viewState.set(viewState);
     }
 
+    public void searchText(Page page, String pattern) {
+        if (isRecycled.get()) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Searching not allowed on recycling");
+            }
+            return;
+        }
+
+        final SearchTask decodeTask = new SearchTask(page, pattern);
+        executor.add(decodeTask);
+    }
+
     @Override
     public void decodePage(final ViewState viewState, final PageTreeNode node) {
-        final DecodeTask decodeTask = new DecodeTask(viewState, node);
-        updateViewState(viewState);
-
         if (isRecycled.get()) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Decoding not allowed on recycling");
@@ -134,6 +144,8 @@ public class DecodeServiceBase implements DecodeService {
             return;
         }
 
+        final DecodeTask decodeTask = new DecodeTask(viewState, node);
+        updateViewState(viewState);
         executor.add(decodeTask);
     }
 
@@ -339,9 +351,6 @@ public class DecodeServiceBase implements DecodeService {
             // before opening new native page
             pages.put(pageIndex, null);
             page = document.getPage(pageIndex);
-
-            // !!! For debug purpose only
-            page.getPageText();
         }
         pages.put(pageIndex, new SoftReference<CodecPage>(page));
         return page;
@@ -383,13 +392,13 @@ public class DecodeServiceBase implements DecodeService {
 
         final Map<PageTreeNode, DecodeTask> decodingTasks = new IdentityHashMap<PageTreeNode, DecodeTask>();
 
-        final ArrayList<Runnable> tasks;
+        final ArrayList<Task> tasks;
         final Thread thread;
         final ReentrantLock lock = new ReentrantLock();
         final AtomicBoolean run = new AtomicBoolean(true);
 
         Executor() {
-            tasks = new ArrayList<Runnable>();
+            tasks = new ArrayList<Task>();
             thread = new Thread(this);
 
             final int decodingThreadPriority = SettingsManager.getAppSettings().decodingThreadPriority;
@@ -423,7 +432,7 @@ public class DecodeServiceBase implements DecodeService {
             try {
                 if (!tasks.isEmpty()) {
                     final TaskComparator comp = new TaskComparator(viewState.get());
-                    Runnable candidate = null;
+                    Task candidate = null;
                     int cindex = 0;
 
                     int index = 0;
@@ -439,7 +448,7 @@ public class DecodeServiceBase implements DecodeService {
                         tasks.clear();
                     } else {
                         while (index < tasks.size()) {
-                            final Runnable next = tasks.get(index);
+                            final Task next = tasks.get(index);
                             if (next != null && comp.compare(next, candidate) < 0) {
                                 candidate = next;
                                 cindex = index;
@@ -464,6 +473,39 @@ public class DecodeServiceBase implements DecodeService {
                 }
             }
             return null;
+        }
+
+        public void add(final SearchTask task) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Adding search task: " + task + " for " + task.page.index);
+            }
+
+            lock.lock();
+            try {
+                boolean added = false;
+                for (int index = 0; index < tasks.size(); index++) {
+                    if (null == tasks.get(index)) {
+                        tasks.set(index, task);
+                        if (LCTX.isDebugEnabled()) {
+                            LCTX.d(">>>: " + index + "/" + tasks.size() + ": " + task);
+                        }
+                        added = true;
+                        break;
+                    }
+                }
+                if (!added) {
+                    if (LCTX.isDebugEnabled()) {
+                        LCTX.d("+++: " + tasks.size() + "/" + tasks.size() + ": " + task);
+                    }
+                    tasks.add(task);
+                }
+
+                synchronized (run) {
+                    run.notifyAll();
+                }
+            } finally {
+                lock.unlock();
+            }
         }
 
         public void add(final DecodeTask task) {
@@ -554,24 +596,7 @@ public class DecodeServiceBase implements DecodeService {
                     stopDecoding(task, null, "recycling");
                 }
 
-                tasks.add(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        for (final SoftReference<CodecPage> ref : pages.values()) {
-                            final CodecPage page = ref != null ? ref.get() : null;
-                            if (page != null) {
-                                page.recycle();
-                            }
-                        }
-                        pages.clear();
-                        if (document != null) {
-                            document.recycle();
-                        }
-                        codecContext.recycle();
-                        run.set(false);
-                    }
-                });
+                tasks.add(new ShutdownTask());
 
                 synchronized (run) {
                     run.notifyAll();
@@ -581,9 +606,24 @@ public class DecodeServiceBase implements DecodeService {
                 lock.unlock();
             }
         }
+
+        void shutdown() {
+            for (final SoftReference<CodecPage> ref : pages.values()) {
+                final CodecPage page = ref != null ? ref.get() : null;
+                if (page != null) {
+                    page.recycle();
+                }
+            }
+            pages.clear();
+            if (document != null) {
+                document.recycle();
+            }
+            codecContext.recycle();
+            run.set(false);
+        }
     }
 
-    class TaskComparator implements Comparator<Runnable> {
+    class TaskComparator implements Comparator<Task> {
 
         final PageTreeNodeComparator cmp;
 
@@ -592,31 +632,77 @@ public class DecodeServiceBase implements DecodeService {
         }
 
         @Override
-        public int compare(final Runnable r1, final Runnable r2) {
-            final boolean isTask1 = r1 instanceof DecodeTask;
-            final boolean isTask2 = r2 instanceof DecodeTask;
-
-            if (isTask1 != isTask2) {
-                return isTask1 ? -1 : 1;
+        public int compare(final Task r1, final Task r2) {
+            if (r1.priority < r2.priority) {
+                return -1;
+            }
+            if (r2.priority < r1.priority) {
+                return +1;
             }
 
-            if (!isTask1) {
+            if (r1 instanceof DecodeTask && r2 instanceof DecodeTask) {
+                final DecodeTask t1 = (DecodeTask) r1;
+                final DecodeTask t2 = (DecodeTask) r2;
+
+                if (cmp != null) {
+                    return cmp.compare(t1.node, t2.node);
+                }
                 return 0;
             }
 
-            final DecodeTask t1 = (DecodeTask) r1;
-            final DecodeTask t2 = (DecodeTask) r2;
-
-            if (cmp != null) {
-                return cmp.compare(t1.node, t2.node);
-            }
-
-            return 0;
+            return CompareUtils.compare(r1.id, r2.id);
         }
 
     }
 
-    class DecodeTask implements Runnable {
+    abstract class Task implements Runnable {
+
+        final long id = TASK_ID_SEQ.incrementAndGet();
+        final AtomicBoolean cancelled = new AtomicBoolean();
+        final int priority;
+
+        Task(final int priority) {
+            this.priority = priority;
+        }
+
+    }
+
+    class ShutdownTask extends Task {
+
+        public ShutdownTask() {
+            super(0);
+        }
+
+        @Override
+        public void run() {
+            executor.shutdown();
+        }
+    }
+
+    class SearchTask extends Task {
+
+        final Page page;
+        final String pattern;
+
+        public SearchTask(Page page, String pattern) {
+            super(1);
+            this.page = page;
+            this.pattern = pattern;
+        }
+
+        @Override
+        public void run() {
+            try {
+                List<? extends RectF> regions = getPage(page.index.docIndex).searchText(pattern);
+                page.searchComplete(regions);
+            } catch (Throwable th) {
+                LCTX.e("Unexpected error: ", th);
+                page.searchComplete(null);
+            }
+        }
+    }
+
+    class DecodeTask extends Task {
 
         final long id = TASK_ID_SEQ.incrementAndGet();
         final AtomicBoolean cancelled = new AtomicBoolean();
@@ -626,6 +712,7 @@ public class DecodeServiceBase implements DecodeService {
         final int pageNumber;
 
         DecodeTask(final ViewState viewState, final PageTreeNode node) {
+            super(2);
             this.pageNumber = node.page.index.docIndex;
             this.viewState = viewState;
             this.node = node;
