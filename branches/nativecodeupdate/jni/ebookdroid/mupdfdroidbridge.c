@@ -440,9 +440,8 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPage(JNIEnv *env, jobject
 
     /* initialize parameter arrays for MuPDF */
 
-    ctm = fz_identity;
-
     matrix = (*env)->GetPrimitiveArrayCritical(env, matrixarray, 0);
+    ctm = fz_identity;
     ctm.a = matrix[0];
     ctm.b = matrix[1];
     ctm.c = matrix[2];
@@ -450,7 +449,6 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPage(JNIEnv *env, jobject
     ctm.e = matrix[4];
     ctm.f = matrix[5];
     (*env)->ReleasePrimitiveArrayCritical(env, matrixarray, matrix, 0);
-    // DEBUG( "Matrix: %f %f %f %f %f %f", ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f);
 
     viewboxarr = (*env)->GetPrimitiveArrayCritical(env, viewboxarray, 0);
     viewbox.x0 = viewboxarr[0];
@@ -458,27 +456,30 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPage(JNIEnv *env, jobject
     viewbox.x1 = viewboxarr[2];
     viewbox.y1 = viewboxarr[3];
     (*env)->ReleasePrimitiveArrayCritical(env, viewboxarray, viewboxarr, 0);
-    // DEBUG( "Viewbox: %d %d %d %d", viewbox.x0, viewbox.y0, viewbox.x1, viewbox.y1);
-    /* do the rendering */
 
     buffer = (*env)->GetPrimitiveArrayCritical(env, bufferarray, 0);
 
-    pixmap = fz_new_pixmap_with_data(doc->ctx, fz_device_bgr, viewbox.x1 - viewbox.x0, viewbox.y1 - viewbox.y0,
-        (unsigned char*) buffer);
+    fz_try(doc->ctx)
+    {
+	pixmap = fz_new_pixmap_with_data(doc->ctx, fz_device_bgr, viewbox.x1 - viewbox.x0, viewbox.y1 - viewbox.y0,
+    	    (unsigned char*) buffer);
 
-    // DEBUG("doing the rendering...");
+	fz_clear_pixmap_with_value(doc->ctx, pixmap, 0xff);
 
-    fz_clear_pixmap_with_value(doc->ctx, pixmap, 0xff);
+	dev = fz_new_draw_device(doc->ctx, pixmap);
+	fz_run_display_list(page->pageList, dev, ctm, viewbox, NULL);
+	fz_free_device(dev);
 
-    dev = fz_new_draw_device(doc->ctx, pixmap);
-    fz_run_display_list(page->pageList, dev, ctm, viewbox, NULL);
-    fz_free_device(dev);
-
+	fz_drop_pixmap(doc->ctx, pixmap);
+    }
+    fz_catch(doc->ctx)
+    {
+        DEBUG("Render failed");
+    }
+    
     (*env)->ReleasePrimitiveArrayCritical(env, bufferarray, buffer, 0);
 
-    fz_drop_pixmap(doc->ctx, pixmap);
 
-    // DEBUG("PdfView.renderPage() done");
 }
 
 /*JNI BITMAP API*/
@@ -531,9 +532,8 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPageBitmap(JNIEnv *env, j
         return JNI_FALSE;
     }
 
-    ctm = fz_identity;
-
     matrix = (*env)->GetPrimitiveArrayCritical(env, matrixarray, 0);
+    ctm = fz_identity;
     ctm.a = matrix[0];
     ctm.b = matrix[1];
     ctm.c = matrix[2];
@@ -541,7 +541,6 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPageBitmap(JNIEnv *env, j
     ctm.e = matrix[4];
     ctm.f = matrix[5];
     (*env)->ReleasePrimitiveArrayCritical(env, matrixarray, matrix, 0);
-    // DEBUG( "Matrix: %f %f %f %f %f %f", ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f);
 
     viewboxarr = (*env)->GetPrimitiveArrayCritical(env, viewboxarray, 0);
     viewbox.x0 = viewboxarr[0];
@@ -549,21 +548,24 @@ Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_renderPageBitmap(JNIEnv *env, j
     viewbox.x1 = viewboxarr[2];
     viewbox.y1 = viewboxarr[3];
     (*env)->ReleasePrimitiveArrayCritical(env, viewboxarray, viewboxarr, 0);
-    // DEBUG( "Viewbox: %d %d %d %d", viewbox.x0, viewbox.y0, viewbox.x1, viewbox.y1);
 
-    pixmap = fz_new_pixmap_with_data(doc->ctx, fz_device_rgb, viewbox.x1 - viewbox.x0, viewbox.y1 - viewbox.y0, pixels);
+    fz_try(doc->ctx)
+    {
 
-    // DEBUG("doing the rendering...");
+	pixmap = fz_new_pixmap_with_data(doc->ctx, fz_device_rgb, viewbox.x1 - viewbox.x0, viewbox.y1 - viewbox.y0, pixels);
 
-    fz_clear_pixmap_with_value(doc->ctx, pixmap, 0xff);
+	fz_clear_pixmap_with_value(doc->ctx, pixmap, 0xff);
 
-    dev = fz_new_draw_device(doc->ctx, pixmap);
-    fz_run_display_list(page->pageList, dev, ctm, viewbox, NULL);
-    fz_free_device(dev);
+	dev = fz_new_draw_device(doc->ctx, pixmap);
+	fz_run_display_list(page->pageList, dev, ctm, viewbox, NULL);
+	fz_free_device(dev);
 
-    fz_drop_pixmap(doc->ctx, pixmap);
-
-    // DEBUG("PdfView.renderPage() done");
+	fz_drop_pixmap(doc->ctx, pixmap);
+    }
+    fz_catch(doc->ctx)
+    {
+        DEBUG("Render failed");
+    }
 
     NativeBitmap_unlockPixels(env, bitmap);
 
