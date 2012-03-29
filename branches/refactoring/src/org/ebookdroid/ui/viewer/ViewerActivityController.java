@@ -84,8 +84,9 @@ actions = {
         @ActionMethodDef(id = R.id.actions_toggleTouchManagerView, method = "toggleControls"),
         @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu"),
         @ActionMethodDef(id = R.id.actions_keyBindings, method = "showKeyBindingsDialog"),
-        @ActionMethodDef(id = R.id.mainmenu_search, method = "showSearchDialog"),
-        @ActionMethodDef(id = R.id.actions_doSearch, method = "doSearch")
+        @ActionMethodDef(id = R.id.mainmenu_search, method = "toggleControls"),
+        @ActionMethodDef(id = R.id.actions_doSearch, method = "doSearch"),
+        @ActionMethodDef(id = R.id.actions_doSearchBack, method = "doSearch")
 // finish
 })
 public class ViewerActivityController extends ActionController<ViewerActivity> implements IActivityController,
@@ -164,6 +165,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
         createAction(R.id.mainmenu_zoom).putValue("view", activity.getZoomControls());
+        createAction(R.id.mainmenu_search).putValue("view", activity.getSearchControls());
         createAction(R.id.actions_toggleTouchManagerView).putValue("view", activity.getTouchView());
 
         if (++loadingCount == 1) {
@@ -427,22 +429,22 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
     }
 
-    @ActionMethod(ids = R.id.mainmenu_search)
-    public final void showSearchDialog(final ActionEx action) {
-        final EditText input = new EditText(getManagedComponent());
-        input.setText("");
-        input.selectAll();
+//    @ActionMethod(ids = R.id.mainmenu_search)
+//    public final void showSearchDialog(final ActionEx action) {
+//        final EditText input = new EditText(getManagedComponent());
+//        input.setText("");
+//        input.selectAll();
+//
+//        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+//        builder.setTitle("Search...").setMessage("Enter text to search").setView(input);
+//        builder.setPositiveButton(R.id.actions_doSearch, new EditableValue("input", input));
+//        builder.setNegativeButton().show();
+//    }
 
-        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
-        builder.setTitle("Search...").setMessage("Enter text to search").setView(input);
-        builder.setPositiveButton(R.id.actions_doSearch, new EditableValue("input", input));
-        builder.setNegativeButton().show();
-    }
-
-    @ActionMethod(ids = R.id.actions_doSearch)
+    @ActionMethod(ids = {R.id.actions_doSearch, R.id.actions_doSearchBack})
     public final void doSearch(final ActionEx action) {
         final Editable value = action.getParameter("input");
-        final String text = value.toString();
+        final String text = (String) (value != null ? value.toString() : LengthUtils.toString(action.getParameter("text")));
         new SearchTask().execute(text);
     }
 
@@ -564,7 +566,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         return this;
     }
 
-    @ActionMethod(ids = { R.id.mainmenu_zoom, R.id.actions_toggleTouchManagerView })
+    @ActionMethod(ids = { R.id.mainmenu_zoom, R.id.actions_toggleTouchManagerView, R.id.mainmenu_search })
     public void toggleControls(final ActionEx action) {
         final View view = action.getParameter("view");
         ViewEffects.toggleControls(view);
