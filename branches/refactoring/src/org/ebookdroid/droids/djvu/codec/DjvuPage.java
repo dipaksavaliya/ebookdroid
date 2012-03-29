@@ -131,7 +131,7 @@ public class DjvuPage implements CodecPage {
             final float height = getHeight();
             for (final PageTextBox ptb : list) {
                 normalizeTextBox(ptb, width, height);
-                System.out.println("" + ptb);
+                // System.out.println("" + ptb);
             }
         }
         return list;
@@ -145,7 +145,7 @@ public class DjvuPage implements CodecPage {
             final float height = getHeight();
             for (final PageTextBox ptb : list) {
                 normalizeTextBox(ptb, width, height);
-                System.out.println("" + ptb);
+                // System.out.println("" + ptb);
             }
         }
         return list;

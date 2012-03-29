@@ -14,6 +14,7 @@
 /*JNI BITMAP API */
 
 #include <nativebitmap.h>
+#include <javahelpers.h>
 
 void ThrowError(JNIEnv* env, const char* msg)
 {
@@ -352,56 +353,14 @@ class SearchHelper
 {
     public:
     bool valid;
-    JNIEnv *jenv;
-
-    jclass arrayListClass;
-    jmethodID alInitMethodId;
-    jmethodID alAddMethodId;
-
-    jclass ptbClass;
-    jmethodID ptbInitMethodId;
-    jfieldID ptbLeftFid;
-    jfieldID ptbTopFid;
-    jfieldID ptbRightFid;
-    jfieldID ptbBottomFid;
-    jfieldID ptbTextFid;
-
-    jclass stringClass;
-    jmethodID lowerMethodId;
-    jmethodID indexMethodId;
+    ArrayListHelper arr;
+    StringHelper str;
+    PageTextBoxHelper box;
 
     public:
-    SearchHelper(JNIEnv *env)
+    SearchHelper(JNIEnv *env) : arr(env), str(env), box(env)
     {
-        valid = false;
-        jenv = env;
-        arrayListClass = jenv->FindClass("java/util/ArrayList");
-        if (arrayListClass)
-        {
-            alInitMethodId = jenv->GetMethodID(arrayListClass, "<init>", "()V");
-            alAddMethodId = jenv->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-        }
-
-        ptbClass = jenv->FindClass("org/ebookdroid/core/codec/PageTextBox");
-        if (ptbClass)
-        {
-            ptbInitMethodId = jenv->GetMethodID(ptbClass, "<init>", "()V");
-            ptbLeftFid = env->GetFieldID(ptbClass, "left", "F");
-            ptbTopFid = env->GetFieldID(ptbClass, "top", "F");
-            ptbRightFid = env->GetFieldID(ptbClass, "right", "F");
-            ptbBottomFid = env->GetFieldID(ptbClass, "bottom", "F");
-            ptbTextFid = env->GetFieldID(ptbClass, "text", "Ljava/lang/String;");
-        }
-
-        stringClass = env->FindClass("java/lang/String");
-        if (stringClass)
-        {
-            lowerMethodId = env->GetMethodID(stringClass, "toLowerCase", "()Ljava/lang/String;");
-            indexMethodId = env->GetMethodID(stringClass, "indexOf", "(Ljava/lang/String;)I");
-        }
-
-        valid = arrayListClass && alInitMethodId && alAddMethodId && ptbClass && ptbInitMethodId && ptbLeftFid
-            && ptbTopFid && ptbRightFid && ptbBottomFid && ptbTextFid && stringClass && lowerMethodId && indexMethodId;
+        valid = arr.valid && str.valid && box.valid;
     }
 };
 
@@ -442,30 +401,27 @@ void djvu_get_djvu_words(SearchHelper& h, jobject list, miniexp_t expr, jstring 
         {
             const char* text = miniexp_to_str(head);
 
-            DEBUG_PRINT("%d, %d, %d, %d: %s", coords[0], coords[1], coords[2], coords[3], text);
+            // DEBUG_PRINT("%d, %d, %d, %d: %s", coords[0], coords[1], coords[2], coords[3], text);
 
             bool add = !pattern;
-            jstring txt = h.jenv->NewStringUTF(text);
+            jstring txt = h.str.toString(text);
             if (pattern)
             {
-                jstring ltxt = (jstring) h.jenv->CallObjectMethod(txt, h.lowerMethodId);
-                add = h.jenv->CallIntMethod(ltxt, h.indexMethodId, pattern) >= 0;
-                h.jenv->DeleteLocalRef(ltxt);
+                jstring ltxt = h.str.toLowerCase(txt);
+                add = h.str.indexOf(ltxt, pattern) >= 0;
+                h.str.release(ltxt);
             }
             if (add)
             {
                 // add to list
-                jobject ptb = h.jenv->NewObject(h.ptbClass, h.ptbInitMethodId);
-                h.jenv->SetFloatField(ptb, h.ptbLeftFid, (jfloat) (float) coords[0]);
-                h.jenv->SetFloatField(ptb, h.ptbTopFid, (jfloat) (float) coords[1]);
-                h.jenv->SetFloatField(ptb, h.ptbRightFid, (jfloat) (float) coords[2]);
-                h.jenv->SetFloatField(ptb, h.ptbBottomFid, (jfloat) (float) coords[3]);
-                h.jenv->SetObjectField(ptb, h.ptbTextFid, txt);
-                h.jenv->CallBooleanMethod(list, h.alAddMethodId, ptb);
+                jobject ptb = h.box.create();
+                h.box.setRect(ptb, coords);
+                h.box.setText(ptb, txt);
+                h.arr.add(list, ptb);
             }
             else
             {
-                h.jenv->DeleteLocalRef(txt);
+                h.str.release(txt);
             }
         }
         else if (miniexp_consp(head))
@@ -496,13 +452,14 @@ extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageText(JN
     DEBUG_PRINT("getPageLinks(%d): text on page found", pageNumber);
 
     SearchHelper h(jenv);
+
     if (!h.valid)
     {
         DEBUG_PRINT("getPageLinks(%d): JNI helper initialization failed", pageNumber);
         return NULL;
     }
 
-    jobject arrayList = h.jenv->NewObject(h.arrayListClass, h.alInitMethodId);
+    jobject arrayList = h.arr.create();
 
     djvu_get_djvu_words(h, arrayList, r, pattern);
 
@@ -522,28 +479,16 @@ extern "C" jint Java_org_ebookdroid_droids_djvu_codec_DjvuDocument_getPageInfo(J
     while ((r = ddjvu_document_get_pageinfo((ddjvu_document_t*) docHandle, pageNumber, &info)) < DDJVU_JOB_OK)
         Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(env, cls, contextHandle);
 
-    clazz = env->GetObjectClass(cpi);
-    if (0 == clazz)
+    CodecPageInfoHelper h(env);
+    if (!h.valid)
     {
-        return (-1);
+        return -1;
     }
-    fid = env->GetFieldID(clazz, "width", "I");
 
-    // This next line is where the power is hidden. Directly change
-    // even private fields within java objects. Nasty!
-    env->SetIntField(cpi, fid, info.width);
-
-    fid = env->GetFieldID(clazz, "height", "I");
-    env->SetIntField(cpi, fid, info.height);
-
-    fid = env->GetFieldID(clazz, "dpi", "I");
-    env->SetIntField(cpi, fid, info.dpi);
-
-    fid = env->GetFieldID(clazz, "rotation", "I");
-    env->SetIntField(cpi, fid, info.rotation);
-
-    fid = env->GetFieldID(clazz, "version", "I");
-    env->SetIntField(cpi, fid, info.version);
+    h.setSize(cpi, info.width, info.height);
+    h.setDpi(cpi, info.dpi);
+    h.setRotation(cpi, info.rotation);
+    h.setVersion(cpi, info.version);
 
     return 0;
 }
