@@ -35,6 +35,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -48,6 +49,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -429,22 +432,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
     }
 
-//    @ActionMethod(ids = R.id.mainmenu_search)
-//    public final void showSearchDialog(final ActionEx action) {
-//        final EditText input = new EditText(getManagedComponent());
-//        input.setText("");
-//        input.selectAll();
-//
-//        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
-//        builder.setTitle("Search...").setMessage("Enter text to search").setView(input);
-//        builder.setPositiveButton(R.id.actions_doSearch, new EditableValue("input", input));
-//        builder.setNegativeButton().show();
-//    }
-
-    @ActionMethod(ids = {R.id.actions_doSearch, R.id.actions_doSearchBack})
+    @ActionMethod(ids = { R.id.actions_doSearch, R.id.actions_doSearchBack })
     public final void doSearch(final ActionEx action) {
         final Editable value = action.getParameter("input");
-        final String text = (String) (value != null ? value.toString() : LengthUtils.toString(action.getParameter("text")));
+        final String text = (value != null ? value.toString() : LengthUtils.toString(action.getParameter("text")));
         new SearchTask().execute(text);
     }
 
@@ -821,30 +812,78 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
     }
 
-    final class SearchTask extends AsyncTask<String, String, String> {
+    // private static final AtomicLong ST_SEQ = new AtomicLong();
 
+    final class SearchTask extends AsyncTask<String, String, String> implements DecodeService.SearchCallback {
+
+        // private final long id = ST_SEQ.getAndIncrement();
+
+        private final int pageCount = getDocumentModel().getPageCount();
+        private final CountDownLatch sync = new CountDownLatch(pageCount);
+        private ProgressDialog progressDialog;
+
+        @Override
         protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(getManagedComponent(), "", "Searching... (0/" + pageCount + ")", true);
         }
 
         @Override
         protected String doInBackground(final String... params) {
-            String pattern = LengthUtils.isNotEmpty(params) ? params[0] : null;
-            if (LengthUtils.isEmpty(pattern)) {
-                for(Page page : getDocumentModel().getPages()) {
-                    page.clearHighlights();
+            try {
+                final String pattern = LengthUtils.isNotEmpty(params) ? params[0] : null;
+                if (LengthUtils.isEmpty(pattern)) {
+                    for (final Page page : getDocumentModel().getPages()) {
+                        page.clearHighlights();
+                    }
+                } else {
+                    for (Page p : getDocumentModel().getPages()) {
+                        getDocumentModel().getDecodeService().searchText(p, pattern, this);
+                    }
+
+                    while (true) {
+                        try {
+                            if (sync.await(1, TimeUnit.SECONDS)) {
+                                break;
+                            }
+                            publishProgress("Searching... (" + (pageCount - sync.getCount()) + "/" + pageCount + ")");
+                        } catch (final InterruptedException ex) {
+                            Thread.interrupted();
+                        }
+                    }
                 }
-                getDocumentController().redrawView();
-            } else {
-                Page page = getDocumentModel().getCurrentPageObject();
-                if (page != null) {
-                    getDocumentModel().getDecodeService().searchText(page, pattern);
-                }
+            } catch (Throwable th) {
+                th.printStackTrace();
             }
             return null;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(final String result) {
+            if (progressDialog != null) {
+                try {
+                    progressDialog.dismiss();
+                } catch (final Throwable th) {
+                }
+            }
+            getDocumentController().redrawView();
+        }
+
+        @Override
+        protected void onProgressUpdate(final String... values) {
+            if (!progressDialog.isShowing()) {
+                progressDialog = ProgressDialog.show(getManagedComponent(), "", values[0], true);
+            } else {
+                progressDialog.setMessage(values[0]);
+            }
+        }
+
+        @Override
+        public void searchComplete(final Page page, final List<? extends RectF> regions) {
+            page.setHighlights(regions);
+            sync.countDown();
+            if (LengthUtils.isNotEmpty(regions)) {
+                getDocumentController().redrawView();
+            }
         }
     }
 }

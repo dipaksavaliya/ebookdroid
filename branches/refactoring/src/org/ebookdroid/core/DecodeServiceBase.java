@@ -123,7 +123,8 @@ public class DecodeServiceBase implements DecodeService {
         this.viewState.set(viewState);
     }
 
-    public void searchText(Page page, String pattern) {
+    @Override
+    public void searchText(final Page page, final String pattern, final SearchCallback callback) {
         if (isRecycled.get()) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Searching not allowed on recycling");
@@ -131,7 +132,7 @@ public class DecodeServiceBase implements DecodeService {
             return;
         }
 
-        final SearchTask decodeTask = new SearchTask(page, pattern);
+        final SearchTask decodeTask = new SearchTask(page, pattern, callback);
         executor.add(decodeTask);
     }
 
@@ -683,21 +684,23 @@ public class DecodeServiceBase implements DecodeService {
 
         final Page page;
         final String pattern;
+        final SearchCallback callback;
 
-        public SearchTask(Page page, String pattern) {
+        public SearchTask(final Page page, final String pattern, final SearchCallback callback) {
             super(1);
             this.page = page;
             this.pattern = pattern;
+            this.callback = callback;
         }
 
         @Override
         public void run() {
             try {
-                List<? extends RectF> regions = getPage(page.index.docIndex).searchText(pattern);
-                page.searchComplete(regions);
-            } catch (Throwable th) {
+                final List<? extends RectF> regions = getPage(page.index.docIndex).searchText(pattern);
+                callback.searchComplete(page, regions);
+            } catch (final Throwable th) {
                 LCTX.e("Unexpected error: ", th);
-                page.searchComplete(null);
+                callback.searchComplete(page, null);
             }
         }
     }

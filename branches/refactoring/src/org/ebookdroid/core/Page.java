@@ -17,7 +17,7 @@ import java.util.List;
 import org.emdev.utils.MathUtils;
 import org.emdev.utils.MatrixUtils;
 
-public class Page implements DecodeService.SearchCallback {
+public class Page {
 
     static final LogContext LCTX = LogContext.ROOT.lctx("Page", false);
 
@@ -55,15 +55,8 @@ public class Page implements DecodeService.SearchCallback {
         nodes.recycleAll(bitmapsToRecycle, true);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ebookdroid.core.DecodeService.SearchCallback#searchComplete(int, java.util.List)
-     */
-    @Override
-    public void searchComplete(List<? extends RectF> regions) {
+    public void setHighlights(List<? extends RectF> regions) {
         highlights = regions;
-        base.getView().redrawView();
     }
 
     public void clearHighlights() {

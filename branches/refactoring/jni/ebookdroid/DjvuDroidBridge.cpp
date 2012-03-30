@@ -445,11 +445,11 @@ extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageText(JN
 
     if (r == miniexp_nil || !miniexp_consp(r))
     {
-        DEBUG_PRINT("getPageLinks(%d): no text on page", pageNumber);
+        // DEBUG_PRINT("getPageLinks(%d): no text on page", pageNumber);
         return NULL;
     }
 
-    DEBUG_PRINT("getPageLinks(%d): text on page found", pageNumber);
+    // DEBUG_PRINT("getPageLinks(%d): text on page found", pageNumber);
 
     SearchHelper h(jenv);
 

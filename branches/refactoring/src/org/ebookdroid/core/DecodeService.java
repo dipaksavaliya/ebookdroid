@@ -17,7 +17,7 @@ public interface DecodeService {
 
     void decodePage(ViewState viewState, PageTreeNode node);
 
-    void searchText(Page page, String pattern);
+    void searchText(Page page, String pattern, SearchCallback callback);
 
     void stopDecoding(PageTreeNode node, String reason);
 
@@ -49,7 +49,7 @@ public interface DecodeService {
 
     interface SearchCallback {
 
-        void searchComplete(List<? extends RectF> regions);
+        void searchComplete(Page page, List<? extends RectF> regions);
 
     }
 
