@@ -19,6 +19,8 @@ public interface DecodeService {
 
     void searchText(Page page, String pattern, SearchCallback callback);
 
+    void stopSearch(String pattern);
+
     void stopDecoding(PageTreeNode node, String reason);
 
     int getPageCount();

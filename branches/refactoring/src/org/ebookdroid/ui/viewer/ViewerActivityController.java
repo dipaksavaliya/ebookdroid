@@ -33,6 +33,8 @@ import org.ebookdroid.ui.viewer.views.ViewEffects;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.RectF;
@@ -51,6 +53,7 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -812,37 +815,46 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
     }
 
-    // private static final AtomicLong ST_SEQ = new AtomicLong();
+    final class SearchTask extends AsyncTask<String, String, String> implements DecodeService.SearchCallback,
+            OnCancelListener {
 
-    final class SearchTask extends AsyncTask<String, String, String> implements DecodeService.SearchCallback {
-
-        // private final long id = ST_SEQ.getAndIncrement();
-
-        private final int pageCount = getDocumentModel().getPageCount();
+        private final int pageCount = documentModel.getPageCount();
         private final CountDownLatch sync = new CountDownLatch(pageCount);
         private ProgressDialog progressDialog;
+        private final AtomicBoolean continueFlag = new AtomicBoolean(true);
+        private String pattern;
 
         @Override
         protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(getManagedComponent(), "", "Searching... (0/" + pageCount + ")", true);
+            onProgressUpdate("Searching... (0/" + pageCount + ")");
+        }
+
+        @Override
+        public void onCancel(final DialogInterface dialog) {
+            documentModel.getDecodeService().stopSearch(pattern);
+            continueFlag.set(false);
         }
 
         @Override
         protected String doInBackground(final String... params) {
             try {
-                final String pattern = LengthUtils.isNotEmpty(params) ? params[0] : null;
-                if (LengthUtils.isEmpty(pattern)) {
-                    for (final Page page : getDocumentModel().getPages()) {
-                        page.clearHighlights();
+                for (final Page page : documentModel.getPages()) {
+                    page.clearHighlights();
+                }
+                pattern = LengthUtils.isNotEmpty(params) ? params[0] : null;
+                if (LengthUtils.isNotEmpty(pattern)) {
+                    final Page current = documentModel.getCurrentPageObject();
+                    final int index = current != null ? current.index.viewIndex : 0;
+                    for (final Page p : documentModel.getPages(index)) {
+                        documentModel.getDecodeService().searchText(p, pattern, this);
                     }
-                } else {
-                    for (Page p : getDocumentModel().getPages()) {
-                        getDocumentModel().getDecodeService().searchText(p, pattern, this);
+                    for (final Page p : documentModel.getPages(0, index)) {
+                        documentModel.getDecodeService().searchText(p, pattern, this);
                     }
 
-                    while (true) {
+                    while (continueFlag.get()) {
                         try {
-                            if (sync.await(1, TimeUnit.SECONDS)) {
+                            if (sync.await(250, TimeUnit.MILLISECONDS)) {
                                 break;
                             }
                             publishProgress("Searching... (" + (pageCount - sync.getCount()) + "/" + pageCount + ")");
@@ -851,7 +863,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                         }
                     }
                 }
-            } catch (Throwable th) {
+            } catch (final Throwable th) {
                 th.printStackTrace();
             }
             return null;
@@ -870,8 +882,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         @Override
         protected void onProgressUpdate(final String... values) {
-            if (!progressDialog.isShowing()) {
+            if (progressDialog == null || !progressDialog.isShowing()) {
                 progressDialog = ProgressDialog.show(getManagedComponent(), "", values[0], true);
+                progressDialog.setCancelable(true);
+                progressDialog.setCanceledOnTouchOutside(true);
+                progressDialog.setOnCancelListener(this);
             } else {
                 progressDialog.setMessage(values[0]);
             }

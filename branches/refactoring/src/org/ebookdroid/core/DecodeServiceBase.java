@@ -138,6 +138,11 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     @Override
+    public void stopSearch(final String pattern) {
+        executor.stopSearch(pattern);
+    }
+
+    @Override
     public void decodePage(final ViewState viewState, final PageTreeNode node) {
         if (isRecycled.get()) {
             if (LCTX.isDebugEnabled()) {
@@ -510,6 +515,27 @@ public class DecodeServiceBase implements DecodeService {
             }
         }
 
+        public void stopSearch(final String pattern) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Stop search tasks: " + pattern);
+            }
+
+            lock.lock();
+            try {
+                for (int index = 0; index < tasks.size(); index++) {
+                    final Task task = tasks.get(index);
+                    if (task instanceof SearchTask) {
+                        final SearchTask st = (SearchTask) task;
+                        if (st.pattern.equals(pattern)) {
+                            tasks.set(index, null);
+                        }
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
+
         public void add(final DecodeTask task) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Adding decoding task: " + task + " for " + task.node);
@@ -700,7 +726,7 @@ public class DecodeServiceBase implements DecodeService {
             try {
                 try {
                     regions = document.searchText(page.index.docIndex, pattern);
-                } catch (DocSearchNotSupported ex) {
+                } catch (final DocSearchNotSupported ex) {
                     regions = getPage(page.index.docIndex).searchText(pattern);
                 }
                 callback.searchComplete(page, regions);
