@@ -7,6 +7,7 @@ import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.core.codec.CodecContext;
 import org.ebookdroid.core.codec.CodecDocument;
+import org.ebookdroid.core.codec.CodecDocument.DocSearchNotSupported;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
@@ -695,8 +696,13 @@ public class DecodeServiceBase implements DecodeService {
 
         @Override
         public void run() {
+            List<? extends RectF> regions = null;
             try {
-                final List<? extends RectF> regions = getPage(page.index.docIndex).searchText(pattern);
+                try {
+                    regions = document.searchText(page.index.docIndex, pattern);
+                } catch (DocSearchNotSupported ex) {
+                    regions = getPage(page.index.docIndex).searchText(pattern);
+                }
                 callback.searchComplete(page, regions);
             } catch (final Throwable th) {
                 LCTX.e("Unexpected error: ", th);

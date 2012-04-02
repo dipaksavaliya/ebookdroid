@@ -41,7 +41,8 @@ public class SearchControls extends LinearLayout {
 
         prevButton.setLayoutParams(btnParams);
         nextButton.setLayoutParams(btnParams);
-
+        nextButton.setBackgroundColor(Color.BLACK);
+        
         m_edit = new EditText(parent);
         m_edit.setSingleLine();
         m_edit.setLayoutParams(new LinearLayout.LayoutParams(LayoutUtils.FILL_PARENT, LayoutUtils.FILL_PARENT, 100.0f));
@@ -60,7 +61,7 @@ public class SearchControls extends LinearLayout {
         nextButton.setOnClickListener(forwardSearch);
         m_edit.setOnEditorActionListener(forwardSearch);
 
-        line.addView(prevButton);
+        // line.addView(prevButton);
         line.addView(m_edit);
         line.addView(nextButton);
 

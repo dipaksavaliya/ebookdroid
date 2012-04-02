@@ -7,6 +7,7 @@ import org.ebookdroid.core.codec.OutlineLink;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.RectF;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -349,4 +350,8 @@ public class FB2Document implements CodecDocument {
         outline.add(new OutlineLink(title.title, "#" + pages.size(), title.level));
     }
 
+    @Override
+    public List<? extends RectF> searchText(final int pageNuber, final String pattern) throws DocSearchNotSupported {
+        return null;
+    }
 }

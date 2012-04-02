@@ -151,14 +151,14 @@ public class DjvuPage implements CodecPage {
         return list;
     }
 
-    private static void normalize(final RectF r, final float width, final float height) {
+    static void normalize(final RectF r, final float width, final float height) {
         r.left = r.left / width;
         r.right = r.right / width;
         r.top = r.top / height;
         r.bottom = r.bottom / height;
     }
 
-    private static void normalizeTextBox(PageTextBox r, final float width, final float height) {
+    static void normalizeTextBox(PageTextBox r, final float width, final float height) {
         r.left = r.left / width;
         r.right = r.right / width;
         r.top = 1 - r.top / height;
@@ -184,6 +184,6 @@ public class DjvuPage implements CodecPage {
 
     private native static ArrayList<PageLink> getPageLinks(long docHandle, int pageNo);
 
-    private native static List<PageTextBox> getPageText(long docHandle, int pageNo, long contextHandle, String pattern);
+    native static List<PageTextBox> getPageText(long docHandle, int pageNo, long contextHandle, String pattern);
 
 }
