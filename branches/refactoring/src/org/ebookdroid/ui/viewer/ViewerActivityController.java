@@ -28,6 +28,7 @@ import org.ebookdroid.core.models.ZoomModel;
 import org.ebookdroid.ui.settings.SettingsUI;
 import org.ebookdroid.ui.viewer.dialogs.OutlineDialog;
 import org.ebookdroid.ui.viewer.stubs.ViewContollerStub;
+import org.ebookdroid.ui.viewer.views.SearchControls;
 import org.ebookdroid.ui.viewer.views.ViewEffects;
 
 import android.app.Activity;
@@ -435,11 +436,16 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
     }
 
+    private String currentSearchPattern;
+
     @ActionMethod(ids = { R.id.actions_doSearch, R.id.actions_doSearchBack })
     public final void doSearch(final ActionEx action) {
         final Editable value = action.getParameter("input");
-        final String text = (value != null ? value.toString() : LengthUtils.toString(action.getParameter("text")));
-        new SearchTask().execute(text);
+        final String newPattern = (value != null ? value.toString() : LengthUtils.toString(action.getParameter("text")));
+        final String oldPattern = currentSearchPattern;
+
+        currentSearchPattern = newPattern;
+        new SearchTask().execute(newPattern, oldPattern, (String) action.getParameter("forward"));
     }
 
     @ActionMethod(ids = R.id.mainmenu_goto_page)
@@ -815,18 +821,18 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
     }
 
-    final class SearchTask extends AsyncTask<String, String, String> implements DecodeService.SearchCallback,
+    final class SearchTask extends AsyncTask<String, String, RectF> implements DecodeService.SearchCallback,
             OnCancelListener {
 
-        private final int pageCount = documentModel.getPageCount();
-        private final CountDownLatch sync = new CountDownLatch(pageCount);
+        private CountDownLatch sync;
         private ProgressDialog progressDialog;
         private final AtomicBoolean continueFlag = new AtomicBoolean(true);
         private String pattern;
+        private Page targetPage = null;
 
         @Override
         protected void onPreExecute() {
-            onProgressUpdate("Searching... (0/" + pageCount + ")");
+            onProgressUpdate("Searching...");
         }
 
         @Override
@@ -836,31 +842,62 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         @Override
-        protected String doInBackground(final String... params) {
+        protected RectF doInBackground(final String... params) {
             try {
-                for (final Page page : documentModel.getPages()) {
-                    page.clearHighlights();
-                }
-                pattern = LengthUtils.isNotEmpty(params) ? params[0] : null;
-                if (LengthUtils.isNotEmpty(pattern)) {
-                    final Page current = documentModel.getCurrentPageObject();
-                    final int index = current != null ? current.index.viewIndex : 0;
-                    for (final Page p : documentModel.getPages(index)) {
-                        documentModel.getDecodeService().searchText(p, pattern, this);
-                    }
-                    for (final Page p : documentModel.getPages(0, index)) {
-                        documentModel.getDecodeService().searchText(p, pattern, this);
-                    }
+                final int length = LengthUtils.length(params);
 
+                pattern = length > 0 ? params[0] : null;
+                final String oldPattern = length >= 2 ? params[1] : null;
+                final boolean forward = length >= 3 ? Boolean.parseBoolean(params[2]) : true;
+
+                if (LengthUtils.isEmpty(pattern) || !pattern.equals(oldPattern)) {
+                    for (final Page page : documentModel.getPages()) {
+                        page.clearHighlights();
+                    }
+                    if (LengthUtils.isEmpty(pattern)) {
+                        return null;
+                    }
+                }
+
+                final int currentIndex = documentModel.getCurrentViewPageIndex();
+                Page p = documentModel.getPageObject(currentIndex);
+                if (p.areHighlightsActual(pattern)) {
+                    final RectF next = p.getNextHighlight();
+                    if (next != null) {
+                        targetPage = p;
+                        return next;
+                    }
+                }
+
+                final int startIndex = forward ? currentIndex + 1 : currentIndex - 1;
+                final int endIndex = forward ? documentModel.getPageCount() : -1;
+                final int direction = forward ? +1 : -1;
+
+                for (int index = startIndex; forward && index < endIndex || index > endIndex; index += direction) {
+                    publishProgress("Searching on page " + (index + 1) + "...");
+                    p = documentModel.getPageObject(index);
+                    if (p.areHighlightsActual(pattern)) {
+                        final RectF next = p.getNextHighlight();
+                        if (next != null) {
+                            targetPage = p;
+                            return next;
+                        }
+                    }
+                    sync = new CountDownLatch(1);
+                    documentModel.getDecodeService().searchText(p, pattern, this);
                     while (continueFlag.get()) {
                         try {
                             if (sync.await(250, TimeUnit.MILLISECONDS)) {
                                 break;
                             }
-                            publishProgress("Searching... (" + (pageCount - sync.getCount()) + "/" + pageCount + ")");
                         } catch (final InterruptedException ex) {
                             Thread.interrupted();
                         }
+                    }
+                    final RectF next = p.getNextHighlight();
+                    if (next != null) {
+                        targetPage = p;
+                        return next;
                     }
                 }
             } catch (final Throwable th) {
@@ -870,12 +907,20 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         @Override
-        protected void onPostExecute(final String result) {
+        protected void onPostExecute(final RectF result) {
             if (progressDialog != null) {
                 try {
                     progressDialog.dismiss();
                 } catch (final Throwable th) {
                 }
+            }
+            if (result != null) {
+                final RectF newRect = new RectF(result);
+                final SearchControls sc = getManagedComponent().getSearchControls();
+                newRect.offset(0, -((3 + sc.getActualHeight()) / targetPage.getBounds(getZoomModel().getZoom()).height() ) );
+                getDocumentController().goToLink(targetPage.index.docIndex, newRect);
+            } else {
+                Toast.makeText(getManagedComponent(), "Text not found", 0).show();
             }
             getDocumentController().redrawView();
         }
@@ -894,11 +939,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         @Override
         public void searchComplete(final Page page, final List<? extends RectF> regions) {
-            page.setHighlights(regions);
+            page.setHighlights(pattern, regions);
             sync.countDown();
-            if (LengthUtils.isNotEmpty(regions)) {
-                getDocumentController().redrawView();
-            }
         }
     }
 }

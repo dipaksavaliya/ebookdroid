@@ -158,13 +158,17 @@ public class DjvuPage implements CodecPage {
         r.bottom = r.bottom / height;
     }
 
-    static void normalizeTextBox(PageTextBox r, final float width, final float height) {
-        r.left = r.left / width;
-        r.right = r.right / width;
-        r.top = 1 - r.top / height;
-        r.bottom = 1 - r.bottom / height;
+    static void normalizeTextBox(final PageTextBox r, final float width, final float height) {
+        final float left = r.left / width;
+        final float right = r.right / width;
+        final float top = 1 - r.top / height;
+        final float bottom = 1 - r.bottom / height;
+        r.left = Math.min(left, right);
+        r.right = Math.max(left, right);
+        r.top = Math.min(top, bottom);
+        r.bottom = Math.max(top, bottom);
     }
-    
+
     private static native int getWidth(long pageHandle);
 
     private static native int getHeight(long pageHandle);

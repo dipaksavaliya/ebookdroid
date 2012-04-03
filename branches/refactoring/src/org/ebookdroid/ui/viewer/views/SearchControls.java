@@ -19,29 +19,32 @@ import org.emdev.utils.LayoutUtils;
 public class SearchControls extends LinearLayout {
 
     private EditText m_edit;
+    private ImageButton m_prevButton;
+    private ImageButton m_nextButton;
+    private LinearLayout m_line;
 
     public SearchControls(final ViewerActivity parent) {
         super(parent);
         setVisibility(View.GONE);
         setOrientation(LinearLayout.VERTICAL);
 
-        LinearLayout line = new LinearLayout(parent);
-        line.setOrientation(LinearLayout.HORIZONTAL);
-        line.setLayoutParams(new LinearLayout.LayoutParams(LayoutUtils.FILL_PARENT, LayoutUtils.WRAP_CONTENT));
-        line.setGravity(Gravity.TOP);
-        line.setBackgroundColor(Color.BLACK);
+        m_line = new LinearLayout(parent);
+        m_line.setOrientation(LinearLayout.HORIZONTAL);
+        m_line.setLayoutParams(new LinearLayout.LayoutParams(LayoutUtils.FILL_PARENT, LayoutUtils.WRAP_CONTENT));
+        m_line.setGravity(Gravity.TOP);
+        m_line.setBackgroundColor(Color.BLACK);
 
-        final ImageButton prevButton = new ImageButton(parent);
-        final ImageButton nextButton = new ImageButton(parent);
+        m_prevButton = new ImageButton(parent);
+        m_nextButton = new ImageButton(parent);
 
         LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(40, 40, 1.0f);
         btnParams.leftMargin = 4;
         btnParams.rightMargin = 4;
         btnParams.bottomMargin = 4;
 
-        prevButton.setLayoutParams(btnParams);
-        nextButton.setLayoutParams(btnParams);
-        nextButton.setBackgroundColor(Color.BLACK);
+        m_prevButton.setLayoutParams(btnParams);
+        m_nextButton.setLayoutParams(btnParams);
+        m_nextButton.setBackgroundColor(Color.BLACK);
         
         m_edit = new EditText(parent);
         m_edit.setSingleLine();
@@ -51,21 +54,21 @@ public class SearchControls extends LinearLayout {
         ActionEx forwardSearch = parent.getController().getOrCreateAction(R.id.actions_doSearch);
         ActionEx backwardSearch = parent.getController().getOrCreateAction(R.id.actions_doSearchBack);
 
-        forwardSearch.addParameter(new EditableValue("input", m_edit)).addParameter(new Constant("direction", 1));
-        backwardSearch.addParameter(new EditableValue("input", m_edit)).addParameter(new Constant("direction", -1));
+        forwardSearch.addParameter(new EditableValue("input", m_edit)).addParameter(new Constant("forward", "true"));
+        backwardSearch.addParameter(new EditableValue("input", m_edit)).addParameter(new Constant("forward", "false"));
 
-        prevButton.setImageResource(R.drawable.arrowleft);
-        prevButton.setOnClickListener(backwardSearch);
+        m_prevButton.setImageResource(R.drawable.arrowleft);
+        m_prevButton.setOnClickListener(backwardSearch);
 
-        nextButton.setImageResource(R.drawable.arrowright);
-        nextButton.setOnClickListener(forwardSearch);
+        m_nextButton.setImageResource(R.drawable.arrowright);
+        m_nextButton.setOnClickListener(forwardSearch);
         m_edit.setOnEditorActionListener(forwardSearch);
 
-        // line.addView(prevButton);
-        line.addView(m_edit);
-        line.addView(nextButton);
+        m_line.addView(m_prevButton);
+        m_line.addView(m_edit);
+        m_line.addView(m_nextButton);
 
-        addView(line);
+        addView(m_line);
     }
 
     public void setVisibility(int visibility) {
@@ -78,5 +81,9 @@ public class SearchControls extends LinearLayout {
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
         return false;
+    }
+    
+    public int getActualHeight() {
+        return m_line.getHeight();
     }
 }
