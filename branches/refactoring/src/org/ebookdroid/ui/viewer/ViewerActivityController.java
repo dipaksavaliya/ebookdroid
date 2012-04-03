@@ -862,7 +862,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 final int currentIndex = documentModel.getCurrentViewPageIndex();
                 Page p = documentModel.getPageObject(currentIndex);
                 if (p.areHighlightsActual(pattern)) {
-                    final RectF next = p.getNextHighlight();
+                    final RectF next = forward ? p.getNextHighlight() : p.getPrevHighlight();
                     if (next != null) {
                         targetPage = p;
                         return next;
@@ -877,7 +877,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                     publishProgress("Searching on page " + (index + 1) + "...");
                     p = documentModel.getPageObject(index);
                     if (p.areHighlightsActual(pattern)) {
-                        final RectF next = p.getNextHighlight();
+                        final RectF next = forward ? p.getNextHighlight() : p.getPrevHighlight();
                         if (next != null) {
                             targetPage = p;
                             return next;
@@ -894,7 +894,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                             Thread.interrupted();
                         }
                     }
-                    final RectF next = p.getNextHighlight();
+                    final RectF next = forward ? p.getNextHighlight() : p.getPrevHighlight();
                     if (next != null) {
                         targetPage = p;
                         return next;
