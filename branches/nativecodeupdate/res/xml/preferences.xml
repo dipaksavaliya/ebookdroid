@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:vudroid="http://schemas.android.com/apk/res/vudroid"
-    xmlns:android="http://schemas.android.com/apk/res/android" >
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ebookdroid="http://ebookdroid.org" >
 
     <PreferenceScreen
         android:summary="@string/pref_ui_category_summary"
@@ -18,13 +19,22 @@
             android:summary="@string/pref_confirmclose_summary"
             android:title="@string/pref_confirmclose_title" />
 
-        <EditTextPreference
+        <!--EditTextPreference
             android:defaultValue="@string/pref_brightness_defvalue"
             android:key="@string/pref_brightness_id"
             android:maxLength="3"
             android:numeric="integer"
             android:summary="@string/pref_brightness_summary"
+            android:title="@string/pref_brightness_title" /-->
+
+        <org.emdev.ui.preference.SeekBarPreference
+            android:defaultValue="@string/pref_brightness_defvalue"
+            android:key="@string/pref_brightness_id"
+    	    ebookdroid:minValue="0"
+    	    ebookdroid:maxValue="100"
+            android:summary="@string/pref_brightness_summary"
             android:title="@string/pref_brightness_title" />
+
 
         <CheckBoxPreference
             android:defaultValue="@string/pref_brightnessnightmodeonly_defvalue"
