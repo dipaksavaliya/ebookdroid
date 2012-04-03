@@ -30,8 +30,8 @@
         <org.emdev.ui.preference.SeekBarPreference
             android:defaultValue="@string/pref_brightness_defvalue"
             android:key="@string/pref_brightness_id"
-    	    ebookdroid:minValue="0"
-    	    ebookdroid:maxValue="100"
+    	    ebookdroid:minValue="@string/pref_brightness_minvalue"
+    	    ebookdroid:maxValue="@string/pref_brightness_maxvalue"
             android:summary="@string/pref_brightness_summary"
             android:title="@string/pref_brightness_title" />
 
