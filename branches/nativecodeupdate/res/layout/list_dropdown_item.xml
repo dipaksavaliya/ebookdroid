@@ -6,11 +6,9 @@
 
     <TextView
         android:id="@+id/list_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="marquee"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:textColor="@color/list_item_color_android2"
-        android:gravity="center_vertical"
-        android:textStyle="bold" />
+        android:gravity="center" />
 
 </RelativeLayout>
