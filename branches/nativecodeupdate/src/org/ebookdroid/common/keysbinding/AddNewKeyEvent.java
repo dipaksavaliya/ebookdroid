@@ -53,6 +53,8 @@ public class AddNewKeyEvent extends Dialog {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_MENU) // blacklist menu key
+            return super.onKeyUp(keyCode, event);
         key = keyCode;
         keyText.setText(KeyBindingsManager.keyCodeToString(key)+ " [" + key + "]");
         return true;//super.onKeyUp(keyCode, event);

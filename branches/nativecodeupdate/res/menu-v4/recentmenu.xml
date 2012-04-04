@@ -23,5 +23,4 @@
         android:id="@+id/mainmenu_about"
         android:icon="@drawable/about"
         android:title="@string/menu_about"/>
-
 </menu>

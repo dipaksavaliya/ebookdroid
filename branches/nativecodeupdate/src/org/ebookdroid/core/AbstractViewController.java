@@ -254,7 +254,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                     LCTX.d("Key action: " + action.name + ", " + action.getMethod().toString());
                 }
                 action.run();
-                return true;
+              return true;
             } else {
                 if (LCTX.isDebugEnabled()) {
                     LCTX.d("Key action not found: " + event);

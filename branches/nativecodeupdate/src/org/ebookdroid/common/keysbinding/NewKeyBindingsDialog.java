@@ -139,8 +139,8 @@ public class NewKeyBindingsDialog extends Dialog {
             KeyBindingsManager.ActionRef action = items.valueAt(position);
             TextView keyText = (TextView) convertView.findViewById(R.id.keybinding_item_key);
             TextView actionText = (TextView) convertView.findViewById(R.id.keybinding_item_action);
-            keyText.setText(KeyBindingsManager.keyCodeToString(action.code));                            
-            actionText.setText(ActionEx.getActionName(action.id));
+            keyText.setText(KeyBindingsManager.keyCodeToString(action.code) + "[" + action.code + "]");                            
+            actionText.setText(action.name);
             return convertView;
         }
 }
