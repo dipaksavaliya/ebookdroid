@@ -21,7 +21,6 @@
 			android:layout_weight="1"
 			android:id="@+id/pageNumberTextEdit"
 			android:minEms="4"
-			android:numeric="integer"
 			android:inputType="number"
 			android:layout_marginLeft="4dip"
 			android:layout_marginRight="2dip"
