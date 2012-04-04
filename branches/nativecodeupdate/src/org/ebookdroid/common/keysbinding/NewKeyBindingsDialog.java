@@ -5,13 +5,10 @@ import org.ebookdroid.common.keysbinding.AddNewKeyEvent.AddNewKeyEventResult;
 import org.ebookdroid.common.keysbinding.KeyBindingsManager.ActionRef;
 import org.ebookdroid.ui.viewer.IActivityController;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.content.DialogInterface;
-
 
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,7 +23,8 @@ import org.emdev.utils.collections.SparseArrayEx;
 
 
 public class NewKeyBindingsDialog extends Dialog {
-
+    
+    final BindingAdapter bindings;
 
     public NewKeyBindingsDialog(final IActivityController base) {
         super(base.getContext());
@@ -36,34 +34,40 @@ public class NewKeyBindingsDialog extends Dialog {
         setContentView(R.layout.keybinding_maindialog);
 
         final ListView list = (ListView) findViewById(R.id.keybinding_main_eventslist);
-        final BindingAdapter bindings = new BindingAdapter();
+        bindings = new BindingAdapter();
         bindings.setActions(KeyBindingsManager.getActions());
         list.setAdapter(bindings);
         
         list.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Are you sure you want remove action?")
-                       .setCancelable(false)
-                       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                           public void onClick(DialogInterface dialog, int id) {
-                             KeyBindingsManager.ActionRef act = (ActionRef) bindings.getItem(position);
-                             if(act != null)
-                             {
-                                 KeyBindingsManager.removeAction(act.code);
-                                 bindings.setActions(KeyBindingsManager.getActions());
-                             }
-                           }
-                       })
-                       .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                           public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                           }
-                       });
-                AlertDialog alert = builder.create();
-                alert.show();
+                KeyBindingsManager.ActionRef act = (ActionRef) bindings.getItem(position);
+                AddNewKeyEvent dialog = new AddNewKeyEvent(getContext(),act.code, act.name);
+                dialog.setDialogResult(new AddNewKeyEventResult() {
 
+                    public void save(Integer key, String action)
+                    {
+                        final Integer actionId = action != null ? ActionEx.getActionId(action) : null;
+                        Log.i("Test", "Action selected " + action + "  " + actionId);
+                        if(key != null && action != null)
+                        {
+                            KeyBindingsManager.addAction(actionId, key);
+                            bindings.setActions(KeyBindingsManager.getActions());
+                        }
+                    }
+                    
+                    public void del(Integer oldkey, Integer key)
+                    {
+                        Log.i("Test", "Delete key" + key);
+                        if(key != null)
+                        {
+                            KeyBindingsManager.removeAction(key);
+                            bindings.setActions(KeyBindingsManager.getActions());
+                        }
+                        
+                    }
+                });
+                dialog.show();
             }
 
           });
@@ -73,10 +77,11 @@ public class NewKeyBindingsDialog extends Dialog {
 
             @Override
             public void onClick(View v) {
-                AddNewKeyEvent dialog = new AddNewKeyEvent(getContext());
+                AddNewKeyEvent dialog = new AddNewKeyEvent(getContext(), null, null);
                 dialog.setDialogResult(new AddNewKeyEventResult() {
 
-                    public void finish(Integer key, String action) {
+                    public void save(Integer key, String action)
+                    {
                         final Integer actionId = action != null ? ActionEx.getActionId(action) : null;
                         Log.i("Test", "Action selected " + action + "  " + actionId);
                         if(key != null && action != null)
@@ -85,6 +90,16 @@ public class NewKeyBindingsDialog extends Dialog {
                             bindings.setActions(KeyBindingsManager.getActions());
                         }
                     }
+                    
+                    public void del(Integer oldkey, Integer key)
+                    {
+                        if(key != null)
+                        {
+                            KeyBindingsManager.removeAction(key);
+                            bindings.setActions(KeyBindingsManager.getActions());
+                        }
+                        
+                    }
                 });
                 dialog.show();
             }
@@ -92,6 +107,7 @@ public class NewKeyBindingsDialog extends Dialog {
 
     }
 
+    
  
     @Override
     protected void onStart() {
