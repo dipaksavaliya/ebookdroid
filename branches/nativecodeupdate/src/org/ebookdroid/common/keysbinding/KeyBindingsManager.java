@@ -24,6 +24,10 @@ public class KeyBindingsManager {
     private static SparseArrayEx<ActionRef> actions = new SparseArrayEx<KeyBindingsManager.ActionRef>();
 
     private static SparseArrayEx<String> keyLabels;
+    
+    public static SparseArrayEx<ActionRef> getActions(){
+        return actions;
+    }
 
     public static void loadFromSettings(final AppSettings newSettings) {
         actions.clear();

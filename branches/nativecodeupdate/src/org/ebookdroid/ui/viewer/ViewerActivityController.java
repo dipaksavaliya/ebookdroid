@@ -6,6 +6,7 @@ import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.keysbinding.KeyBindingsDialog;
 import org.ebookdroid.common.keysbinding.KeyBindingsManager;
+import org.ebookdroid.common.keysbinding.NewKeyBindingsDialog;
 import org.ebookdroid.common.log.EmergencyHandler;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.common.settings.AppSettings;
@@ -481,7 +482,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.actions_keyBindings)
     public void showKeyBindingsDialog(final ActionEx action) {
-        final KeyBindingsDialog dlg = new KeyBindingsDialog(this);
+        final NewKeyBindingsDialog dlg = new NewKeyBindingsDialog(this);
         dlg.show();
     }
 

@@ -14,14 +14,14 @@
 		android:layout_alignParentTop="true"
 		android:layout_centerHorizontal="true"
 		android:textSize="23sp" />
-		
+
 	<SeekBar
 		android:id="@+id/pref_seek_bar"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:layout_below="@id/pref_seek_current_value"
 		android:layout_marginTop="10dp" />
-	
+
 	<TextView
 		android:id="@+id/pref_seek_min_value"
 		android:layout_width="wrap_content"
@@ -34,6 +34,6 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_above="@id/pref_seek_bar"
-		android:layout_alignParentRight="true" />		
-				
+		android:layout_alignParentRight="true" />
+
 </RelativeLayout>
