@@ -23,7 +23,7 @@ public interface IViewController extends ZoomListener {
 
     ViewState goToPage(int page, float offsetX, float offsetY);
 
-    void goToLink(int pageDocIndex, RectF targetRect);
+    void goToLink(int pageDocIndex, RectF targetRect, boolean addToHistory);
 
     RectF calcPageBounds(PageAlign pageAlign, float pageAspectRatio, int width, int height);
 

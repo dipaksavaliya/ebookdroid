@@ -13,7 +13,6 @@ import org.ebookdroid.common.settings.ISettingsChangeListener;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
-import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.common.touch.TouchManager;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.NavigationHistory;
@@ -386,23 +385,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             if (link.targetPage < 1 || link.targetPage > pageCount) {
                 getManagedComponent().showToastText(2000, R.string.error_page_out_of_rande, pageCount);
             } else {
-                Page target = documentModel.getPageByDocIndex(link.targetPage - 1);
-                float offsetX = 0;
-                float offsetY = 0;
-                if (link.targetRect != null) {
-                    offsetX = link.targetRect.left;
-                    offsetY = link.targetRect.top;
-                    if (target.type == PageType.LEFT_PAGE && offsetX >= 0.5f) {
-                        target = documentModel.getPageObject(target.index.viewIndex + 1);
-                        offsetX -= 0.5f;
-                    }
-                }
-                if (LCTX.isDebugEnabled()) {
-                    LCTX.d("Target page found: " + target);
-                }
-                if (target != null) {
-                    jumpToPage(target.index.viewIndex, offsetX, offsetY);
-                }
+                getDocumentController().goToLink(link.targetPage - 1, link.targetRect, true);
             }
             return;
         }
@@ -420,8 +403,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
      * @see org.ebookdroid.ui.viewer.IActivityController#jumpToPage(int, float, float)
      */
     @Override
-    public void jumpToPage(final int viewIndex, final float offsetX, final float offsetY) {
-        history.update();
+    public void jumpToPage(final int viewIndex, final float offsetX, final float offsetY, boolean addToHistory) {
+        if (addToHistory) {
+            history.update();
+        }
         getDocumentController().goToPage(viewIndex, offsetX, offsetY);
     }
 
@@ -873,7 +858,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 final int endIndex = forward ? documentModel.getPageCount() : -1;
                 final int direction = forward ? +1 : -1;
 
-                for (int index = startIndex; forward && index < endIndex || index > endIndex; index += direction) {
+                for (int index = startIndex; (forward && index < endIndex || index > endIndex) && continueFlag.get(); index += direction) {
                     publishProgress("Searching on page " + (index + 1) + "...");
                     p = documentModel.getPageObject(index);
                     if (p.areHighlightsActual(pattern)) {
@@ -917,8 +902,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             if (result != null) {
                 final RectF newRect = new RectF(result);
                 final SearchControls sc = getManagedComponent().getSearchControls();
-                newRect.offset(0, -((3 + sc.getActualHeight()) / targetPage.getBounds(getZoomModel().getZoom()).height() ) );
-                getDocumentController().goToLink(targetPage.index.docIndex, newRect);
+                final int controlsHeight = 3 + sc.getActualHeight();
+                final float pageHeight = targetPage.getBounds(getZoomModel().getZoom()).height();
+                newRect.offset(0, -(controlsHeight / pageHeight));
+                getDocumentController().goToLink(targetPage.index.docIndex, newRect, false);
             } else {
                 Toast.makeText(getManagedComponent(), "Text not found", 0).show();
             }
@@ -927,13 +914,18 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         @Override
         protected void onProgressUpdate(final String... values) {
+            final int length = LengthUtils.length(values);
+            if (length == 0) {
+                return;
+            }
+            final String last = values[length - 1];
             if (progressDialog == null || !progressDialog.isShowing()) {
-                progressDialog = ProgressDialog.show(getManagedComponent(), "", values[0], true);
+                progressDialog = ProgressDialog.show(getManagedComponent(), "", last, true);
                 progressDialog.setCancelable(true);
                 progressDialog.setCanceledOnTouchOutside(true);
                 progressDialog.setOnCancelListener(this);
             } else {
-                progressDialog.setMessage(values[0]);
+                progressDialog.setMessage(last);
             }
         }
 

@@ -171,12 +171,13 @@ public class EventDraw implements IEvent {
         if (LengthUtils.isEmpty(page.highlights)) {
             return;
         }
-        for (final RectF link : page.highlights) {
+        final Paint p = new Paint();
+        for (int i = 0; i < page.highlights.size(); i++) {
+            final boolean current = page.currrentHighlight != null && i == page.currrentHighlight.intValue();
+            final RectF link = page.highlights.get(i);
             final RectF rect = page.getPageRegion(pageBounds, new RectF(link));
             rect.offset(-viewState.viewBase.x, -viewState.viewBase.y);
-            final Paint p = new Paint();
-            p.setColor(Color.GREEN);
-            p.setAlpha(128);
+            p.setColor(current ? 0x7F007F00 : 0x3F00FF00);
             canvas.drawRect(rect, p);
         }
     }

@@ -150,7 +150,6 @@ public class ViewContollerStub implements IViewController {
     }
 
     @Override
-    public void goToLink(final int pageDocIndex, final RectF targetRect) {
+    public void goToLink(final int pageDocIndex, final RectF targetRect, final boolean addToHistory) {
     }
-
 }

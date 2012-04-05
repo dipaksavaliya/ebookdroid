@@ -470,7 +470,7 @@ public abstract class AbstractViewController extends AbstractComponentController
             LCTX.d("Page link found under tap: " + link);
         }
 
-        goToLink(link.targetPage, link.targetRect);
+        goToLink(link.targetPage, link.targetRect, true);
         return true;
     }
 
@@ -480,7 +480,7 @@ public abstract class AbstractViewController extends AbstractComponentController
      * @see org.ebookdroid.ui.viewer.IViewController#goToLink(int, android.graphics.RectF)
      */
     @Override
-    public void goToLink(final int pageDocIndex, final RectF targetRect) {
+    public void goToLink(final int pageDocIndex, final RectF targetRect, boolean addToHistory) {
         if (pageDocIndex >= 0) {
             Page target = model.getPageByDocIndex(pageDocIndex);
             float offsetX = 0;
@@ -497,7 +497,7 @@ public abstract class AbstractViewController extends AbstractComponentController
                 LCTX.d("Target page found: " + target);
             }
             if (target != null) {
-                base.jumpToPage(target.index.viewIndex, offsetX, offsetY);
+                base.jumpToPage(target.index.viewIndex, offsetX, offsetY, addToHistory);
             }
         }
     }

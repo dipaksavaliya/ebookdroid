@@ -19,14 +19,13 @@ public class SearchControls extends LinearLayout {
     private EditText m_edit;
     private ImageButton m_prevButton;
     private ImageButton m_nextButton;
-    private LinearLayout m_line;
 
     public SearchControls(final ViewerActivity parent) {
         super(parent);
         setVisibility(View.GONE);
         setOrientation(LinearLayout.VERTICAL);
 
-        m_line = (LinearLayout) LayoutInflater.from(parent).inflate(R.layout.seach_controls, this, true);
+        LayoutInflater.from(parent).inflate(R.layout.seach_controls, this, true);
         m_prevButton = (ImageButton) findViewById(R.id.search_controls_prev);
         m_nextButton = (ImageButton) findViewById(R.id.search_controls_next);
         m_edit = (EditText) findViewById(R.id.search_controls_edit);
@@ -53,8 +52,8 @@ public class SearchControls extends LinearLayout {
     public boolean onTouchEvent(final MotionEvent event) {
         return false;
     }
-    
+
     public int getActualHeight() {
-        return m_line.getHeight();
+        return m_edit.getHeight();
     }
 }
