@@ -94,4 +94,45 @@ public class FB2TextElement extends AbstractFB2LineElement {
         final AbstractFB2LineElement[] result = { first, this.style.defis, second };
         return result;
     }
+
+    public int indexOf(String subString) {
+        int start1 = start;
+        int subCount = subString.length();
+        if (subCount > 0) {
+            if (subCount + start1 - start > length) {
+                return -1;
+            }
+            // TODO optimize charAt to direct array access
+            char firstChar = subString.charAt(0);
+            while (true) {
+                int i = start1;
+                boolean found = false;
+                for (; i < start + length; i++) {
+                    if (chars[i] == firstChar) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found || subCount + i - start> length) {
+                    return -1; // handles subCount > count || start >= count
+                }
+                int o1 = i, o2 = 0;
+                while (++o2 < subCount && chars[++o1] == subString.charAt(o2)) {
+                    // Intentionally empty
+                }
+                if (o2 == subCount) {
+                    return i - start;
+                }
+                start1 = i + 1;
+            }
+        }
+        return (start1 < length || start1 == 0) ? start1 - start: length - start;
+    }
+
+    @Override
+    public String toString() {
+        return new String(chars, start, length);
+    }
+
+
 }

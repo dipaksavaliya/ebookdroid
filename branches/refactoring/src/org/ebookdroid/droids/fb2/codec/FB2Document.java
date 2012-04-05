@@ -352,6 +352,51 @@ public class FB2Document implements CodecDocument {
 
     @Override
     public List<? extends RectF> searchText(final int pageNuber, final String pattern) throws DocSearchNotSupported {
-        return null;
+        final FB2Page page = (FB2Page) getPage(pageNuber);
+        if (page == null) {
+            return null;
+        }
+
+        List<RectF> rects = new ArrayList<RectF>();
+        float y = FB2Page.MARGIN_Y;
+        for (int i = 0, n = page.lines.size(); i < n; i++) {
+            final FB2Line line = page.lines.get(i);
+            float top = y;
+            float bottom = y + line.getHeight();
+            line.ensureJustification();
+            float x = FB2Page.MARGIN_X;
+            for (int i1 = 0, n1 = line.elements.size(); i1 < n1; i1++) {
+                final AbstractFB2LineElement e = line.elements.get(i1);
+                final float w = e.width + (e instanceof FB2LineWhiteSpace ? line.spaceWidth : 0);
+                if (e instanceof FB2TextElement) {
+                    FB2TextElement textElement = (FB2TextElement) e;
+                    if (textElement.indexOf(pattern) != -1) {
+                       rects.add(new RectF(x / FB2Page.PAGE_WIDTH, top / FB2Page.PAGE_HEIGHT, (x + w) / FB2Page.PAGE_WIDTH, bottom / FB2Page.PAGE_HEIGHT));
+                    }
+                }
+                x += w;
+            }
+            y = bottom;
+        }
+        for (int i = 0, n = page.noteLines.size(); i < n; i++) {
+            final FB2Line line = page.noteLines.get(i);
+            float top = y;
+            float bottom = y + line.getHeight();
+            line.ensureJustification();
+            float x = FB2Page.MARGIN_X;
+            for (int i1 = 0, n1 = line.elements.size(); i1 < n1; i1++) {
+                final AbstractFB2LineElement e = line.elements.get(i1);
+                final float w = e.width + (e instanceof FB2LineWhiteSpace ? line.spaceWidth : 0);
+                if (e instanceof FB2TextElement) {
+                    FB2TextElement textElement = (FB2TextElement) e;
+                    if (textElement.indexOf(pattern) != -1) {
+                       rects.add(new RectF(x / FB2Page.PAGE_WIDTH, top / FB2Page.PAGE_HEIGHT, (x + w) / FB2Page.PAGE_WIDTH, bottom / FB2Page.PAGE_HEIGHT));
+                    }
+                }
+                x += w;
+            }
+            y = bottom;
+        }
+        return rects;
     }
 }
