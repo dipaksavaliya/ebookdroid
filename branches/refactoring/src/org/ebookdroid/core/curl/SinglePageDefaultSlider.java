@@ -16,13 +16,18 @@ public class SinglePageDefaultSlider extends AbstractPageSlider {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawForeground(org.ebookdroid.core.EventDraw)
      */
     @Override
     protected void drawForeground(final EventDraw event) {
         final ViewState viewState = event.viewState;
-        Page page = viewState.model.getPageObject(bFlipRight ? foreIndex : backIndex);
+
+        Page page = null;
+
+        if (bFlipping) {
+            page = viewState.model.getPageObject(bFlipRight ? foreIndex : backIndex);
+        }
         if (page == null) {
             page = viewState.model.getCurrentPageObject();
         }
@@ -38,7 +43,7 @@ public class SinglePageDefaultSlider extends AbstractPageSlider {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawBackground(org.ebookdroid.core.EventDraw)
      */
     @Override
