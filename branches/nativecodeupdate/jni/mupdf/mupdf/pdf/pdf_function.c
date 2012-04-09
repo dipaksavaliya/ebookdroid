@@ -500,7 +500,9 @@ ps_run(fz_context *ctx, psobj *code, ps_stack *st, int pc)
 
 			case PS_OP_LN:
 				r1 = ps_pop_real(st);
-				ps_push_real(st, logf(r1));
+				/* Bug 692941 - logf as separate statement */
+				r2 = logf(r1);
+				ps_push_real(st, r2);
 				break;
 
 			case PS_OP_LOG:
@@ -690,8 +692,9 @@ resize_code(fz_context *ctx, pdf_function *func, int newsize)
 {
 	if (newsize >= func->u.p.cap)
 	{
-		func->u.p.cap = func->u.p.cap + 64;
-		func->u.p.code = fz_resize_array(ctx, func->u.p.code, func->u.p.cap, sizeof(psobj));
+		int new_cap = func->u.p.cap + 64;
+		func->u.p.code = fz_resize_array(ctx, func->u.p.code, new_cap, sizeof(psobj));
+		func->u.p.cap = new_cap;
 	}
 }
 

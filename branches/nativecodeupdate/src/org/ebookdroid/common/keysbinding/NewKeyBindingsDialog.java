@@ -6,7 +6,6 @@ import org.ebookdroid.common.keysbinding.KeyBindingsManager.ActionRef;
 import org.ebookdroid.ui.viewer.IActivityController;
 
 import android.app.Dialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -45,10 +44,9 @@ public class NewKeyBindingsDialog extends Dialog {
                 AddNewKeyEvent dialog = new AddNewKeyEvent(getContext(),act.code, act.name);
                 dialog.setDialogResult(new AddNewKeyEventResult() {
 
-                    public void save(Integer key, String action)
+                    public void save(Integer oldkey, Integer key, String action)
                     {
                         final Integer actionId = action != null ? ActionEx.getActionId(action) : null;
-                        Log.i("Test", "Action selected " + action + "  " + actionId);
                         if(key != null && action != null)
                         {
                             KeyBindingsManager.addAction(actionId, key);
@@ -58,7 +56,6 @@ public class NewKeyBindingsDialog extends Dialog {
                     
                     public void del(Integer oldkey, Integer key)
                     {
-                        Log.i("Test", "Delete key" + key);
                         if(key != null)
                         {
                             KeyBindingsManager.removeAction(key);
@@ -80,10 +77,9 @@ public class NewKeyBindingsDialog extends Dialog {
                 AddNewKeyEvent dialog = new AddNewKeyEvent(getContext(), null, null);
                 dialog.setDialogResult(new AddNewKeyEventResult() {
 
-                    public void save(Integer key, String action)
+                    public void save(Integer oldkey, Integer key, String action)
                     {
                         final Integer actionId = action != null ? ActionEx.getActionId(action) : null;
-                        Log.i("Test", "Action selected " + action + "  " + actionId);
                         if(key != null && action != null)
                         {
                             KeyBindingsManager.addAction(actionId, key);

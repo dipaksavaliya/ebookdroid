@@ -38,7 +38,7 @@ public class AddNewKeyEvent extends Dialog {
                     if( result != null ){
 
                         final String action = actionsAdapter.getActionId(actions.getSelectedItemPosition());
-                        result.save(key, action);     
+                        result.save(oldkey, key, action);     
                     }
                     dismiss();
                 }
@@ -68,7 +68,7 @@ public class AddNewKeyEvent extends Dialog {
             setTitle("New Key Event");
             
             oldkey = null;
-            deleteAction.setVisibility(View.GONE);
+            deleteAction.setVisibility(View.INVISIBLE);
         }
         else
         {
@@ -99,7 +99,7 @@ public class AddNewKeyEvent extends Dialog {
 
     
     public interface AddNewKeyEventResult{
-        public void save(Integer key, String action);
+        public void save(Integer oldkey, Integer key, String action);
         public void del(Integer oldkey, Integer key);
      }
 }
