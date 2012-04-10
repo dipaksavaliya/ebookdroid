@@ -1,4 +1,5 @@
 #summary EBookDroid preferences.
+
 == User interface: User interface settings ==
  * Load recent: Auto loading last opened book on app start - OFF by default
  * Confirm closing: Ask close confirmation on Back pressed - OFF by default
@@ -52,11 +53,11 @@
    * Highest
   * Hardware acceleration enabled: Set if Hardware acceleration can be set by viewer - OFF by default
   * Texture bitmap size: Defines size of texture parts - possible values:
-   * 64 * 64
-   * 128 * 128
-   * 256 * 256
-   * 512 * 512
-   * 1024 * 1024
+   * 64 `*` 64
+   * 128 `*` 128
+   * 256 `*` 256
+   * 512 `*` 512
+   * 1024 `*` 1024
   * Texture filtering: Enable bilinear texture filtering - OFF by default
   * Reuse texture bitmaps: Reuse existing texture bitmaps when page part is decoded again - ON by default
   * Bitmap allocation hack: Use bitmap allocation tracking hack - OFF by default
