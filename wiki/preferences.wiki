@@ -1,4 +1,4 @@
-#summary EBookDroid preferences.
+EBookDroid preferences
 
 == User interface: User interface settings ==
  * Load recent: Auto loading last opened book on app start - OFF by default
@@ -137,6 +137,7 @@
   * Auto levels: Use auto levels correction - OFF by default
 == File Browser: File browser and file types settings ==
  * Use bookcase view: Use bookcase view instead of lists - ON by default
+ * Auto Scan directory: Directory for automatic files search - /sdcard by default
 === Files Types: Files Types for Show in library ===
   * .djvu: Show DjVu files - ON by default
   * .djv: Show DjVu files - ON by default
