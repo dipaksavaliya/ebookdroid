@@ -57,6 +57,8 @@ public class AppSettings implements AppPreferences {
 
     public final int touchProcessingDelay;
 
+    public final boolean animateScrolling;
+
     /* =============== Tap & Keyboard settings =============== */
 
     public final String tapProfiles;
@@ -72,6 +74,8 @@ public class AppSettings implements AppPreferences {
     public final int decodingThreadPriority;
 
     public final int drawThreadPriority;
+
+    public final boolean useNativeGraphics;
 
     public final boolean hwaEnabled;
 
@@ -150,6 +154,7 @@ public class AppSettings implements AppPreferences {
         tapsEnabled = TAPS_ENABLED.getPreferenceValue(prefs);
         scrollHeight = SCROLL_HEIGHT.getPreferenceValue(prefs);
         touchProcessingDelay = TOUCH_DELAY.getPreferenceValue(prefs);
+        animateScrolling = ANIMATE_SCROLLING.getPreferenceValue(prefs);
         /* =============== Tap & Keyboard settings =============== */
         tapProfiles = TAP_PROFILES.getPreferenceValue(prefs);
         keysBinding = KEY_BINDINGS.getPreferenceValue(prefs);
@@ -158,6 +163,7 @@ public class AppSettings implements AppPreferences {
         viewType = VIEW_TYPE.getPreferenceValue(prefs);
         decodingThreadPriority = DECODE_THREAD_PRIORITY.getPreferenceValue(prefs);
         drawThreadPriority = DRAW_THREAD_PRIORITY.getPreferenceValue(prefs);
+        useNativeGraphics = USE_NATIVE_GRAPHICS.getPreferenceValue(prefs);
         hwaEnabled = HWA_ENABLED.getPreferenceValue(prefs);
         bitmapSize = BITMAP_SIZE.getPreferenceValue(prefs);
         bitmapFileringEnabled = BITMAP_FILTERING.getPreferenceValue(prefs);

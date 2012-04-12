@@ -10,7 +10,6 @@ import android.widget.LinearLayout;
 public final class LayoutUtils {
 
     public static final int FILL_PARENT = ViewGroup.LayoutParams.FILL_PARENT;
-    public static final int WRAP_CONTENT = ViewGroup.LayoutParams.WRAP_CONTENT;
 
     private LayoutUtils() {
     }

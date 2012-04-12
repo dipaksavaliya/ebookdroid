@@ -13,6 +13,7 @@ import org.ebookdroid.common.settings.ISettingsChangeListener;
 import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
+import org.ebookdroid.common.settings.types.PageType;
 import org.ebookdroid.common.touch.TouchManager;
 import org.ebookdroid.core.DecodeService;
 import org.ebookdroid.core.NavigationHistory;
@@ -128,6 +129,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     private final NavigationHistory history;
 
+    private String currentSearchPattern;
+
     /**
      * Instantiates a new base viewer activity.
      */
@@ -175,6 +178,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         createAction(R.id.actions_toggleTouchManagerView).putValue("view", activity.getTouchView());
 
         if (++loadingCount == 1) {
+            if (intent == null || intent.getScheme() == null) {
+                showErrorDlg("Bad intent or scheme:\n" + intent);
+                return;
+            }
             if (intent.getScheme().equals("content")) {
                 try {
                     final Cursor c = activity.getContentResolver().query(intent.getData(), null, null, null, null);
@@ -198,7 +205,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 bookTitle = LengthUtils.safeString(intent.getData().getLastPathSegment(), E_MAIL_ATTACHMENT);
             }
             if (codecType == null) {
-                throw new RuntimeException("Unknown intent data type: " + intent.getData());
+                showErrorDlg("Unknown intent data type: " + intent.getData());
+                return;
             }
 
             documentModel = new DocumentModel(codecType);
@@ -420,8 +428,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             getManagedComponent().showToastText(Toast.LENGTH_SHORT, R.string.outline_missed);
         }
     }
-
-    private String currentSearchPattern;
 
     @ActionMethod(ids = { R.id.actions_doSearch, R.id.actions_doSearchBack })
     public final void doSearch(final ActionEx action) {
@@ -710,8 +716,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             final ViewerActivity activity = getManagedComponent();
             LCTX.d("BookLoadTask.onPreExecute(" + activity.LCTX + "): start");
             try {
-                final String message = activity.getString(R.string.msg_loading);
-                progressDialog = ProgressDialog.show(activity, "", message, true);
+                onProgressUpdate(activity.getString(R.string.msg_loading));
             } catch (final Throwable th) {
                 LCTX.e("BookLoadTask.onPreExecute(): Unexpected error", th);
             } finally {
@@ -759,16 +764,14 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 }
 
                 try {
-                    progressDialog.dismiss();
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
                 } catch (final Throwable th) {
                 }
 
                 if (result != null) {
-                    try {
-                        progressDialog.dismiss();
-                    } catch (final Throwable th) {
-                    }
-
                     final String msg = result.getMessage();
                     if ("PDF needs a password!".equals(msg)) {
                         askPassword(m_fileName, "Enter password...");
@@ -789,19 +792,18 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         @Override
         public void setProgressDialogMessage(final int resourceID, final Object... args) {
-            final String message = getManagedComponent().getString(resourceID, args);
-            publishProgress(message);
+            publishProgress(getManagedComponent().getString(resourceID, args));
         }
 
         @Override
         protected void onProgressUpdate(final String... values) {
-            if (values != null && values.length > 0) {
-                if (!progressDialog.isShowing()) {
-                    final ViewerActivity activity = getManagedComponent();
-                    progressDialog = ProgressDialog.show(activity, "", values[0], true);
-                } else {
-                    progressDialog.setMessage(values[0]);
-                }
+            if (LengthUtils.isEmpty(values)) {
+                return;
+            }
+            if (progressDialog == null || !progressDialog.isShowing()) {
+                progressDialog = ProgressDialog.show(getManagedComponent(), "", values[0], true);
+            } else {
+                progressDialog.setMessage(values[0]);
             }
         }
     }
