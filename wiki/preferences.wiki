@@ -51,6 +51,7 @@ EBookDroid preferences
    * Normal
    * Higher
    * Highest
+  * Use native graphics: Use Android 2+ native graphics library - ON by default
   * Hardware acceleration enabled: Set if Hardware acceleration can be set by viewer - OFF by default
   * Texture bitmap size: Defines size of texture parts - possible values:
    * 64 `*` 64
