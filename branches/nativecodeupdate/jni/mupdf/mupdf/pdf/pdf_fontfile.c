@@ -113,19 +113,19 @@ pdf_lookup_builtin_font(char *name, unsigned int *len)
 	}
 	if (!strcmp("Times-Roman", name)) {
 		*len = 0;
-		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+		return (unsigned char*) "/system/fonts/DroidSerif-Regular.ttf";
 	}
 	if (!strcmp("Times-Bold", name)) {
 		*len = 0;
-		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+		return (unsigned char*) "/system/fonts/DroidSerif-Bold.ttf";
 	}
 	if (!strcmp("Times-Italic", name)) {
 		*len = 0;
-		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+		return (unsigned char*) "/system/fonts/DroidSerif-Italic.ttf";
 	}
 	if (!strcmp("Times-BoldItalic", name)) {
 		*len = 0;
-		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+		return (unsigned char*) "/system/fonts/DroidSerif-BoldItalic.ttf";
 	}
 	if (!strcmp("Symbol", name)) {
 		*len = 0;
