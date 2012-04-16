@@ -5,19 +5,20 @@
 #define NOCJKFONT
 #endif
 
-#include "../generated/font_base14.h"
+//#include "../generated/font_base14.h"
 
-#ifndef NODROIDFONT
-#include "../generated/font_droid.h"
-#endif
+//#ifndef NODROIDFONT
+//#include "../generated/font_droid.h"
+//#endif
 
-#ifndef NOCJKFONT
-#include "../generated/font_cjk.h"
-#endif
+//#ifndef NOCJKFONT
+//#include "../generated/font_cjk.h"
+//#endif
 
 unsigned char *
 pdf_lookup_builtin_font(char *name, unsigned int *len)
 {
+/*
 	if (!strcmp("Courier", name)) {
 		*len = sizeof pdf_font_NimbusMonL_Regu;
 		return (unsigned char*) pdf_font_NimbusMonL_Regu;
@@ -76,11 +77,72 @@ pdf_lookup_builtin_font(char *name, unsigned int *len)
 	}
 	*len = 0;
 	return NULL;
+*/
+
+	if (!strcmp("Courier", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSansMono.ttf";
+	}
+	if (!strcmp("Courier-Bold", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSansMono.ttf";
+	}
+	if (!strcmp("Courier-Oblique", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSansMono.ttf";
+	}
+	if (!strcmp("Courier-BoldOblique", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSansMono.ttf";
+	}
+	if (!strcmp("Helvetica", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+	}
+	if (!strcmp("Helvetica-Bold", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans-Bold.ttf";
+	}
+	if (!strcmp("Helvetica-Oblique", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+	}
+	if (!strcmp("Helvetica-BoldOblique", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+	}
+	if (!strcmp("Times-Roman", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+	}
+	if (!strcmp("Times-Bold", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+	}
+	if (!strcmp("Times-Italic", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+	}
+	if (!strcmp("Times-BoldItalic", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+	}
+	if (!strcmp("Symbol", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/SymbolStd.ttf";
+	}
+	if (!strcmp("ZapfDingbats", name)) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/SymbolStd.ttf";
+	}
+	*len = 0;
+	return NULL;
 }
 
 unsigned char *
 pdf_lookup_substitute_font(int mono, int serif, int bold, int italic, unsigned int *len)
 {
+/*
 #ifdef NODROIDFONT
 	if (mono) {
 		if (bold) {
@@ -116,11 +178,21 @@ pdf_lookup_substitute_font(int mono, int serif, int bold, int italic, unsigned i
 		return (unsigned char*) pdf_font_DroidSans;
 	}
 #endif
+*/
+	if (mono) {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSansMono.ttf";
+	} else {
+		*len = 0;
+		return (unsigned char*) "/system/fonts/DroidSans.ttf";
+	}
+
 }
 
 unsigned char *
 pdf_lookup_substitute_cjk_font(int ros, int serif, unsigned int *len)
 {
+/*
 #ifndef NOCJKFONT
 	*len = sizeof pdf_font_DroidSansFallback;
 	return (unsigned char*) pdf_font_DroidSansFallback;
@@ -128,4 +200,7 @@ pdf_lookup_substitute_cjk_font(int ros, int serif, unsigned int *len)
 	*len = 0;
 	return NULL;
 #endif
+*/
+	*len = 0;
+	return (unsigned char*) "/system/fonts/DroidSansFallback.ttf";
 }
