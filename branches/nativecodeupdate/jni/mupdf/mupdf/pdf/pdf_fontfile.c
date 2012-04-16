@@ -129,11 +129,11 @@ pdf_lookup_builtin_font(char *name, unsigned int *len)
 	}
 	if (!strcmp("Symbol", name)) {
 		*len = 0;
-		return (unsigned char*) "/system/fonts/SymbolStd.ttf";
+		return (unsigned char*) "/sdcard/.org.ebookdroid/StandardSymL.cff";
 	}
 	if (!strcmp("ZapfDingbats", name)) {
 		*len = 0;
-		return (unsigned char*) "/system/fonts/SymbolStd.ttf";
+		return (unsigned char*) "/sdcard/.org.ebookdroid/Dingbats.cff";
 	}
 	*len = 0;
 	return NULL;

@@ -11,10 +11,15 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Environment;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.emdev.utils.android.AndroidVersion;
 
@@ -84,7 +89,43 @@ public class EBookDroidApp extends Application {
         } catch (final NameNotFoundException e) {
             e.printStackTrace();
         }
+        copyAssets();
     }
+    
+    private void copyAssets() {
+        AssetManager assetManager = getAssets();
+        String[] files = null;
+        try {
+            files = assetManager.list("pdffonts");
+        } catch (IOException e) {
+            LCTX.i(e.getMessage());
+        }
+        for(String filename : files) {
+            InputStream in = null;
+            OutputStream out = null;
+            try {
+              in = assetManager.open("pdffonts/" + filename);
+              out = new FileOutputStream("/sdcard/.org.ebookdroid/" + filename);
+              copyFile(in, out);
+              in.close();
+              in = null;
+              out.flush();
+              out.close();
+              out = null;
+            } catch(Exception e) {
+                LCTX.i(e.getMessage());
+            }       
+        }
+    }
+    
+    private void copyFile(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int read;
+        while((read = in.read(buffer)) != -1){
+          out.write(buffer, 0, read);
+        }
+    }
+    
 
     /**
      * {@inheritDoc}
