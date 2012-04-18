@@ -155,9 +155,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         activity.setRequestedOrientation(newSettings.rotation.getOrientation());
 
-        IUIManager.instance.setFullScreenMode(activity, newSettings.fullScreen);
-        IUIManager.instance.setTitleVisible(activity, newSettings.showTitle);
-
         TouchManager.loadFromSettings(newSettings);
         KeyBindingsManager.loadFromSettings(newSettings);
 
@@ -171,6 +168,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         final ViewerActivity activity = getManagedComponent();
+
+        IUIManager.instance.setFullScreenMode(activity, getManagedComponent().view.getView(),
+                SettingsManager.getAppSettings().fullScreen);
+        IUIManager.instance.setTitleVisible(activity, SettingsManager.getAppSettings().showTitle);
 
         createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
         createAction(R.id.mainmenu_zoom).putValue("view", activity.getZoomControls());
@@ -621,16 +622,17 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     @Override
     public void onAppSettingsChanged(final AppSettings oldSettings, final AppSettings newSettings,
             final AppSettings.Diff diff) {
+        final ViewerActivity activity = getManagedComponent();
         if (diff.isRotationChanged()) {
-            getManagedComponent().setRequestedOrientation(newSettings.rotation.getOrientation());
+            activity.setRequestedOrientation(newSettings.rotation.getOrientation());
         }
 
         if (diff.isFullScreenChanged()) {
-            IUIManager.instance.setFullScreenMode(getManagedComponent(), newSettings.fullScreen);
+            IUIManager.instance.setFullScreenMode(activity, activity.view.getView(), newSettings.fullScreen);
         }
 
         if (diff.isKeepScreenOnChanged()) {
-            getManagedComponent().view.getView().setKeepScreenOn(newSettings.keepScreenOn);
+            activity.view.getView().setKeepScreenOn(newSettings.keepScreenOn);
         }
 
         if (diff.isTapConfigChanged()) {
