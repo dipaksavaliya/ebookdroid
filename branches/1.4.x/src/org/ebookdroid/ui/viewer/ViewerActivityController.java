@@ -642,6 +642,9 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     @Override
     public void onBookSettingsChanged(final BookSettings oldSettings, final BookSettings newSettings,
             final BookSettings.Diff diff, final AppSettings.Diff appDiff) {
+        if (newSettings == null) {
+            return;
+        }
 
         boolean redrawn = false;
         if (diff.isViewModeChanged() || diff.isSplitPagesChanged() || diff.isCropPagesChanged()) {
