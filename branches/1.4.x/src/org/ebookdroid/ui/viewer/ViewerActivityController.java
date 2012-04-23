@@ -315,21 +315,21 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         startDecoding(fileName, password);
     }
 
-    @Override
-    public IViewController switchDocumentController() {
-        try {
-            final BookSettings bs = SettingsManager.getBookSettings();
-
-            final IViewController newDc = bs.viewMode.create(this);
-            final IViewController oldDc = ctrl.getAndSet(newDc);
-
-            getZoomModel().removeListener(oldDc);
-            getZoomModel().addListener(newDc);
-
-            return ctrl.get();
-        } catch (final Throwable e) {
-            throw new RuntimeException(e);
+    protected IViewController switchDocumentController(BookSettings bs) {
+        if (bs != null) {
+            try {
+                final IViewController newDc = bs.viewMode.create(this);
+                if (newDc != null) {
+                    final IViewController oldDc = ctrl.getAndSet(newDc);
+                    getZoomModel().removeListener(oldDc);
+                    getZoomModel().addListener(newDc);
+                    return ctrl.get();
+                }
+            } catch (final Throwable e) {
+                LCTX.e("Unexpected error: ", e);
+            }
         }
+        return null;
     }
 
     @Override
@@ -418,6 +418,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
     }
 
+    @SuppressWarnings("deprecation")
     @ActionMethod(ids = R.id.mainmenu_goto_page)
     public void showDialog(final ActionEx action) {
         final Integer dialogId = action.getParameter("dialogId");
@@ -645,8 +646,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         boolean redrawn = false;
         if (diff.isViewModeChanged() || diff.isSplitPagesChanged() || diff.isCropPagesChanged()) {
             redrawn = true;
-            final IViewController newDc = switchDocumentController();
-            if (!diff.isFirstTime()) {
+            final IViewController newDc = switchDocumentController(newSettings);
+            if (!diff.isFirstTime() && newDc != null) {
                 newDc.init(null);
                 newDc.show();
             }

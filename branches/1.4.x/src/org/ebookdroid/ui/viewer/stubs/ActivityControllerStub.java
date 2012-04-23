@@ -72,11 +72,6 @@ public class ActivityControllerStub extends ActionController<ViewerActivity> imp
     }
 
     @Override
-    public IViewController switchDocumentController() {
-        return null;
-    }
-
-    @Override
     public void jumpToPage(final int viewIndex, final float offsetX, final float offsetY, final boolean addToHistory) {
     }
 }
