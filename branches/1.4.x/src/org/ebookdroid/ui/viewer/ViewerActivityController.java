@@ -27,6 +27,7 @@ import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.models.ZoomModel;
 import org.ebookdroid.ui.settings.SettingsUI;
 import org.ebookdroid.ui.viewer.dialogs.OutlineDialog;
+import org.ebookdroid.ui.viewer.stubs.ActivityControllerStub;
 import org.ebookdroid.ui.viewer.stubs.ViewContollerStub;
 import org.ebookdroid.ui.viewer.views.ViewEffects;
 
@@ -167,6 +168,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         createAction(R.id.actions_toggleTouchManagerView).putValue("view", activity.getTouchView());
 
         if (++loadingCount == 1) {
+            documentModel = ActivityControllerStub.DM_STUB;
             if (intent == null) {
                 showErrorDlg("Bad intent or scheme:\n" + intent);
                 return;
@@ -250,7 +252,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             LCTX.d("afterPostCreate()");
         }
         setWindowTitle();
-        if (loadingCount == 1 && documentModel != null) {
+        if (loadingCount == 1 && documentModel != ActivityControllerStub.DM_STUB) {
             startDecoding(m_fileName, "");
         }
     }
