@@ -167,13 +167,23 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         createAction(R.id.actions_toggleTouchManagerView).putValue("view", activity.getTouchView());
 
         if (++loadingCount == 1) {
-            if (intent == null || intent.getScheme() == null) {
+            if (intent == null) {
                 showErrorDlg("Bad intent or scheme:\n" + intent);
                 return;
             }
-            if (intent.getScheme().equals("content")) {
+            final String scheme = intent.getScheme();
+            if (LengthUtils.isEmpty(scheme)) {
+                showErrorDlg("Bad intent or scheme:\n" + intent);
+                return;
+            }
+            final Uri data = intent.getData();
+            if (data == null) {
+                showErrorDlg("No intent data:\n" + intent);
+                return;
+            }
+            if (scheme.equals("content")) {
                 try {
-                    final Cursor c = activity.getContentResolver().query(intent.getData(), null, null, null, null);
+                    final Cursor c = activity.getContentResolver().query(data, null, null, null, null);
                     c.moveToFirst();
                     final int fileNameColumnId = c.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME);
                     if (fileNameColumnId >= 0) {
@@ -190,11 +200,20 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 }
             }
             if (codecType == null) {
-                codecType = CodecType.getByUri(intent.getData().toString());
-                bookTitle = LengthUtils.safeString(intent.getData().getLastPathSegment(), E_MAIL_ATTACHMENT);
+                bookTitle = LengthUtils.safeString(data.getLastPathSegment(), E_MAIL_ATTACHMENT);
+                codecType = CodecType.getByUri(data.toString());
+                if (codecType == null) {
+                    final String type = intent.getType();
+                    if (LengthUtils.isNotEmpty(type)) {
+                        codecType = CodecType.getByMimeType(type);
+                    }
+                }
             }
+
+            LCTX.i("Book type: " + codecType);
+            LCTX.i("Book title: " + bookTitle);
             if (codecType == null) {
-                showErrorDlg("Unknown intent data type: " + intent.getData());
+                showErrorDlg("Unknown intent data type:\n" + data);
                 return;
             }
 
@@ -203,10 +222,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             progressModel = new DecodingProgressModel();
             progressModel.addListener(ViewerActivityController.this);
 
-            final Uri uri = intent.getData();
+            final Uri uri = data;
             m_fileName = "";
 
-            if (intent.getScheme().equals("content")) {
+            if (scheme.equals("content")) {
                 temporaryBook = true;
                 m_fileName = E_MAIL_ATTACHMENT;
                 CacheManager.clear(m_fileName);
@@ -315,7 +334,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         startDecoding(fileName, password);
     }
 
-    protected IViewController switchDocumentController(BookSettings bs) {
+    protected IViewController switchDocumentController(final BookSettings bs) {
         if (bs != null) {
             try {
                 final IViewController newDc = bs.viewMode.create(this);
@@ -400,7 +419,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
      * @see org.ebookdroid.ui.viewer.IActivityController#jumpToPage(int, float, float)
      */
     @Override
-    public void jumpToPage(final int viewIndex, final float offsetX, final float offsetY, boolean addToHistory) {
+    public void jumpToPage(final int viewIndex, final float offsetX, final float offsetY, final boolean addToHistory) {
         if (addToHistory) {
             history.update();
         }
