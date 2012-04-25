@@ -204,13 +204,14 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 codecType = CodecType.getByUri(data.toString());
                 if (codecType == null) {
                     final String type = intent.getType();
+                    LCTX.i("Book mime type: " + type);
                     if (LengthUtils.isNotEmpty(type)) {
                         codecType = CodecType.getByMimeType(type);
                     }
                 }
             }
 
-            LCTX.i("Book type: " + codecType);
+            LCTX.i("Book codec type: " + codecType);
             LCTX.i("Book title: " + bookTitle);
             if (codecType == null) {
                 showErrorDlg("Unknown intent data type:\n" + data);
@@ -249,7 +250,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             LCTX.d("afterPostCreate()");
         }
         setWindowTitle();
-        if (loadingCount == 1) {
+        if (loadingCount == 1 && documentModel != null) {
             startDecoding(m_fileName, "");
         }
     }

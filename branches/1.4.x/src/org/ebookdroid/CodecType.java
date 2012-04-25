@@ -20,7 +20,8 @@ public enum CodecType {
 
     DJVU(DjvuContext.class, Arrays.asList("djvu", "djv"), Arrays.asList("image/djvu", "image/vnd.djvu", "image/x-djvu")),
 
-    XPS(XpsContext.class, Arrays.asList("xps", "oxps"), Arrays.asList("application/vnd.ms-xpsdocument", "application/oxps")),
+    XPS(XpsContext.class, Arrays.asList("xps", "oxps"), Arrays.asList("application/vnd.ms-xpsdocument",
+            "application/oxps")),
 
     CBZ(CbzContext.class, Arrays.asList("cbz"), Arrays.asList("application/x-cbz")),
 
@@ -42,7 +43,7 @@ public enum CodecType {
         mimeTypesToActivity = new HashMap<String, CodecType>();
         for (final CodecType a : values()) {
             for (final String type : a.getMimeTypes()) {
-                extensionToActivity.put(type.toLowerCase(), a);
+                mimeTypesToActivity.put(type.toLowerCase(), a);
             }
         }
     }
@@ -53,7 +54,8 @@ public enum CodecType {
 
     private final List<String> mimeTypes;
 
-    private CodecType(final Class<? extends CodecContext> contextClass, final List<String> extensions, final List<String> mimeTypes) {
+    private CodecType(final Class<? extends CodecContext> contextClass, final List<String> extensions,
+            final List<String> mimeTypes) {
         this.contextClass = contextClass;
         this.extensions = extensions;
         this.mimeTypes = mimeTypes;
@@ -92,9 +94,8 @@ public enum CodecType {
     public static CodecType getByExtension(final String ext) {
         return extensionToActivity.get(ext.toLowerCase());
     }
-    
+
     public static CodecType getByMimeType(final String type) {
         return mimeTypesToActivity.get(type.toLowerCase());
     }
-    
 }
