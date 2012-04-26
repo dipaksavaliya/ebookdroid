@@ -1,12 +1,12 @@
-package org.ebookdroid.droids.mupdf.codec;
+package org.ebookdroid.droids.pdf.codec;
 
 import org.ebookdroid.EBookDroidLibraryLoader;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.settings.SettingsManager;
+import org.ebookdroid.core.codec.AbstractCodecContext;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.PageLink;
-import org.ebookdroid.core.codec.PageTextBox;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.emdev.utils.MatrixUtils;
 
-public class MuPdfPage implements CodecPage {
+public class PdfPage implements CodecPage {
 
     private long pageHandle;
     private final long docHandle;
@@ -26,14 +26,12 @@ public class MuPdfPage implements CodecPage {
     final int actualWidth;
     final int actualHeight;
 
-    private MuPdfPage(final long pageHandle, final long docHandle) {
+    private PdfPage(final long pageHandle, final long docHandle) {
         this.pageHandle = pageHandle;
         this.docHandle = docHandle;
         this.pageBounds = getBounds();
-        //this.actualWidth = AbstractCodecContext.getWidthInPixels(pageBounds.width());
-        //this.actualHeight = AbstractCodecContext.getHeightInPixels(pageBounds.height());
-        this.actualWidth = (int) pageBounds.width();
-        this.actualHeight = (int) pageBounds.height();
+        this.actualWidth = AbstractCodecContext.getWidthInPixels(pageBounds.width());
+        this.actualHeight = AbstractCodecContext.getHeightInPixels(pageBounds.height());
     }
 
     @Override
@@ -73,8 +71,8 @@ public class MuPdfPage implements CodecPage {
         return matrixArray;
     }
 
-    static MuPdfPage createPage(final long dochandle, final int pageno) {
-        return new MuPdfPage(open(dochandle, pageno), dochandle);
+    static PdfPage createPage(final long dochandle, final int pageno) {
+        return new PdfPage(open(dochandle, pageno), dochandle);
     }
 
     @Override
@@ -113,7 +111,7 @@ public class MuPdfPage implements CodecPage {
         final int height = viewbox.height();
 
         if (EBookDroidLibraryLoader.nativeGraphicsAvailable && SettingsManager.getAppSettings().useNativeGraphics) {
-            final BitmapRef bmp = BitmapManager.getBitmap("PDF page", width, height, MuPdfContext.NATIVE_BITMAP_CFG);
+            final BitmapRef bmp = BitmapManager.getBitmap("PDF page", width, height, PdfContext.NATIVE_BITMAP_CFG);
             if (renderPageBitmap(docHandle, pageHandle, mRect, ctm, bmp.getBitmap())) {
                 return bmp;
             } else {
@@ -124,16 +122,16 @@ public class MuPdfPage implements CodecPage {
 
         final int[] bufferarray = new int[width * height];
         renderPage(docHandle, pageHandle, mRect, ctm, bufferarray);
-        final BitmapRef b = BitmapManager.getBitmap("PDF page", width, height, MuPdfContext.BITMAP_CFG);
+        final BitmapRef b = BitmapManager.getBitmap("PDF page", width, height, PdfContext.BITMAP_CFG);
         b.getBitmap().setPixels(bufferarray, 0, width, 0, 0, width, height);
         return b;
     }
 
     @Override
     public List<PageLink> getPageLinks() {
-        return MuPdfLinks.getPageLinks(docHandle, pageHandle, pageBounds);
+        return PdfLinks.getPageLinks(docHandle, pageHandle, pageBounds);
     }
-    
+
     private static native void getBounds(long dochandle, long handle, float[] bounds);
 
     private static native void free(long dochandle, long handle);
@@ -145,17 +143,4 @@ public class MuPdfPage implements CodecPage {
 
     private static native boolean renderPageBitmap(long dochandle, long pagehandle, int[] viewboxarray,
             float[] matrixarray, Bitmap bitmap);
-
-    @Override
-    public List<PageTextBox> getPageText() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<? extends RectF> searchText(String pattern) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
 }

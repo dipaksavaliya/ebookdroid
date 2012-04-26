@@ -1,4 +1,4 @@
-#include "fitz-internal.h"
+#include "fitz.h"
 
 #include <zlib.h>
 

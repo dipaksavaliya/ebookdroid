@@ -140,8 +140,6 @@ typedef struct opj_jp2 {
 	opj_jp2_comps_t *comps;
 	unsigned int j2k_codestream_offset;
 	unsigned int j2k_codestream_length;
-	opj_bool jpip_on;
-	opj_bool ignore_pclr_cmap_cdef;
 } opj_jp2_t;
 
 /**
@@ -169,7 +167,7 @@ Read the JP2H box - JP2 Header box (used in MJ2)
 @param ext Collector for profile, cdef and pclr data
 @return Returns true if successful, returns false otherwise
 */
-opj_bool jp2_read_jp2h(opj_jp2_t *jp2, opj_cio_t *cio, opj_jp2_color_t *color);
+bool jp2_read_jp2h(opj_jp2_t *jp2, opj_cio_t *cio, opj_jp2_color_t *color);
 /**
 Creates a JP2 decompression structure
 @param cinfo Codec context info
@@ -195,7 +193,7 @@ Decode an image from a JPEG-2000 file stream
 @param cstr_info Codestream information structure if required, NULL otherwise
 @return Returns a decoded image if successful, returns NULL otherwise
 */
-opj_image_t* opj_jp2_decode(opj_jp2_t *jp2, opj_cio_t *cio, opj_codestream_info_t *cstr_info);
+opj_image_t* jp2_decode(opj_jp2_t *jp2, opj_cio_t *cio, opj_codestream_info_t *cstr_info);
 /**
 Creates a JP2 compression structure
 @param cinfo Codec context info
@@ -223,8 +221,7 @@ Encode an image into a JPEG-2000 file stream
 @param cstr_info Codestream information structure if required, NULL otherwise
 @return Returns true if successful, returns false otherwise
 */
-opj_bool opj_jp2_encode(opj_jp2_t *jp2, opj_cio_t *cio, opj_image_t *image, opj_codestream_info_t *cstr_info);
-
+bool jp2_encode(opj_jp2_t *jp2, opj_cio_t *cio, opj_image_t *image, opj_codestream_info_t *cstr_info);
 /* ----------------------------------------------------------------------- */
 /*@}*/
 

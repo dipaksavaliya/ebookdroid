@@ -36,7 +36,7 @@
  *	http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
  */
 
-#include "fitz-internal.h"
+#include "fitz.h"
 
 #define aes_context fz_aes
 

@@ -1,4 +1,4 @@
-#include "fitz-internal.h"
+#include "fitz.h"
 
 /* Fax G3/G4 decoder */
 

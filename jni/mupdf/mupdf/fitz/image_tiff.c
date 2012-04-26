@@ -1,4 +1,4 @@
-#include "fitz-internal.h"
+#include "fitz.h"
 
 /*
  * TIFF image loader. Should be enough to support TIFF files in XPS.
@@ -313,7 +313,6 @@ fz_expand_tiff_colormap(struct tiff *tiff)
 	tiff->samplesperpixel += 2;
 	tiff->bitspersample = 8;
 	tiff->stride = stride;
-	fz_free(tiff->ctx, tiff->samples);
 	tiff->samples = samples;
 }
 
@@ -790,13 +789,13 @@ fz_load_tiff(fz_context *ctx, unsigned char *buf, int len)
 			if (image->n == 5)
 			{
 				fz_pixmap *rgb = fz_new_pixmap(tiff.ctx, fz_device_rgb, image->w, image->h);
-				fz_convert_pixmap(tiff.ctx, rgb, image);
+				fz_convert_pixmap(tiff.ctx, image, rgb);
 				rgb->xres = image->xres;
 				rgb->yres = image->yres;
 				fz_drop_pixmap(ctx, image);
 				image = rgb;
 			}
-			fz_premultiply_pixmap(ctx, image);
+			fz_premultiply_pixmap(image);
 		}
 	}
 	fz_always(ctx)

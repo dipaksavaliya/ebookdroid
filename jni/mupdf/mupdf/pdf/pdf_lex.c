@@ -1,5 +1,5 @@
-#include "fitz-internal.h"
-#include "mupdf-internal.h"
+#include "fitz.h"
+#include "mupdf.h"
 
 #define IS_NUMBER \
 	'+':case'-':case'.':case'0':case'1':case'2':case'3':\
@@ -63,106 +63,87 @@ lex_comment(fz_stream *f)
 }
 
 static int
-lex_number(fz_stream *f, pdf_lexbuf *buf, int c)
+lex_number(fz_stream *f, char *s, int n, int *tok)
 {
-	int neg = 0;
-	int i = 0;
-	int n;
-	int d;
-	float v;
+	char *buf = s;
+	*tok = PDF_TOK_INT;
 
 	/* Initially we might have +, -, . or a digit */
-	switch (c)
-	{
-	case '.':
-		goto loop_after_dot;
-	case '-':
-		neg = 1;
-		break;
-	case '+':
-		break;
-	default: /* Must be a digit */
-		i = c - '0';
-		break;
-	}
-
-	while (1)
+	if (n > 1)
 	{
 		int c = fz_read_byte(f);
 		switch (c)
 		{
 		case '.':
+			*tok = PDF_TOK_REAL;
+			*s++ = c;
+			n--;
+			goto loop_after_dot;
+		case '+':
+		case '-':
+		case RANGE_0_9:
+			*s++ = c;
+			n--;
+			goto loop_after_sign;
+		default:
+			fz_unread_byte(f);
+			goto end;
+		case EOF:
+			goto end;
+		}
+	}
+
+	/* We can't accept a sign from here on in, just . or a digit */
+loop_after_sign:
+	while (n > 1)
+	{
+		int c = fz_read_byte(f);
+		switch (c)
+		{
+		case '.':
+			*tok = PDF_TOK_REAL;
+			*s++ = c;
+			n--;
 			goto loop_after_dot;
 		case RANGE_0_9:
-			i = 10*i + c - '0';
-			/* FIXME: Need overflow check here; do we care? */
+			*s++ = c;
 			break;
 		default:
 			fz_unread_byte(f);
-			/* Fallthrough */
+			goto end;
 		case EOF:
-			if (neg)
-				i = -i;
-			buf->i = i;
-			return PDF_TOK_INT;
+			goto end;
 		}
+		n--;
 	}
 
 	/* In here, we've seen a dot, so can accept just digits */
 loop_after_dot:
-	n = 0;
-	d = 1;
-	while (1)
+	while (n > 1)
 	{
 		int c = fz_read_byte(f);
 		switch (c)
 		{
 		case RANGE_0_9:
-			if (d >= INT_MAX/10)
-				goto underflow;
-			n = n*10 + (c - '0');
-			d *= 10;
+			*s++ = c;
 			break;
 		default:
 			fz_unread_byte(f);
-			/* Fallthrough */
+			goto end;
 		case EOF:
-			v = (float)i + ((float)n / (float)d);
-			if (neg)
-				v = -v;
-			buf->f = v;
-			return PDF_TOK_REAL;
+			goto end;
 		}
+		n--;
 	}
 
-underflow:
-	/* Ignore any digits after here, because they are too small */
-	while (1)
-	{
-		int c = fz_read_byte(f);
-		switch (c)
-		{
-		case RANGE_0_9:
-			break;
-		default:
-			fz_unread_byte(f);
-			/* Fallthrough */
-		case EOF:
-			v = (float)i + ((float)n / (float)d);
-			if (neg)
-				v = -v;
-			buf->f = v;
-			return PDF_TOK_REAL;
-		}
-	}
+end:
+	*s = '\0';
+	return s-buf;
 }
 
 static void
-lex_name(fz_stream *f, pdf_lexbuf *buf)
+lex_name(fz_stream *f, char *s, int n)
 {
-	char *s = buf->scratch;
-	int n = buf->size;
-
 	while (n > 1)
 	{
 		int c = fz_read_byte(f);
@@ -227,7 +208,6 @@ lex_name(fz_stream *f, pdf_lexbuf *buf)
 	}
 end:
 	*s = '\0';
-	buf->len = s - buf->scratch;
 }
 
 static int
@@ -400,7 +380,7 @@ pdf_token_from_keyword(char *key)
 }
 
 int
-pdf_lex(fz_stream *f, pdf_lexbuf *buf)
+pdf_lex(fz_stream *f, char *buf, int n, int *sl)
 {
 	while (1)
 	{
@@ -416,10 +396,11 @@ pdf_lex(fz_stream *f, pdf_lexbuf *buf)
 			lex_comment(f);
 			break;
 		case '/':
-			lex_name(f, buf);
+			lex_name(f, buf, n);
+			*sl = strlen(buf);
 			return PDF_TOK_NAME;
 		case '(':
-			buf->len = lex_string(f, buf->scratch, buf->size);
+			*sl = lex_string(f, buf, n);
 			return PDF_TOK_STRING;
 		case ')':
 			fz_warn(f->ctx, "lexical error (unexpected ')')");
@@ -433,7 +414,7 @@ pdf_lex(fz_stream *f, pdf_lexbuf *buf)
 			else
 			{
 				fz_unread_byte(f);
-				buf->len = lex_hex_string(f, buf->scratch, buf->size);
+				*sl = lex_hex_string(f, buf, n);
 				return PDF_TOK_STRING;
 			}
 		case '>':
@@ -453,11 +434,17 @@ pdf_lex(fz_stream *f, pdf_lexbuf *buf)
 		case '}':
 			return PDF_TOK_CLOSE_BRACE;
 		case IS_NUMBER:
-			return lex_number(f, buf, c);
+			{
+				int tok;
+				fz_unread_byte(f);
+				*sl = lex_number(f, buf, n, &tok);
+				return tok;
+			}
 		default: /* isregular: !isdelim && !iswhite && c != EOF */
 			fz_unread_byte(f);
-			lex_name(f, buf);
-			return pdf_token_from_keyword(buf->scratch);
+			lex_name(f, buf, n);
+			*sl = strlen(buf);
+			return pdf_token_from_keyword(buf);
 		}
 	}
 }

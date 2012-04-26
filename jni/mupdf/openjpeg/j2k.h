@@ -265,15 +265,15 @@ typedef struct opj_cp {
 /* UniPG>> */
 #ifdef USE_JPWL
 	/** enables writing of EPC in MH, thus activating JPWL */
-	opj_bool epc_on;
+	bool epc_on;
 	/** enables writing of EPB, in case of activated JPWL */
-	opj_bool epb_on;
+	bool epb_on;
 	/** enables writing of ESD, in case of activated JPWL */
-	opj_bool esd_on;
+	bool esd_on;
 	/** enables writing of informative techniques of ESD, in case of activated JPWL */
-	opj_bool info_on;
+	bool info_on;
 	/** enables writing of RED, in case of activated JPWL */
-	opj_bool red_on;
+	bool red_on;
 	/** error protection method for MH (0,1,16,32,37-128) */
 	int hprot_MH;
 	/** tile number of header protection specification (>=0) */
@@ -299,7 +299,7 @@ typedef struct opj_cp {
 	/** sensitivity methods for TPHs (-1,0-7) */
 	int sens_TPH[JPWL_MAX_NO_TILESPECS];
 	/** enables JPWL correction at the decoder */
-	opj_bool correct;
+	bool correct;
 	/** expected number of components at the decoder */
 	int exp_comps;
 	/** maximum number of tiles at the decoder */
@@ -436,7 +436,7 @@ Encode an image into a JPEG-2000 codestream
 @param cstr_info Codestream information structure if required, NULL otherwise
 @return Returns true if successful, returns false otherwise
 */
-opj_bool j2k_encode(opj_j2k_t *j2k, opj_cio_t *cio, opj_image_t *image, opj_codestream_info_t *cstr_info);
+bool j2k_encode(opj_j2k_t *j2k, opj_cio_t *cio, opj_image_t *image, opj_codestream_info_t *cstr_info);
 
 /* ----------------------------------------------------------------------- */
 /*@}*/

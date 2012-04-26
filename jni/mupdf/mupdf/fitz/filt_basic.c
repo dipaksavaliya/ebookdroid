@@ -1,4 +1,4 @@
-#include "fitz-internal.h"
+#include "fitz.h"
 
 /* Pretend we have a filter that just copies data forever */
 

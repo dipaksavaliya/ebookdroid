@@ -1,5 +1,5 @@
-#include "fitz-internal.h"
-#include "mupdf-internal.h"
+#include "fitz.h"
+#include "mupdf.h"
 
 #define HUGENUM 32000 /* how far to extend axial/radial shadings */
 #define FUNSEGS 32 /* size of sampled mesh for function-based shadings */
@@ -15,19 +15,16 @@ struct vertex
 static void
 pdf_grow_mesh(fz_context *ctx, fz_shade *shade, int amount)
 {
-	int cap = shade->mesh_cap;
-
-	if (shade->mesh_len + amount < cap)
+	if (shade->mesh_len + amount < shade->mesh_cap)
 		return;
 
-	if (cap == 0)
-		cap = 1024;
+	if (shade->mesh_cap == 0)
+		shade->mesh_cap = 1024;
 
-	while (shade->mesh_len + amount > cap)
-		cap = (cap * 3) / 2;
+	while (shade->mesh_len + amount > shade->mesh_cap)
+		shade->mesh_cap = (shade->mesh_cap * 3) / 2;
 
-	shade->mesh = fz_resize_array(ctx, shade->mesh, cap, sizeof(float));
-	shade->mesh_cap = cap;
+	shade->mesh = fz_resize_array(ctx, shade->mesh, shade->mesh_cap, sizeof(float));
 }
 
 static void
@@ -366,9 +363,9 @@ pdf_sample_shade_function(fz_context *ctx, fz_shade *shade, int funcs, pdf_funct
 /* Type 1-3 -- Function-based, axial and radial shadings */
 
 static void
-pdf_load_function_based_shading(fz_shade *shade, pdf_document *xref, pdf_obj *dict, pdf_function *func)
+pdf_load_function_based_shading(fz_shade *shade, pdf_document *xref, fz_obj *dict, pdf_function *func)
 {
-	pdf_obj *obj;
+	fz_obj *obj;
 	float x0, y0, x1, y1;
 	fz_matrix matrix;
 	struct vertex v[4];
@@ -380,18 +377,18 @@ pdf_load_function_based_shading(fz_shade *shade, pdf_document *xref, pdf_obj *di
 
 	x0 = y0 = 0;
 	x1 = y1 = 1;
-	obj = pdf_dict_gets(dict, "Domain");
-	if (pdf_array_len(obj) == 4)
+	obj = fz_dict_gets(dict, "Domain");
+	if (fz_array_len(obj) == 4)
 	{
-		x0 = pdf_to_real(pdf_array_get(obj, 0));
-		x1 = pdf_to_real(pdf_array_get(obj, 1));
-		y0 = pdf_to_real(pdf_array_get(obj, 2));
-		y1 = pdf_to_real(pdf_array_get(obj, 3));
+		x0 = fz_to_real(fz_array_get(obj, 0));
+		x1 = fz_to_real(fz_array_get(obj, 1));
+		y0 = fz_to_real(fz_array_get(obj, 2));
+		y1 = fz_to_real(fz_array_get(obj, 3));
 	}
 
 	matrix = fz_identity;
-	obj = pdf_dict_gets(dict, "Matrix");
-	if (pdf_array_len(obj) == 6)
+	obj = fz_dict_gets(dict, "Matrix");
+	if (fz_array_len(obj) == 6)
 		matrix = pdf_to_matrix(ctx, obj);
 
 	for (yy = 0; yy < FUNSEGS; yy++)
@@ -431,36 +428,36 @@ pdf_load_function_based_shading(fz_shade *shade, pdf_document *xref, pdf_obj *di
 }
 
 static void
-pdf_load_axial_shading(fz_shade *shade, pdf_document *xref, pdf_obj *dict, int funcs, pdf_function **func)
+pdf_load_axial_shading(fz_shade *shade, pdf_document *xref, fz_obj *dict, int funcs, pdf_function **func)
 {
-	pdf_obj *obj;
+	fz_obj *obj;
 	float d0, d1;
 	int e0, e1;
 	float x0, y0, x1, y1;
 	struct vertex p1, p2;
 	fz_context *ctx = xref->ctx;
 
-	obj = pdf_dict_gets(dict, "Coords");
-	x0 = pdf_to_real(pdf_array_get(obj, 0));
-	y0 = pdf_to_real(pdf_array_get(obj, 1));
-	x1 = pdf_to_real(pdf_array_get(obj, 2));
-	y1 = pdf_to_real(pdf_array_get(obj, 3));
+	obj = fz_dict_gets(dict, "Coords");
+	x0 = fz_to_real(fz_array_get(obj, 0));
+	y0 = fz_to_real(fz_array_get(obj, 1));
+	x1 = fz_to_real(fz_array_get(obj, 2));
+	y1 = fz_to_real(fz_array_get(obj, 3));
 
 	d0 = 0;
 	d1 = 1;
-	obj = pdf_dict_gets(dict, "Domain");
-	if (pdf_array_len(obj) == 2)
+	obj = fz_dict_gets(dict, "Domain");
+	if (fz_array_len(obj) == 2)
 	{
-		d0 = pdf_to_real(pdf_array_get(obj, 0));
-		d1 = pdf_to_real(pdf_array_get(obj, 1));
+		d0 = fz_to_real(fz_array_get(obj, 0));
+		d1 = fz_to_real(fz_array_get(obj, 1));
 	}
 
 	e0 = e1 = 0;
-	obj = pdf_dict_gets(dict, "Extend");
-	if (pdf_array_len(obj) == 2)
+	obj = fz_dict_gets(dict, "Extend");
+	if (fz_array_len(obj) == 2)
 	{
-		e0 = pdf_to_bool(pdf_array_get(obj, 0));
-		e1 = pdf_to_bool(pdf_array_get(obj, 1));
+		e0 = fz_to_bool(fz_array_get(obj, 0));
+		e1 = fz_to_bool(fz_array_get(obj, 1));
 	}
 
 	pdf_sample_shade_function(ctx, shade, funcs, func, d0, d1);
@@ -482,38 +479,38 @@ pdf_load_axial_shading(fz_shade *shade, pdf_document *xref, pdf_obj *dict, int f
 }
 
 static void
-pdf_load_radial_shading(fz_shade *shade, pdf_document *xref, pdf_obj *dict, int funcs, pdf_function **func)
+pdf_load_radial_shading(fz_shade *shade, pdf_document *xref, fz_obj *dict, int funcs, pdf_function **func)
 {
-	pdf_obj *obj;
+	fz_obj *obj;
 	float d0, d1;
 	int e0, e1;
 	float x0, y0, r0, x1, y1, r1;
 	struct vertex p1, p2;
 	fz_context *ctx = xref->ctx;
 
-	obj = pdf_dict_gets(dict, "Coords");
-	x0 = pdf_to_real(pdf_array_get(obj, 0));
-	y0 = pdf_to_real(pdf_array_get(obj, 1));
-	r0 = pdf_to_real(pdf_array_get(obj, 2));
-	x1 = pdf_to_real(pdf_array_get(obj, 3));
-	y1 = pdf_to_real(pdf_array_get(obj, 4));
-	r1 = pdf_to_real(pdf_array_get(obj, 5));
+	obj = fz_dict_gets(dict, "Coords");
+	x0 = fz_to_real(fz_array_get(obj, 0));
+	y0 = fz_to_real(fz_array_get(obj, 1));
+	r0 = fz_to_real(fz_array_get(obj, 2));
+	x1 = fz_to_real(fz_array_get(obj, 3));
+	y1 = fz_to_real(fz_array_get(obj, 4));
+	r1 = fz_to_real(fz_array_get(obj, 5));
 
 	d0 = 0;
 	d1 = 1;
-	obj = pdf_dict_gets(dict, "Domain");
-	if (pdf_array_len(obj) == 2)
+	obj = fz_dict_gets(dict, "Domain");
+	if (fz_array_len(obj) == 2)
 	{
-		d0 = pdf_to_real(pdf_array_get(obj, 0));
-		d1 = pdf_to_real(pdf_array_get(obj, 1));
+		d0 = fz_to_real(fz_array_get(obj, 0));
+		d1 = fz_to_real(fz_array_get(obj, 1));
 	}
 
 	e0 = e1 = 0;
-	obj = pdf_dict_gets(dict, "Extend");
-	if (pdf_array_len(obj) == 2)
+	obj = fz_dict_gets(dict, "Extend");
+	if (fz_array_len(obj) == 2)
 	{
-		e0 = pdf_to_bool(pdf_array_get(obj, 0));
-		e1 = pdf_to_bool(pdf_array_get(obj, 1));
+		e0 = fz_to_bool(fz_array_get(obj, 0));
+		e1 = fz_to_bool(fz_array_get(obj, 1));
 	}
 
 	pdf_sample_shade_function(ctx, shade, funcs, func, d0, d1);
@@ -556,9 +553,9 @@ struct mesh_params
 };
 
 static void
-pdf_load_mesh_params(pdf_document *xref, pdf_obj *dict, struct mesh_params *p)
+pdf_load_mesh_params(pdf_document *xref, fz_obj *dict, struct mesh_params *p)
 {
-	pdf_obj *obj;
+	fz_obj *obj;
 	int i, n;
 
 	p->x0 = p->y0 = 0;
@@ -569,23 +566,23 @@ pdf_load_mesh_params(pdf_document *xref, pdf_obj *dict, struct mesh_params *p)
 		p->c1[i] = 1;
 	}
 
-	p->vprow = pdf_to_int(pdf_dict_gets(dict, "VerticesPerRow"));
-	p->bpflag = pdf_to_int(pdf_dict_gets(dict, "BitsPerFlag"));
-	p->bpcoord = pdf_to_int(pdf_dict_gets(dict, "BitsPerCoordinate"));
-	p->bpcomp = pdf_to_int(pdf_dict_gets(dict, "BitsPerComponent"));
+	p->vprow = fz_to_int(fz_dict_gets(dict, "VerticesPerRow"));
+	p->bpflag = fz_to_int(fz_dict_gets(dict, "BitsPerFlag"));
+	p->bpcoord = fz_to_int(fz_dict_gets(dict, "BitsPerCoordinate"));
+	p->bpcomp = fz_to_int(fz_dict_gets(dict, "BitsPerComponent"));
 
-	obj = pdf_dict_gets(dict, "Decode");
-	if (pdf_array_len(obj) >= 6)
+	obj = fz_dict_gets(dict, "Decode");
+	if (fz_array_len(obj) >= 6)
 	{
-		n = (pdf_array_len(obj) - 4) / 2;
-		p->x0 = pdf_to_real(pdf_array_get(obj, 0));
-		p->x1 = pdf_to_real(pdf_array_get(obj, 1));
-		p->y0 = pdf_to_real(pdf_array_get(obj, 2));
-		p->y1 = pdf_to_real(pdf_array_get(obj, 3));
+		n = (fz_array_len(obj) - 4) / 2;
+		p->x0 = fz_to_real(fz_array_get(obj, 0));
+		p->x1 = fz_to_real(fz_array_get(obj, 1));
+		p->y0 = fz_to_real(fz_array_get(obj, 2));
+		p->y1 = fz_to_real(fz_array_get(obj, 3));
 		for (i = 0; i < n; i++)
 		{
-			p->c0[i] = pdf_to_real(pdf_array_get(obj, 4 + i * 2));
-			p->c1[i] = pdf_to_real(pdf_array_get(obj, 5 + i * 2));
+			p->c0[i] = fz_to_real(fz_array_get(obj, 4 + i * 2));
+			p->c1[i] = fz_to_real(fz_array_get(obj, 5 + i * 2));
 		}
 	}
 
@@ -606,8 +603,8 @@ pdf_load_mesh_params(pdf_document *xref, pdf_obj *dict, struct mesh_params *p)
 }
 
 static void
-pdf_load_type4_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
-	int funcs, pdf_function **func)
+pdf_load_type4_shade(fz_shade *shade, pdf_document *xref, fz_obj *dict,
+	int funcs, pdf_function **func, fz_stream *stream)
 {
 	fz_context *ctx = xref->ctx;
 	struct mesh_params p;
@@ -615,7 +612,6 @@ pdf_load_type4_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 	int ncomp;
 	int flag;
 	int i;
-	fz_stream *stream;
 
 	pdf_load_mesh_params(xref, dict, &p);
 
@@ -626,8 +622,6 @@ pdf_load_type4_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 	}
 	else
 		ncomp = shade->colorspace->n;
-
-	stream = pdf_open_stream(xref, pdf_to_num(dict), pdf_to_gen(dict));
 
 	while (!fz_is_eof_bits(stream))
 	{
@@ -671,12 +665,11 @@ pdf_load_type4_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 			break;
 		}
 	}
-	fz_close(stream);
 }
 
 static void
-pdf_load_type5_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
-	int funcs, pdf_function **func)
+pdf_load_type5_shade(fz_shade *shade, pdf_document *xref, fz_obj *dict,
+	int funcs, pdf_function **func, fz_stream *stream)
 {
 	fz_context *ctx = xref->ctx;
 	struct mesh_params p;
@@ -684,7 +677,6 @@ pdf_load_type5_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 	int first;
 	int ncomp;
 	int i, k;
-	fz_stream *stream;
 
 	pdf_load_mesh_params(xref, dict, &p);
 
@@ -699,8 +691,6 @@ pdf_load_type5_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 	ref = fz_malloc_array(ctx, p.vprow, sizeof(struct vertex));
 	buf = fz_malloc_array(ctx, p.vprow, sizeof(struct vertex));
 	first = 1;
-
-	stream = pdf_open_stream(xref, pdf_to_num(dict), pdf_to_gen(dict));
 
 	while (!fz_is_eof_bits(stream))
 	{
@@ -723,14 +713,13 @@ pdf_load_type5_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 
 	fz_free(ctx, ref);
 	fz_free(ctx, buf);
-	fz_close(stream);
 }
 
 /* Type 6 & 7 -- Patch mesh shadings */
 
 static void
-pdf_load_type6_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
-	int funcs, pdf_function **func)
+pdf_load_type6_shade(fz_shade *shade, pdf_document *xref, fz_obj *dict,
+	int funcs, pdf_function **func, fz_stream *stream)
 {
 	fz_context *ctx = xref->ctx;
 	struct mesh_params p;
@@ -739,7 +728,6 @@ pdf_load_type6_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 	fz_point prevp[12];
 	int ncomp;
 	int i, k;
-	fz_stream *stream;
 
 	pdf_load_mesh_params(xref, dict, &p);
 
@@ -752,8 +740,6 @@ pdf_load_type6_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 		ncomp = shade->colorspace->n;
 
 	hasprevpatch = 0;
-
-	stream = pdf_open_stream(xref, pdf_to_num(dict), pdf_to_gen(dict));
 
 	while (!fz_is_eof_bits(stream))
 	{
@@ -848,12 +834,11 @@ pdf_load_type6_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 			hasprevpatch = 1;
 		}
 	}
-	fz_close(stream);
 }
 
 static void
-pdf_load_type7_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
-	int funcs, pdf_function **func)
+pdf_load_type7_shade(fz_shade *shade, pdf_document *xref, fz_obj *dict,
+	int funcs, pdf_function **func, fz_stream *stream)
 {
 	fz_context *ctx = xref->ctx;
 	struct mesh_params p;
@@ -862,7 +847,6 @@ pdf_load_type7_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 	fz_point prevp[16];
 	int ncomp;
 	int i, k;
-	fz_stream *stream;
 
 	pdf_load_mesh_params(xref, dict, &p);
 
@@ -875,8 +859,6 @@ pdf_load_type7_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 		ncomp = shade->colorspace->n;
 
 	hasprevpatch = 0;
-
-	stream = pdf_open_stream(xref, pdf_to_num(dict), pdf_to_gen(dict));
 
 	while (!fz_is_eof_bits(stream))
 	{
@@ -971,17 +953,17 @@ pdf_load_type7_shade(fz_shade *shade, pdf_document *xref, pdf_obj *dict,
 			hasprevpatch = 1;
 		}
 	}
-	fz_close(stream);
 }
 
 /* Load all of the shading dictionary parameters, then switch on the shading type. */
 
 static fz_shade *
-pdf_load_shading_dict(pdf_document *xref, pdf_obj *dict, fz_matrix transform)
+pdf_load_shading_dict(pdf_document *xref, fz_obj *dict, fz_matrix transform)
 {
 	fz_shade *shade = NULL;
 	pdf_function *func[FZ_MAX_COLORS] = { NULL };
-	pdf_obj *obj;
+	fz_stream *stream = NULL;
+	fz_obj *obj;
 	int funcs = 0;
 	int type = 0;
 	int i;
@@ -990,6 +972,7 @@ pdf_load_shading_dict(pdf_document *xref, pdf_obj *dict, fz_matrix transform)
 	fz_var(shade);
 	fz_var(func);
 	fz_var(funcs);
+	fz_var(stream);
 	fz_var(type);
 
 	fz_try(ctx)
@@ -1012,50 +995,56 @@ pdf_load_shading_dict(pdf_document *xref, pdf_obj *dict, fz_matrix transform)
 
 		funcs = 0;
 
-		obj = pdf_dict_gets(dict, "ShadingType");
-		type = pdf_to_int(obj);
+		obj = fz_dict_gets(dict, "ShadingType");
+		type = fz_to_int(obj);
 
-		obj = pdf_dict_gets(dict, "ColorSpace");
+		obj = fz_dict_gets(dict, "ColorSpace");
 		if (!obj)
 			fz_throw(ctx, "shading colorspace is missing");
 		shade->colorspace = pdf_load_colorspace(xref, obj);
-		/* RJW: "cannot load colorspace (%d %d R)", pdf_to_num(obj), pdf_to_gen(obj) */
+		/* RJW: "cannot load colorspace (%d %d R)", fz_to_num(obj), fz_to_gen(obj) */
 
-		obj = pdf_dict_gets(dict, "Background");
+		obj = fz_dict_gets(dict, "Background");
 		if (obj)
 		{
 			shade->use_background = 1;
 			for (i = 0; i < shade->colorspace->n; i++)
-				shade->background[i] = pdf_to_real(pdf_array_get(obj, i));
+				shade->background[i] = fz_to_real(fz_array_get(obj, i));
 		}
 
-		obj = pdf_dict_gets(dict, "BBox");
-		if (pdf_is_array(obj))
+		obj = fz_dict_gets(dict, "BBox");
+		if (fz_is_array(obj))
 		{
 			shade->bbox = pdf_to_rect(ctx, obj);
 		}
 
-		obj = pdf_dict_gets(dict, "Function");
-		if (pdf_is_dict(obj))
+		obj = fz_dict_gets(dict, "Function");
+		if (fz_is_dict(obj))
 		{
 			funcs = 1;
 
 			func[0] = pdf_load_function(xref, obj);
 			if (!func[0])
-				fz_throw(ctx, "cannot load shading function (%d %d R)", pdf_to_num(obj), pdf_to_gen(obj));
+				fz_throw(ctx, "cannot load shading function (%d %d R)", fz_to_num(obj), fz_to_gen(obj));
 		}
-		else if (pdf_is_array(obj))
+		else if (fz_is_array(obj))
 		{
-			funcs = pdf_array_len(obj);
+			funcs = fz_array_len(obj);
 			if (funcs != 1 && funcs != shade->colorspace->n)
 				fz_throw(ctx, "incorrect number of shading functions");
 
 			for (i = 0; i < funcs; i++)
 			{
-				func[i] = pdf_load_function(xref, pdf_array_get(obj, i));
+				func[i] = pdf_load_function(xref, fz_array_get(obj, i));
 				if (!func[i])
-					fz_throw(ctx, "cannot load shading function (%d %d R)", pdf_to_num(obj), pdf_to_gen(obj));
+					fz_throw(ctx, "cannot load shading function (%d %d R)", fz_to_num(obj), fz_to_gen(obj));
 			}
+		}
+
+		if (type >= 4 && type <= 7)
+		{
+			stream = pdf_open_stream(xref, fz_to_num(dict), fz_to_gen(dict));
+			/* RJW: "cannot open shading stream (%d %d R)", fz_to_num(dict), fz_to_gen(dict) */
 		}
 
 		switch (type)
@@ -1063,26 +1052,30 @@ pdf_load_shading_dict(pdf_document *xref, pdf_obj *dict, fz_matrix transform)
 		case 1: pdf_load_function_based_shading(shade, xref, dict, func[0]); break;
 		case 2: pdf_load_axial_shading(shade, xref, dict, funcs, func); break;
 		case 3: pdf_load_radial_shading(shade, xref, dict, funcs, func); break;
-		case 4: pdf_load_type4_shade(shade, xref, dict, funcs, func); break;
-		case 5: pdf_load_type5_shade(shade, xref, dict, funcs, func); break;
-		case 6: pdf_load_type6_shade(shade, xref, dict, funcs, func); break;
-		case 7: pdf_load_type7_shade(shade, xref, dict, funcs, func); break;
+		case 4: pdf_load_type4_shade(shade, xref, dict, funcs, func, stream); break;
+		case 5: pdf_load_type5_shade(shade, xref, dict, funcs, func, stream); break;
+		case 6: pdf_load_type6_shade(shade, xref, dict, funcs, func, stream); break;
+		case 7: pdf_load_type7_shade(shade, xref, dict, funcs, func, stream); break;
 		default:
 			fz_throw(ctx, "unknown shading type: %d", type);
 		}
 
+		if (stream)
+			fz_close(stream);
 		for (i = 0; i < funcs; i++)
 			if (func[i])
 				pdf_drop_function(ctx, func[i]);
 	}
 	fz_catch(ctx)
 	{
+		if (stream)
+			fz_close(stream);
 		for (i = 0; i < funcs; i++)
 			if (func[i])
 				pdf_drop_function(ctx, func[i]);
 		fz_drop_shade(ctx, shade);
 
-		fz_throw(ctx, "cannot load shading type %d (%d %d R)", type, pdf_to_num(dict), pdf_to_gen(dict));
+		fz_throw(ctx, "cannot load shading type %d (%d %d R)", type, fz_to_num(dict), fz_to_gen(dict));
 	}
 	return shade;
 }
@@ -1096,52 +1089,52 @@ fz_shade_size(fz_shade *s)
 }
 
 fz_shade *
-pdf_load_shading(pdf_document *xref, pdf_obj *dict)
+pdf_load_shading(pdf_document *xref, fz_obj *dict)
 {
 	fz_matrix mat;
-	pdf_obj *obj;
+	fz_obj *obj;
 	fz_context *ctx = xref->ctx;
 	fz_shade *shade;
 
-	if ((shade = pdf_find_item(ctx, fz_free_shade_imp, dict)))
+	if ((shade = fz_find_item(ctx, fz_free_shade_imp, dict)))
 	{
 		return shade;
 	}
 
 	/* Type 2 pattern dictionary */
-	if (pdf_dict_gets(dict, "PatternType"))
+	if (fz_dict_gets(dict, "PatternType"))
 	{
-		obj = pdf_dict_gets(dict, "Matrix");
+		obj = fz_dict_gets(dict, "Matrix");
 		if (obj)
 			mat = pdf_to_matrix(ctx, obj);
 		else
 			mat = fz_identity;
 
-		obj = pdf_dict_gets(dict, "ExtGState");
+		obj = fz_dict_gets(dict, "ExtGState");
 		if (obj)
 		{
-			if (pdf_dict_gets(obj, "CA") || pdf_dict_gets(obj, "ca"))
+			if (fz_dict_gets(obj, "CA") || fz_dict_gets(obj, "ca"))
 			{
 				fz_warn(ctx, "shading with alpha not supported");
 			}
 		}
 
-		obj = pdf_dict_gets(dict, "Shading");
+		obj = fz_dict_gets(dict, "Shading");
 		if (!obj)
 			fz_throw(ctx, "syntaxerror: missing shading dictionary");
 
 		shade = pdf_load_shading_dict(xref, obj, mat);
-		/* RJW: "cannot load shading dictionary (%d %d R)", pdf_to_num(obj), pdf_to_gen(obj) */
+		/* RJW: "cannot load shading dictionary (%d %d R)", fz_to_num(obj), fz_to_gen(obj) */
 	}
 
 	/* Naked shading dictionary */
 	else
 	{
 		shade = pdf_load_shading_dict(xref, dict, fz_identity);
-		/* RJW: "cannot load shading dictionary (%d %d R)", pdf_to_num(dict), pdf_to_gen(dict) */
+		/* RJW: "cannot load shading dictionary (%d %d R)", fz_to_num(dict), fz_to_gen(dict) */
 	}
 
-	pdf_store_item(ctx, dict, shade, fz_shade_size(shade));
+	fz_store_item(ctx, dict, shade, fz_shade_size(shade));
 
 	return shade;
 }

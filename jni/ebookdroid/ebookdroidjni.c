@@ -16,9 +16,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 {
     __android_log_print(ANDROID_LOG_DEBUG, "EBookDroid",
         "initializing EBookDroid JNI library based on MuPDF and DjVuLibre");
-#ifndef __mips__
-     atexit(closeHandler);
-#endif
+    fz_accelerate();
+    // atexit(closeHandler);
     NativeBitmap_getInfo = NULL;
     NativeBitmap_lockPixels = NULL;
     NativeBitmap_unlockPixels = NULL;
@@ -36,14 +35,14 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_ebookdroid_EBookDroidLibraryLoader_free(JNIEnv *env, jobject this)
+Java_org_ebookdroid_EBookDroidLibraryLoader_free(JNIEnv *env, jclass classObject)
 {
     __android_log_print(ANDROID_LOG_DEBUG, "EBookDroid", "Free EBookDroid JNI library");
     closeHandler();
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_ebookdroid_EBookDroidLibraryLoader_isNativeGraphicsAvailable(JNIEnv *env, jobject this)
+Java_org_ebookdroid_EBookDroidLibraryLoader_isNativeGraphicsAvailable(JNIEnv *env, jclass classObject)
 {
     return present;
 }

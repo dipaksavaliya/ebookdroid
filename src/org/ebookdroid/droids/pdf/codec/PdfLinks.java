@@ -1,4 +1,4 @@
-package org.ebookdroid.droids.mupdf.codec;
+package org.ebookdroid.droids.pdf.codec;
 
 import org.ebookdroid.core.codec.PageLink;
 
@@ -7,7 +7,7 @@ import android.graphics.RectF;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MuPdfLinks {
+public class PdfLinks {
 
     private static final int FZ_LINK_NONE = 0;
     private static final int FZ_LINK_GOTO = 1;
@@ -42,7 +42,7 @@ public class MuPdfLinks {
                     link.targetRect.left = temp[0];
                     link.targetRect.top = temp[1];
 
-                    MuPdfDocument.normalizeLinkTargetRect(docHandle, link.targetPage, link.targetRect);
+                    PdfDocument.normalizeLinkTargetRect(docHandle, link.targetPage, link.targetRect);
                 }
 
                 links.add(link);

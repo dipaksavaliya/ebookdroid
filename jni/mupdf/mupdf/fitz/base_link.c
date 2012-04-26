@@ -1,4 +1,4 @@
-#include "fitz-internal.h"
+#include "fitz.h"
 
 void
 fz_free_link_dest(fz_context *ctx, fz_link_dest *dest)
@@ -31,7 +31,6 @@ fz_new_link(fz_context *ctx, fz_rect bbox, fz_link_dest dest)
 	fz_try(ctx)
 	{
 		link = fz_malloc_struct(ctx, fz_link);
-		link->refs = 1;
 	}
 	fz_catch(ctx)
 	{
@@ -44,20 +43,14 @@ fz_new_link(fz_context *ctx, fz_rect bbox, fz_link_dest dest)
 	return link;
 }
 
-fz_link *
-fz_keep_link(fz_context *ctx, fz_link *link)
-{
-	if (link)
-		link->refs++;
-	return link;
-}
-
 void
-fz_drop_link(fz_context *ctx, fz_link *link)
+fz_free_link(fz_context *ctx, fz_link *link)
 {
-	while (link && --link->refs == 0)
+	fz_link *next;
+
+	while (link)
 	{
-		fz_link *next = link->next;
+		next = link->next;
 		fz_free_link_dest(ctx, &link->dest);
 		fz_free(ctx, link);
 		link = next;

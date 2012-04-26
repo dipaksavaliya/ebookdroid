@@ -1,9 +1,5 @@
 package org.ebookdroid.droids.fb2.codec;
 
-import org.ebookdroid.droids.fb2.codec.FB2Document.LineCreationParams;
-
-import java.util.ArrayList;
-
 public class FB2MarkupImageRef implements FB2MarkupElement {
 
     private final String ref;
@@ -15,18 +11,8 @@ public class FB2MarkupImageRef implements FB2MarkupElement {
     }
 
     @Override
-    public void publishToLines(ArrayList<FB2Line> lines, LineCreationParams params) {
-        final FB2Image image = params.doc.getImage(ref, inline);
-        if (image != null) {
-            if (!inline) {
-                final FB2Line line = new FB2Line(params.maxLineWidth);
-                line.append(image);
-                line.applyJustification(JustificationMode.Center);
-                lines.add(line);
-            } else {
-                image.publishToLines(lines, params);
-            }
-        }
+    public void publishToDocument(final FB2Document doc) {
+        doc.publishImage(ref, inline);
     }
 
 }

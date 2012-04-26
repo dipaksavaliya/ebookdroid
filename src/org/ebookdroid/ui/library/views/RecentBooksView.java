@@ -1,8 +1,9 @@
 package org.ebookdroid.ui.library.views;
 
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.ui.library.IBrowserActivity;
-import org.ebookdroid.ui.library.adapters.BookNode;
 import org.ebookdroid.ui.library.adapters.RecentAdapter;
+import org.ebookdroid.ui.settings.SettingsUI;
 
 import android.net.Uri;
 import android.view.View;
@@ -10,7 +11,7 @@ import android.widget.AdapterView;
 
 import java.io.File;
 
-public class RecentBooksView extends android.widget.ListView implements AdapterView.OnItemClickListener {
+public class RecentBooksView extends android.widget.ListView implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     protected final IBrowserActivity base;
 
@@ -25,11 +26,19 @@ public class RecentBooksView extends android.widget.ListView implements AdapterV
         setAdapter(adapter);
         setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         setOnItemClickListener(this);
+        setOnItemLongClickListener(this);
     }
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
-        final BookNode bs = adapter.getItem(i);
-        base.showDocument(Uri.fromFile(new File(bs.path)));
+        final BookSettings bs = adapter.getItem(i);
+        base.showDocument(Uri.fromFile(new File(bs.fileName)));
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View arg1, int i, long l) {
+        final BookSettings bs = adapter.getItem(i);
+        SettingsUI.showBookSettings(base.getActivity(), bs.fileName);
+        return true;
     }
 }

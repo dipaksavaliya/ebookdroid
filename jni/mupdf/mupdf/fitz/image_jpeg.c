@@ -1,4 +1,4 @@
-#include "fitz-internal.h"
+#include "fitz.h"
 
 #include <jpeglib.h>
 #include <setjmp.h>
@@ -115,10 +115,7 @@ fz_load_jpeg(fz_context *ctx, unsigned char *rbuf, int rlen)
 		image->yres = cinfo.Y_density * 254 / 100;
 	}
 
-	if (image->xres <= 0) image->xres = 72;
-	if (image->yres <= 0) image->yres = 72;
-
-	fz_clear_pixmap(ctx, image);
+	fz_clear_pixmap(image);
 
 	row[0] = fz_malloc(ctx, cinfo.output_components * cinfo.output_width);
 	dp = image->samples;

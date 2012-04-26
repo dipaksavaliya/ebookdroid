@@ -27,19 +27,16 @@ import org.ebookdroid.core.models.DocumentModel;
 import org.ebookdroid.core.models.ZoomModel;
 import org.ebookdroid.ui.settings.SettingsUI;
 import org.ebookdroid.ui.viewer.dialogs.OutlineDialog;
+import org.ebookdroid.ui.viewer.stubs.ActivityControllerStub;
 import org.ebookdroid.ui.viewer.stubs.ViewContollerStub;
-import org.ebookdroid.ui.viewer.views.SearchControls;
 import org.ebookdroid.ui.viewer.views.ViewEffects;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.PointF;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -53,9 +50,6 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -91,10 +85,7 @@ actions = {
         @ActionMethodDef(id = R.id.mainmenu_thumbnail, method = "setCurrentPageAsThumbnail"),
         @ActionMethodDef(id = R.id.actions_toggleTouchManagerView, method = "toggleControls"),
         @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu"),
-        @ActionMethodDef(id = R.id.actions_keyBindings, method = "showKeyBindingsDialog"),
-        @ActionMethodDef(id = R.id.mainmenu_search, method = "toggleControls"),
-        @ActionMethodDef(id = R.id.actions_doSearch, method = "doSearch"),
-        @ActionMethodDef(id = R.id.actions_doSearchBack, method = "doSearch")
+        @ActionMethodDef(id = R.id.actions_keyBindings, method = "showKeyBindingsDialog")
 // finish
 })
 public class ViewerActivityController extends ActionController<ViewerActivity> implements IActivityController,
@@ -129,8 +120,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     private String m_fileName;
 
     private final NavigationHistory history;
-
-    private String currentSearchPattern;
 
     /**
      * Instantiates a new base viewer activity.
@@ -176,17 +165,27 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         createAction(R.id.mainmenu_goto_page, new Constant("dialogId", DIALOG_GOTO));
         createAction(R.id.mainmenu_zoom).putValue("view", activity.getZoomControls());
-        createAction(R.id.mainmenu_search).putValue("view", activity.getSearchControls());
         createAction(R.id.actions_toggleTouchManagerView).putValue("view", activity.getTouchView());
 
         if (++loadingCount == 1) {
-            if (intent == null || intent.getScheme() == null) {
+            documentModel = ActivityControllerStub.DM_STUB;
+            if (intent == null) {
                 showErrorDlg("Bad intent or scheme:\n" + intent);
                 return;
             }
-            if (intent.getScheme().equals("content")) {
+            final String scheme = intent.getScheme();
+            if (LengthUtils.isEmpty(scheme)) {
+                showErrorDlg("Bad intent or scheme:\n" + intent);
+                return;
+            }
+            final Uri data = intent.getData();
+            if (data == null) {
+                showErrorDlg("No intent data:\n" + intent);
+                return;
+            }
+            if (scheme.equals("content")) {
                 try {
-                    final Cursor c = activity.getContentResolver().query(intent.getData(), null, null, null, null);
+                    final Cursor c = activity.getContentResolver().query(data, null, null, null, null);
                     c.moveToFirst();
                     final int fileNameColumnId = c.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME);
                     if (fileNameColumnId >= 0) {
@@ -203,11 +202,21 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 }
             }
             if (codecType == null) {
-                codecType = CodecType.getByUri(intent.getData().toString());
-                bookTitle = LengthUtils.safeString(intent.getData().getLastPathSegment(), E_MAIL_ATTACHMENT);
+                bookTitle = LengthUtils.safeString(data.getLastPathSegment(), E_MAIL_ATTACHMENT);
+                codecType = CodecType.getByUri(data.toString());
+                if (codecType == null) {
+                    final String type = intent.getType();
+                    LCTX.i("Book mime type: " + type);
+                    if (LengthUtils.isNotEmpty(type)) {
+                        codecType = CodecType.getByMimeType(type);
+                    }
+                }
             }
+
+            LCTX.i("Book codec type: " + codecType);
+            LCTX.i("Book title: " + bookTitle);
             if (codecType == null) {
-                showErrorDlg("Unknown intent data type: " + intent.getData());
+                showErrorDlg("Unknown intent data type:\n" + data);
                 return;
             }
 
@@ -216,10 +225,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             progressModel = new DecodingProgressModel();
             progressModel.addListener(ViewerActivityController.this);
 
-            final Uri uri = intent.getData();
+            final Uri uri = data;
             m_fileName = "";
 
-            if (intent.getScheme().equals("content")) {
+            if (scheme.equals("content")) {
                 temporaryBook = true;
                 m_fileName = E_MAIL_ATTACHMENT;
                 CacheManager.clear(m_fileName);
@@ -243,7 +252,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             LCTX.d("afterPostCreate()");
         }
         setWindowTitle();
-        if (loadingCount == 1) {
+        if (loadingCount == 1 && documentModel != ActivityControllerStub.DM_STUB) {
             startDecoding(m_fileName, "");
         }
     }
@@ -328,21 +337,21 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         startDecoding(fileName, password);
     }
 
-    @Override
-    public IViewController switchDocumentController() {
-        try {
-            final BookSettings bs = SettingsManager.getBookSettings();
-
-            final IViewController newDc = bs.viewMode.create(this);
-            final IViewController oldDc = ctrl.getAndSet(newDc);
-
-            getZoomModel().removeListener(oldDc);
-            getZoomModel().addListener(newDc);
-
-            return ctrl.get();
-        } catch (final Throwable e) {
-            throw new RuntimeException(e);
+    protected IViewController switchDocumentController(final BookSettings bs) {
+        if (bs != null) {
+            try {
+                final IViewController newDc = bs.viewMode.create(this);
+                if (newDc != null) {
+                    final IViewController oldDc = ctrl.getAndSet(newDc);
+                    getZoomModel().removeListener(oldDc);
+                    getZoomModel().addListener(newDc);
+                    return ctrl.get();
+                }
+            } catch (final Throwable e) {
+                LCTX.e("Unexpected error: ", e);
+            }
         }
+        return null;
     }
 
     @Override
@@ -413,7 +422,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
      * @see org.ebookdroid.ui.viewer.IActivityController#jumpToPage(int, float, float)
      */
     @Override
-    public void jumpToPage(final int viewIndex, final float offsetX, final float offsetY, boolean addToHistory) {
+    public void jumpToPage(final int viewIndex, final float offsetX, final float offsetY, final boolean addToHistory) {
         if (addToHistory) {
             history.update();
         }
@@ -431,16 +440,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
     }
 
-    @ActionMethod(ids = { R.id.actions_doSearch, R.id.actions_doSearchBack })
-    public final void doSearch(final ActionEx action) {
-        final Editable value = action.getParameter("input");
-        final String newPattern = (value != null ? value.toString() : LengthUtils.toString(action.getParameter("text")));
-        final String oldPattern = currentSearchPattern;
-
-        currentSearchPattern = newPattern;
-        new SearchTask().execute(newPattern, oldPattern, (String) action.getParameter("forward"));
-    }
-
+    @SuppressWarnings("deprecation")
     @ActionMethod(ids = R.id.mainmenu_goto_page)
     public void showDialog(final ActionEx action) {
         final Integer dialogId = action.getParameter("dialogId");
@@ -564,7 +564,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         return this;
     }
 
-    @ActionMethod(ids = { R.id.mainmenu_zoom, R.id.actions_toggleTouchManagerView, R.id.mainmenu_search })
+    @ActionMethod(ids = { R.id.mainmenu_zoom, R.id.actions_toggleTouchManagerView })
     public void toggleControls(final ActionEx action) {
         final View view = action.getParameter("view");
         ViewEffects.toggleControls(view);
@@ -664,12 +664,15 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     @Override
     public void onBookSettingsChanged(final BookSettings oldSettings, final BookSettings newSettings,
             final BookSettings.Diff diff, final AppSettings.Diff appDiff) {
+        if (newSettings == null) {
+            return;
+        }
 
         boolean redrawn = false;
         if (diff.isViewModeChanged() || diff.isSplitPagesChanged() || diff.isCropPagesChanged()) {
             redrawn = true;
-            final IViewController newDc = switchDocumentController();
-            if (!diff.isFirstTime()) {
+            final IViewController newDc = switchDocumentController(newSettings);
+            if (!diff.isFirstTime() && newDc != null) {
                 newDc.init(null);
                 newDc.show();
             }
@@ -813,136 +816,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             } else {
                 progressDialog.setMessage(values[0]);
             }
-        }
-    }
-
-    final class SearchTask extends AsyncTask<String, String, RectF> implements DecodeService.SearchCallback,
-            OnCancelListener {
-
-        private CountDownLatch sync;
-        private ProgressDialog progressDialog;
-        private final AtomicBoolean continueFlag = new AtomicBoolean(true);
-        private String pattern;
-        private Page targetPage = null;
-
-        @Override
-        protected void onPreExecute() {
-            onProgressUpdate("Searching...");
-        }
-
-        @Override
-        public void onCancel(final DialogInterface dialog) {
-            documentModel.getDecodeService().stopSearch(pattern);
-            continueFlag.set(false);
-        }
-
-        @Override
-        protected RectF doInBackground(final String... params) {
-            try {
-                final int length = LengthUtils.length(params);
-
-                pattern = length > 0 ? params[0] : null;
-                final String oldPattern = length >= 2 ? params[1] : null;
-                final boolean forward = length >= 3 ? Boolean.parseBoolean(params[2]) : true;
-
-                if (LengthUtils.isEmpty(pattern) || !pattern.equals(oldPattern)) {
-                    for (final Page page : documentModel.getPages()) {
-                        page.clearHighlights();
-                    }
-                    if (LengthUtils.isEmpty(pattern)) {
-                        return null;
-                    }
-                }
-
-                final int currentIndex = documentModel.getCurrentViewPageIndex();
-                Page p = documentModel.getPageObject(currentIndex);
-                if (p.areHighlightsActual(pattern)) {
-                    final RectF next = forward ? p.getNextHighlight() : p.getPrevHighlight();
-                    if (next != null) {
-                        targetPage = p;
-                        return next;
-                    }
-                }
-
-                final int startIndex = forward ? currentIndex + 1 : currentIndex - 1;
-                final int endIndex = forward ? documentModel.getPageCount() : -1;
-                final int direction = forward ? +1 : -1;
-
-                for (int index = startIndex; (forward && index < endIndex || index > endIndex) && continueFlag.get(); index += direction) {
-                    publishProgress("Searching on page " + (index + 1) + "...");
-                    p = documentModel.getPageObject(index);
-                    if (p.areHighlightsActual(pattern)) {
-                        final RectF next = forward ? p.getNextHighlight() : p.getPrevHighlight();
-                        if (next != null) {
-                            targetPage = p;
-                            return next;
-                        }
-                    }
-                    sync = new CountDownLatch(1);
-                    documentModel.getDecodeService().searchText(p, pattern, this);
-                    while (continueFlag.get()) {
-                        try {
-                            if (sync.await(250, TimeUnit.MILLISECONDS)) {
-                                break;
-                            }
-                        } catch (final InterruptedException ex) {
-                            Thread.interrupted();
-                        }
-                    }
-                    final RectF next = forward ? p.getNextHighlight() : p.getPrevHighlight();
-                    if (next != null) {
-                        targetPage = p;
-                        return next;
-                    }
-                }
-            } catch (final Throwable th) {
-                th.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(final RectF result) {
-            if (progressDialog != null) {
-                try {
-                    progressDialog.dismiss();
-                } catch (final Throwable th) {
-                }
-            }
-            if (result != null) {
-                final RectF newRect = new RectF(result);
-                final SearchControls sc = getManagedComponent().getSearchControls();
-                final int controlsHeight = 3 + sc.getActualHeight();
-                final float pageHeight = targetPage.getBounds(getZoomModel().getZoom()).height();
-                newRect.offset(0, -(controlsHeight / pageHeight));
-                getDocumentController().goToLink(targetPage.index.docIndex, newRect, false);
-            } else {
-                Toast.makeText(getManagedComponent(), "Text not found", 0).show();
-            }
-            getDocumentController().redrawView();
-        }
-
-        @Override
-        protected void onProgressUpdate(final String... values) {
-            final int length = LengthUtils.length(values);
-            if (length == 0) {
-                return;
-            }
-            final String last = values[length - 1];
-            if (progressDialog == null || !progressDialog.isShowing()) {
-                progressDialog = ProgressDialog.show(getManagedComponent(), "", last, true);
-                progressDialog.setCancelable(true);
-                progressDialog.setCanceledOnTouchOutside(true);
-                progressDialog.setOnCancelListener(this);
-            } else {
-                progressDialog.setMessage(last);
-            }
-        }
-
-        @Override
-        public void searchComplete(final Page page, final List<? extends RectF> regions) {
-            page.setHighlights(pattern, regions);
-            sync.countDown();
         }
     }
 }

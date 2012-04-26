@@ -126,13 +126,13 @@ unsigned char *cio_getbp(opj_cio_t *cio) {
 /*
  * Write a byte.
  */
-opj_bool cio_byteout(opj_cio_t *cio, unsigned char v) {
+bool cio_byteout(opj_cio_t *cio, unsigned char v) {
 	if (cio->bp >= cio->end) {
 		opj_event_msg(cio->cinfo, EVT_ERROR, "write error\n");
-		return OPJ_FALSE;
+		return false;
 	}
 	*cio->bp++ = v;
-	return OPJ_TRUE;
+	return true;
 }
 
 /*
@@ -152,7 +152,7 @@ unsigned char cio_bytein(opj_cio_t *cio) {
  * v : value to write
  * n : number of bytes to write
  */
-unsigned int cio_write(opj_cio_t *cio, unsigned long long int v, int n) {
+unsigned int cio_write(opj_cio_t *cio, unsigned int v, int n) {
 	int i;
 	for (i = n - 1; i >= 0; i--) {
 		if( !cio_byteout(cio, (unsigned char) ((v >> (i << 3)) & 0xff)) )
