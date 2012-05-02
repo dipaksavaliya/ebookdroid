@@ -56,7 +56,7 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> implements CodecPage
                 opts.inJustDecodeBounds = onlyBounds;
                 opts.inSampleSize = scale;
 
-                final Bitmap bitmap = BitmapFactory.decodeStream(new BufferedInputStream(is), null, opts);
+                final Bitmap bitmap = BitmapFactory.decodeStream(new BufferedInputStream(is, 64 * 1024), null, opts);
                 pageInfo = new CodecPageInfo();
                 if (onlyBounds) {
                     pageInfo.height = (opts.outHeight * scale);
@@ -144,9 +144,9 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> implements CodecPage
         final Canvas c = new Canvas(bmp.getBitmap());
 
         final Rect srcRect = new Rect((int) (pageSliceBounds.left * storedBitmap.getWidth()),
-                (int) (pageSliceBounds.top * storedBitmap.getHeight()),
-                (int)FloatMath.ceil(pageSliceBounds.right * storedBitmap.getWidth()),
-                (int)FloatMath.ceil(pageSliceBounds.bottom * storedBitmap.getHeight()));
+                (int) (pageSliceBounds.top * storedBitmap.getHeight()), (int) FloatMath.ceil(pageSliceBounds.right
+                        * storedBitmap.getWidth()), (int) FloatMath.ceil(pageSliceBounds.bottom
+                        * storedBitmap.getHeight()));
 
         if (CbxDocument.LCTX.isDebugEnabled()) {
             CbxDocument.LCTX.d("source ratio=" + (srcRect.width() / (float) srcRect.height()) + ", target ratio="

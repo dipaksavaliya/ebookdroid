@@ -1,11 +1,17 @@
 package org.emdev.utils.archives.rar;
 
+import org.ebookdroid.common.log.LogContext;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.emdev.utils.archives.ArchiveEntry;
 
 public class RarArchiveEntry implements ArchiveEntry {
+
+    private static final LogContext LCTX = LogContext.ROOT.lctx("Unrar");
 
     final RarArchive archive;
     final String path;
@@ -45,6 +51,24 @@ public class RarArchiveEntry implements ArchiveEntry {
     @Override
     public InputStream open() throws IOException {
         final Process process = UnrarBridge.exec("p", "-inul", archive.rarfile.getAbsolutePath(), path);
+        final InputStream errorStream = process.getErrorStream();
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                BufferedReader err = new BufferedReader(new InputStreamReader(errorStream));
+                try {
+                    for (String s = err.readLine(); s != null; s = err.readLine()) {
+                        LCTX.e(s);
+                    }
+                } catch (IOException ex) {
+                }
+                try {
+                    err.close();
+                } catch (IOException ex) {
+                }
+            }
+        }).start();
         return process.getInputStream();
     }
 }
