@@ -1,8 +1,11 @@
 package org.emdev.utils.archives.rar;
 
+import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.log.LogContext;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +19,8 @@ public class RarArchiveEntry implements ArchiveEntry {
     final RarArchive archive;
     final String path;
     final String name;
+
+    private File cached;
 
     RarArchiveEntry(final RarArchive archive, final String path, final String name) {
         this.archive = archive;
@@ -50,25 +55,32 @@ public class RarArchiveEntry implements ArchiveEntry {
      */
     @Override
     public InputStream open() throws IOException {
-        final Process process = UnrarBridge.exec("p", "-inul", archive.rarfile.getAbsolutePath(), path);
-        final InputStream errorStream = process.getErrorStream();
-        new Thread(new Runnable() {
+        if (cached == null || !cached.exists()) {
+            final Process process = UnrarBridge.exec("p", "-inul", archive.rarfile.getAbsolutePath(), path);
+            final InputStream inputStream = process.getInputStream();
+            final InputStream errorStream = process.getErrorStream();
 
-            @Override
-            public void run() {
-                BufferedReader err = new BufferedReader(new InputStreamReader(errorStream));
-                try {
-                    for (String s = err.readLine(); s != null; s = err.readLine()) {
-                        LCTX.e(s);
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    BufferedReader err = new BufferedReader(new InputStreamReader(errorStream), 8 * 1024);
+                    try {
+                        for (String s = err.readLine(); s != null; s = err.readLine()) {
+                            LCTX.e(s);
+                        }
+                    } catch (IOException ex) {
                     }
-                } catch (IOException ex) {
+                    try {
+                        err.close();
+                    } catch (IOException ex) {
+                    }
                 }
-                try {
-                    err.close();
-                } catch (IOException ex) {
-                }
-            }
-        }).start();
-        return process.getInputStream();
+            }).start();
+
+            cached = CacheManager.createTempFile(inputStream, "page");
+        }
+        FileInputStream tempin = new FileInputStream(cached);
+        return tempin;
     }
 }

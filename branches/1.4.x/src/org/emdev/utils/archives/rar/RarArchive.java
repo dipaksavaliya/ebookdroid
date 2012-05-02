@@ -37,14 +37,14 @@ public class RarArchive implements ArchiveFile<RarArchiveEntry> {
         final Set<String> dirs = new HashSet<String>();
 
         final Process process = UnrarBridge.exec("vb", rarfile.getAbsolutePath());
-        final BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        final BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()), 8 * 1024);
 
-        LCTX.d("List archive entries for: " + rarfile.getAbsolutePath());
+        LCTX.i("List archive entries for: " + rarfile.getAbsolutePath());
         for (String s = in.readLine(); s != null; s = in.readLine()) {
             if (dirs.contains(s)) {
                 continue;
             }
-            LCTX.d("Entry: " + s);
+            LCTX.i("Entry: " + s);
             final File f = new File(s);
             entries.add(new RarArchiveEntry(this, s, f.getName()));
 
