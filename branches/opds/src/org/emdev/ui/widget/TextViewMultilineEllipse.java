@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.emdev.ui.view;
+package org.emdev.ui.widget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,6 @@ import android.graphics.Paint.Align;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
-
 
 /**
  * Provides a simple TextView-like control which allows us to set a max number
@@ -46,8 +45,8 @@ import android.view.View;
  *
  * @author Mark Wyszomierski
  */
-public class TextViewMultilineEllipse extends View
-{
+public class TextViewMultilineEllipse extends View {
+
     private TextPaint mTextPaint;
     private CharSequence mText;
     private int mAscent;
@@ -60,8 +59,6 @@ public class TextViewMultilineEllipse extends View
     private boolean mExpanded;
     private LineBreaker mBreakerExpanded;
     private LineBreaker mBreakerCollapsed;
-
-
 
     public TextViewMultilineEllipse(Context context) {
         super(context);
@@ -94,11 +91,11 @@ public class TextViewMultilineEllipse extends View
         mTextPaint.setTextAlign(Align.LEFT);
     }
 
-
-
     /**
      * Sets the text to display in this widget.
-     * @param text The text to display.
+     *
+     * @param text
+     *            The text to display.
      */
     public void setText(CharSequence text) {
         mText = text;
@@ -108,7 +105,9 @@ public class TextViewMultilineEllipse extends View
 
     /**
      * Sets the text size for this widget.
-     * @param size Font size.
+     *
+     * @param size
+     *            Font size.
      */
     public void setTextSize(int size) {
         mTextPaint.setTextSize(size);
@@ -118,7 +117,9 @@ public class TextViewMultilineEllipse extends View
 
     /**
      * Sets the text color for this widget.
-     * @param color ARGB value for the text.
+     *
+     * @param color
+     *            ARGB value for the text.
      */
     public void setTextColor(int color) {
         mTextPaint.setColor(color);
@@ -128,7 +129,9 @@ public class TextViewMultilineEllipse extends View
     /**
      * The string to append when ellipsizing. Must be shorter than the available
      * width for a single line!
-     * @param ellipsis The ellipsis string to use, like "...", or "-----".
+     *
+     * @param ellipsis
+     *            The ellipsis string to use, like "...", or "-----".
      */
     public void setEllipsis(String ellipsis) {
         mStrEllipsis = ellipsis;
@@ -136,6 +139,7 @@ public class TextViewMultilineEllipse extends View
 
     /**
      * Optional extra ellipsize string. This
+     *
      * @param ellipsisMore
      */
     public void setEllipsisMore(String ellipsisMore) {
@@ -144,6 +148,7 @@ public class TextViewMultilineEllipse extends View
 
     /**
      * The maximum number of lines to allow, height-wise.
+     *
      * @param maxLines
      */
     public void setMaxLines(int maxLines) {
@@ -152,7 +157,9 @@ public class TextViewMultilineEllipse extends View
 
     /**
      * Turn drawing of the optional ellipsizeMore string on or off.
-     * @param drawEllipsizeMoreString Yes or no.
+     *
+     * @param drawEllipsizeMoreString
+     *            Yes or no.
      */
     public void setDrawEllipsizeMoreString(boolean drawEllipsizeMoreString) {
         mDrawEllipsizeMoreString = drawEllipsizeMoreString;
@@ -160,7 +167,9 @@ public class TextViewMultilineEllipse extends View
 
     /**
      * Font color to use for the optional ellipsizeMore string.
-     * @param color ARGB color.
+     *
+     * @param color
+     *            ARGB color.
      */
     public void setColorEllpsizeMore(int color) {
         mColorEllipsizeMore = color;
@@ -169,7 +178,9 @@ public class TextViewMultilineEllipse extends View
     /**
      * When drawing the ellipsizeMore string, either draw it wherever ellipsizing on the last
      * line occurs, or always right align it. On by default.
-     * @param rightAlignEllipsizeMoreString Yes or no.
+     *
+     * @param rightAlignEllipsizeMoreString
+     *            Yes or no.
      */
     public void setRightAlignEllipsizeMoreString(boolean rightAlignEllipsizeMoreString) {
         mRightAlignEllipsizeMoreString = rightAlignEllipsizeMoreString;
@@ -180,14 +191,14 @@ public class TextViewMultilineEllipse extends View
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(
-            measureWidth(widthMeasureSpec),
-            measureHeight(heightMeasureSpec));
+        setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
     }
 
     /**
      * Determines the width of this view
-     * @param measureSpec A measureSpec packed into an int
+     *
+     * @param measureSpec
+     *            A measureSpec packed into an int
      * @return The width of the view, honoring constraints from measureSpec
      */
     private int measureWidth(int measureSpec) {
@@ -201,15 +212,13 @@ public class TextViewMultilineEllipse extends View
 
             // Format the text using this exact width, and the current mode.
             breakWidth(specSize);
-        }
-        else {
+        } else {
             if (specMode == MeasureSpec.AT_MOST) {
                 // Use the AT_MOST size - if we had very short text, we may need even less
                 // than the AT_MOST value, so return the minimum.
                 result = breakWidth(specSize);
                 result = Math.min(result, specSize);
-            }
-            else {
+            } else {
                 // We're not given any width - so in this case we assume we have an unlimited
                 // width?
                 breakWidth(specSize);
@@ -221,7 +230,9 @@ public class TextViewMultilineEllipse extends View
 
     /**
      * Determines the height of this view
-     * @param measureSpec A measureSpec packed into an int
+     *
+     * @param measureSpec
+     *            A measureSpec packed into an int
      * @return The height of the view, honoring constraints from measureSpec
      */
     private int measureHeight(int measureSpec) {
@@ -233,20 +244,16 @@ public class TextViewMultilineEllipse extends View
         if (specMode == MeasureSpec.EXACTLY) {
             // We were told how big to be, so nothing to do.
             result = specSize;
-        }
-        else {
+        } else {
             // The lines should already be broken up. Calculate our max desired height
             // for our current mode.
             int numLines;
             if (mExpanded) {
                 numLines = mBreakerExpanded.getLines().size();
-            }
-            else {
+            } else {
                 numLines = mBreakerCollapsed.getLines().size();
             }
-            result = numLines * (int) (-mAscent + mTextPaint.descent())
-                   + getPaddingTop()
-                   + getPaddingBottom();
+            result = numLines * (int) (-mAscent + mTextPaint.descent()) + getPaddingTop() + getPaddingBottom();
 
             // Respect AT_MOST value if that was what is called for by measureSpec.
             if (specMode == MeasureSpec.AT_MOST) {
@@ -270,8 +277,7 @@ public class TextViewMultilineEllipse extends View
         if (mExpanded) {
             breaker = mBreakerExpanded;
             lines = mBreakerExpanded.getLines();
-        }
-        else {
+        } else {
             breaker = mBreakerCollapsed;
             lines = mBreakerCollapsed.getLines();
         }
@@ -281,7 +287,7 @@ public class TextViewMultilineEllipse extends View
         for (int i = 0; i < lines.size(); i++) {
             // Draw the current line.
             int[] pair = lines.get(i);
-            canvas.drawText(mText, pair[0], pair[1]+1, x, y, mTextPaint);
+            canvas.drawText(mText, pair[0], pair[1] + 1, x, y, mTextPaint);
 
             // Draw the ellipsis if necessary.
             if (i == lines.size() - 1) {
@@ -292,10 +298,12 @@ public class TextViewMultilineEllipse extends View
                         mTextPaint.setColor(mColorEllipsizeMore);
                         if (mRightAlignEllipsizeMoreString) {
                             // Seems to not be right...
-                            canvas.drawText(mStrEllipsisMore, canvas.getWidth()-(breaker.getLengthEllipsisMore()+getPaddingRight()+getPaddingLeft()), y, mTextPaint);
-                        }
-                        else {
-                            canvas.drawText(mStrEllipsisMore, x + breaker.getLengthLastEllipsizedLinePlusEllipsis(), y, mTextPaint);
+                            canvas.drawText(mStrEllipsisMore, canvas.getWidth()
+                                    - (breaker.getLengthEllipsisMore() + getPaddingRight() + getPaddingLeft()), y,
+                                    mTextPaint);
+                        } else {
+                            canvas.drawText(mStrEllipsisMore, x + breaker.getLengthLastEllipsizedLinePlusEllipsis(), y,
+                                    mTextPaint);
                         }
                         mTextPaint.setColor(lastColor);
                     }
@@ -328,33 +336,22 @@ public class TextViewMultilineEllipse extends View
     private int breakWidth(int availableWidth) {
         int widthUsed = 0;
         if (mExpanded) {
-            widthUsed =
-              mBreakerExpanded.breakText(
-                 mText,
-                availableWidth - getPaddingLeft() - getPaddingRight(),
-                mTextPaint);
-        }
-        else {
-            widthUsed =
-              mBreakerCollapsed.breakText(
-                mText,
-                mStrEllipsis,
-                mStrEllipsisMore,
-                mMaxLines,
-                availableWidth - getPaddingLeft() - getPaddingRight(),
-                mTextPaint);
+            widthUsed = mBreakerExpanded.breakText(mText, availableWidth - getPaddingLeft() - getPaddingRight(),
+                    mTextPaint);
+        } else {
+            widthUsed = mBreakerCollapsed.breakText(mText, mStrEllipsis, mStrEllipsisMore, mMaxLines, availableWidth
+                    - getPaddingLeft() - getPaddingRight(), mTextPaint);
         }
 
         return widthUsed + getPaddingLeft() + getPaddingRight();
     }
 
-
     /**
      * Used internally to break a string into a list of integer pairs. The pairs are
      * start and end locations for lines given the current available layout width.
      */
-    private static class LineBreaker
-    {
+    private static class LineBreaker {
+
         /** Was the input text long enough to need an ellipsis? */
         private boolean mRequiredEllipsis;
 
@@ -364,32 +361,33 @@ public class TextViewMultilineEllipse extends View
         /** The width in pixels of the last line, used to draw the ellipsis if necessary. */
         private float mLengthLastLine;
 
-        /** The width of the ellipsis string, so we know where to draw the ellipsisMore string
-         *  if necessary.
+        /**
+         * The width of the ellipsis string, so we know where to draw the ellipsisMore string
+         * if necessary.
          */
         private float mLengthEllipsis;
 
         /** The width of the ellipsizeMore string, same use as above. */
         private float mLengthEllipsisMore;
 
-
         public LineBreaker() {
             mRequiredEllipsis = false;
-            mLines = new ArrayList<int[]>();
+            mLines = new ArrayList<int[]>(100);
         }
 
         /**
          * Used for breaking text in 'expanded' mode, which needs no ellipse.
          * Uses as many lines as is necessary to accomodate the entire input
          * string.
-         * @param input String to be broken.
-         * @param maxWidth Available layout width.
-         * @param tp Current paint object with styles applied to it.
+         *
+         * @param input
+         *            String to be broken.
+         * @param maxWidth
+         *            Available layout width.
+         * @param tp
+         *            Current paint object with styles applied to it.
          */
-        public int breakText(CharSequence input,
-                                int maxWidth,
-                             TextPaint tp)
-        {
+        public int breakText(CharSequence input, int maxWidth, TextPaint tp) {
             return breakText(input, null, null, -1, maxWidth, tp);
         }
 
@@ -398,20 +396,22 @@ public class TextViewMultilineEllipse extends View
          * the available width. The last line will subtract the physical width of the ellipsis
          * string from maxWidth to reserve room for the ellipsis. If the ellpsisMore string is set,
          * then space will also be reserved for its length as well.
-         * @param input String to be broken.
-         * @param ellipsis Ellipsis string, like "..."
-         * @param ellipsisMore Optional space reservation after the ellipsis, like " Read More!"
-         * @param maxLines Max number of lines to allow before ellipsizing.
-         * @param maxWidth Available layout width.
-         * @param tp Current paint object with styles applied to it.
+         *
+         * @param input
+         *            String to be broken.
+         * @param ellipsis
+         *            Ellipsis string, like "..."
+         * @param ellipsisMore
+         *            Optional space reservation after the ellipsis, like " Read More!"
+         * @param maxLines
+         *            Max number of lines to allow before ellipsizing.
+         * @param maxWidth
+         *            Available layout width.
+         * @param tp
+         *            Current paint object with styles applied to it.
          */
-        public int breakText(CharSequence input,
-                                String ellipsis,
-                                String ellipsisMore,
-                             int maxLines,
-                             int maxWidth,
-                             TextPaint tp)
-        {
+        public int breakText(CharSequence input, String ellipsis, String ellipsisMore, int maxLines, int maxWidth,
+                TextPaint tp) {
             mLines.clear();
             mRequiredEllipsis = false;
             mLengthLastLine = 0.0f;
@@ -422,7 +422,7 @@ public class TextViewMultilineEllipse extends View
             // line. Skip everything.
             if (maxWidth == -1) {
                 mLines.add(new int[] { 0, input.length() });
-                return (int)(tp.measureText(input, 0, input.length()) + 0.5f);
+                return (int) (tp.measureText(input, 0, input.length()) + 0.5f);
             }
 
             // Measure the ellipsis string, and the ellipsisMore string if valid.
@@ -438,6 +438,8 @@ public class TextViewMultilineEllipse extends View
             float lengthThisLine = 0.0f;
             boolean breakWords = true;
             int pos = 0;
+            float[] widths = new float[input.length()];
+            tp.getTextWidths(input, 0, input.length(), widths);
             while (pos < input.length()) {
 
                 if (posStartThisLine == -1) {
@@ -449,7 +451,7 @@ public class TextViewMultilineEllipse extends View
                     break;
                 }
 
-                float widthOfChar = tp.measureText(input.charAt(pos) + "");
+                float widthOfChar = widths[pos];
                 boolean newLineRequired = false;
 
                 // Check for a new line character or if we've run over max width.
@@ -459,9 +461,8 @@ public class TextViewMultilineEllipse extends View
                     // We want the current line to go up to the character right before the
                     // new line char, and we want the next line to start at the char after
                     // this new line char.
-                    mLines.add(new int[] { posStartThisLine, pos-1 });
-                }
-                else if (lengthThisLine + widthOfChar >= maxWidth) {
+                    mLines.add(new int[] { posStartThisLine, pos - 1 });
+                } else if (lengthThisLine + widthOfChar >= maxWidth) {
                     newLineRequired = true;
                     // We need to backup if we are in the middle of a word.
                     if (input.charAt(pos) == ' ' || breakWords == false) {
@@ -470,8 +471,7 @@ public class TextViewMultilineEllipse extends View
 
                         // So this line includes up to the character before the space.
                         mLines.add(new int[] { posStartThisLine, pos });
-                    }
-                    else {
+                    } else {
                         // Backup until we are at a space.
                         while (input.charAt(pos) != ' ') {
                             pos--;
@@ -497,8 +497,7 @@ public class TextViewMultilineEllipse extends View
                         // the last word.
                         breakWords = false;
                     }
-                }
-                else {
+                } else {
                     lengthThisLine += widthOfChar;
 
                     // If we're on the last character of the input string, add on whatever we have leftover.
@@ -512,7 +511,7 @@ public class TextViewMultilineEllipse extends View
 
             // If we ellipsized, then add the ellipsis string to the end.
             if (mRequiredEllipsis) {
-                int[] pairLast = mLines.get(mLines.size()-1);
+                int[] pairLast = mLines.get(mLines.size() - 1);
                 final CharSequence subSequence = input.subSequence(pairLast[0], pairLast[1] + 1);
                 mLengthLastLine = tp.measureText(subSequence, 0, subSequence.length());
             }
@@ -521,11 +520,9 @@ public class TextViewMultilineEllipse extends View
             // whatever the maxWidth supplied was.
             if (mLines.size() == 0) {
                 return 0;
-            }
-            else if (mLines.size() == 1) {
-                return (int)(tp.measureText(input, 0, input.length()) + 0.5f);
-            }
-            else {
+            } else if (mLines.size() == 1) {
+                return (int) (tp.measureText(input, 0, input.length()) + 0.5f);
+            } else {
                 return maxWidth;
             }
         }
