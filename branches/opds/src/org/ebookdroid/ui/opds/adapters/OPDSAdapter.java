@@ -1,6 +1,7 @@
 package org.ebookdroid.ui.opds.adapters;
 
 import org.ebookdroid.R;
+import org.ebookdroid.R.color;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.cache.ThumbnailFile;
 import org.ebookdroid.opds.Entry;
@@ -30,6 +31,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.emdev.ui.adapters.BaseViewHolder;
+import org.emdev.ui.view.TextViewMultilineEllipse;
+import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
 public class OPDSAdapter extends BaseAdapter {
@@ -72,7 +75,7 @@ public class OPDSAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, final View view, final ViewGroup parent) {
 
-        final ViewHolder holder = BaseViewHolder.getOrCreateViewHolder(ViewHolder.class, R.layout.browseritem, view,
+        final ViewHolder holder = BaseViewHolder.getOrCreateViewHolder(ViewHolder.class, R.layout.opdsitem, view,
                 parent);
 
         final Entry file = getItem(i);
@@ -92,12 +95,10 @@ public class OPDSAdapter extends BaseAdapter {
 
         if (file.content != null) {
             String decoded = URLDecoder.decode(file.content.content);
-            holder.info.setSingleLine(false);
             holder.info.setText(Html.fromHtml(decoded));
         } else {
             holder.info.setText("");
         }
-        holder.fileSize.setText("");
 
         return holder.getView();
     }
@@ -123,16 +124,17 @@ public class OPDSAdapter extends BaseAdapter {
 
         TextView textView;
         ImageView imageView;
-        TextView info;
-        TextView fileSize;
+        TextViewMultilineEllipse info;
 
         @Override
         public void init(final View convertView) {
             super.init(convertView);
-            textView = (TextView) convertView.findViewById(R.id.browserItemText);
-            imageView = (ImageView) convertView.findViewById(R.id.browserItemIcon);
-            info = (TextView) convertView.findViewById(R.id.browserItemInfo);
-            fileSize = (TextView) convertView.findViewById(R.id.browserItemfileSize);
+            textView = (TextView) convertView.findViewById(R.id.opdsItemText);
+            imageView = (ImageView) convertView.findViewById(R.id.opdsItemIcon);
+            info = (TextViewMultilineEllipse) convertView.findViewById(R.id.opdsDescription);
+            info.setMaxLines(5);
+            info.setTextSize(LayoutUtils.getDeviceSize(9));
+            info.setTextColor(textView.getCurrentTextColor());
         }
     }
 
