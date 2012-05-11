@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.emdev.ui.adapters.BaseViewHolder;
-import org.emdev.ui.view.TextViewMultilineEllipse;
+import org.emdev.ui.widget.TextViewMultilineEllipse;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
