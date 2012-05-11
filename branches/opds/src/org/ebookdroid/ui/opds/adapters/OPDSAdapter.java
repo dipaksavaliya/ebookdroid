@@ -1,7 +1,6 @@
 package org.ebookdroid.ui.opds.adapters;
 
 import org.ebookdroid.R;
-import org.ebookdroid.R.color;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.cache.ThumbnailFile;
 import org.ebookdroid.opds.Entry;
