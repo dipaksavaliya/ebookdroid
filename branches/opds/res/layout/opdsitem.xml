@@ -28,10 +28,10 @@
         android:singleLine="true"
         android:textSize="15dip" />
 
-    <org.emdev.ui.view.TextViewMultilineEllipse
+    <org.emdev.ui.widget.TextViewMultilineEllipse
         android:id="@+id/opdsDescription"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_below="@id/opdsItemText"
