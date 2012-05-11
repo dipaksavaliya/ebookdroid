@@ -543,10 +543,6 @@ public class TextViewMultilineEllipse extends View {
             return mLengthLastLine + mLengthEllipsis;
         }
 
-        public float getLengthEllipsis() {
-            return mLengthEllipsis;
-        }
-
         public float getLengthEllipsisMore() {
             return mLengthEllipsisMore;
         }
