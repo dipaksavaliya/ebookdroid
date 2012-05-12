@@ -81,23 +81,28 @@ public class OPDSClient {
             final HttpGet req = new HttpGet(link.uri);
             final HttpResponse resp = client.execute(req);
             final HttpEntity entity = resp.getEntity();
-            return CacheManager.createTempFile(entity.getContent(), ".opds.thmb");
+            return CacheManager.createTempFile(entity.getContent(), ".opds");
         } catch (final Throwable th) {
             LCTX.e("Error on OPDS catalog access: ", th);
         }
         return null;
     }
 
-    public void download(Link link) {
+    public File download(final Link link) {
         try {
             final HttpGet req = new HttpGet(link.uri);
             final HttpResponse resp = client.execute(req);
             final HttpEntity entity = resp.getEntity();
 
             final String name = new File("" + req.getURI().toString()).getName();
-            entity.writeTo(new FileOutputStream(new File("/sdcard", name)));
+            final File file = new File("/sdcard", name);
+
+            entity.writeTo(new FileOutputStream(file));
+
+            return file;
         } catch (final Throwable th) {
             LCTX.e("Error on downloading book: ", th);
         }
+        return null;
     }
 }

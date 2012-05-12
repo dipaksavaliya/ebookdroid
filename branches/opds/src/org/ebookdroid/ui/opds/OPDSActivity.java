@@ -6,13 +6,7 @@ import org.ebookdroid.opds.Entry;
 import org.ebookdroid.opds.Feed;
 import org.ebookdroid.opds.Link;
 import org.ebookdroid.ui.opds.adapters.OPDSAdapter;
-import org.ebookdroid.ui.opds.adapters.OPDSAdapter.FeedListener;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -20,14 +14,15 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.emdev.ui.AbstractActionActivity;
+import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
+import org.emdev.ui.actions.IActionController;
 import org.emdev.utils.LengthUtils;
 
 public class OPDSActivity extends AbstractActionActivity implements AdapterView.OnItemClickListener,
@@ -102,6 +97,14 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         }
     }
 
+    @ActionMethod(ids = R.id.opdsrefreshfolder)
+    public void refresh(final ActionEx action) {
+        final Feed dir = adapter.getCurrentFeed();
+        if (dir != null) {
+            setCurrentFeed(dir);
+        }
+    }
+
     @Override
     public void feedLoaded(final Feed feed) {
         updateNavigation(feed);
@@ -118,33 +121,36 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         }
     }
 
-    private void downloadBook(final Book book) {
-        if (LengthUtils.length(book.downloads) == 0) {
+    protected void downloadBook(final Book book) {
+        if (LengthUtils.isEmpty(book.downloads)) {
             return;
         }
-        if (book.downloads.size() > 1) {
-            List<String> itemList = new ArrayList<String>();
-            for (Link link : book.downloads) {
-                itemList.add(LengthUtils.safeString(link.type, "Raw type"));
-            }
 
-            final String[] items = itemList.toArray(new String[itemList.size()]);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Pick an item");
-
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-
-                public void onClick(DialogInterface dialog, int item) {
-                    adapter.downloadBook(book.downloads.get(item));
-                }
-            });
-
-            AlertDialog alert = builder.create();
-
-            alert.show();
+        if (book.downloads.size() == 1) {
+            adapter.downloadBook(book, 0);
             return;
         }
-        adapter.downloadBook(book.downloads.get(0));
+
+        final List<String> itemList = new ArrayList<String>();
+        for (final Link link : book.downloads) {
+            itemList.add(LengthUtils.safeString(link.type, "Raw type"));
+        }
+        final String[] items = itemList.toArray(new String[itemList.size()]);
+
+        final ActionDialogBuilder builder = new ActionDialogBuilder(this, getController());
+        builder.setTitle("Select type of book to download");
+        builder.setItems(items, this.getController().getOrCreateAction(R.id.actions_downloadBook)
+                .putValue("book", book));
+        builder.show();
+    }
+
+    @ActionMethod(ids = R.id.actions_downloadBook)
+    public void doDownload(final ActionEx action) {
+        final Book book = action.getParameter("book");
+        final Integer index = action.getParameter(IActionController.DIALOG_ITEM_PROPERTY);
+        if (book != null && index != null) {
+            adapter.downloadBook(book, index.intValue());
+        }
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.ebookdroid.opds.Entry;
 import org.ebookdroid.opds.Feed;
 import org.ebookdroid.opds.Link;
 import org.ebookdroid.opds.OPDSClient;
-import org.ebookdroid.ui.opds.OPDSActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -44,7 +43,7 @@ public class OPDSAdapter extends BaseAdapter {
     private final OPDSClient client;
     private final List<? extends Entry> rootFeeds;
 
-    private Feed currentFeed;
+    private volatile Feed currentFeed;
 
     private final ListenerProxy listeners = new ListenerProxy(FeedListener.class);
 
@@ -75,8 +74,12 @@ public class OPDSAdapter extends BaseAdapter {
 
         notifyDataSetInvalidated();
 
-        if (feed != null && feed.loadedAt == 0) {
-            new LoadTask().execute(feed);
+        if (feed != null) {
+            if (feed.loadedAt == 0) {
+                new LoadFeedTask().execute(feed);
+            } else {
+                new LoadThumbnailTask().execute(feed);
+            }
         }
     }
 
@@ -213,7 +216,7 @@ public class OPDSAdapter extends BaseAdapter {
         }
     }
 
-    final class LoadTask extends AsyncTask<Feed, String, Feed> implements OnCancelListener {
+    final class LoadFeedTask extends AsyncTask<Feed, String, Feed> implements OnCancelListener {
 
         private ProgressDialog progressDialog;
 
@@ -230,9 +233,7 @@ public class OPDSAdapter extends BaseAdapter {
         @Override
         protected Feed doInBackground(final Feed... params) {
             final Feed feed = client.load(params[0]);
-            for (final Book book : feed.books) {
-                loadBookThumbnail(book);
-            }
+            new LoadThumbnailTask().execute(feed);
             return feed;
         }
 
@@ -269,20 +270,52 @@ public class OPDSAdapter extends BaseAdapter {
         }
     }
 
+    final class LoadThumbnailTask extends AsyncTask<Feed, Book, String> {
+
+        @Override
+        protected String doInBackground(final Feed... params) {
+            final Feed feed = params[0];
+            for (final Book book : feed.books) {
+                if (currentFeed != book.parent) {
+                    break;
+                }
+                loadBookThumbnail(book);
+                publishProgress(book);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final String result) {
+            notifyDataSetInvalidated();
+        }
+
+        @Override
+        protected void onProgressUpdate(final Book... books) {
+            boolean inCurrent = false;
+            for (final Book book : books) {
+                inCurrent |= book.parent == currentFeed;
+            }
+            if (inCurrent) {
+                notifyDataSetInvalidated();
+            }
+        }
+    }
+
     public static interface FeedListener {
 
         void feedLoaded(Feed feed);
     }
 
-    public void downloadBook(Link l) {
-        if (l == null) {
+    public void downloadBook(final Book book, int linkIndex) {
+        if (book == null || linkIndex >= book.downloads.size()) {
             return;
         }
-        new DownloadBookTask().execute(l);
+        final Link link = book.downloads.get(linkIndex);
+        new DownloadBookTask().execute(book, link);
     }
 
-
-    final class DownloadBookTask extends AsyncTask<Link, String, Void> implements OnCancelListener {
+    final class DownloadBookTask extends AsyncTask<Object, String, File> implements OnCancelListener {
 
         private ProgressDialog progressDialog;
 
@@ -297,21 +330,37 @@ public class OPDSAdapter extends BaseAdapter {
         }
 
         @Override
-        protected Void doInBackground(final Link... params) {
-            OPDSAdapter.this.client.download(params[0]);
-
-            return null;
+        protected File doInBackground(final Object... params) {
+            Book book = (Book) params[0];
+            Link link = (Link) params[1];
+            File file = client.download(link);
+//            if (file != null) {
+//                final ThumbnailFile preview = CacheManager.getThumbnailFile(book.id);
+//                if (preview.exists()) {
+//                    ThumbnailFile newFile = CacheManager.getThumbnailFile(file.getAbsolutePath());
+//                    try {
+//                        FileUtils.copy(new FileInputStream(preview), new FileOutputStream(newFile));
+//                    } catch (IOException ex) {
+//                        ex.printStackTrace();
+//                    }
+//                }
+//            }
+            return file;
         }
 
         @Override
-        protected void onPostExecute(final Void result) {
+        protected void onPostExecute(final File result) {
             if (progressDialog != null) {
                 try {
                     progressDialog.dismiss();
                 } catch (final Throwable th) {
                 }
             }
-            Toast.makeText(EBookDroidApp.context, "Book download complete", 0).show();
+            if (result != null) {
+                Toast.makeText(EBookDroidApp.context, "Book download complite: " + result.getAbsolutePath(), 0).show();
+            } else {
+                Toast.makeText(EBookDroidApp.context, "Book download failed", 0).show();
+            }
         }
 
         @Override
@@ -331,6 +380,5 @@ public class OPDSAdapter extends BaseAdapter {
             }
         }
     }
-
 
 }

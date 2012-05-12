@@ -69,7 +69,7 @@ public class ThumbnailFile extends File {
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(this);
-            image.compress(Bitmap.CompressFormat.JPEG, 50, out);
+            image.compress(Bitmap.CompressFormat.PNG, 90, out);
         } catch (final IOException e) {
         } finally {
             if (out != null) {
