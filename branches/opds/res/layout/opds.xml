@@ -27,15 +27,16 @@
             android:contentDescription="@string/content_description_up"
             android:onClick="onButtonClick"
             android:src="@drawable/arrowup_enabled" />
+<!--
 
         <View style="@style/action_bar_separator" />
-
         <ImageView
             android:id="@+id/opdsrecent"
             style="@style/action_bar_action"
             android:contentDescription="@string/content_description_recent"
             android:onClick="onButtonClick"
             android:src="@drawable/actionbar_recent" />
+ -->
     </LinearLayout>
 
     <ListView
