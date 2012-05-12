@@ -1,12 +1,15 @@
 package org.ebookdroid.ui.opds.adapters;
 
+import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.cache.ThumbnailFile;
 import org.ebookdroid.opds.Book;
 import org.ebookdroid.opds.Entry;
 import org.ebookdroid.opds.Feed;
+import org.ebookdroid.opds.Link;
 import org.ebookdroid.opds.OPDSClient;
+import org.ebookdroid.ui.opds.OPDSActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -269,4 +273,64 @@ public class OPDSAdapter extends BaseAdapter {
 
         void feedLoaded(Feed feed);
     }
+
+    public void downloadBook(Link l) {
+        if (l == null) {
+            return;
+        }
+        new DownloadBookTask().execute(l);
+    }
+
+
+    final class DownloadBookTask extends AsyncTask<Link, String, Void> implements OnCancelListener {
+
+        private ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            onProgressUpdate("Loading...");
+        }
+
+        @Override
+        public void onCancel(final DialogInterface dialog) {
+            this.cancel(true);
+        }
+
+        @Override
+        protected Void doInBackground(final Link... params) {
+            OPDSAdapter.this.client.download(params[0]);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final Void result) {
+            if (progressDialog != null) {
+                try {
+                    progressDialog.dismiss();
+                } catch (final Throwable th) {
+                }
+            }
+            Toast.makeText(EBookDroidApp.context, "Book download complete", 0).show();
+        }
+
+        @Override
+        protected void onProgressUpdate(final String... values) {
+            final int length = LengthUtils.length(values);
+            if (length == 0) {
+                return;
+            }
+            final String last = values[length - 1];
+            if (progressDialog == null || !progressDialog.isShowing()) {
+                progressDialog = ProgressDialog.show(context, "", last, true);
+                progressDialog.setCancelable(true);
+                progressDialog.setCanceledOnTouchOutside(true);
+                progressDialog.setOnCancelListener(this);
+            } else {
+                progressDialog.setMessage(last);
+            }
+        }
+    }
+
+
 }

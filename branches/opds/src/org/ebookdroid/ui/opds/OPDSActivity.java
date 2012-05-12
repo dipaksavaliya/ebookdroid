@@ -1,10 +1,17 @@
 package org.ebookdroid.ui.opds;
 
 import org.ebookdroid.R;
+import org.ebookdroid.opds.Book;
 import org.ebookdroid.opds.Entry;
 import org.ebookdroid.opds.Feed;
+import org.ebookdroid.opds.Link;
 import org.ebookdroid.ui.opds.adapters.OPDSAdapter;
+import org.ebookdroid.ui.opds.adapters.OPDSAdapter.FeedListener;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -12,10 +19,12 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.emdev.ui.AbstractActionActivity;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
+import org.emdev.utils.LengthUtils;
 
 public class OPDSActivity extends AbstractActionActivity implements AdapterView.OnItemClickListener,
         OPDSAdapter.FeedListener {
@@ -100,6 +109,17 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         if (selected instanceof Feed) {
             setCurrentFeed((Feed) selected);
         }
+        if (selected instanceof Book) {
+            downloadBook((Book)selected);
+        }
+    }
+
+    private void downloadBook(Book book) {
+        if (LengthUtils.length(book.downloads) == 0) {
+            return;
+        }
+        Link l = book.downloads.get(0);
+        adapter.downloadBook(l);
     }
 
     @Override

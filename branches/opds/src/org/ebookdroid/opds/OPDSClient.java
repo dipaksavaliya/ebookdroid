@@ -7,6 +7,7 @@ import org.ebookdroid.common.log.LogContext;
 import android.net.http.AndroidHttpClient;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -85,5 +86,18 @@ public class OPDSClient {
             LCTX.e("Error on OPDS catalog access: ", th);
         }
         return null;
+    }
+
+    public void download(Link link) {
+        try {
+            final HttpGet req = new HttpGet(link.uri);
+            final HttpResponse resp = client.execute(req);
+            final HttpEntity entity = resp.getEntity();
+
+            final String name = new File("" + req.getURI().toString()).getName();
+            entity.writeTo(new FileOutputStream(new File("/sdcard", name)));
+        } catch (final Throwable th) {
+            LCTX.e("Error on downloading book: ", th);
+        }
     }
 }
