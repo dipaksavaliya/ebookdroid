@@ -16,15 +16,21 @@
  */
 package org.emdev.ui.widget;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.ebookdroid.R;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint.Align;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides a simple TextView-like control which allows us to set a max number
@@ -48,6 +54,10 @@ import android.view.View;
 public class TextViewMultilineEllipse extends View {
 
     private TextPaint mTextPaint;
+
+    private ColorStateList mTextColor;
+    private int mCurTextColor;
+
     private CharSequence mText;
     private int mAscent;
     private String mStrEllipsis;
@@ -69,6 +79,28 @@ public class TextViewMultilineEllipse extends View {
     public TextViewMultilineEllipse(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+
+        TypedArray a = context.obtainStyledAttributes(attrs,
+                R.styleable.org_emdev_ui_widget_TextViewMultilineEllipse);
+
+        CharSequence s = a.getString(R.styleable.org_emdev_ui_widget_TextViewMultilineEllipse_text);
+        if (s != null) {
+            setText(s.toString());
+        }
+
+        // Retrieve the color(s) to be used for this view and apply them.
+        // Note, if you only care about supporting a single color, that you
+        // can instead call a.getColor() and pass that to setTextColor().
+        setTextColor(a.getColorStateList(R.styleable.org_emdev_ui_widget_TextViewMultilineEllipse_textColor));
+
+        int textSize = a.getDimensionPixelOffset(R.styleable.org_emdev_ui_widget_TextViewMultilineEllipse_textSize, 0);
+        if (textSize > 0) {
+            setTextSize(textSize);
+        }
+
+        mMaxLines = a.getInt(R.styleable.org_emdev_ui_widget_TextViewMultilineEllipse_maxLines, -1);
+
+        a.recycle();
     }
 
     private void init() {
@@ -91,6 +123,14 @@ public class TextViewMultilineEllipse extends View {
         mTextPaint.setTextAlign(Align.LEFT);
     }
 
+    @Override
+    protected void drawableStateChanged() {
+        super.drawableStateChanged();
+        if (mTextColor != null && mTextColor.isStateful()) {
+            updateTextColors();
+        }
+    }
+
     /**
      * Sets the text to display in this widget.
      *
@@ -110,20 +150,66 @@ public class TextViewMultilineEllipse extends View {
      *            Font size.
      */
     public void setTextSize(int size) {
-        mTextPaint.setTextSize(size);
-        requestLayout();
-        invalidate();
+        setRawTextSize(size);
     }
 
     /**
-     * Sets the text color for this widget.
+     * Set the default text size to a given unit and value. See {@link TypedValue} for the possible dimension units.
      *
-     * @param color
-     *            ARGB value for the text.
+     * @param unit
+     *            The desired dimension unit.
+     * @param size
+     *            The desired size in the given units.
+     */
+    public void setTextSize(int unit, float size) {
+        Context c = getContext();
+        Resources r;
+
+        if (c == null)
+            r = Resources.getSystem();
+        else
+            r = c.getResources();
+
+        setRawTextSize(TypedValue.applyDimension(unit, size, r.getDisplayMetrics()));
+    }
+
+    private void setRawTextSize(float size) {
+        if (size != mTextPaint.getTextSize()) {
+            mTextPaint.setTextSize(size);
+
+            requestLayout();
+            invalidate();
+        }
+    }
+
+    /**
+     * Sets the text color for all the states (normal, selected,
+     * focused) to be this color.
      */
     public void setTextColor(int color) {
-        mTextPaint.setColor(color);
-        invalidate();
+        mTextColor = ColorStateList.valueOf(color);
+        updateTextColors();
+    }
+
+    /**
+     * Sets the text color.
+     */
+    public void setTextColor(ColorStateList colors) {
+        final ColorStateList defList = Resources.getSystem().getColorStateList(android.R.color.primary_text_dark);
+        mTextColor = colors != null ? colors : defList;
+        updateTextColors();
+    }
+
+    private void updateTextColors() {
+        boolean inval = false;
+        int color = mTextColor.getColorForState(getDrawableState(), 0);
+        if (color != mCurTextColor) {
+            mCurTextColor = color;
+            inval = true;
+        }
+        if (inval) {
+            invalidate();
+        }
     }
 
     /**
@@ -281,6 +367,8 @@ public class TextViewMultilineEllipse extends View {
             breaker = mBreakerCollapsed;
             lines = mBreakerCollapsed.getLines();
         }
+
+        mTextPaint.setColor(mCurTextColor);
 
         float x = getPaddingLeft();
         float y = getPaddingTop() + (-mAscent);

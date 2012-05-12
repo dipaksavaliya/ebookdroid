@@ -31,7 +31,6 @@ import java.util.List;
 
 import org.emdev.ui.adapters.BaseViewHolder;
 import org.emdev.ui.widget.TextViewMultilineEllipse;
-import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.listeners.ListenerProxy;
 
@@ -207,9 +206,6 @@ public class OPDSAdapter extends BaseAdapter {
             textView = (TextView) convertView.findViewById(R.id.opdsItemText);
             imageView = (ImageView) convertView.findViewById(R.id.opdsItemIcon);
             info = (TextViewMultilineEllipse) convertView.findViewById(R.id.opdsDescription);
-            info.setMaxLines(5);
-            info.setTextSize(LayoutUtils.getDeviceSize(9));
-            info.setTextColor(textView.getCurrentTextColor());
         }
     }
 
