@@ -8,6 +8,7 @@ import org.ebookdroid.opds.Link;
 import org.ebookdroid.ui.opds.adapters.OPDSAdapter;
 import org.ebookdroid.ui.opds.adapters.OPDSAdapter.FeedListener;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -20,6 +21,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.emdev.ui.AbstractActionActivity;
 import org.emdev.ui.actions.ActionEx;
@@ -110,16 +114,37 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
             setCurrentFeed((Feed) selected);
         }
         if (selected instanceof Book) {
-            downloadBook((Book)selected);
+            downloadBook((Book) selected);
         }
     }
 
-    private void downloadBook(Book book) {
+    private void downloadBook(final Book book) {
         if (LengthUtils.length(book.downloads) == 0) {
             return;
         }
-        Link l = book.downloads.get(0);
-        adapter.downloadBook(l);
+        if (book.downloads.size() > 1) {
+            List<String> itemList = new ArrayList<String>();
+            for (Link link : book.downloads) {
+                itemList.add(LengthUtils.safeString(link.type, "Raw type"));
+            }
+
+            final String[] items = itemList.toArray(new String[itemList.size()]);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Pick an item");
+
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+
+                public void onClick(DialogInterface dialog, int item) {
+                    adapter.downloadBook(book.downloads.get(item));
+                }
+            });
+
+            AlertDialog alert = builder.create();
+
+            alert.show();
+            return;
+        }
+        adapter.downloadBook(book.downloads.get(0));
     }
 
     @Override
