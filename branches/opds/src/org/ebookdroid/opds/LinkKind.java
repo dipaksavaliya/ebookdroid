@@ -2,14 +2,6 @@ package org.ebookdroid.opds;
 
 public enum LinkKind {
 
-    FEED {
-
-        @Override
-        public boolean accept(final String rel, final String type) {
-            return type != null && type.contains("profile=opds-catalog");
-        }
-    },
-
     NEXT_FEED {
 
         @Override
@@ -17,6 +9,14 @@ public enum LinkKind {
             return type != null && type.contains("profile=opds-catalog") && "next".equals(rel);
         }
 
+    },
+
+    FEED {
+
+        @Override
+        public boolean accept(final String rel, final String type) {
+            return type != null && type.contains("profile=opds-catalog");
+        }
     },
 
     BOOK_DOWNLOAD {

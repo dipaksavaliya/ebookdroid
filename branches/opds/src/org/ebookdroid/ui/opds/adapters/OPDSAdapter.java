@@ -3,8 +3,9 @@ package org.ebookdroid.ui.opds.adapters;
 import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.cache.ThumbnailFile;
+import org.ebookdroid.opds.Book;
 import org.ebookdroid.opds.Entry;
-import org.ebookdroid.opds.Link;
+import org.ebookdroid.opds.Feed;
 import org.ebookdroid.opds.OPDSClient;
 
 import android.app.ProgressDialog;
@@ -24,44 +25,78 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URLDecoder;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.emdev.ui.adapters.BaseViewHolder;
 import org.emdev.ui.widget.TextViewMultilineEllipse;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.listeners.ListenerProxy;
 
 public class OPDSAdapter extends BaseAdapter {
 
-    private static final List<Entry> emptyList = Collections.emptyList();
-
-    public final Entry root;
-
     private final Context context;
     private final OPDSClient client;
+    private final List<? extends Entry> rootFeeds;
 
-    private Entry currentDirectory;
-    private List<Entry> files = emptyList;
+    private Feed currentFeed;
 
-    public OPDSAdapter(final Context context, final String rootUri) {
+    private final ListenerProxy listeners = new ListenerProxy(FeedListener.class);
+
+    public OPDSAdapter(final Context context, final Feed... feeds) {
         this.context = context;
         this.client = new OPDSClient();
-        this.root = new Entry(new Link(rootUri));
-        this.currentDirectory = root;
+
+        this.rootFeeds = Arrays.asList(feeds);
+        this.currentFeed = null;
+    }
+
+    @Override
+    protected void finalize() {
+        close();
+    }
+
+    public void close() {
+        client.close();
+    }
+
+    public void setCurrentFeed(final Feed feed) {
+        if (feed != null && feed == this.currentFeed) {
+            feed.books.clear();
+            feed.children.clear();
+            feed.loadedAt = 0;
+        }
+        this.currentFeed = feed;
+
+        notifyDataSetInvalidated();
+
+        if (feed != null && feed.loadedAt == 0) {
+            new LoadTask().execute(feed);
+        }
+    }
+
+    public Feed getCurrentFeed() {
+        return currentFeed;
     }
 
     @Override
     public int getCount() {
-        return LengthUtils.length(files);
+        return currentFeed != null ? currentFeed.children.size() + currentFeed.books.size() : rootFeeds.size();
     }
 
     @Override
     public Entry getItem(final int i) {
-        if (LengthUtils.isNotEmpty(files)) {
-            return files.get(i);
+        if (currentFeed == null) {
+            return rootFeeds.get(i);
+        }
+        if (i < currentFeed.children.size()) {
+            return currentFeed.children.get(i);
+        }
+        final int bookindex = i - currentFeed.children.size();
+        if (bookindex < currentFeed.books.size()) {
+            return currentFeed.books.get(bookindex);
         }
         return null;
     }
@@ -77,14 +112,14 @@ public class OPDSAdapter extends BaseAdapter {
         final ViewHolder holder = BaseViewHolder.getOrCreateViewHolder(ViewHolder.class, R.layout.opdsitem, view,
                 parent);
 
-        final Entry file = getItem(i);
+        final Entry entry = getItem(i);
 
-        holder.textView.setText(file.title);
+        holder.textView.setText(entry.title);
 
-        if (file.catalog != null) {
+        if (entry instanceof Feed) {
             holder.imageView.setImageResource(R.drawable.folderopen);
         } else {
-            final ThumbnailFile thumbnailFile = CacheManager.getThumbnailFile(file.id);
+            final ThumbnailFile thumbnailFile = CacheManager.getThumbnailFile(entry.id);
             if (thumbnailFile.exists()) {
                 holder.imageView.setImageBitmap(thumbnailFile.getRawImage());
             } else {
@@ -92,8 +127,8 @@ public class OPDSAdapter extends BaseAdapter {
             }
         }
 
-        if (file.content != null) {
-            String decoded = URLDecoder.decode(file.content.content);
+        if (entry.content != null) {
+            final String decoded = URLDecoder.decode(entry.content.content);
             holder.info.setText(Html.fromHtml(decoded));
         } else {
             holder.info.setText("");
@@ -102,21 +137,62 @@ public class OPDSAdapter extends BaseAdapter {
         return holder.getView();
     }
 
-    public void setCurrentDirectory(final Entry currentDirectory) {
-        this.currentDirectory = currentDirectory;
+    protected void loadBookThumbnail(final Book book) {
+        if (book.thumbnail == null) {
+            return;
+        }
+        final ThumbnailFile thumbnailFile = CacheManager.getThumbnailFile(book.id);
+        if (thumbnailFile.exists()) {
+            return;
+        }
 
-        setFiles(emptyList);
+        try {
+            final File file = client.loadFile(book.thumbnail);
+            if (file == null) {
+                return;
+            }
 
-        new LoadTask().execute(currentDirectory);
+            final Options opts = new Options();
+            opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            opts.inJustDecodeBounds = true;
+
+            BitmapFactory.decodeStream(new FileInputStream(file), null, opts);
+
+            opts.inSampleSize = getScale(opts, 200, 200);
+            opts.inJustDecodeBounds = false;
+
+            final Bitmap image = BitmapFactory.decodeStream(new FileInputStream(file), null, opts);
+            if (image != null) {
+                thumbnailFile.setImage(image);
+                image.recycle();
+            }
+        } catch (final Throwable ex) {
+            ex.printStackTrace();
+        }
     }
 
-    private void setFiles(final List<Entry> files) {
-        this.files = files;
-        notifyDataSetInvalidated();
+    protected int getScale(final Options opts, final float requiredWidth, final float requiredHeight) {
+        int scale = 1;
+        int widthTmp = opts.outWidth;
+        int heightTmp = opts.outHeight;
+        while (true) {
+            if (widthTmp / 2 < requiredWidth || heightTmp / 2 < requiredHeight) {
+                break;
+            }
+            widthTmp /= 2;
+            heightTmp /= 2;
+
+            scale *= 2;
+        }
+        return scale;
     }
 
-    public Entry getCurrentDirectory() {
-        return currentDirectory;
+    public void addListener(final FeedListener listener) {
+        listeners.addListener(listener);
+    }
+
+    public void removeListener(final FeedListener listener) {
+        listeners.removeListener(listener);
     }
 
     public static class ViewHolder extends BaseViewHolder {
@@ -137,7 +213,7 @@ public class OPDSAdapter extends BaseAdapter {
         }
     }
 
-    final class LoadTask extends AsyncTask<Entry, String, List<Entry>> implements OnCancelListener {
+    final class LoadTask extends AsyncTask<Feed, String, Feed> implements OnCancelListener {
 
         private ProgressDialog progressDialog;
 
@@ -152,23 +228,27 @@ public class OPDSAdapter extends BaseAdapter {
         }
 
         @Override
-        protected List<Entry> doInBackground(final Entry... params) {
-            List<Entry> entries = client.load(params[0]);
-            for (Entry entry : entries) {
-                loadBookThumbnail(entry);
+        protected Feed doInBackground(final Feed... params) {
+            final Feed feed = client.load(params[0]);
+            for (final Book book : feed.books) {
+                loadBookThumbnail(book);
             }
-            return entries;
+            return feed;
         }
 
         @Override
-        protected void onPostExecute(final List<Entry> result) {
+        protected void onPostExecute(final Feed result) {
             if (progressDialog != null) {
                 try {
                     progressDialog.dismiss();
                 } catch (final Throwable th) {
                 }
             }
-            setFiles(result);
+
+            final FeedListener l = listeners.getListener();
+            l.feedLoaded(result);
+
+            notifyDataSetChanged();
         }
 
         @Override
@@ -189,52 +269,8 @@ public class OPDSAdapter extends BaseAdapter {
         }
     }
 
-    public void loadBookThumbnail(final Entry entry) {
-        if (entry.thumbnail == null) {
-            return;
-        }
-        final ThumbnailFile thumbnailFile = CacheManager.getThumbnailFile(entry.id);
-        if (thumbnailFile.exists()) {
-            return;
-        }
+    public static interface FeedListener {
 
-        try {
-            File file = client.loadFile(entry.thumbnail);
-            if (file == null) {
-                return;
-            }
-
-            final Options opts = new Options();
-            opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            opts.inJustDecodeBounds = true;
-
-            BitmapFactory.decodeStream(new FileInputStream(file), null, opts);
-
-            opts.inSampleSize = getScale(opts, 200, 200);
-            opts.inJustDecodeBounds = false;
-
-            Bitmap image = BitmapFactory.decodeStream(new FileInputStream(file), null, opts);
-            thumbnailFile.setImage(image);
-            image.recycle();
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        }
+        void feedLoaded(Feed feed);
     }
-
-    private int getScale(final Options opts, final float requiredWidth, final float requiredHeight) {
-        int scale = 1;
-        int widthTmp = opts.outWidth;
-        int heightTmp = opts.outHeight;
-        while (true) {
-            if (widthTmp / 2 < requiredWidth || heightTmp / 2 < requiredHeight) {
-                break;
-            }
-            widthTmp /= 2;
-            heightTmp /= 2;
-
-            scale *= 2;
-        }
-        return scale;
-    }
-
 }

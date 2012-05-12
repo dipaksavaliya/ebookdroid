@@ -1,36 +1,50 @@
 package org.ebookdroid.opds;
 
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class OPDSContentHandler extends DefaultHandler {
 
-    final Entry parent;
+    private final SAXParserFactory spf = SAXParserFactory.newInstance();
 
-    final List<Entry> entries = new ArrayList<Entry>();
-
-    Link next;
+    final Feed feed;
 
     private boolean inEntry;
     private boolean grabContent;
 
     private final StringBuilder buf = new StringBuilder();
-
     private final Map<String, String> values = new HashMap<String, String>();
 
-    private Link entryFeed;
+    private Link feedLink;
     private Link bookThumbnail;
     private List<Link> bookLinks;
 
-    public OPDSContentHandler(final Entry parent) {
-        this.parent = parent;
+    public OPDSContentHandler(final Feed feed) {
+        this.feed = feed;
+    }
+
+    public void parse(InputStreamReader inputStreamReader) throws ParserConfigurationException, SAXException,
+            IOException {
+        final Reader isr = new BufferedReader(inputStreamReader, 32 * 1024);
+        final InputSource is = new InputSource();
+        is.setCharacterStream(isr);
+        final SAXParser parser = spf.newSAXParser();
+        parser.parse(is, this);
     }
 
     @Override
@@ -50,7 +64,7 @@ public class OPDSContentHandler extends DefaultHandler {
                 LinkKind kind = LinkKind.valueOf(rel, type);
                 switch (kind) {
                     case FEED:
-                        entryFeed = new Link(kind, ref, rel, type);
+                        feedLink = new Link(kind, ref, rel, type);
                         break;
                     case BOOK_DOWNLOAD:
                         if (bookLinks == null) {
@@ -61,8 +75,8 @@ public class OPDSContentHandler extends DefaultHandler {
                     case BOOK_THUMBNAIL:
                         bookThumbnail = new Link(kind, ref, rel, type);
                         break;
-                     default:
-                         break;
+                    default:
+                        break;
                 }
             } else {
                 grabContent = "id".equals(qName) || "title".equals(qName);
@@ -71,7 +85,7 @@ public class OPDSContentHandler extends DefaultHandler {
             if ("entry".equals(qName)) {
                 inEntry = true;
                 values.clear();
-                entryFeed = null;
+                feedLink = null;
                 bookThumbnail = null;
                 bookLinks = null;
             } else if ("link".equals(qName)) {
@@ -80,7 +94,10 @@ public class OPDSContentHandler extends DefaultHandler {
                 final String type = a.getValue("type");
                 LinkKind kind = LinkKind.valueOf(rel, type);
                 if (kind == LinkKind.NEXT_FEED) {
-                    next = new Link(kind, ref, rel, type);
+                    feed.next = new Feed(feed.parent, ref, feed.title, feed.content);
+                    feed.next.link = new Link(kind, ref, rel, type);
+                    feed.next.next = null;
+                    feed.next.prev = feed;
                 }
             }
         }
@@ -98,8 +115,19 @@ public class OPDSContentHandler extends DefaultHandler {
                 final Content content = contentString != null ? new Content(contentType, contentString) : null;
                 final String entryId = values.get("id");
                 final String entryTitle = values.get("title");
-                final Entry entry = new Entry(parent, entryId, entryTitle, content, null, entryFeed, bookThumbnail, bookLinks);
-                entries.add(entry);
+                if (feedLink != null) {
+                    Feed child = new Feed(feed, entryId, entryTitle, content);
+                    child.link = feedLink;
+                    child.next = null;
+                    child.prev = null;
+                    feed.children.add(child);
+                } else {
+                    Book book = new Book(feed, entryId, entryTitle, content);
+                    book.author = null;
+                    book.downloads = bookLinks;
+                    book.thumbnail = bookThumbnail;
+                    feed.books.add(book);
+                }
                 values.clear();
             }
         }

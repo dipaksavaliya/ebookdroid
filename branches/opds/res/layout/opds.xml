@@ -22,22 +22,24 @@
             android:textSize="12sp" />
 
         <ImageView
+            android:id="@+id/opdsprevfolder"
+            style="@style/action_bar_action"
+            android:contentDescription="@string/content_description_up"
+            android:onClick="onButtonClick"
+            android:src="@drawable/arrowleft_disabled" />
+        <ImageView
             android:id="@+id/opdsupfolder"
             style="@style/action_bar_action"
             android:contentDescription="@string/content_description_up"
             android:onClick="onButtonClick"
-            android:src="@drawable/arrowup_enabled" />
-<!--
-
-        <View style="@style/action_bar_separator" />
+            android:src="@drawable/arrowup_disabled" />
         <ImageView
-            android:id="@+id/opdsrecent"
+            android:id="@+id/opdsnextfolder"
             style="@style/action_bar_action"
-            android:contentDescription="@string/content_description_recent"
+            android:contentDescription="@string/content_description_up"
             android:onClick="onButtonClick"
-            android:src="@drawable/actionbar_recent" />
- -->
-    </LinearLayout>
+            android:src="@drawable/arrowright_disabled" />
+        </LinearLayout>
 
     <ListView
         android:id="@+id/opdslist"
