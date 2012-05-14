@@ -357,7 +357,7 @@ public class OPDSAdapter extends BaseAdapter {
                 }
             }
             if (result != null) {
-                Toast.makeText(EBookDroidApp.context, "Book download complite: " + result.getAbsolutePath(), 0).show();
+                Toast.makeText(EBookDroidApp.context, "Book download complete: " + result.getAbsolutePath(), 0).show();
             } else {
                 Toast.makeText(EBookDroidApp.context, "Book download failed", 0).show();
             }
