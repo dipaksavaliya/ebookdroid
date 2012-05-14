@@ -21,7 +21,8 @@ import android.os.AsyncTask;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.view.ViewGroup.MarginLayoutParams;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +39,7 @@ import org.emdev.ui.widget.TextViewMultilineEllipse;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.listeners.ListenerProxy;
 
-public class OPDSAdapter extends BaseAdapter {
+public class OPDSAdapter extends BaseExpandableListAdapter {
 
     private final Context context;
     private final OPDSClient client;
@@ -89,17 +90,77 @@ public class OPDSAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
-        return currentFeed != null ? currentFeed.facets.size() + currentFeed.children.size() + currentFeed.books.size()
-                : rootFeeds.size();
+    public int getGroupCount() {
+        if (currentFeed == null) {
+            return rootFeeds.size();
+        }
+        return currentFeed.children.size() + currentFeed.books.size();
     }
 
     @Override
-    public Entry getItem(final int i) {
+    @SuppressWarnings("unchecked")
+    public Entry getGroup(final int groupPosition) {
         if (currentFeed == null) {
-            return rootFeeds.get(i);
+            return rootFeeds.get(groupPosition);
         }
-        return getItem(i, currentFeed.facets, currentFeed.children, currentFeed.books);
+        return getItem(groupPosition, currentFeed.children, currentFeed.books);
+    }
+
+    @Override
+    public long getGroupId(final int groupPosition) {
+        return groupPosition;
+    }
+
+    @Override
+    public int getChildrenCount(final int groupPosition) {
+        final Entry group = getGroup(groupPosition);
+        if (group instanceof Feed) {
+            return ((Feed) group).facets.size();
+        } else if (group instanceof Book) {
+            int size = ((Book) group).downloads.size();
+            return size > 1 ? size : 0;
+        }
+        return 0;
+    }
+
+    @Override
+    public Object getChild(final int groupPosition, final int childPosition) {
+        final Entry group = getGroup(groupPosition);
+        if (group instanceof Feed) {
+            return ((Feed) group).facets.get(childPosition);
+        } else if (group instanceof Book) {
+            return ((Book) group).downloads.get(childPosition);
+        }
+        return null;
+    }
+
+    @Override
+    public long getChildId(final int groupPosition, final int childPosition) {
+        return childPosition;
+    }
+
+    @Override
+    public boolean isChildSelectable(final int groupPosition, final int childPosition) {
+        return true;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    @Override
+    public View getGroupView(final int groupPosition, final boolean isExpanded, final View convertView,
+            final ViewGroup parent) {
+
+        return getItemView(getGroup(groupPosition), false, convertView, parent);
+    }
+
+    @Override
+    public View getChildView(final int groupPosition, final int childPosition, final boolean isLastChild,
+            final View convertView, final ViewGroup parent) {
+
+        return getItemView(getChild(groupPosition, childPosition), true, convertView, parent);
     }
 
     protected Entry getItem(final int i, final List<? extends Entry>... lists) {
@@ -117,39 +178,40 @@ public class OPDSAdapter extends BaseAdapter {
         return null;
     }
 
-    @Override
-    public long getItemId(final int i) {
-        return i;
-    }
-
-    @Override
-    public View getView(final int i, final View view, final ViewGroup parent) {
+    protected View getItemView(final Object item, boolean child, final View view, final ViewGroup parent) {
 
         final ViewHolder holder = BaseViewHolder.getOrCreateViewHolder(ViewHolder.class, R.layout.opdsitem, view,
                 parent);
 
-        final Entry entry = getItem(i);
-
-        holder.textView.setText(entry.title);
-
-        if (entry instanceof Feed) {
-            holder.imageView.setImageResource(R.drawable.folderopen);
-        } else {
-            final ThumbnailFile thumbnailFile = CacheManager.getThumbnailFile(entry.id);
-            if (thumbnailFile.exists()) {
-                holder.imageView.setImageBitmap(thumbnailFile.getRawImage());
+        if (item instanceof Entry) {
+            final Entry entry = (Entry) item;
+            holder.textView.setText(entry.title);
+            if (entry.content != null) {
+                @SuppressWarnings("deprecation")
+                final String decoded = URLDecoder.decode(entry.content.content);
+                holder.info.setText(Html.fromHtml(decoded));
             } else {
-                holder.imageView.setImageResource(R.drawable.book);
+                holder.info.setText("");
             }
-        }
-
-        if (entry.content != null) {
-            final String decoded = URLDecoder.decode(entry.content.content);
-            holder.info.setText(Html.fromHtml(decoded));
-        } else {
+            if (entry instanceof Feed) {
+                holder.imageView.setImageResource(R.drawable.folderopen);
+            } else if (entry instanceof Book) {
+                final ThumbnailFile thumbnailFile = CacheManager.getThumbnailFile(entry.id);
+                if (thumbnailFile.exists()) {
+                    holder.imageView.setImageBitmap(thumbnailFile.getRawImage());
+                } else {
+                    holder.imageView.setImageResource(R.drawable.book);
+                }
+            }
+        } else if (item instanceof Link) {
+            final Link link = (Link) item;
+            holder.textView.setText(link.type);
             holder.info.setText("");
+            holder.imageView.setImageResource(R.drawable.book);
         }
 
+        MarginLayoutParams lp = (MarginLayoutParams) holder.imageView.getLayoutParams();
+        lp.leftMargin = child ? 50 : 4;
         return holder.getView();
     }
 

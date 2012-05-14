@@ -13,8 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +26,12 @@ import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.utils.LengthUtils;
 
-public class OPDSActivity extends AbstractActionActivity implements AdapterView.OnItemClickListener,
-        OPDSAdapter.FeedListener {
+public class OPDSActivity extends AbstractActionActivity implements ExpandableListView.OnGroupClickListener,
+        ExpandableListView.OnChildClickListener, OPDSAdapter.FeedListener {
 
     private OPDSAdapter adapter;
 
-    private ListView list;
+    private ExpandableListView list;
 
     private Menu menu;
 
@@ -44,7 +43,7 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.opds);
-        list = (ListView) findViewById(R.id.opdslist);
+        list = (ExpandableListView) findViewById(R.id.opdslist);
 
         final Feed flibusta = new Feed("Flibusta", "http://flibusta.net/opds");
         final Feed plough = new Feed("Plough", "http://www.plough.com/ploughCatalog_opds.xml");
@@ -53,7 +52,8 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         adapter.addListener(this);
 
         list.setAdapter(adapter);
-        list.setOnItemClickListener(this);
+        list.setOnGroupClickListener(this);
+        list.setOnChildClickListener(this);
     }
 
     @Override
@@ -146,25 +146,44 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
     }
 
     @Override
-    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
-        final Entry selected = adapter.getItem(i);
-        if (selected instanceof Feed) {
-            setCurrentFeed((Feed) selected);
+    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+        if (adapter.getChildrenCount(groupPosition) > 0) {
+            return false;
         }
-        if (selected instanceof Book) {
-            downloadBook((Book) selected);
+        Entry group = adapter.getGroup(groupPosition);
+        if (group instanceof Feed) {
+            setCurrentFeed((Feed) group);
+            return true;
+        } else if (group instanceof Book) {
+            downloadBook((Book) group, null);
+            return true;
         }
+        return false;
     }
 
-    protected void downloadBook(final Book book) {
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+        Entry group = adapter.getGroup(groupPosition);
+        Object child = adapter.getChild(groupPosition, childPosition);
+        if (child instanceof Feed) {
+            setCurrentFeed((Feed) child);
+        } else if (child instanceof Link) {
+            downloadBook((Book) group, (Link) child);
+        }
+
+        return true;
+    }
+
+    protected void downloadBook(final Book book, final Link link) {
         if (LengthUtils.isEmpty(book.downloads)) {
             return;
         }
 
-        if (book.downloads.size() == 1) {
+        if (link != null || book.downloads.size() == 1) {
+            final Link target = link != null ? link : book.downloads.get(0);
             final ActionDialogBuilder builder = new ActionDialogBuilder(this, getController());
-            builder.setTitle("Downloading book");
-            builder.setMessage(LengthUtils.safeString(book.downloads.get(0).type, "Raw type"));
+            builder.setTitle("Downloading book as");
+            builder.setMessage(LengthUtils.safeString(target.type, "Raw type"));
             builder.setPositiveButton(R.id.actions_downloadBook, new Constant("book", book), new Constant(
                     IActionController.DIALOG_ITEM_PROPERTY, 0));
             builder.setNegativeButton();
@@ -173,8 +192,8 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         }
 
         final List<String> itemList = new ArrayList<String>();
-        for (final Link link : book.downloads) {
-            itemList.add(LengthUtils.safeString(link.type, "Raw type"));
+        for (final Link l : book.downloads) {
+            itemList.add(LengthUtils.safeString(l.type, "Raw type"));
         }
         final String[] items = itemList.toArray(new String[itemList.size()]);
 
