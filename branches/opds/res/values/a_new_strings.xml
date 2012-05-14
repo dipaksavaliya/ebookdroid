@@ -47,5 +47,6 @@
     <string name="pref_usenativegraphics_summary">Use Android 2+ native graphics library</string>
 
     <string name="menu_opds">OPDS Browser</string>
-
+    <string name="opds_loading" formatted="false">"Loading %s/%s..."</string>
+    
 </resources>

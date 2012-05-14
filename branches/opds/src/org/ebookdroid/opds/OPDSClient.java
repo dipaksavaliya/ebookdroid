@@ -1,6 +1,7 @@
 package org.ebookdroid.opds;
 
 import org.ebookdroid.EBookDroidApp;
+import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.log.LogContext;
 
@@ -11,18 +12,19 @@ import android.webkit.URLUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.channels.ClosedByInterruptException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
+import org.emdev.ui.progress.IProgressIndicator;
+import org.emdev.ui.progress.UIFileCopying;
 import org.emdev.utils.LengthUtils;
 
 public class OPDSClient {
@@ -95,81 +97,90 @@ public class OPDSClient {
         return null;
     }
 
-    public File download(final Link link) {
+    public File download(final Link link, final IProgressIndicator progress) {
         try {
-            //set the download URL, a url that points to a file on the internet
-            //this is the file to be downloaded
-            URL url = new URL(link.uri);
+            final AtomicReference<String> uri = new AtomicReference<String>(link.uri);
+            final HttpResponse resp = connect(uri);
+            final StatusLine statusLine = resp.getStatusLine();
+            final int statusCode = statusLine.getStatusCode();
 
-            //create the new connection
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-            //set up some things on the connection
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
-
-            urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.50 Safari/534.24");            //and connect!
-            urlConnection.setRequestProperty("Connection", "close");
-            urlConnection.connect();
-
-            final int responseCode = urlConnection.getResponseCode();
-            System.out.println("Response code = " + responseCode);
-
-            //this will be used in reading the data from the internet
-            InputStream inputStream = urlConnection.getInputStream();
-
-            //set the path where we want to save the file
-            //in this case, going to save it on the root directory of the
-            //sd card.
-            File SDCardRoot = Environment.getExternalStorageDirectory();
-
-            final String contentDisposition = urlConnection.getHeaderField("Content-Disposition");
-
-            final String mimeType = urlConnection.getContentType();
-
-            final String location = urlConnection.getHeaderField("Location");
-            System.out.println("Location = " + location);
-
-            final String guessFileName = URLUtil.guessFileName(location != null ? location : link.uri, contentDisposition, mimeType);
-            //create a new file, specifying the path, and the filename
-            //which we want to save the file as.
-            File file = new File(SDCardRoot,guessFileName);
-
-            //this will be used to write the downloaded data into the file we created
-            FileOutputStream fileOutput = new FileOutputStream(file);
-
-
-            //this is the total size of the file
-            int totalSize = urlConnection.getContentLength();
-            //variable to store total downloaded bytes
-            int downloadedSize = 0;
-
-            //create a buffer...
-            byte[] buffer = new byte[1024];
-            int bufferLength = 0; //used to store a temporary size of the buffer
-
-            //now, read through the input buffer and write the contents to the file
-            while ( (bufferLength = inputStream.read(buffer)) > 0 ) {
-                    //add the data in the buffer to the file in the file output stream (the file on the sd card
-                    fileOutput.write(buffer, 0, bufferLength);
-                    //add up the size so we know how much is downloaded
-                    downloadedSize += bufferLength;
-                    //this is where you would do something to report the prgress, like this maybe
-//                    updateProgress(downloadedSize, totalSize);
-
+            if (statusCode != 200) {
+                LCTX.e("Content cannot be retrived: " + statusLine);
+                return null;
             }
-            //close the output stream when done
-            fileOutput.close();
+
+            final HttpEntity entity = resp.getEntity();
+            final String contentDisposition = getHeaderValue(resp, "Content-Disposition");
+            final String mimeType = getHeaderValue(entity.getContentType());
+            final long contentLength = entity.getContentLength();
+
+            LCTX.d("Content-Disposition: " + contentDisposition);
+            LCTX.d("Content-Type: " + mimeType);
+            LCTX.d("Content-Length: " + contentLength);
+
+            final String guessFileName = URLUtil.guessFileName(uri.get(), contentDisposition, mimeType);
+
+            LCTX.d("File name: " + guessFileName);
+
+            // create a new file, specifying the path, and the filename which we want to save the file as.
+            final File SDCardRoot = Environment.getExternalStorageDirectory();
+            final File file = new File(SDCardRoot, guessFileName);
+
+            // this will be used to write the downloaded data into the file we created
+            final FileOutputStream fileOutput = new FileOutputStream(file);
+            final UIFileCopying worker = new UIFileCopying(R.string.opds_loading, 64 * 1024, progress);
+            try {
+                worker.copy(contentLength, entity.getContent(), fileOutput);
+            } catch (final ClosedByInterruptException ex) {
+                try {
+                    file.delete();
+                } catch (final Exception ex1) {
+                }
+            }
 
             return file;
+        } catch (final Throwable th) {
+            LCTX.e("Error on downloading book: ", th);
+        }
+        return null;
+    }
 
-    //catch some possible errors...
-    } catch (MalformedURLException e) {
-            e.printStackTrace();
-    } catch (IOException e) {
-            e.printStackTrace();
+    protected HttpResponse connect(final AtomicReference<String> uri) throws IOException {
+        LCTX.d("URL to download: " + uri);
+        HttpGet req = new HttpGet(uri.get());
+        HttpResponse resp = client.execute(req);
+        StatusLine statusLine = resp.getStatusLine();
+        int statusCode = statusLine.getStatusCode();
+
+        LCTX.d("Status: " + statusLine);
+        int redirectCount = 5;
+        while (redirectCount > 0 && (statusCode == 301 || statusCode == 302)) {
+            redirectCount--;
+
+            final String location = getHeaderValue(resp, "Location");
+            uri.set(location);
+            LCTX.d("Location: " + uri);
+
+            if (LengthUtils.isEmpty(location)) {
+                break;
+            }
+            req = new HttpGet(location);
+            resp = client.execute(req);
+            statusLine = resp.getStatusLine();
+            statusCode = statusLine.getStatusCode();
+            LCTX.d("Status: " + statusLine);
+        }
+
+        return resp;
     }
-    return null;
+
+    protected static String getHeaderValue(final HttpResponse resp, final String name) {
+        final Header header = resp.getFirstHeader(name);
+        return header != null ? header.getValue() : null;
     }
+
+    protected static String getHeaderValue(final Header header) {
+        return header != null ? header.getValue() : null;
+    }
+
 }

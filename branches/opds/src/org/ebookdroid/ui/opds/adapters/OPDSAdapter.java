@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.emdev.ui.adapters.BaseViewHolder;
+import org.emdev.ui.progress.IProgressIndicator;
 import org.emdev.ui.widget.TextViewMultilineEllipse;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.listeners.ListenerProxy;
@@ -315,7 +316,8 @@ public class OPDSAdapter extends BaseAdapter {
         new DownloadBookTask().execute(book, link);
     }
 
-    final class DownloadBookTask extends AsyncTask<Object, String, File> implements OnCancelListener {
+    final class DownloadBookTask extends AsyncTask<Object, String, File> implements OnCancelListener,
+            IProgressIndicator {
 
         private ProgressDialog progressDialog;
 
@@ -333,18 +335,7 @@ public class OPDSAdapter extends BaseAdapter {
         protected File doInBackground(final Object... params) {
             Book book = (Book) params[0];
             Link link = (Link) params[1];
-            File file = client.download(link);
-//            if (file != null) {
-//                final ThumbnailFile preview = CacheManager.getThumbnailFile(book.id);
-//                if (preview.exists()) {
-//                    ThumbnailFile newFile = CacheManager.getThumbnailFile(file.getAbsolutePath());
-//                    try {
-//                        FileUtils.copy(new FileInputStream(preview), new FileOutputStream(newFile));
-//                    } catch (IOException ex) {
-//                        ex.printStackTrace();
-//                    }
-//                }
-//            }
+            File file = client.download(link, this);
             return file;
         }
 
@@ -361,6 +352,11 @@ public class OPDSAdapter extends BaseAdapter {
             } else {
                 Toast.makeText(EBookDroidApp.context, "Book download failed", 0).show();
             }
+        }
+
+        @Override
+        public void setProgressDialogMessage(int resourceID, Object... args) {
+            publishProgress(context.getResources().getString(resourceID, args));
         }
 
         @Override
