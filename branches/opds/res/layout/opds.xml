@@ -5,60 +5,10 @@
     android:layout_height="fill_parent"
     android:layout_gravity="center" >
 
-    <LinearLayout style="@style/action_bar" >
-
-        <ImageView
-            android:id="@+id/opdshome"
-            style="@style/action_bar_icon"
-            android:contentDescription="@string/content_description_home"
-            android:onClick="onButtonClick"
-            android:src="@drawable/home" />
-
-        <View style="@style/action_bar_separator" />
-
-        <TextView
-            android:id="@+id/opdstext"
-            style="@style/action_bar_title"
-            android:textSize="12sp" />
-
-        <View style="@style/action_bar_separator" />
-
-        <ImageView
-            android:id="@+id/opdsprevfolder"
-            style="@style/action_bar_action"
-            android:contentDescription="@string/content_description_up"
-            android:onClick="onButtonClick"
-            android:src="@drawable/arrowleft_disabled" />
-
-        <ImageView
-            android:id="@+id/opdsupfolder"
-            style="@style/action_bar_action"
-            android:contentDescription="@string/content_description_up"
-            android:onClick="onButtonClick"
-            android:src="@drawable/arrowup_disabled" />
-
-        <ImageView
-            android:id="@+id/opdsnextfolder"
-            style="@style/action_bar_action"
-            android:contentDescription="@string/content_description_up"
-            android:onClick="onButtonClick"
-            android:src="@drawable/arrowright_disabled" />
-
-        <View style="@style/action_bar_separator" />
-
-        <ImageView
-            android:id="@+id/opdsrefreshfolder"
-            style="@style/action_bar_action"
-            android:contentDescription="@string/content_description_up"
-            android:onClick="onButtonClick"
-            android:src="@drawable/refresh" />
-    </LinearLayout>
-
     <ListView
         android:id="@+id/opdslist"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/actionbar_height"
+        android:layout_height="fill_parent"
         android:gravity="center"
         android:orientation="vertical" />
 

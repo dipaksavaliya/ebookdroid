@@ -51,9 +51,16 @@ public class OPDSClient {
             return feed;
         }
         try {
-            final HttpGet req = createRequest(feed);
+            final AtomicReference<String> uri = new AtomicReference<String>(createRequest(feed));
+            final HttpResponse resp = connect(uri);
+            final StatusLine statusLine = resp.getStatusLine();
+            final int statusCode = statusLine.getStatusCode();
 
-            final HttpResponse resp = client.execute(req);
+            if (statusCode != 200) {
+                LCTX.e("Content cannot be retrived: " + statusLine);
+                return null;
+            }
+
             final HttpEntity entity = resp.getEntity();
 
             final OPDSContentHandler h = new OPDSContentHandler(feed);
@@ -69,20 +76,20 @@ public class OPDSClient {
         return feed;
     }
 
-    private HttpGet createRequest(final Feed feed) throws URISyntaxException {
-        HttpGet req = new HttpGet(feed.link.uri);
-        URI reqUri = req.getURI();
+    private String createRequest(final Feed feed) throws URISyntaxException {
+        String uri = feed.link.uri;
+        URI reqUri = new URI(uri);
         if (reqUri.getHost() == null) {
             for (Feed p = feed.parent; p != null; p = p.parent) {
                 final URI parentURI = new URI(p.link.uri);
                 if (parentURI.getHost() != null) {
                     reqUri = new URI(parentURI.getScheme(), parentURI.getHost(), reqUri.getPath(), reqUri.getFragment());
-                    req = new HttpGet(reqUri);
+                    uri = reqUri.toASCIIString();
                     break;
                 }
             }
         }
-        return req;
+        return uri;
     }
 
     public File loadFile(final Link link) {
@@ -146,7 +153,7 @@ public class OPDSClient {
     }
 
     protected HttpResponse connect(final AtomicReference<String> uri) throws IOException {
-        LCTX.d("URL to download: " + uri);
+        LCTX.d("Connecting to: " + uri);
         HttpGet req = new HttpGet(uri.get());
         HttpResponse resp = client.execute(req);
         StatusLine statusLine = resp.getStatusLine();

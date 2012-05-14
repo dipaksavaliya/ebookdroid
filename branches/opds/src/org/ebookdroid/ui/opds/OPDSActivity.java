@@ -9,11 +9,12 @@ import org.ebookdroid.ui.opds.adapters.OPDSAdapter;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,9 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
 
     private OPDSAdapter adapter;
 
-    private TextView header;
     private ListView list;
+
+    private Menu menu;
 
     public OPDSActivity() {
     }
@@ -42,7 +44,6 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.opds);
-        header = (TextView) findViewById(R.id.opdstext);
         list = (ListView) findViewById(R.id.opdslist);
 
         final Feed flibusta = new Feed("Flibusta", "http://flibusta.net/opds");
@@ -61,11 +62,44 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         goHome(null);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        adapter.close();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.opdsmenu, menu);
+
+        this.menu = menu;
+        updateNavigation(adapter.getCurrentFeed());
+        return true;
+    }
+
+    @Override
+    public boolean onMenuOpened(final int featureId, final Menu menu) {
+        this.menu = menu;
+        updateNavigation(adapter.getCurrentFeed());
+        return super.onMenuOpened(featureId, menu);
+    }
+
     public void setCurrentFeed(final Feed feed) {
         updateNavigation(feed);
 
-        header.setText(feed != null ? feed.title : "OPDS feeds");
+        setTitle(feed != null ? feed.title : "OPDS feeds");
         adapter.setCurrentFeed(feed);
+    }
+
+    @ActionMethod(ids = R.id.opdsclose)
+    public void close(final ActionEx action) {
+        finish();
     }
 
     @ActionMethod(ids = R.id.opdshome)
@@ -131,7 +165,8 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
             final ActionDialogBuilder builder = new ActionDialogBuilder(this, getController());
             builder.setTitle("Downloading book");
             builder.setMessage(LengthUtils.safeString(book.downloads.get(0).type, "Raw type"));
-            builder.setPositiveButton(R.id.actions_downloadBook, new Constant("book", book), new Constant(IActionController.DIALOG_ITEM_PROPERTY, 0));
+            builder.setPositiveButton(R.id.actions_downloadBook, new Constant("book", book), new Constant(
+                    IActionController.DIALOG_ITEM_PROPERTY, 0));
             builder.setNegativeButton();
             builder.show();
             return;
@@ -164,7 +199,6 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             final Feed current = adapter.getCurrentFeed();
             if (current == null) {
-                adapter.close();
                 finish();
             } else {
                 setCurrentFeed(current.parent);
@@ -179,19 +213,18 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         final boolean canNext = feed != null && feed.next != null;
         final boolean canPrev = feed != null && feed.prev != null;
 
-        updateNavigation(canUp, R.id.opdsupfolder, R.drawable.arrowup_enabled, R.drawable.arrowup_disabled);
-        updateNavigation(canNext, R.id.opdsnextfolder, R.drawable.arrowright_enabled, R.drawable.arrowright_disabled);
-        updateNavigation(canPrev, R.id.opdsprevfolder, R.drawable.arrowleft_enabled, R.drawable.arrowleft_disabled);
+        if (menu != null) {
+            updateItem(canUp, R.id.opdsupfolder, R.drawable.arrowup_enabled, R.drawable.arrowup_disabled);
+            updateItem(canNext, R.id.opdsnextfolder, R.drawable.arrowright_enabled, R.drawable.arrowright_disabled);
+            updateItem(canPrev, R.id.opdsprevfolder, R.drawable.arrowleft_enabled, R.drawable.arrowleft_disabled);
+        }
     }
 
-    protected void updateNavigation(final boolean enabled, final int viewId, final int enabledResId,
-            final int disabledResId) {
-
-        final View v = findViewById(viewId);
-        if (v instanceof ImageView) {
-            final ImageView view = (ImageView) v;
-            view.setImageResource(enabled ? enabledResId : disabledResId);
-            view.setEnabled(enabled);
+    protected void updateItem(final boolean enabled, final int viewId, final int enabledResId, final int disabledResId) {
+        final MenuItem v = menu.findItem(viewId);
+        if (v != null) {
+            v.setIcon(enabled ? enabledResId : disabledResId);
+            v.setEnabled(enabled);
         }
     }
 }

@@ -39,7 +39,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/opdsItemText"
         android:layout_toRightOf="@id/opdsItemIcon"
-        app:textSize="9dip"
+        app:textSize="13dip"
         app:maxLines="5"/>
 
 </RelativeLayout>
