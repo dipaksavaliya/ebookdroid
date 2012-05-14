@@ -10,6 +10,7 @@ public class Feed extends Entry {
     public Feed prev;
     public long loadedAt;
 
+    public final List<Feed> facets = new ArrayList<Feed>();
     public final List<Feed> children = new ArrayList<Feed>();
     public final List<Book> books = new ArrayList<Book>();
 

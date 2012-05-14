@@ -2,6 +2,14 @@ package org.ebookdroid.opds;
 
 public enum LinkKind {
 
+    FACET_FEED {
+
+        @Override
+        public boolean accept(final String rel, final String type) {
+            return type != null && type.contains("profile=opds-catalog") && "http://www.feedbooks.com/opds/facet".equals(rel);
+        }
+
+    },
     NEXT_FEED {
 
         @Override

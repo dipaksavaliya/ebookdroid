@@ -90,7 +90,8 @@ public class OPDSAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return currentFeed != null ? currentFeed.children.size() + currentFeed.books.size() : rootFeeds.size();
+        return currentFeed != null ? currentFeed.facets.size() + currentFeed.children.size() + currentFeed.books.size()
+                : rootFeeds.size();
     }
 
     @Override
@@ -98,12 +99,20 @@ public class OPDSAdapter extends BaseAdapter {
         if (currentFeed == null) {
             return rootFeeds.get(i);
         }
-        if (i < currentFeed.children.size()) {
-            return currentFeed.children.get(i);
-        }
-        final int bookindex = i - currentFeed.children.size();
-        if (bookindex < currentFeed.books.size()) {
-            return currentFeed.books.get(bookindex);
+        return getItem(i, currentFeed.facets, currentFeed.children, currentFeed.books);
+    }
+
+    protected Entry getItem(final int i, final List<? extends Entry>... lists) {
+        int index = i;
+        for (final List<? extends Entry> l : lists) {
+            if (index < 0) {
+                return null;
+            }
+            final int size = l.size();
+            if (index < size) {
+                return l.get(index);
+            }
+            index -= size;
         }
         return null;
     }
@@ -308,7 +317,7 @@ public class OPDSAdapter extends BaseAdapter {
         void feedLoaded(Feed feed);
     }
 
-    public void downloadBook(final Book book, int linkIndex) {
+    public void downloadBook(final Book book, final int linkIndex) {
         if (book == null || linkIndex >= book.downloads.size()) {
             return;
         }
@@ -333,9 +342,9 @@ public class OPDSAdapter extends BaseAdapter {
 
         @Override
         protected File doInBackground(final Object... params) {
-            Book book = (Book) params[0];
-            Link link = (Link) params[1];
-            File file = client.download(link, this);
+            final Book book = (Book) params[0];
+            final Link link = (Link) params[1];
+            final File file = client.download(link, this);
             return file;
         }
 
@@ -355,7 +364,7 @@ public class OPDSAdapter extends BaseAdapter {
         }
 
         @Override
-        public void setProgressDialogMessage(int resourceID, Object... args) {
+        public void setProgressDialogMessage(final int resourceID, final Object... args) {
             publishProgress(context.getResources().getString(resourceID, args));
         }
 

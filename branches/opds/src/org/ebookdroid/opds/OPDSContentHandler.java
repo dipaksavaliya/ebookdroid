@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.emdev.utils.LengthUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -29,8 +31,10 @@ public class OPDSContentHandler extends DefaultHandler {
 
     private final StringBuilder buf = new StringBuilder();
     private final Map<String, String> values = new HashMap<String, String>();
+    private Map<String, Link> facets = new LinkedHashMap<String, Link>();
 
     private Link feedLink;
+
     private Link bookThumbnail;
     private List<Link> bookLinks;
 
@@ -66,6 +70,11 @@ public class OPDSContentHandler extends DefaultHandler {
                     case FEED:
                         feedLink = new Link(kind, ref, rel, type);
                         break;
+                    case FACET_FEED:
+                        final String title = a.getValue("title");
+                        if (LengthUtils.isNotEmpty(title)) {
+                            facets.put(title, new Link(kind, ref, rel, type));
+                        }
                     case BOOK_DOWNLOAD:
                         if (bookLinks == null) {
                             bookLinks = new LinkedList<Link>();
@@ -85,6 +94,7 @@ public class OPDSContentHandler extends DefaultHandler {
             if ("entry".equals(qName)) {
                 inEntry = true;
                 values.clear();
+                facets.clear();
                 feedLink = null;
                 bookThumbnail = null;
                 bookLinks = null;
@@ -115,11 +125,16 @@ public class OPDSContentHandler extends DefaultHandler {
                 final Content content = contentString != null ? new Content(contentType, contentString) : null;
                 final String entryId = values.get("id");
                 final String entryTitle = values.get("title");
-                if (feedLink != null) {
+                if (feedLink != null || !facets.isEmpty()) {
                     Feed child = new Feed(feed, entryId, entryTitle, content);
                     child.link = feedLink;
                     child.next = null;
                     child.prev = null;
+                    for(Map.Entry<String, Link> f : facets.entrySet()) {
+                        String title = f.getKey();
+                        Link fl = f.getValue();
+                        child.facets.add(new Feed(child, fl.uri, title, null));
+                    }
                     feed.children.add(child);
                 } else {
                     Book book = new Book(feed, entryId, entryTitle, content);
@@ -129,6 +144,7 @@ public class OPDSContentHandler extends DefaultHandler {
                     feed.books.add(book);
                 }
                 values.clear();
+                facets.clear();
             }
         }
         grabContent = false;
