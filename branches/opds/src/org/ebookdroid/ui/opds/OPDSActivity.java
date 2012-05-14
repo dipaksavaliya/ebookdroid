@@ -23,6 +23,7 @@ import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.IActionController;
+import org.emdev.ui.actions.params.Constant;
 import org.emdev.utils.LengthUtils;
 
 public class OPDSActivity extends AbstractActionActivity implements AdapterView.OnItemClickListener,
@@ -127,7 +128,12 @@ public class OPDSActivity extends AbstractActionActivity implements AdapterView.
         }
 
         if (book.downloads.size() == 1) {
-            adapter.downloadBook(book, 0);
+            final ActionDialogBuilder builder = new ActionDialogBuilder(this, getController());
+            builder.setTitle("Downloading book");
+            builder.setMessage(LengthUtils.safeString(book.downloads.get(0).type, "Raw type"));
+            builder.setPositiveButton(R.id.actions_downloadBook, new Constant("book", book), new Constant(IActionController.DIALOG_ITEM_PROPERTY, 0));
+            builder.setNegativeButton();
+            builder.show();
             return;
         }
 
