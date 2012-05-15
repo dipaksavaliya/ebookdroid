@@ -48,7 +48,7 @@ public class OPDSClient {
         client.close();
     }
 
-    public Feed load(final Feed feed) {
+    public Feed load(final Feed feed, final IProgressIndicator progress) {
         if (feed.link == null) {
             return feed;
         }
@@ -62,6 +62,8 @@ public class OPDSClient {
                 LCTX.e("Content cannot be retrived: " + statusLine);
                 return null;
             }
+
+            progress.setProgressDialogMessage(R.string.opds_loading_catalog);
 
             final HttpEntity entity = resp.getEntity();
 
@@ -137,7 +139,7 @@ public class OPDSClient {
 
             // this will be used to write the downloaded data into the file we created
             final FileOutputStream fileOutput = new FileOutputStream(file);
-            final UIFileCopying worker = new UIFileCopying(R.string.opds_loading, 64 * 1024, progress);
+            final UIFileCopying worker = new UIFileCopying(R.string.opds_loading_book, 64 * 1024, progress);
             try {
                 worker.copy(contentLength, entity.getContent(), fileOutput);
             } catch (final ClosedByInterruptException ex) {

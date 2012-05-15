@@ -289,13 +289,13 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    final class LoadFeedTask extends AsyncTask<Feed, String, Feed> implements OnCancelListener {
+    final class LoadFeedTask extends AsyncTask<Feed, String, Feed> implements OnCancelListener, IProgressIndicator {
 
         private ProgressDialog progressDialog;
 
         @Override
         protected void onPreExecute() {
-            onProgressUpdate("Loading...");
+            onProgressUpdate(context.getResources().getString(R.string.opds_connecting));
         }
 
         @Override
@@ -305,7 +305,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
 
         @Override
         protected Feed doInBackground(final Feed... params) {
-            final Feed feed = client.load(params[0]);
+            final Feed feed = client.load(params[0], this);
             new LoadThumbnailTask().execute(feed);
             return feed;
         }
@@ -323,6 +323,11 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
             l.feedLoaded(result);
 
             notifyDataSetChanged();
+        }
+
+        @Override
+        public void setProgressDialogMessage(final int resourceID, final Object... args) {
+            publishProgress(context.getResources().getString(resourceID, args));
         }
 
         @Override
@@ -395,7 +400,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
 
         @Override
         protected void onPreExecute() {
-            onProgressUpdate("Loading...");
+            onProgressUpdate(context.getResources().getString(R.string.opds_connecting));
         }
 
         @Override
@@ -405,7 +410,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
 
         @Override
         protected File doInBackground(final Object... params) {
-            final Book book = (Book) params[0];
+            // final Book book = (Book) params[0];
             final Link link = (Link) params[1];
             final File file = client.download(link, this);
             return file;
