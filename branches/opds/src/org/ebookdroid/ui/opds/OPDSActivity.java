@@ -54,6 +54,9 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
         list.setAdapter(adapter);
         list.setOnGroupClickListener(this);
         list.setOnChildClickListener(this);
+
+        list.setGroupIndicator(null);
+        list.setChildIndicator(null);
     }
 
     @Override
@@ -70,7 +73,7 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
     @Override
