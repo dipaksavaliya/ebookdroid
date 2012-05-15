@@ -75,6 +75,7 @@ public class OPDSContentHandler extends DefaultHandler {
                         if (LengthUtils.isNotEmpty(title)) {
                             facets.put(title, new Link(kind, ref, rel, type));
                         }
+                        break;
                     case BOOK_DOWNLOAD:
                         if (bookLinks == null) {
                             bookLinks = new LinkedList<Link>();
@@ -133,7 +134,9 @@ public class OPDSContentHandler extends DefaultHandler {
                     for(Map.Entry<String, Link> f : facets.entrySet()) {
                         String title = f.getKey();
                         Link fl = f.getValue();
-                        child.facets.add(new Feed(child, fl.uri, title, null));
+                        final Feed facet = new Feed(child, fl.uri, title, null);
+                        facet.link = fl;
+                        child.facets.add(facet);
                     }
                     feed.children.add(child);
                 } else {
