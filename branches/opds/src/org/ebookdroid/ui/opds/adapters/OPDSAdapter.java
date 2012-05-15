@@ -6,6 +6,7 @@ import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.cache.ThumbnailFile;
 import org.ebookdroid.opds.Book;
 import org.ebookdroid.opds.Entry;
+import org.ebookdroid.opds.ExtentedEntryBuilder;
 import org.ebookdroid.opds.Feed;
 import org.ebookdroid.opds.Link;
 import org.ebookdroid.opds.OPDSClient;
@@ -51,7 +52,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
 
     public OPDSAdapter(final Context context, final Feed... feeds) {
         this.context = context;
-        this.client = new OPDSClient();
+        this.client = new OPDSClient(new ExtentedEntryBuilder());
 
         this.rootFeeds = Arrays.asList(feeds);
         this.currentFeed = null;

@@ -32,9 +32,11 @@ public class OPDSClient {
     private static final LogContext LCTX = LogContext.ROOT.lctx("OPDS");
 
     private final AndroidHttpClient client;
+    private final IEntryBuilder builder;
 
-    public OPDSClient() {
-        client = AndroidHttpClient.newInstance(EBookDroidApp.APP_PACKAGE + " " + EBookDroidApp.APP_VERSION);
+    public OPDSClient(IEntryBuilder builder) {
+        this.client = AndroidHttpClient.newInstance(EBookDroidApp.APP_PACKAGE + " " + EBookDroidApp.APP_VERSION);
+        this.builder = builder;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class OPDSClient {
 
             final HttpEntity entity = resp.getEntity();
 
-            final OPDSContentHandler h = new OPDSContentHandler(feed);
+            final OPDSContentHandler h = new OPDSContentHandler(feed, builder);
             final Header enc = entity.getContentEncoding();
             final String encoding = enc != null ? enc.getValue() : "";
 

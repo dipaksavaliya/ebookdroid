@@ -25,6 +25,7 @@ public class OPDSContentHandler extends DefaultHandler {
     private final SAXParserFactory spf = SAXParserFactory.newInstance();
 
     final Feed feed;
+    final IEntryBuilder builder;
 
     private boolean inEntry;
     private boolean grabContent;
@@ -38,8 +39,9 @@ public class OPDSContentHandler extends DefaultHandler {
     private Link bookThumbnail;
     private List<Link> bookLinks;
 
-    public OPDSContentHandler(final Feed feed) {
+    public OPDSContentHandler(final Feed feed, IEntryBuilder builder) {
         this.feed = feed;
+        this.builder = builder;
     }
 
     public void parse(InputStreamReader inputStreamReader) throws ParserConfigurationException, SAXException,
@@ -127,24 +129,9 @@ public class OPDSContentHandler extends DefaultHandler {
                 final String entryId = values.get("id");
                 final String entryTitle = values.get("title");
                 if (feedLink != null || !facets.isEmpty()) {
-                    Feed child = new Feed(feed, entryId, entryTitle, content);
-                    child.link = feedLink;
-                    child.next = null;
-                    child.prev = null;
-                    for(Map.Entry<String, Link> f : facets.entrySet()) {
-                        String title = f.getKey();
-                        Link fl = f.getValue();
-                        final Feed facet = new Feed(child, fl.uri, title, null);
-                        facet.link = fl;
-                        child.facets.add(facet);
-                    }
-                    feed.children.add(child);
+                    feed.children.add(builder.newFeed(feed, entryId, entryTitle, content, feedLink, facets));
                 } else {
-                    Book book = new Book(feed, entryId, entryTitle, content);
-                    book.author = null;
-                    book.downloads = bookLinks;
-                    book.thumbnail = bookThumbnail;
-                    feed.books.add(book);
+                    feed.books.add(builder.newBook(feed, entryId, entryTitle, content, bookThumbnail, bookLinks));
                 }
                 values.clear();
                 facets.clear();
