@@ -18,7 +18,7 @@ public class BaseEntryBuilder implements IEntryBuilder {
 
     @Override
     public Book newBook(final Feed parent, final String id, final String title, final Content content,
-            final Link thumbnail, final List<Link> downloads) {
+            final Link thumbnail, final List<BookDownloadLink> downloads) {
         final Book book = new Book(parent, id, title, content);
         book.thumbnail = thumbnail;
         book.downloads = downloads;

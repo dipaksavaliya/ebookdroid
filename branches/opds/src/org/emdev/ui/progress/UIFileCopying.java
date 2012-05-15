@@ -13,6 +13,7 @@ public class UIFileCopying implements CopingProgress {
     private final int bufsize;
     private final IProgressIndicator delegate;
 
+    private long interval;
     private long contentLength;
     private long copied;
     private long indicated;
@@ -21,6 +22,7 @@ public class UIFileCopying implements CopingProgress {
         this.stringId = stringId;
         this.delegate = delegate;
         this.bufsize = bufsize;
+        this.interval = Math.min(64*1024, bufsize);
     }
 
     public void copy(final long contentLength, final InputStream source, final OutputStream target) throws IOException {
@@ -37,7 +39,7 @@ public class UIFileCopying implements CopingProgress {
     @Override
     public void progress(final long bytes) {
         copied = bytes;
-        if (copied - indicated >= bufsize) {
+        if (copied - indicated >= interval) {
             indicated = copied;
             final String val1 = FileUtils.getFileSize(Math.min(indicated, contentLength));
             final String val2 = FileUtils.getFileSize(contentLength);

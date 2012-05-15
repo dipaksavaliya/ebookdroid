@@ -5,6 +5,7 @@ import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.cache.ThumbnailFile;
 import org.ebookdroid.opds.Book;
+import org.ebookdroid.opds.BookDownloadLink;
 import org.ebookdroid.opds.Entry;
 import org.ebookdroid.opds.ExtentedEntryBuilder;
 import org.ebookdroid.opds.Feed;
@@ -389,7 +390,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
         if (book == null || linkIndex >= book.downloads.size()) {
             return;
         }
-        final Link link = book.downloads.get(linkIndex);
+        final BookDownloadLink link = book.downloads.get(linkIndex);
         new DownloadBookTask().execute(book, link);
     }
 
@@ -411,7 +412,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
         @Override
         protected File doInBackground(final Object... params) {
             // final Book book = (Book) params[0];
-            final Link link = (Link) params[1];
+            final BookDownloadLink link = (BookDownloadLink) params[1];
             final File file = client.download(link, this);
             return file;
         }

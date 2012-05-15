@@ -1,5 +1,6 @@
 package org.ebookdroid.opds;
 
+import org.ebookdroid.CodecType;
 import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
@@ -9,6 +10,8 @@ import android.net.http.AndroidHttpClient;
 import android.os.Environment;
 import android.webkit.URLUtil;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +19,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.ClosedByInterruptException;
+import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.http.Header;
@@ -26,6 +30,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.emdev.ui.progress.IProgressIndicator;
 import org.emdev.ui.progress.UIFileCopying;
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.archives.zip.ZipArchive;
+import org.emdev.utils.archives.zip.ZipArchiveEntry;
 
 public class OPDSClient {
 
@@ -108,7 +114,7 @@ public class OPDSClient {
         return null;
     }
 
-    public File download(final Link link, final IProgressIndicator progress) {
+    public File download(final BookDownloadLink link, final IProgressIndicator progress) {
         try {
             final AtomicReference<String> uri = new AtomicReference<String>(link.uri);
             final HttpResponse resp = connect(uri);
@@ -137,11 +143,19 @@ public class OPDSClient {
             final File SDCardRoot = Environment.getExternalStorageDirectory();
             final File file = new File(SDCardRoot, guessFileName);
 
+            boolean exists = file.exists() && file.length() == contentLength;
+
             // this will be used to write the downloaded data into the file we created
-            final FileOutputStream fileOutput = new FileOutputStream(file);
-            final UIFileCopying worker = new UIFileCopying(R.string.opds_loading_book, 64 * 1024, progress);
             try {
-                worker.copy(contentLength, entity.getContent(), fileOutput);
+                if (!exists) {
+                    final UIFileCopying worker = new UIFileCopying(R.string.opds_loading_book, 64 * 1024, progress);
+                    final BufferedInputStream input = new BufferedInputStream(entity.getContent(), 64 * 1024);
+                    final BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(file), 256*1024);
+                    worker.copy(contentLength, input, fileOutput);
+                }
+                if (link.isZipped && !link.bookType.isZipSupported()) {
+                    return unpack(file, progress);
+                }
             } catch (final ClosedByInterruptException ex) {
                 try {
                     file.delete();
@@ -154,6 +168,59 @@ public class OPDSClient {
             LCTX.e("Error on downloading book: ", th);
         }
         return null;
+    }
+
+    protected File unpack(final File file, final IProgressIndicator progress) {
+        try {
+            ZipArchive archive = new ZipArchive(file);
+            try {
+                final Enumeration<ZipArchiveEntry> entries = archive.entries();
+                while (entries.hasMoreElements()) {
+                    final ZipArchiveEntry entry = entries.nextElement();
+                    CodecType codecType = CodecType.getByUri(entry.getName());
+                    if (codecType != null) {
+
+                        File entryFile = new File(file.getParentFile(), entry.getName());
+                        LCTX.d("Unpacked file name: " + entryFile.getAbsolutePath());
+
+                        int bufsize = 256 * 1024;
+                        final UIFileCopying worker = new UIFileCopying(R.string.opds_unpacking_book, bufsize, progress);
+
+                        BufferedInputStream in = new BufferedInputStream(entry.open(), bufsize);
+                        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(entryFile), bufsize);
+                        worker.copy(entry.getSize(), in, out);
+
+                        try {
+                            archive.close();
+                        } catch (Exception ex1) {
+                        }
+                        try {
+                            file.delete();
+                        } catch (Exception ex) {
+                        }
+                        return entryFile;
+                    }
+                }
+            } catch (final ClosedByInterruptException ex) {
+                try {
+                    archive.close();
+                } catch (Exception ex1) {
+                }
+                try {
+                    file.delete();
+                } catch (Exception ex2) {
+                }
+            } catch (Exception ex) {
+                LCTX.e("Error on unpacking book: ", ex);
+                try {
+                    archive.close();
+                } catch (Exception ex1) {
+                }
+            }
+        } catch (Exception ex) {
+            LCTX.e("Error on unpacking book: ", ex);
+        }
+        return file;
     }
 
     protected HttpResponse connect(final AtomicReference<String> uri) throws IOException {

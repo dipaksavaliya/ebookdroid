@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -37,8 +39,10 @@ public class OPDSContentHandler extends DefaultHandler {
     private Link feedLink;
 
     private Link bookThumbnail;
-    private List<Link> bookLinks;
+    private List<BookDownloadLink> bookLinks;
 
+    private final Set<String> unsupportedTypes = new HashSet<String>();
+    
     public OPDSContentHandler(final Feed feed, IEntryBuilder builder) {
         this.feed = feed;
         this.builder = builder;
@@ -79,10 +83,17 @@ public class OPDSContentHandler extends DefaultHandler {
                         }
                         break;
                     case BOOK_DOWNLOAD:
-                        if (bookLinks == null) {
-                            bookLinks = new LinkedList<Link>();
+                        BookDownloadLink bdl = new BookDownloadLink(kind, ref, rel, type);
+                        if (bdl.bookType != null) {
+                            if (bookLinks == null) {
+                                bookLinks = new LinkedList<BookDownloadLink>();
+                            }
+                            bookLinks.add(bdl);
+                        } else {
+                            if (unsupportedTypes.add(type)) {
+                                System.out.println("Unsupported mime type: " + type);
+                            }
                         }
-                        bookLinks.add(new Link(kind, ref, rel, type));
                         break;
                     case BOOK_THUMBNAIL:
                         bookThumbnail = new Link(kind, ref, rel, type);
@@ -130,7 +141,7 @@ public class OPDSContentHandler extends DefaultHandler {
                 final String entryTitle = values.get("title");
                 if (feedLink != null || !facets.isEmpty()) {
                     feed.children.add(builder.newFeed(feed, entryId, entryTitle, content, feedLink, facets));
-                } else {
+                } else if (LengthUtils.isNotEmpty(bookLinks)) {
                     feed.books.add(builder.newBook(feed, entryId, entryTitle, content, bookThumbnail, bookLinks));
                 }
                 values.clear();

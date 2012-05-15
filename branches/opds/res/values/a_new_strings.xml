@@ -48,8 +48,9 @@
 
     <string name="menu_opds">OPDS Browser</string>
 
-    <string name="opds_connecting" formatted="false">"Connecting..."</string>
-    <string name="opds_loading_catalog" formatted="false">"Loading catalog"</string>
-    <string name="opds_loading_book" formatted="false">"Loading book: %s/%s..."</string>
+    <string name="opds_connecting" formatted="false">"Connecting&#8230;"</string>
+    <string name="opds_loading_catalog" formatted="false">"Loading catalog&#8230;"</string>
+    <string name="opds_loading_book" formatted="false">"Loading book: %s/%s&#8230;"</string>
+    <string name="opds_unpacking_book" formatted="false">"Unpacking book: %s/%s&#8230;"</string>
     
 </resources>
