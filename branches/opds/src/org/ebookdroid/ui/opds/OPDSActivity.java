@@ -7,8 +7,6 @@ import org.ebookdroid.opds.Feed;
 import org.ebookdroid.opds.Link;
 import org.ebookdroid.ui.opds.adapters.OPDSAdapter;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,14 +14,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.emdev.ui.AbstractActionActivity;
@@ -32,11 +26,8 @@ import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
+import org.emdev.ui.actions.params.EditableValue;
 import org.emdev.utils.LengthUtils;
-import org.emdev.utils.preferences.JSONSharedPreferences;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class OPDSActivity extends AbstractActionActivity implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, OPDSAdapter.FeedListener {
@@ -47,10 +38,6 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
 
     private Menu menu;
 
-    private HashMap<String, String> feeds = new HashMap<String, String>();
-
-    private Button addFeed;
-
     public OPDSActivity() {
     }
 
@@ -59,41 +46,7 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.opds);
-        addFeed = (Button) findViewById(R.id.opdsaddfeed);
-
-        addFeed.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                final View childView = LayoutInflater.from(OPDSActivity.this).inflate(R.layout.alias_url, null);
-
-                final AlertDialog.Builder alert = new AlertDialog.Builder(OPDSActivity.this);
-
-                alert.setTitle("Adding new catalog");
-                alert.setMessage("Enter alias and URL of the catalog");
-                alert.setView(childView);
-
-                final EditText aliasEdit = (EditText) childView.findViewById(R.id.editAlias);
-                final EditText urlEdit = (EditText) childView.findViewById(R.id.editURL);
-
-                alert.setPositiveButton("Add feed", new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        OPDSActivity.this.addFeed(aliasEdit.getText().toString(), urlEdit.getText().toString());
-
-                    }
-                });
-
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    }
-                });
-
-                alert.show();
-            }
-        });
+        setActionForView(R.id.opdsaddfeed);
 
         list = (ExpandableListView) findViewById(R.id.opdslist);
         list.setOnGroupClickListener(this);
@@ -102,52 +55,38 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
         list.setGroupIndicator(null);
         list.setChildIndicator(null);
 
-        feeds.clear();
-
-        try {
-            JSONObject jsonObj = JSONSharedPreferences.loadJSONObject(this, "OPDS_prefs", "OPDSList");
-
-            final Iterator names = jsonObj.keys();
-            while (names.hasNext()) {
-                String key = (String) names.next();
-                feeds.put(key, jsonObj.getString(key));
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        if (feeds.isEmpty()) {
-            feeds.put("Flibusta", "http://flibusta.net/opds");
-            feeds.put("Plough", "http://www.plough.com/ploughCatalog_opds.xml");
-        }
-
-        recreateAdapter();
-
-    }
-
-    protected void addFeed(String alias, String url) {
-        if (LengthUtils.isNotEmpty(alias) && LengthUtils.isNotEmpty(url)) {
-            feeds.put(alias, url);
-
-            JSONSharedPreferences.saveJSONObject(this, "OPDS_prefs", "OPDSList", new JSONObject(feeds));
-
-            recreateAdapter();
-        }
-    }
-
-    private void recreateAdapter() {
-        if (adapter != null) {
-            adapter.close();
-        }
-
-        ArrayList<Feed> tmpFeeds = new ArrayList<Feed>();
-        for (java.util.Map.Entry<String, String> entry : feeds.entrySet()) {
-            tmpFeeds.add(new Feed(entry.getKey(), entry.getValue()));
-        }
-
-        adapter = new OPDSAdapter(this, tmpFeeds.toArray(new Feed[tmpFeeds.size()]));
+        adapter = new OPDSAdapter(this);
         adapter.addListener(this);
-
         list.setAdapter(adapter);
+    }
+
+    @ActionMethod(ids = R.id.opdsaddfeed)
+    public void showAddFeedDlg(ActionEx action) {
+
+        final View childView = LayoutInflater.from(this).inflate(R.layout.alias_url, null);
+
+        final ActionDialogBuilder builder = new ActionDialogBuilder(this, getController());
+        builder.setTitle(R.string.opds_addfeed_title);
+        builder.setMessage(R.string.opds_addfeed_msg);
+        builder.setView(childView);
+
+        final EditText aliasEdit = (EditText) childView.findViewById(R.id.editAlias);
+        final EditText urlEdit = (EditText) childView.findViewById(R.id.editURL);
+
+        builder.setPositiveButton(R.string.opds_addfeed_ok, R.id.actions_addFeed,
+                new EditableValue("alias", aliasEdit), new EditableValue("url", urlEdit));
+        builder.setNegativeButton();
+        builder.show();
+    }
+
+    @ActionMethod(ids = R.id.actions_addFeed)
+    public void addFeed(ActionEx action) {
+        String alias = LengthUtils.toString(action.getParameter("alias"));
+        String url = LengthUtils.toString(action.getParameter("url"));
+
+        if (LengthUtils.isAllNotEmpty(alias, url)) {
+            adapter.addFeed(alias, url);
+        }
     }
 
     @Override

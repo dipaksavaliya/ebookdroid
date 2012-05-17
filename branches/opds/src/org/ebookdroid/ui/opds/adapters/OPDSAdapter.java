@@ -4,6 +4,7 @@ import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.cache.ThumbnailFile;
+import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.opds.Book;
 import org.ebookdroid.opds.BookDownloadLink;
 import org.ebookdroid.opds.Entry;
@@ -32,7 +33,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URLDecoder;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.emdev.ui.adapters.BaseViewHolder;
@@ -40,22 +41,45 @@ import org.emdev.ui.progress.IProgressIndicator;
 import org.emdev.ui.widget.TextViewMultilineEllipse;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.listeners.ListenerProxy;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class OPDSAdapter extends BaseExpandableListAdapter {
 
     private final Context context;
     private final OPDSClient client;
-    private final List<? extends Entry> rootFeeds;
+    private final List<Feed> rootFeeds;
 
     private volatile Feed currentFeed;
 
     private final ListenerProxy listeners = new ListenerProxy(FeedListener.class);
 
-    public OPDSAdapter(final Context context, final Feed... feeds) {
+    public OPDSAdapter(final Context context) {
         this.context = context;
         this.client = new OPDSClient(new ExtentedEntryBuilder());
 
-        this.rootFeeds = Arrays.asList(feeds);
+        this.rootFeeds = new ArrayList<Feed>();
+
+        final JSONArray feeds = SettingsManager.getAppSettings().opdsCatalogs;
+        for (int i = 0, n = feeds.length(); i < n; i++) {
+            try {
+                final JSONObject obj = feeds.getJSONObject(i);
+                final String alias = obj.getString("alias");
+                final String url = obj.getString("url");
+                if (LengthUtils.isAllNotEmpty(alias, url)) {
+                    rootFeeds.add(new Feed(alias, url));
+                }
+            } catch (final JSONException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        // TODO remove in release
+        if (rootFeeds.isEmpty()) {
+            addFeeds(new Feed("Flibusta", "http://flibusta.net/opds"), new Feed("Plough", "http://www.plough.com/ploughCatalog_opds.xml"));
+        }
+
         this.currentFeed = null;
     }
 
@@ -66,6 +90,29 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
 
     public void close() {
         client.close();
+    }
+
+    public void addFeed(final String alias, final String url) {
+        addFeeds(new Feed(alias, url));
+    }
+
+    public void addFeeds(final Feed... feeds) {
+        final JSONArray catalogs = SettingsManager.getAppSettings().opdsCatalogs;
+        for (final Feed feed : feeds) {
+            rootFeeds.add(feed);
+            try {
+                final JSONObject newCatalog = new JSONObject();
+                newCatalog.put("alias", feed.title);
+                newCatalog.put("url", feed.link.uri);
+                catalogs.put(newCatalog);
+            } catch (final JSONException ex) {
+                ex.printStackTrace();
+            }
+        }
+        SettingsManager.changeOpdsCatalogs(catalogs);
+        if (currentFeed == null) {
+            notifyDataSetChanged();
+        }
     }
 
     public void setCurrentFeed(final Feed feed) {
@@ -119,7 +166,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
         if (group instanceof Feed) {
             return ((Feed) group).facets.size();
         } else if (group instanceof Book) {
-            int size = ((Book) group).downloads.size();
+            final int size = ((Book) group).downloads.size();
             return size > 1 ? size : 0;
         }
         return 0;
@@ -180,7 +227,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
         return null;
     }
 
-    protected View getItemView(final Object item, boolean child, final View view, final ViewGroup parent) {
+    protected View getItemView(final Object item, final boolean child, final View view, final ViewGroup parent) {
 
         final ViewHolder holder = BaseViewHolder.getOrCreateViewHolder(ViewHolder.class, R.layout.opdsitem, view,
                 parent);
@@ -212,7 +259,7 @@ public class OPDSAdapter extends BaseExpandableListAdapter {
             holder.imageView.setImageResource(R.drawable.book);
         }
 
-        MarginLayoutParams lp = (MarginLayoutParams) holder.imageView.getLayoutParams();
+        final MarginLayoutParams lp = (MarginLayoutParams) holder.imageView.getLayoutParams();
         lp.leftMargin = child ? 50 : 4;
         return holder.getView();
     }
