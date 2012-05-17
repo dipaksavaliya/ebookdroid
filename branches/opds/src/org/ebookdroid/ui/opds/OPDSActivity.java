@@ -8,6 +8,8 @@ import org.ebookdroid.opds.Link;
 import org.ebookdroid.ui.opds.adapters.OPDSAdapter;
 
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +39,7 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
 
     private ExpandableListView list;
 
-    private Menu menu;
+    private Menu optionsMenu;
 
     public OPDSActivity() {
     }
@@ -58,35 +61,8 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
         adapter = new OPDSAdapter(this);
         adapter.addListener(this);
         list.setAdapter(adapter);
-    }
 
-    @ActionMethod(ids = R.id.opdsaddfeed)
-    public void showAddFeedDlg(ActionEx action) {
-
-        final View childView = LayoutInflater.from(this).inflate(R.layout.alias_url, null);
-
-        final ActionDialogBuilder builder = new ActionDialogBuilder(this, getController());
-        builder.setTitle(R.string.opds_addfeed_title);
-        builder.setMessage(R.string.opds_addfeed_msg);
-        builder.setView(childView);
-
-        final EditText aliasEdit = (EditText) childView.findViewById(R.id.editAlias);
-        final EditText urlEdit = (EditText) childView.findViewById(R.id.editURL);
-
-        builder.setPositiveButton(R.string.opds_addfeed_ok, R.id.actions_addFeed,
-                new EditableValue("alias", aliasEdit), new EditableValue("url", urlEdit));
-        builder.setNegativeButton();
-        builder.show();
-    }
-
-    @ActionMethod(ids = R.id.actions_addFeed)
-    public void addFeed(ActionEx action) {
-        String alias = LengthUtils.toString(action.getParameter("alias"));
-        String url = LengthUtils.toString(action.getParameter("url"));
-
-        if (LengthUtils.isAllNotEmpty(alias, url)) {
-            adapter.addFeed(alias, url);
-        }
+        this.registerForContextMenu(list);
     }
 
     @Override
@@ -103,7 +79,7 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
     @Override
@@ -111,24 +87,137 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
         final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.opdsmenu, menu);
 
-        this.menu = menu;
-        updateNavigation(adapter.getCurrentFeed());
+        this.optionsMenu = menu;
+        updateNavigation(optionsMenu, adapter.getCurrentFeed());
         return true;
     }
 
     @Override
     public boolean onMenuOpened(final int featureId, final Menu menu) {
-        this.menu = menu;
-        updateNavigation(adapter.getCurrentFeed());
+        this.optionsMenu = menu;
+        updateNavigation(optionsMenu, adapter.getCurrentFeed());
         return super.onMenuOpened(featureId, menu);
     }
 
-    public void setCurrentFeed(final Feed feed) {
-        updateNavigation(feed);
+    @Override
+    public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
+        if (menuInfo instanceof ExpandableListContextMenuInfo) {
+            final ExpandableListContextMenuInfo cmi = (ExpandableListContextMenuInfo) menuInfo;
+            final int type = ExpandableListView.getPackedPositionType(cmi.packedPosition);
+            final int groupPosition = ExpandableListView.getPackedPositionGroup(cmi.packedPosition);
+            final int childPosition = ExpandableListView.getPackedPositionChild(cmi.packedPosition);
+            System.out.println("OPDSActivity.onCreateContextMenu(): " + type + ", " + groupPosition + ", "
+                    + childPosition);
+            switch (type) {
+                case ExpandableListView.PACKED_POSITION_TYPE_NULL:
+                    onCreateContextMenu(menu);
+                    return;
+                case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
+                    final Entry entry = adapter.getGroup(groupPosition);
+                    if (entry instanceof Feed) {
+                        onCreateFeedContextMenu(menu, (Feed) entry);
+                    } else if (entry instanceof Book) {
+                        onCreateBookContextMenu(menu, (Book) entry);
+                    }
+                    return;
+                case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
+                    final Entry group = adapter.getGroup(groupPosition);
+                    final Object child = adapter.getChild(groupPosition, childPosition);
+                    if (child instanceof Link) {
+                        onCreateLinkContextMenu(menu, (Book) group, (Link) child);
+                    } else if (child instanceof Feed) {
+                        onCreateFacetContextMenu(menu, (Feed) group, (Feed) child);
+                    }
+                    return;
+            }
+        }
+        onCreateContextMenu(menu);
+    }
 
-        setTitle(feed != null ? feed.title : "OPDS feeds");
+    private void onCreateContextMenu(final ContextMenu menu) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.opds_defmenu, menu);
+
+        Feed feed = adapter.getCurrentFeed();
+        menu.setHeaderTitle(getFeedTitle(feed));
+        updateNavigation(menu, feed);
+    }
+
+    private void onCreateFeedContextMenu(final ContextMenu menu, final Feed feed) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.opds_feedmenu, menu);
+
+        menu.setHeaderTitle(getFeedTitle(feed));
+        updateNavigation(menu, feed.parent);
+
+        getController().getOrCreateAction(R.id.opdsgoto).putValue("feed", feed);
+    }
+
+    private void onCreateFacetContextMenu(final ContextMenu menu, final Feed feed, final Feed facet) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.opds_facetmenu, menu);
+
+        menu.setHeaderTitle(getFeedTitle(facet));
+        updateNavigation(menu, feed.parent);
+
+        getController().getOrCreateAction(R.id.opdsgoto).putValue("feed", facet);
+    }
+
+    private void onCreateBookContextMenu(final ContextMenu menu, final Book book) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.opds_bookmenu, menu);
+
+        menu.setHeaderTitle(book.title);
+        getController().getOrCreateAction(R.id.opds_book_download).putValue("book", book).putValue("link", null);
+    }
+
+    private void onCreateLinkContextMenu(final ContextMenu menu, final Book book, final Link link) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.opds_bookmenu, menu);
+
+        menu.setHeaderTitle(book.title);
+        getController().getOrCreateAction(R.id.opds_book_download).putValue("book", book).putValue("link", null);
+    }
+
+    public void setCurrentFeed(final Feed feed) {
+        updateNavigation(optionsMenu, feed);
+
+        setTitle(getFeedTitle(feed));
         findViewById(R.id.opdsaddfeed).setVisibility(feed != null ? View.GONE : View.VISIBLE);
         adapter.setCurrentFeed(feed);
+    }
+
+    private String getFeedTitle(final Feed feed) {
+        return feed != null ? feed.title : "OPDS feeds";
+    }
+
+    @ActionMethod(ids = { R.id.opdsaddfeed, R.id.opds_feed_add})
+    public void showAddFeedDlg(final ActionEx action) {
+    
+        final View childView = LayoutInflater.from(this).inflate(R.layout.alias_url, null);
+    
+        final ActionDialogBuilder builder = new ActionDialogBuilder(this, getController());
+        builder.setTitle(R.string.opds_addfeed_title);
+        builder.setMessage(R.string.opds_addfeed_msg);
+        builder.setView(childView);
+    
+        final EditText aliasEdit = (EditText) childView.findViewById(R.id.editAlias);
+        final EditText urlEdit = (EditText) childView.findViewById(R.id.editURL);
+    
+        builder.setPositiveButton(R.string.opds_addfeed_ok, R.id.actions_addFeed,
+                new EditableValue("alias", aliasEdit), new EditableValue("url", urlEdit));
+        builder.setNegativeButton();
+        builder.show();
+    }
+
+    @ActionMethod(ids = R.id.actions_addFeed)
+    public void addFeed(final ActionEx action) {
+        final String alias = LengthUtils.toString(action.getParameter("alias"));
+        final String url = LengthUtils.toString(action.getParameter("url"));
+    
+        if (LengthUtils.isAllNotEmpty(alias, url)) {
+            adapter.addFeed(alias, url);
+        }
     }
 
     @ActionMethod(ids = R.id.opdsclose)
@@ -139,6 +228,12 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
     @ActionMethod(ids = R.id.opdshome)
     public void goHome(final ActionEx action) {
         setCurrentFeed(null);
+    }
+
+    @ActionMethod(ids = R.id.opdsgoto)
+    public void goTo(final ActionEx action) {
+        Feed feed = action.getParameter("feed");
+        setCurrentFeed(feed);
     }
 
     @ActionMethod(ids = R.id.opdsupfolder)
@@ -176,39 +271,47 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
 
     @Override
     public void feedLoaded(final Feed feed) {
-        updateNavigation(feed);
+        updateNavigation(optionsMenu, feed);
     }
 
     @Override
-    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+    public boolean onGroupClick(final ExpandableListView parent, final View v, final int groupPosition, final long id) {
         if (adapter.getChildrenCount(groupPosition) > 0) {
             return false;
         }
-        Entry group = adapter.getGroup(groupPosition);
+        final Entry group = adapter.getGroup(groupPosition);
         if (group instanceof Feed) {
             setCurrentFeed((Feed) group);
             return true;
         } else if (group instanceof Book) {
-            downloadBook((Book) group, null);
+            showDownloadDlg((Book) group, null);
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-        Entry group = adapter.getGroup(groupPosition);
-        Object child = adapter.getChild(groupPosition, childPosition);
+    public boolean onChildClick(final ExpandableListView parent, final View v, final int groupPosition,
+            final int childPosition, final long id) {
+        final Entry group = adapter.getGroup(groupPosition);
+        final Object child = adapter.getChild(groupPosition, childPosition);
         if (child instanceof Feed) {
             setCurrentFeed((Feed) child);
         } else if (child instanceof Link) {
-            downloadBook((Book) group, (Link) child);
+            showDownloadDlg((Book) group, (Link) child);
         }
 
         return true;
     }
 
-    protected void downloadBook(final Book book, final Link link) {
+    @ActionMethod(ids = R.id.opds_book_download)
+    public void showDownloadDlg(final ActionEx action) {
+        final Book book = action.getParameter("book");
+        final Link link = action.getParameter("link");
+        showDownloadDlg(book, link);
+    }
+
+    protected void showDownloadDlg(final Book book, final Link link) {
         if (LengthUtils.isEmpty(book.downloads)) {
             return;
         }
@@ -261,19 +364,21 @@ public class OPDSActivity extends AbstractActionActivity implements ExpandableLi
         return super.onKeyDown(keyCode, event);
     }
 
-    protected void updateNavigation(final Feed feed) {
+    protected void updateNavigation(final Menu menu, final Feed feed) {
         final boolean canUp = feed != null;
         final boolean canNext = feed != null && feed.next != null;
         final boolean canPrev = feed != null && feed.prev != null;
 
         if (menu != null) {
-            updateItem(canUp, R.id.opdsupfolder, R.drawable.arrowup_enabled, R.drawable.arrowup_disabled);
-            updateItem(canNext, R.id.opdsnextfolder, R.drawable.arrowright_enabled, R.drawable.arrowright_disabled);
-            updateItem(canPrev, R.id.opdsprevfolder, R.drawable.arrowleft_enabled, R.drawable.arrowleft_disabled);
+            updateItem(menu, canUp, R.id.opdsupfolder, R.drawable.arrowup_enabled, R.drawable.arrowup_disabled);
+            updateItem(menu, canNext, R.id.opdsnextfolder, R.drawable.arrowright_enabled,
+                    R.drawable.arrowright_disabled);
+            updateItem(menu, canPrev, R.id.opdsprevfolder, R.drawable.arrowleft_enabled, R.drawable.arrowleft_disabled);
         }
     }
 
-    protected void updateItem(final boolean enabled, final int viewId, final int enabledResId, final int disabledResId) {
+    protected void updateItem(final Menu menu, final boolean enabled, final int viewId, final int enabledResId,
+            final int disabledResId) {
         final MenuItem v = menu.findItem(viewId);
         if (v != null) {
             v.setIcon(enabled ? enabledResId : disabledResId);
