@@ -4,7 +4,7 @@ import org.ebookdroid.EBookDroidLibraryLoader;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.BitmapRef;
 import org.ebookdroid.common.settings.AppSettings;
-import org.ebookdroid.core.codec.CodecPage;
+import org.ebookdroid.core.codec.AbstractCodecPage;
 import org.ebookdroid.core.codec.PageLink;
 import org.ebookdroid.core.codec.PageTextBox;
 
@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.emdev.utils.LengthUtils;
 
-public class DjvuPage implements CodecPage {
+public class DjvuPage extends AbstractCodecPage {
 
     private final long contextHandle;
     private final long docHandle;

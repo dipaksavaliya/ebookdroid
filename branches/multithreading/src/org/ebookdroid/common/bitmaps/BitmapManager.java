@@ -63,7 +63,7 @@ public class BitmapManager {
         }
     }
 
-    public static BitmapRef addBitmap(final String name, final Bitmap bitmap) {
+    public synchronized static BitmapRef addBitmap(final String name, final Bitmap bitmap) {
         final BitmapRef ref = new BitmapRef(bitmap, generation.get());
         used.put(ref.id, ref);
 
@@ -80,7 +80,7 @@ public class BitmapManager {
         return ref;
     }
 
-    public static BitmapRef getBitmap(final String name, final int width, final int height, final Bitmap.Config config) {
+    public synchronized static BitmapRef getBitmap(final String name, final int width, final int height, final Bitmap.Config config) {
         if (used.isEmpty() && pool.isEmpty()) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("!!! Bitmap pool size: " + (BITMAP_MEMORY_LIMIT / 1024) + "KB");
@@ -132,7 +132,7 @@ public class BitmapManager {
         return ref;
     }
 
-    public static void clear(final String msg) {
+    public synchronized static void clear(final String msg) {
         generation.addAndGet(GENERATION_THRESHOLD * 2);
         removeOldRefs();
         release();
@@ -170,7 +170,7 @@ public class BitmapManager {
     }
 
     @SuppressWarnings("unchecked")
-    public static void release() {
+    public synchronized static void release() {
         generation.incrementAndGet();
         removeOldRefs();
 

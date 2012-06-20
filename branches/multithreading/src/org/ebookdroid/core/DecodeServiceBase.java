@@ -70,7 +70,9 @@ public class DecodeServiceBase implements DecodeService {
                     if (LCTX.isDebugEnabled()) {
                         LCTX.d("Recycle and remove old codec page: " + eldest.getKey());
                     }
-                    codecPage.recycle();
+                    if (!codecPage.locked()) {
+                        codecPage.recycle();
+                    }
                 }
                 return true;
             }
@@ -179,7 +181,7 @@ public class DecodeServiceBase implements DecodeService {
 
         try {
             vuPage = getPage(task.pageNumber);
-
+            vuPage.lock();
             if (executor.isTaskDead(task)) {
                 if (LCTX.isDebugEnabled()) {
                     LCTX.d("Task " + task.id + ": Abort dead decode task for " + task.node);
@@ -240,6 +242,10 @@ public class DecodeServiceBase implements DecodeService {
         } catch (final Throwable th) {
             LCTX.e("Task " + task.id + ": Decoding failed for " + task.node + ": " + th.getMessage(), th);
             abortDecoding(task, vuPage, null);
+        } finally {
+            if (vuPage != null) {
+                vuPage.unlock();
+            }
         }
     }
 
@@ -334,7 +340,7 @@ public class DecodeServiceBase implements DecodeService {
         updateImage(currentDecodeTask, page, bitmap, null, null);
     }
 
-    CodecPage getPage(final int pageIndex) {
+    synchronized CodecPage getPage(final int pageIndex) {
         if (LCTX.isDebugEnabled()) {
             LCTX.d("Codec pages in cache: " + pages.size());
         }
@@ -401,19 +407,22 @@ public class DecodeServiceBase implements DecodeService {
         final Map<PageTreeNode, DecodeTask> decodingTasks = new IdentityHashMap<PageTreeNode, DecodeTask>();
 
         final ArrayList<Task> tasks;
-        final Thread thread;
+        final Thread[] threads;
         final ReentrantLock lock = new ReentrantLock();
         final AtomicBoolean run = new AtomicBoolean(true);
 
         Executor() {
             tasks = new ArrayList<Task>();
-            thread = new Thread(this);
+            threads = new Thread[4];
 
             final int decodingThreadPriority = AppSettings.current().decodingThreadPriority;
             LCTX.i("Decoding thread priority: " + decodingThreadPriority);
-            thread.setPriority(decodingThreadPriority);
 
-            thread.start();
+            for (int i = 0; i < threads.length; i++) {
+                threads[i] = new Thread(this, "DecodingThread-" + i);
+                threads[i].setPriority(decodingThreadPriority);
+                threads[i].start();
+            }
         }
 
         @Override
