@@ -413,7 +413,8 @@ public class DecodeServiceBase implements DecodeService {
 
         Executor() {
             tasks = new ArrayList<Task>();
-            threads = new Thread[4];
+            threads = new Thread[AppSettings.current().decodingThreads];
+            LCTX.i("Number of decoding threads: " + threads.length);
 
             final int decodingThreadPriority = AppSettings.current().decodingThreadPriority;
             LCTX.i("Decoding thread priority: " + decodingThreadPriority);
