@@ -63,7 +63,7 @@ public class BitmapManager {
         }
     }
 
-    public synchronized static BitmapRef addBitmap(final String name, final Bitmap bitmap) {
+    public static BitmapRef addBitmap(final String name, final Bitmap bitmap) {
         final BitmapRef ref = new BitmapRef(bitmap, generation.get());
         used.put(ref.id, ref);
 
@@ -80,7 +80,7 @@ public class BitmapManager {
         return ref;
     }
 
-    public synchronized static BitmapRef getBitmap(final String name, final int width, final int height, final Bitmap.Config config) {
+    public static BitmapRef getBitmap(final String name, final int width, final int height, final Bitmap.Config config) {
         if (used.isEmpty() && pool.isEmpty()) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("!!! Bitmap pool size: " + (BITMAP_MEMORY_LIMIT / 1024) + "KB");
@@ -93,24 +93,28 @@ public class BitmapManager {
             final Bitmap bmp = ref.bitmap;
 
             if (bmp != null && bmp.getConfig() == config && ref.width == width && ref.height >= height) {
-                it.remove();
+                if (ref.used.compareAndSet(false, true)) {
+                    it.remove();
 
-                ref.gen = generation.get();
-                used.put(ref.id, ref);
+                    ref.gen = generation.get();
+                    used.put(ref.id, ref);
 
-                reused.incrementAndGet();
-                memoryPooled.addAndGet(-ref.size);
-                memoryUsed.addAndGet(ref.size);
+                    reused.incrementAndGet();
+                    memoryPooled.addAndGet(-ref.size);
+                    memoryUsed.addAndGet(ref.size);
 
-                if (LCTX.isDebugEnabled()) {
-                    LCTX.d("Reuse bitmap: [" + ref.id + ", " + ref.name + " => " + name + ", " + width + ", " + height
-                            + "], created=" + created + ", reused=" + reused + ", memoryUsed=" + used.size() + "/"
-                            + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool=" + pool.size() + "/"
-                            + (memoryPooled.get() / 1024) + "KB");
+                    if (LCTX.isDebugEnabled()) {
+                        LCTX.d("Reuse bitmap: [" + ref.id + ", " + ref.name + " => " + name + ", " + width + ", "
+                                + height + "], created=" + created + ", reused=" + reused + ", memoryUsed="
+                                + used.size() + "/" + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool="
+                                + pool.size() + "/" + (memoryPooled.get() / 1024) + "KB");
+                    }
+                    bmp.eraseColor(Color.CYAN);
+                    ref.name = name;
+                    return ref;
+                } else {
+                    LCTX.e("Attempt to re-use used bitmap: " + ref);
                 }
-                bmp.eraseColor(Color.CYAN);
-                ref.name = name;
-                return ref;
             }
         }
 
@@ -132,7 +136,7 @@ public class BitmapManager {
         return ref;
     }
 
-    public synchronized static void clear(final String msg) {
+    public static void clear(final String msg) {
         generation.addAndGet(GENERATION_THRESHOLD * 2);
         removeOldRefs();
         release();
@@ -170,7 +174,7 @@ public class BitmapManager {
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized static void release() {
+    public static void release() {
         generation.incrementAndGet();
         removeOldRefs();
 
@@ -229,11 +233,14 @@ public class BitmapManager {
 
     static void releaseImpl(final BitmapRef ref) {
         assert ref != null;
-
-        if (null != used.remove(ref.id)) {
-            memoryUsed.addAndGet(-ref.size);
+        if (ref.used.compareAndSet(true, false)) {
+            if (null != used.remove(ref.id)) {
+                memoryUsed.addAndGet(-ref.size);
+            } else {
+                LCTX.e("The bitmap " + ref + " not found in used ones");
+            }
         } else {
-            LCTX.e("The bitmap " + ref + " not found in used ones");
+            LCTX.e("Attempt to release unused bitmap");
         }
 
         pool.add(ref);
