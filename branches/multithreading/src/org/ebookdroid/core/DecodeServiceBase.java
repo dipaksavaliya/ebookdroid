@@ -376,7 +376,6 @@ public class DecodeServiceBase implements DecodeService {
 
     @Override
     public int getPageCount() {
-        System.out.println("DecodeServiceBase.getPageCount(" + this.hashCode() + "): " + document);
         return document.getPageCount();
     }
 

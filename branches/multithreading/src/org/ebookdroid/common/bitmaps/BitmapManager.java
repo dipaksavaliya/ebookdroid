@@ -113,7 +113,9 @@ public class BitmapManager {
                     ref.name = name;
                     return ref;
                 } else {
-                    LCTX.e("Attempt to re-use used bitmap: " + ref);
+                    if (LCTX.isDebugEnabled()) {
+                        LCTX.d("Attempt to re-use used bitmap: " + ref);
+                    }
                 }
             }
         }
@@ -240,7 +242,9 @@ public class BitmapManager {
                 LCTX.e("The bitmap " + ref + " not found in used ones");
             }
         } else {
-            LCTX.e("Attempt to release unused bitmap");
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Attempt to release unused bitmap");
+            }
         }
 
         pool.add(ref);
