@@ -519,7 +519,7 @@ extern "C" jint Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getHeight(JNIEnv 
     return ddjvu_page_get_height((ddjvu_page_t*) pageHangle);
 }
 
-extern "C" jboolean Java_org_ebookdroid_droids_djvu_codec_DjvuPage_renderPage(JNIEnv *env, jclass cls, jlong pageHangle,
+extern "C" jboolean Java_org_ebookdroid_droids_djvu_codec_DjvuPage_renderPage(JNIEnv *env, jclass cls, jlong pageHangle, jlong contextHandle,
                                                                             jint targetWidth, jint targetHeight,
                                                                             jfloat pageSliceX, jfloat pageSliceY,
                                                                             jfloat pageSliceWidth,
@@ -545,6 +545,11 @@ extern "C" jboolean Java_org_ebookdroid_droids_djvu_codec_DjvuPage_renderPage(JN
     ddjvu_format_set_y_direction(pixelFormat, TRUE);
 
     char *pBuffer = (char *) env->GetPrimitiveArrayCritical(buffer, 0);
+
+    while (!ddjvu_page_decoding_done(page)) {
+        Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(env, cls, contextHandle);
+    }
+
     jboolean result = ddjvu_page_render(page, (ddjvu_render_mode_t) rendermode, &pageRect, &targetRect, pixelFormat,
         targetWidth * 4, pBuffer);
     env->ReleasePrimitiveArrayCritical(buffer, pBuffer, 0);
@@ -556,7 +561,7 @@ extern "C" jboolean Java_org_ebookdroid_droids_djvu_codec_DjvuPage_renderPage(JN
 /*JNI BITMAP API*/
 
 extern "C" jboolean Java_org_ebookdroid_droids_djvu_codec_DjvuPage_renderPageBitmap(JNIEnv *env, jclass cls,
-                                                                                  jlong pageHangle, jint targetWidth,
+                                                                                  jlong pageHangle, jlong contextHandle, jint targetWidth,
                                                                                   jint targetHeight, jfloat pageSliceX,
                                                                                   jfloat pageSliceY,
                                                                                   jfloat pageSliceWidth,
@@ -614,6 +619,12 @@ extern "C" jboolean Java_org_ebookdroid_droids_djvu_codec_DjvuPage_renderPageBit
 
     ddjvu_format_set_row_order(pixelFormat, TRUE);
     ddjvu_format_set_y_direction(pixelFormat, TRUE);
+
+
+    while (!ddjvu_page_decoding_done(page)) {
+        Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(env, cls, contextHandle);
+    }
+
 
 //    jboolean result = ddjvu_page_render(page, DDJVU_RENDER_COLOR, &pageRect, &targetRect, pixelFormat, targetWidth * 4, (char*)pixels);
     jboolean result = ddjvu_page_render(page, (ddjvu_render_mode_t) rendermode, &pageRect, &targetRect, pixelFormat,
