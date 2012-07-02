@@ -4,9 +4,7 @@ import org.ebookdroid.EBookDroidLibraryLoader;
 import org.ebookdroid.common.log.LogContext;
 import org.ebookdroid.core.codec.AbstractCodecContext;
 
-import java.util.concurrent.Semaphore;
-
-public class DjvuContext extends AbstractCodecContext implements Runnable {
+public class DjvuContext extends AbstractCodecContext {
 
     private static final LogContext LCTX = LogContext.ROOT.lctx("Djvu");
 
@@ -14,43 +12,13 @@ public class DjvuContext extends AbstractCodecContext implements Runnable {
         EBookDroidLibraryLoader.load();
     }
 
-    private final Semaphore docSemaphore = new Semaphore(0);
-
     public DjvuContext() {
         super(create());
-        new Thread(this).start();
     }
 
     @Override
     public DjvuDocument openDocument(final String fileName, final String password) {
-        final DjvuDocument djvuDocument = new DjvuDocument(this, fileName);
-        try {
-            docSemaphore.acquire();
-        } catch (final InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        return djvuDocument;
-    }
-
-    @Override
-    public void run() {
-        for (;;) {
-            try {
-                synchronized (this) {
-                    if (isRecycled()) {
-                        return;
-                    }
-                    handleMessage(getContextHandle());
-                    wait(200);
-                }
-            } catch (final Exception e) {
-                LCTX.e("Codec error", e);
-            }
-        }
-    }
-
-    private void handleDocInfo() {
-        docSemaphore.release();
+        return new DjvuDocument(this, fileName);
     }
 
     @Override
