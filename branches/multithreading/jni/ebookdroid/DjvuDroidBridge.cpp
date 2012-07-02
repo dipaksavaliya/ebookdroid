@@ -54,6 +54,15 @@ void handleMessages(JNIEnv *env, ddjvu_context_t* ctx)
     }
 }
 
+void waitAndHandleMessages(JNIEnv *env, jlong contextHandle)
+{
+    ddjvu_context_t* ctx = (ddjvu_context_t*) (contextHandle);
+    // Wait for first message
+    ddjvu_message_wait(ctx);
+    // Process available messages
+    handleMessages(env, ctx);
+}
+
 #define HANDLE_TO_DOC(handle) (ddjvu_document_t*)handle
 #define HANDLE(ptr) (jlong)ptr
 
@@ -314,16 +323,6 @@ extern "C" jlong Java_org_ebookdroid_droids_djvu_codec_DjvuDocument_open(JNIEnv 
     return docHandle;
 }
 
-extern "C" void Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(JNIEnv *env, jobject thiz,
-                                                                              jlong contextHandle)
-{
-    ddjvu_context_t* ctx = (ddjvu_context_t*) (contextHandle);
-    // Wait for first message
-    ddjvu_message_wait(ctx);
-    // Process available messages
-    handleMessages(env, ctx);
-}
-
 extern "C" jlong Java_org_ebookdroid_droids_djvu_codec_DjvuDocument_getPage(JNIEnv *env, jclass cls, jlong docHandle,
                                                                           jint pageNumber)
 {
@@ -429,7 +428,7 @@ extern "C" jobject Java_org_ebookdroid_droids_djvu_codec_DjvuPage_getPageText(JN
 
     while ((r = ddjvu_document_get_pagetext((ddjvu_document_t*) docHandle, pageNumber, "word")) == miniexp_dummy)
     {
-        Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(jenv, cls, contextHandle);
+        waitAndHandleMessages(jenv, contextHandle);
     }
 
     if (r == miniexp_nil || !miniexp_consp(r))
@@ -466,7 +465,9 @@ extern "C" jint Java_org_ebookdroid_droids_djvu_codec_DjvuDocument_getPageInfo(J
     jfieldID fid;
 
     while ((r = ddjvu_document_get_pageinfo((ddjvu_document_t*) docHandle, pageNumber, &info)) < DDJVU_JOB_OK)
-        Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(env, cls, contextHandle);
+    {
+        waitAndHandleMessages(env, contextHandle);
+    }
 
     CodecPageInfoHelper h(env);
     if (!h.valid)
@@ -535,8 +536,9 @@ extern "C" jboolean Java_org_ebookdroid_droids_djvu_codec_DjvuPage_renderPage(JN
 
     char *pBuffer = (char *) env->GetPrimitiveArrayCritical(buffer, 0);
 
-    while (!ddjvu_page_decoding_done(page)) {
-        Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(env, cls, contextHandle);
+    while (!ddjvu_page_decoding_done(page))
+    {
+        waitAndHandleMessages(env, contextHandle);
     }
 
     jboolean result = ddjvu_page_render(page, (ddjvu_render_mode_t) rendermode, &pageRect, &targetRect, pixelFormat,
@@ -601,11 +603,10 @@ extern "C" jboolean Java_org_ebookdroid_droids_djvu_codec_DjvuPage_renderPageBit
     ddjvu_format_set_row_order(pixelFormat, TRUE);
     ddjvu_format_set_y_direction(pixelFormat, TRUE);
 
-
-    while (!ddjvu_page_decoding_done(page)) {
-        Java_org_ebookdroid_droids_djvu_codec_DjvuContext_handleMessage(env, cls, contextHandle);
+    while (!ddjvu_page_decoding_done(page))
+    {
+        waitAndHandleMessages(env, contextHandle);
     }
-
 
     jboolean result = ddjvu_page_render(page, (ddjvu_render_mode_t) rendermode, &pageRect, &targetRect, pixelFormat,
         targetWidth * 2, (char*) pixels);
