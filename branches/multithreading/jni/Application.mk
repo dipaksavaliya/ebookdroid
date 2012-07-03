@@ -1,5 +1,0 @@
-APP_ABI := armeabi
-
-APP_CFLAGS := -DHAVE_CONFIG_H -DTHREADMODEL=POSIXTHREADS -DDEBUGLVL=0 -O3 -D__ANDROID__
-
-APP_MODULES := jpeg libdjvu mupdf ebookdroid hqx
