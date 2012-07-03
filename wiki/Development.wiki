@@ -1,10 +1,10 @@
 === The following tools are required to build the application: === 
 
-* Google Android SDK v20
-* Google Android NDK v8
+ * Google Android SDK v20
+ * Google Android NDK v8
 
-=== The following tools are optional === 
+=== The following tools are optional: === 
 
-* Eclipse 3.7
-* Google ADT plugin for Eclipse v20
-* Apache Ant v1.8
+ * Eclipse 3.7
+ * Google ADT plugin for Eclipse v20
+ * Apache Ant v1.8
