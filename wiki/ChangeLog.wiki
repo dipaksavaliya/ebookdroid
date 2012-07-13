@@ -2,18 +2,19 @@
 = EBookDroid v1.5.0 changelog =
 
 === New features ===
+ * Backup/Restore for application and recent books settings.
  * PDF built-in fonts removed.
  * OPDS browser added to have ability download books online.
  * Book text search for PDF, XPS, DjVU and FB2.
  * Book context menu added to bookcase and file browser.
  * Tree-like outline.
+ * Quick Zoom action added to be available for keys/tap zones binding.
 
 === Optimization of decoding and drawing process ===
  * Multi-threaded rendering for all formats.
- * New event management engine.
 
 === Improved book formats support ===
- * MuPDF library updated up to 1.0.
+ * MuPDF library updated upto 1.0.
  * DjVU library updated.
  * FB2 tables supported.
 
@@ -22,11 +23,12 @@
  * Number of decoding threads preference added onto Performance page.
  * Navigation preferences added onto UI page.
  * Color preferences added for links and search marks onto UI page.
- 
+ * Auto-backup preferences added.
+
 == Bug fixes ==
  * Old bugs fixed.
  * New bugs added.
- 
+
 = EBookDroid v1.4.2 changelog =
 
 == Bug fixes ==
