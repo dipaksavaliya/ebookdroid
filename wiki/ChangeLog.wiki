@@ -14,7 +14,7 @@
  * Multi-threaded rendering for all formats.
 
 === Improved book formats support ===
- * MuPDF library updated upto 1.0.
+ * MuPDF library updated upto 1.0+.
  * DjVU library updated.
  * FB2 tables supported.
 
@@ -24,10 +24,15 @@
  * Navigation preferences added onto UI page.
  * Color preferences added for links and search marks onto UI page.
  * Auto-backup preferences added.
+ * Added flag to cache FB2 images to disk.
 
+=== Other changes ===
+ * Russian localization actualized
+ 
 == Bug fixes ==
  * Old bugs fixed.
  * New bugs added.
+
 
 = EBookDroid v1.4.2 changelog =
 
