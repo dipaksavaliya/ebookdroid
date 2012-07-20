@@ -1,0 +1,35 @@
+[ 
+{
+	name : "Free fonts", 
+	families :
+	[
+		{	type  : "mono",
+			fonts :
+			[
+				{ style : "regular",     path : "FreeMono/FreeMono.ttf" },
+				{ style : "italic",      path : "FreeMono/FreeMonoOblique.ttf" },
+				{ style : "bold",        path : "FreeMono/FreeMonoBold.ttf" },
+				{ style : "bold italic", path : "FreeMono/FreeMonoBoldOblique.ttf" }
+			]
+		},
+		{	type  : "sans",
+			fonts :
+			[
+				{ style : "regular",     path : "FreeSans/FreeSans.ttf" },
+				{ style : "italic",      path : "FreeSans/FreeSansOblique.ttf" },
+				{ style : "bold",        path : "FreeSans/FreeSansBold.ttf" },
+				{ style : "bold italic", path : "FreeSans/FreeSansBoldOblique.ttf" }
+			]
+		},
+		{	type  : "serif",
+			fonts :
+			[
+				{ style : "regular",     path : "FreeSerif/FreeSerif.ttf" },
+				{ style : "italic",      path : "FreeSerif/FreeSerifItalic.ttf" },
+				{ style : "bold",        path : "FreeSerif/FreeSerifBold.ttf" },
+				{ style : "bold italic", path : "FreeSerif/FreeSerifBoldItalic.ttf" }
+			]
+		}
+	]
+}
+]
