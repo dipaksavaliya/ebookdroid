@@ -1,5 +1,8 @@
 package org.ebookdroid.fontpack;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.emdev.BaseDroidApp;
 import org.emdev.fonts.AssetsFontProvider;
 import org.emdev.fonts.ExtStorageFontProvider;
@@ -9,6 +12,8 @@ import org.emdev.fonts.data.FontFamilyType;
 import org.emdev.fonts.data.FontPack;
 import org.emdev.fonts.data.FontStyle;
 import org.emdev.fonts.typeface.TypefaceEx;
+
+import android.content.pm.PackageManager;
 
 public class FontpackApp extends BaseDroidApp {
 
@@ -45,4 +50,15 @@ public class FontpackApp extends BaseDroidApp {
         }
     }
 
+    public static void uninstall() {
+        final PackageManager pm = context.getPackageManager();
+        // deletePackage(String packageName, IPackageDeleteObserver observer, int flags);
+        try {
+            final Class<?> ipdoClass = Class.forName("android.content.pm.IPackageDeleteObserver");
+            final Method deleteMethod = pm.getClass().getMethod("deletePackage", String.class, ipdoClass, int.class);
+            deleteMethod.invoke(pm, BaseDroidApp.APP_PACKAGE, null, Integer.valueOf(0));
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
+    }
 }
