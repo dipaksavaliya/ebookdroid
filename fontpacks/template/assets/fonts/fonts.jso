@@ -1,53 +1,37 @@
 [
 {
     name : "Free fonts",
-    families :
-    [
-        {	type  : "mono",
-            fonts :
-            [
-                { style : "regular",     path : "FreeMono/FreeMono.ttf" },
-                { style : "italic",      path : "FreeMono/FreeMonoOblique.ttf" },
-                { style : "bold",        path : "FreeMono/FreeMonoBold.ttf" },
-                { style : "bold italic", path : "FreeMono/FreeMonoBoldOblique.ttf" }
-            ]
-        },
-        {	type  : "sans",
-            fonts :
-            [
-                { style : "regular",     path : "FreeSans/FreeSans.ttf" },
-                { style : "italic",      path : "FreeSans/FreeSansOblique.ttf" },
-                { style : "bold",        path : "FreeSans/FreeSansBold.ttf" },
-                { style : "bold italic", path : "FreeSans/FreeSansBoldOblique.ttf" }
-            ]
-        },
-        {	type  : "serif",
-            fonts :
-            [
-                { style : "regular",     path : "FreeSerif/FreeSerif.ttf" },
-                { style : "italic",      path : "FreeSerif/FreeSerifItalic.ttf" },
-                { style : "bold",        path : "FreeSerif/FreeSerifBold.ttf" },
-                { style : "bold italic", path : "FreeSerif/FreeSerifBoldItalic.ttf" }
-            ]
-        }
-    ]
+    mono :
+    {
+         "regular"     : "FreeMono/FreeMono.ttf" ,
+         "italic"      : "FreeMono/FreeMonoOblique.ttf" ,
+         "bold"        : "FreeMono/FreeMonoBold.ttf" ,
+         "bold italic" : "FreeMono/FreeMonoBoldOblique.ttf"
+    },
+    sans :
+    {
+         "regular"     : "FreeSans/FreeSans.ttf" ,
+         "italic"      : "FreeSans/FreeSansOblique.ttf" ,
+         "bold"        : "FreeSans/FreeSansBold.ttf" ,
+         "bold italic" : "FreeSans/FreeSansBoldOblique.ttf"
+    },
+    serif :
+    {
+         "regular"     : "FreeSerif/FreeSerif.ttf" ,
+         "italic"      : "FreeSerif/FreeSerifItalic.ttf" ,
+         "bold"        : "FreeSerif/FreeSerifBold.ttf" ,
+         "bold italic" : "FreeSerif/FreeSerifBoldItalic.ttf"
+    }
 },
 {
-    name : "Free URW fonts",
-    families :
-    [
-        {	type  : "symbol",
-            fonts :
-            [
-                { style : "regular",     path : "URW/StandardSymL.ttf" }
-            ]
-        },
-        {	type  : "dingbat",
-            fonts :
-            [
-                { style : "regular",     path : "URW/Dingbats.ttf" }
-            ]
-        }
-    ]
+    name   : "Free URW fonts",
+    symbol :
+    {
+          "regular"    : "URW/StandardSymL.ttf"
+    },
+    dingbat :
+    {
+          "regular"    : "URW/Dingbats.ttf"
+    }
 }
 ]

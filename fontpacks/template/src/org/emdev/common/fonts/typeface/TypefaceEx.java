@@ -1,8 +1,8 @@
-package org.emdev.fonts.typeface;
-
-import org.emdev.fonts.data.FontStyle;
+package org.emdev.common.fonts.typeface;
 
 import android.graphics.Typeface;
+
+import org.emdev.common.fonts.data.FontStyle;
 
 public class TypefaceEx {
 

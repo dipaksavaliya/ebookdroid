@@ -1,10 +1,9 @@
-package org.emdev.fonts.data;
+package org.emdev.common.fonts.data;
 
 import java.util.Iterator;
 
+import org.emdev.utils.LengthUtils;
 import org.emdev.utils.collections.ArrayIterator;
-import org.emdev.utils.enums.EnumUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,26 +21,25 @@ public class FontFamily implements Iterable<FontInfo> {
         }
     }
 
-    public FontFamily(final JSONObject object) throws JSONException {
-        this.type = EnumUtils.getByResValue(FontFamilyType.class, object.getString("type"), FontFamilyType.SANS);
+    public FontFamily(final FontFamilyType type, final JSONObject object) throws JSONException {
+        this.type = type;
         this.fonts = new FontInfo[FontStyle.values().length];
-        final JSONArray arr = object.getJSONArray("fonts");
-        for (int i = 0, n = arr.length(); i < n; i++) {
-            final FontInfo fi = new FontInfo(arr.getJSONObject(i));
-            this.fonts[fi.style.ordinal()] = fi;
+
+        for (FontStyle style : FontStyle.values()) {
+            String path = object.optString(style.getResValue());
+            if (LengthUtils.isNotEmpty(path)) {
+                final FontInfo fi = new FontInfo(path, style);
+                this.fonts[style.ordinal()] = fi;
+            }
         }
     }
 
     public JSONObject toJSON() throws JSONException {
         final JSONObject object = new JSONObject();
-        final JSONArray arr = new JSONArray();
-
-        object.put("type", type.getResValue());
-        object.put("fonts", arr);
 
         for (final FontInfo fi : fonts) {
-            if (fi != null) {
-                arr.put(fi.toJSON());
+            if (fi != null && LengthUtils.isNotEmpty(fi.path)) {
+                object.put(fi.style.getResValue(), fi.path);
             }
         }
 

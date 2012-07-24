@@ -1,4 +1,4 @@
-package org.emdev.fonts.data;
+package org.emdev.common.fonts.data;
 
 import org.emdev.utils.enums.EnumUtils;
 import org.emdev.utils.enums.ResourceConstant;
@@ -8,19 +8,19 @@ import android.graphics.Typeface;
 public enum FontStyle implements ResourceConstant {
 
     /**
-     * 
+     *
      */
     REGULAR("regular", "regular", Typeface.NORMAL),
     /**
-     * 
+     *
      */
     ITALIC("italic", "regular", Typeface.ITALIC),
     /**
-     * 
+     *
      */
     BOLD("bold", "regular", Typeface.BOLD),
     /**
-     * 
+     *
      */
     BOLD_ITALIC("bold italic", "italic", Typeface.BOLD_ITALIC);
 

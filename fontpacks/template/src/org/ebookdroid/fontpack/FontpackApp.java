@@ -1,21 +1,23 @@
 package org.ebookdroid.fontpack;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
 import java.lang.reflect.Method;
 
 import org.emdev.BaseDroidApp;
-import org.emdev.fonts.AssetsFontProvider;
-import org.emdev.fonts.ExtStorageFontProvider;
-import org.emdev.fonts.IFontProvider;
-import org.emdev.fonts.SystemFontProvider;
-import org.emdev.fonts.data.FontFamilyType;
-import org.emdev.fonts.data.FontPack;
-import org.emdev.fonts.data.FontStyle;
-import org.emdev.fonts.typeface.TypefaceEx;
+import org.emdev.common.fonts.AssetsFontProvider;
+import org.emdev.common.fonts.ExtStorageFontProvider;
+import org.emdev.common.fonts.IFontProvider;
+import org.emdev.common.fonts.SystemFontProvider;
+import org.emdev.common.fonts.data.FontFamilyType;
+import org.emdev.common.fonts.data.FontPack;
+import org.emdev.common.fonts.data.FontStyle;
+import org.emdev.common.fonts.typeface.TypefaceEx;
 
 import android.content.pm.PackageManager;
 
 public class FontpackApp extends BaseDroidApp {
+
+    public static File EBOOKDROID_APP_STORAGE;
 
     public static SystemFontProvider sfm;
     public static AssetsFontProvider afm;
@@ -25,13 +27,15 @@ public class FontpackApp extends BaseDroidApp {
     public void onCreate() {
         super.onCreate();
 
+        EBOOKDROID_APP_STORAGE = getAppStorage("org.ebookdroid");
+
         sfm = new SystemFontProvider();
         sfm.init();
 
         afm = new AssetsFontProvider();
         afm.init();
 
-        esfm = new ExtStorageFontProvider();
+        esfm = new ExtStorageFontProvider(EBOOKDROID_APP_STORAGE);
         esfm.init();
 
         print(sfm);

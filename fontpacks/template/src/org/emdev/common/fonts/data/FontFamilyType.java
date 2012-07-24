@@ -1,4 +1,4 @@
-package org.emdev.fonts.data;
+package org.emdev.common.fonts.data;
 
 import org.emdev.utils.enums.ResourceConstant;
 

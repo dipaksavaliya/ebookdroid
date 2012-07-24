@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.ebookdroid.fontpack.FontpackApp;
 import org.ebookdroid.fontpack.R;
-import org.emdev.fonts.AssetsFontProvider;
-import org.emdev.fonts.IFontProvider;
-import org.emdev.fonts.data.FontFamily;
-import org.emdev.fonts.data.FontPack;
-import org.emdev.fonts.data.FontStyle;
-import org.emdev.fonts.typeface.TypefaceEx;
+import org.emdev.common.fonts.AssetsFontProvider;
+import org.emdev.common.fonts.IFontProvider;
+import org.emdev.common.fonts.data.FontFamily;
+import org.emdev.common.fonts.data.FontPack;
+import org.emdev.common.fonts.data.FontStyle;
+import org.emdev.common.fonts.typeface.TypefaceEx;
 import org.emdev.ui.AbstractActionActivity;
 import org.emdev.ui.actions.ActionController;
 import org.emdev.ui.actions.ActionEx;

@@ -1,20 +1,24 @@
-package org.emdev.fonts;
+package org.emdev.common.fonts;
+
+import android.graphics.Typeface;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.emdev.BaseDroidApp;
-import org.emdev.fonts.data.FontInfo;
+import org.emdev.common.fonts.data.FontInfo;
 import org.emdev.utils.LengthUtils;
-
-import android.graphics.Typeface;
 
 public class AssetsFontProvider extends AbstractCustomFontProvider {
 
     @Override
     protected InputStream openCatalog() throws IOException {
-        return BaseDroidApp.context.getAssets().open("fonts/fonts.jso");
+        try {
+            return BaseDroidApp.context.getAssets().open("fonts/fonts.jso");
+        } catch (Exception ex) {
+        }
+        return null;
     }
 
     @Override

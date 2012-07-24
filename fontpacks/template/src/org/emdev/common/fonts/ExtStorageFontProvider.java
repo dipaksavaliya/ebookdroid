@@ -1,4 +1,4 @@
-package org.emdev.fonts;
+package org.emdev.common.fonts;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,10 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.emdev.BaseDroidApp;
-import org.emdev.fonts.data.FontFamily;
-import org.emdev.fonts.data.FontInfo;
-import org.emdev.fonts.data.FontPack;
+import org.emdev.common.fonts.data.FontFamily;
+import org.emdev.common.fonts.data.FontInfo;
+import org.emdev.common.fonts.data.FontPack;
 import org.emdev.utils.FileUtils;
 
 import android.graphics.Typeface;
@@ -23,10 +22,9 @@ public class ExtStorageFontProvider extends AbstractCustomFontProvider {
 
     private final File fontsCatalog;
 
-    public ExtStorageFontProvider() {
-        fontsFolder = new File(BaseDroidApp.APP_STORAGE, "fonts");
+    public ExtStorageFontProvider(final File targetAppStorage) {
+        fontsFolder = new File(targetAppStorage, "fonts");
         fontsFolder.mkdirs();
-
         fontsCatalog = new File(fontsFolder, "fonts.jso");
     }
 
@@ -38,10 +36,15 @@ public class ExtStorageFontProvider extends AbstractCustomFontProvider {
     @Override
     protected Typeface loadTypeface(final FontInfo fi) {
         final File f = getFontFile(fi);
-        return f.exists() ? Typeface.createFromFile(f) : null;
+        try {
+            return f.exists() ? Typeface.createFromFile(f) : null;
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
+        return null;
     }
 
-    protected File getFontFile(final FontInfo fi) {
+    public File getFontFile(final FontInfo fi) {
         return fi.path.startsWith("/") ? new File(fi.path) : new File(fontsFolder, fi.path);
     }
 

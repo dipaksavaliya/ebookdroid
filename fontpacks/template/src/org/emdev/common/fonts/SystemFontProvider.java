@@ -1,16 +1,16 @@
-package org.emdev.fonts;
+package org.emdev.common.fonts;
+
+import android.graphics.Typeface;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.emdev.fonts.data.FontFamily;
-import org.emdev.fonts.data.FontFamilyType;
-import org.emdev.fonts.data.FontInfo;
-import org.emdev.fonts.data.FontPack;
-import org.emdev.fonts.data.FontStyle;
-import org.emdev.fonts.typeface.TypefaceEx;
-
-import android.graphics.Typeface;
+import org.emdev.common.fonts.data.FontFamily;
+import org.emdev.common.fonts.data.FontFamilyType;
+import org.emdev.common.fonts.data.FontInfo;
+import org.emdev.common.fonts.data.FontPack;
+import org.emdev.common.fonts.data.FontStyle;
+import org.emdev.common.fonts.typeface.TypefaceEx;
 
 public class SystemFontProvider extends AbstractFontProvider {
 

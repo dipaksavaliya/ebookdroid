@@ -1,4 +1,6 @@
-package org.emdev.fonts;
+package org.emdev.common.fonts;
+
+import android.graphics.Typeface;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,15 +11,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.emdev.fonts.data.FontFamilyType;
-import org.emdev.fonts.data.FontInfo;
-import org.emdev.fonts.data.FontPack;
-import org.emdev.fonts.data.FontStyle;
-import org.emdev.fonts.typeface.TypefaceEx;
+import org.emdev.common.fonts.data.FontFamilyType;
+import org.emdev.common.fonts.data.FontInfo;
+import org.emdev.common.fonts.data.FontPack;
+import org.emdev.common.fonts.data.FontStyle;
+import org.emdev.common.fonts.typeface.TypefaceEx;
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import android.graphics.Typeface;
 
 public abstract class AbstractCustomFontProvider extends AbstractFontProvider {
 
@@ -103,7 +103,7 @@ public abstract class AbstractCustomFontProvider extends AbstractFontProvider {
     protected abstract InputStream openCatalog() throws IOException;
 
     protected abstract Typeface loadTypeface(FontInfo fi);
-    
+
     public abstract InputStream openInputFontStream(FontInfo fi) throws IOException;
 
     public abstract OutputStream openOutputFontStream(FontInfo fi) throws IOException;
