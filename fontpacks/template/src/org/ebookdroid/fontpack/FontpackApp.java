@@ -13,11 +13,17 @@ import org.emdev.common.fonts.data.FontStyle;
 import org.emdev.common.fonts.typeface.TypefaceEx;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 
 public class FontpackApp extends BaseDroidApp {
 
+    private static final String EBOOKDROID_PACKAGE = "org.ebookdroid";
+
     public static File EBOOKDROID_APP_STORAGE;
+    public static int EBOOKDROID_VERSION;
 
     public static SystemFontProvider sfm;
     public static AssetsFontProvider afm;
@@ -27,7 +33,18 @@ public class FontpackApp extends BaseDroidApp {
     public void onCreate() {
         super.onCreate();
 
-        EBOOKDROID_APP_STORAGE = getAppStorage("org.ebookdroid");
+        EBOOKDROID_VERSION = 0;
+        final PackageManager pm = getPackageManager();
+        try {
+            final PackageInfo pi = pm.getPackageInfo(EBOOKDROID_PACKAGE, 0);
+            if (pi != null) {
+                EBOOKDROID_VERSION = pi.versionCode;
+            } else {
+            }
+        } catch (NameNotFoundException ex) {
+        }
+
+        EBOOKDROID_APP_STORAGE = getAppStorage(EBOOKDROID_PACKAGE);
 
         sfm = new SystemFontProvider();
         sfm.init();

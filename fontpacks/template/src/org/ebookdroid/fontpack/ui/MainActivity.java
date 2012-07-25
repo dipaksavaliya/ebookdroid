@@ -6,6 +6,7 @@ import org.emdev.common.fonts.IFontProvider;
 import org.emdev.common.fonts.data.FontPack;
 import org.emdev.ui.AbstractActionActivity;
 import org.emdev.ui.actions.ActionController;
+import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.tasks.BaseAsyncTask;
@@ -19,6 +20,17 @@ public class MainActivity extends AbstractActionActivity<MainActivity, ActionCon
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (FontpackApp.EBOOKDROID_VERSION == 0) {
+            showErrorDlg(R.string.msg_no_ebookdroid);
+            return;
+        }
+
+        if (FontpackApp.EBOOKDROID_VERSION < 1499) {
+            showErrorDlg(R.string.msg_old_ebookdroid);
+            return;
+        }
+
         setContentView(R.layout.activity_main);
     }
 
@@ -44,6 +56,21 @@ public class MainActivity extends AbstractActionActivity<MainActivity, ActionCon
     @ActionMethod(ids = R.id.install)
     public void install(final ActionEx action) {
         new FontInstaller().execute(FontpackApp.afm);
+    }
+
+    @ActionMethod(ids = R.id.menu_close)
+    public void close(final ActionEx action) {
+        finish();
+    }
+
+    public void showErrorDlg(final int msgId, final Object... args) {
+        final ActionDialogBuilder builder = new ActionDialogBuilder(this, getController());
+
+        builder.setTitle(R.string.app_name);
+        builder.setMessage(msgId, args);
+
+        builder.setPositiveButton(R.string.menu_close, R.id.menu_close);
+        builder.show();
     }
 
     public class FontInstaller extends BaseAsyncTask<IFontProvider, Boolean> {

@@ -13,7 +13,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:padding="@dimen/padding_medium"
-        android:text="Font pack description" />
+        android:text="@string/fontpack_description" />
 
     <Button
         android:id="@+id/install"
@@ -24,7 +24,7 @@
         android:layout_alignParentRight="true"
         android:clickable="true"
         android:onClick="onButtonClick"
-        android:text="Install" />
+        android:text="@string/install_text" />
 
     <CheckBox
         android:id="@+id/remove"
@@ -35,7 +35,7 @@
         android:checked="true"
         android:clickable="true"
         android:onClick="onButtonClick"
-        android:text="Remove font package after install" />
+        android:text="@string/remove_text" />
 
     <WebView
         android:id="@+id/licence"
