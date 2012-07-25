@@ -5,4 +5,7 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Font pack</string>
 
+    <string name="msg_installing">Installing...</string>
+    <string name="msg_installing_pack">Installing %1$s...</string>
+
 </resources>
