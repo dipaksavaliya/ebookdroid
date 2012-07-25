@@ -1,6 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_viewfonts"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/menu_viewfonts"/>
+
+    <item
         android:id="@+id/menu_close"
         android:orderInCategory="100"
         android:showAsAction="never"

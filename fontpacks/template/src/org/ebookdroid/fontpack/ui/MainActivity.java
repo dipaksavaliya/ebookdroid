@@ -11,6 +11,7 @@ import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.tasks.BaseAsyncTask;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.widget.CheckBox;
@@ -56,6 +57,11 @@ public class MainActivity extends AbstractActionActivity<MainActivity, ActionCon
     @ActionMethod(ids = R.id.install)
     public void install(final ActionEx action) {
         new FontInstaller().execute(FontpackApp.afm);
+    }
+
+    @ActionMethod(ids=R.id.menu_viewfonts)
+    public void viewFonts(final ActionEx action) {
+        startActivity(new Intent(this, FontViewerActivity.class));
     }
 
     @ActionMethod(ids = R.id.menu_close)

@@ -1,0 +1,113 @@
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnCount="3" >
+
+    <TextView
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/padding_medium"
+        android:text="Provider" />
+
+    <Spinner
+        android:id="@+id/fontProviderSpinner1"
+        android:spinnerMode="dropdown" />
+
+    <Spinner
+        android:id="@+id/fontProviderSpinner2"
+        android:spinnerMode="dropdown" />
+
+    <TextView
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/padding_medium"
+        android:text="Font pack" />
+
+    <Spinner
+        android:id="@+id/fontPackSpinner1"
+        android:spinnerMode="dropdown" />
+
+    <Spinner
+        android:id="@+id/fontPackSpinner2"
+        android:spinnerMode="dropdown" />
+
+    <TextView
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/padding_medium"
+        android:text="Font Family" />
+
+    <Spinner
+        android:id="@+id/fontFamilySpinner1"
+        android:spinnerMode="dropdown" />
+
+    <Spinner
+        android:id="@+id/fontFamilySpinner2"
+        android:spinnerMode="dropdown" />
+
+    <TextView
+        android:id="@+id/regularText1"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_column="1"
+        android:padding="@dimen/padding_medium"
+        android:text="Regular" />
+
+    <TextView
+        android:id="@+id/regularText2"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_column="2"
+        android:padding="@dimen/padding_medium"
+        android:text="Regular" />
+
+    <TextView
+        android:id="@+id/italicText1"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_column="1"
+        android:padding="@dimen/padding_medium"
+        android:text="Italic" />
+
+    <TextView
+        android:id="@+id/italicText2"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_column="2"
+        android:padding="@dimen/padding_medium"
+        android:text="Italic" />
+
+    <TextView
+        android:id="@+id/boldText1"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_column="1"
+        android:padding="@dimen/padding_medium"
+        android:text="Bold"/>
+
+    <TextView
+        android:id="@+id/boldText2"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_column="2"
+        android:padding="@dimen/padding_medium"
+        android:text="Bold" />
+
+    <TextView
+        android:id="@+id/boldItalicText1"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_column="1"
+        android:padding="@dimen/padding_medium"
+        android:text="Bold Italic" />
+
+    <TextView
+        android:id="@+id/boldItalicText2"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_column="2"
+        android:padding="@dimen/padding_medium"
+        android:text="Bold Italic" />
+
+</GridLayout>

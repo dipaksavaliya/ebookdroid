@@ -5,12 +5,7 @@ import java.io.File;
 import org.emdev.BaseDroidApp;
 import org.emdev.common.fonts.AssetsFontProvider;
 import org.emdev.common.fonts.ExtStorageFontProvider;
-import org.emdev.common.fonts.IFontProvider;
 import org.emdev.common.fonts.SystemFontProvider;
-import org.emdev.common.fonts.data.FontFamilyType;
-import org.emdev.common.fonts.data.FontPack;
-import org.emdev.common.fonts.data.FontStyle;
-import org.emdev.common.fonts.typeface.TypefaceEx;
 
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -54,17 +49,6 @@ public class FontpackApp extends BaseDroidApp {
 
         esfm = new ExtStorageFontProvider(EBOOKDROID_APP_STORAGE);
         esfm.init();
-    }
-
-    private void print(IFontProvider fm) {
-        for (FontPack fp : fm) {
-            for (FontFamilyType type : FontFamilyType.values()) {
-                for (FontStyle style : FontStyle.values()) {
-                    TypefaceEx tf = fm.getTypeface(fp, type, style);
-                    System.out.println(fp.name + " " + type + " " + style + ": " + tf);
-                }
-            }
-        }
     }
 
     public static void uninstall() {

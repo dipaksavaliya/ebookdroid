@@ -126,6 +126,6 @@ public class ExtStorageFontProvider extends AbstractCustomFontProvider {
 
     @Override
     public String toString() {
-        return "External Storage";
+        return "External";
     }
 }
