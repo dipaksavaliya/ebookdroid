@@ -17,6 +17,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.util.Log;
 
 public class FontpackApp extends BaseDroidApp {
 
@@ -37,11 +38,10 @@ public class FontpackApp extends BaseDroidApp {
         final PackageManager pm = getPackageManager();
         try {
             final PackageInfo pi = pm.getPackageInfo(EBOOKDROID_PACKAGE, 0);
-            if (pi != null) {
-                EBOOKDROID_VERSION = pi.versionCode;
-            } else {
-            }
+            EBOOKDROID_VERSION = pi.versionCode;
+            Log.i(APP_NAME, "EBookDroid installed: v" + pi.versionName + " (" + EBOOKDROID_VERSION + ")");
         } catch (NameNotFoundException ex) {
+            Log.w(APP_NAME, "EBookDroid is not installed");
         }
 
         EBOOKDROID_APP_STORAGE = getAppStorage(EBOOKDROID_PACKAGE);
@@ -54,10 +54,6 @@ public class FontpackApp extends BaseDroidApp {
 
         esfm = new ExtStorageFontProvider(EBOOKDROID_APP_STORAGE);
         esfm.init();
-
-        print(sfm);
-        print(afm);
-        print(esfm);
     }
 
     private void print(IFontProvider fm) {
