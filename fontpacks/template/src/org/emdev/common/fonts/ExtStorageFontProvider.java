@@ -1,5 +1,7 @@
 package org.emdev.common.fonts;
 
+import android.graphics.Typeface;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,8 +16,6 @@ import org.emdev.common.fonts.data.FontInfo;
 import org.emdev.common.fonts.data.FontPack;
 import org.emdev.utils.FileUtils;
 
-import android.graphics.Typeface;
-
 public class ExtStorageFontProvider extends AbstractCustomFontProvider {
 
     private final File fontsFolder;
@@ -23,12 +23,15 @@ public class ExtStorageFontProvider extends AbstractCustomFontProvider {
     private final File fontsCatalog;
 
     public ExtStorageFontProvider(final File targetAppStorage) {
+        super(2, "External");
+
         fontsFolder = new File(targetAppStorage, "fonts");
         fontsFolder.mkdirs();
         fontsCatalog = new File(fontsFolder, "fonts.jso");
     }
 
     @Override
+    @SuppressWarnings("resource")
     protected InputStream openCatalog() throws IOException {
         return fontsCatalog.exists() ? new FileInputStream(fontsCatalog) : null;
     }
@@ -38,7 +41,7 @@ public class ExtStorageFontProvider extends AbstractCustomFontProvider {
         final File f = getFontFile(fi);
         try {
             return f.exists() ? Typeface.createFromFile(f) : null;
-        } catch (Throwable th) {
+        } catch (final Throwable th) {
             th.printStackTrace();
         }
         return null;
@@ -54,7 +57,7 @@ public class ExtStorageFontProvider extends AbstractCustomFontProvider {
             final FileWriter fw = new FileWriter(fontsCatalog);
             final BufferedWriter out = new BufferedWriter(fw);
             try {
-                out.write(toJSON().toString());
+                out.write(toJSON().toString(4));
                 return true;
             } catch (final Exception ex) {
                 ex.printStackTrace();
@@ -122,10 +125,5 @@ public class ExtStorageFontProvider extends AbstractCustomFontProvider {
                 }
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return "External";
     }
 }

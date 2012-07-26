@@ -25,8 +25,8 @@ public class FontFamily implements Iterable<FontInfo> {
         this.type = type;
         this.fonts = new FontInfo[FontStyle.values().length];
 
-        for (FontStyle style : FontStyle.values()) {
-            String path = object.optString(style.getResValue());
+        for (final FontStyle style : FontStyle.values()) {
+            final String path = object.optString(style.getResValue());
             if (LengthUtils.isNotEmpty(path)) {
                 final FontInfo fi = new FontInfo(path, style);
                 this.fonts[style.ordinal()] = fi;
@@ -55,6 +55,7 @@ public class FontFamily implements Iterable<FontInfo> {
         return fonts[style.ordinal()];
     }
 
+    @Override
     public String toString() {
         return type.getResValue();
     }

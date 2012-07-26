@@ -1,6 +1,5 @@
 package org.emdev.common.fonts.data;
 
-
 public class FontInfo {
 
     public final String path;
@@ -12,6 +11,7 @@ public class FontInfo {
         this.style = style;
     }
 
+    @Override
     public String toString() {
         return style.getResValue() + ": " + path;
     }

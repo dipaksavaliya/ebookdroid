@@ -12,11 +12,14 @@ public class FontPack implements Iterable<FontFamily> {
 
     public final IFontProvider provider;
 
+    public final int id;
+
     public final String name;
 
     protected final FontFamily[] types;
 
     public FontPack(final IFontProvider provider, final FontPack source) {
+        this.id = provider.getNewPackId();
         this.provider = provider;
         this.name = source.name;
         this.types = new FontFamily[FontFamilyType.values().length];
@@ -26,8 +29,9 @@ public class FontPack implements Iterable<FontFamily> {
         }
     }
 
-    public FontPack(final IFontProvider manager, final String name, final FontFamily... types) {
-        this.provider = manager;
+    public FontPack(final IFontProvider provider, final String name, final FontFamily... types) {
+        this.id = provider.getNewPackId();
+        this.provider = provider;
         this.name = name;
         this.types = new FontFamily[FontFamilyType.values().length];
 
@@ -36,26 +40,27 @@ public class FontPack implements Iterable<FontFamily> {
         }
     }
 
-    public FontPack(final IFontProvider manager, final JSONObject object) throws JSONException {
-        this.provider = manager;
+    public FontPack(final IFontProvider provider, final JSONObject object) throws JSONException {
+        this.id = provider.getNewPackId();
+        this.provider = provider;
         this.name = object.getString("name");
         this.types = new FontFamily[FontFamilyType.values().length];
 
-        for (FontFamilyType type : FontFamilyType.values()) {
-            JSONObject ffObject = object.optJSONObject(type.getResValue());
+        for (final FontFamilyType type : FontFamilyType.values()) {
+            final JSONObject ffObject = object.optJSONObject(type.getResValue());
             if (ffObject != null) {
-                FontFamily ff = new FontFamily(type, ffObject);
+                final FontFamily ff = new FontFamily(type, ffObject);
                 this.types[type.ordinal()] = ff;
             }
         }
     }
 
     public JSONObject toJSON() throws JSONException {
-        JSONObject object = new JSONObject();
+        final JSONObject object = new JSONObject();
 
         object.put("name", name);
 
-        for (FontFamily ff : types) {
+        for (final FontFamily ff : types) {
             if (ff != null) {
                 object.put(ff.type.getResValue(), ff.toJSON());
             }
@@ -78,10 +83,11 @@ public class FontPack implements Iterable<FontFamily> {
         return ff != null ? ff.fonts[style.ordinal()] : null;
     }
 
-    public TypefaceEx getTypeface(FontFamilyType type, FontStyle style) {
+    public TypefaceEx getTypeface(final FontFamilyType type, final FontStyle style) {
         return provider.getTypeface(this, type, style);
     }
 
+    @Override
     public String toString() {
         return name;
     }
