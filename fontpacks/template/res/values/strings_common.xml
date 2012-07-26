@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="menu_viewfonts">View fonts</string>
+    <string name="menu_licence">View licence...</string>
     <string name="menu_close">Close</string>
 
     <string name="msg_no_ebookdroid">EBookDroid application is not installed</string>
@@ -12,5 +12,6 @@
     <string name="msg_installing">Installing...</string>
     <string name="msg_installing_pack">Installing %1$s...</string>
 
+    <string name="text_string">QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm</string>
 
 </resources>

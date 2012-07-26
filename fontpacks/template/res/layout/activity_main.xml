@@ -33,18 +33,23 @@
         android:layout_above="@id/install"
         android:layout_alignParentLeft="true"
         android:checked="true"
-        android:clickable="true"
-        android:onClick="onButtonClick"
         android:text="@string/remove_text" />
 
-    <WebView
-        android:id="@+id/licence"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@id/remove"
         android:layout_below="@id/description"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:padding="@dimen/padding_large" />
+        android:padding="@dimen/padding_large" >
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <org.ebookdroid.fontpack.ui.FontView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </HorizontalScrollView>
+    </ScrollView>
 
 </RelativeLayout>
