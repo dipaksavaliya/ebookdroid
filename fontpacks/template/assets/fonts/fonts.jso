@@ -27,11 +27,30 @@
     name   : "Free URW fonts",
     symbol :
     {
-          "regular"    : "URW/StandardSymL.ttf"
+         "regular"     : "URW/StandardSymL.ttf"
     },
     dingbat :
     {
-          "regular"    : "URW/Dingbats.ttf"
+         "regular"     : "URW/Dingbats.ttf"
+    }
+},
+{
+    name   : "Academy fonts",
+    serif :
+    {
+         "regular"     : "Academy/academy.ttf",
+         "italic"      : "Academy/academyi.ttf"
+    }
+},
+{
+    name   : "Academy Old fonts",
+    serif :
+    {
+         "regular"     : "AcademyOld/acado___.ttf",
+         "italic"      : "AcademyOld/acadoi__.ttf",
+         "bold"        : "AcademyOld/acadob__.ttf",
+         "bold italic" : "AcademyOld/acadobo_.ttf"
     }
 }
+
 ]
