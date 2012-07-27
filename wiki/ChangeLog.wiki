@@ -1,9 +1,14 @@
 #labels Featured
 = EBookDroid v1.5.0 changelog =
 
+=== PDF & FB2 fonts ===
+ * PDF built-in fonts removed.
+ * FB2 built-in fonts removed.
+ * Added support of external font packs
+ * Added PDF & FB2 font preferences
+
 === New features ===
  * Backup/Restore for application and recent books settings.
- * PDF built-in fonts removed.
  * OPDS browser added to have ability download books online.
  * Book text search for PDF, XPS, DjVU and FB2.
  * Book context menu added to bookcase and file browser.
@@ -28,7 +33,8 @@
 
 === Other changes ===
  * Russian localization actualized
- 
+ * Spanish localization actualized
+
 == Bug fixes ==
  * Old bugs fixed.
  * New bugs added.
@@ -44,7 +50,7 @@
 = EBookDroid v1.4.1 changelog =
 
 === New features ===
- * Store on-page position in bookmarks created from "Add bookmark" menu item. 
+ * Store on-page position in bookmarks created from "Add bookmark" menu item.
  * Store position in navigation history in "GoTo Page" dialog.
 
 === Optimization of decoding and drawing process ===
@@ -107,7 +113,7 @@
  * DPad half-page scrolling removed. Dpad keys are now working as Volume ones - in configurable scroll mode
  * Saving/restoring position inside the page (#19)
  * Localization updated
- 
+
 == Bug fixes ==
  * Fix for #84
  * Fix for #125
@@ -129,7 +135,7 @@
  * Some MuPDF errors handling added.
  * Store memory limit for MuPDF library
  * FB2 fonts are corrected
- 
+
 === Configuration and settings ===
  * ShowAnimIcon preference added.
  * Fix "Use bookcase" settings for Android 1.5
@@ -140,7 +146,7 @@
  * Re-styled About dialog.
  * Bookshelf & Library improvements.
  * Attachments are viewed via temporary file
- 
+
 == Bug fixes ==
  * Fix for mixed case file extensions
  * Fix for #123.
@@ -150,12 +156,12 @@
 = EBookDroid v1.3 changelog =
 
 === New features ===
- * Hardware acceleration is returned back for Android 3+ 
+ * Hardware acceleration is returned back for Android 3+
  * Horizontal scroll view mode added
  * FB2 support added
  * Page cropping implemented
  * Bookshelf view (Android 1.6+) for recent books and library folders added
- * Natural curler (like as in FBReader) added 
+ * Natural curler (like as in FBReader) added
  * PDF rotation implemented.
  * Book thumbnails added
  * "Set as thumbnail" action is added into menu
@@ -164,7 +170,7 @@
 === Optimization of decoding and drawing process ===
  * Bitmap pool added
  * Page bitmaps are splitted onto 128*128 pieces to unify memory usage
- * Gray background is drawn if djvu page is failed to decode 
+ * Gray background is drawn if djvu page is failed to decode
  * Zooming processing improved
 
 === Impoved book formats support ===
@@ -181,7 +187,7 @@
  * Animated transition is used (if defined) when scroll button pressed
  * New Year's Easter egg added
  * Clearing application data dialog added
-  
+
 == Bug fixes ==
  * Old bugs fixed
  * New bugs added
@@ -233,7 +239,7 @@
  * For any other page bookmark can be added inside the "Goto page" dialog
   * use seek bar to set the required page number
   *  click the "Bookmarks" button below to open "Add bookmark dialog"
- * After that bookmark will be available in scrollable list below the "Bookmarks" button 
+ * After that bookmark will be available in scrollable list below the "Bookmarks" button
  * Short click on a bookmark in this list move the progress indicator in seek bar and update page number edit control
  * Long click on a bookmark allow to delete this bookmark
  * Long click on the "Bookmarks" allow to delete all bookmarks for the opened book.
