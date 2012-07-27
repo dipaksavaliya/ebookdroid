@@ -1,5 +1,8 @@
 package org.ebookdroid.fontpack.ui;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.ebookdroid.fontpack.FontpackApp;
 import org.ebookdroid.fontpack.R;
 import org.emdev.common.fonts.IFontProvider;
@@ -13,6 +16,7 @@ import org.emdev.ui.tasks.BaseAsyncTask;
 
 import android.os.Bundle;
 import android.view.Menu;
+import android.webkit.WebView;
 import android.widget.CheckBox;
 
 public class MainActivity extends AbstractActionActivity<MainActivity, ActionController<MainActivity>> {
@@ -58,9 +62,33 @@ public class MainActivity extends AbstractActionActivity<MainActivity, ActionCon
         new FontInstaller().execute(FontpackApp.afm);
     }
 
-    @ActionMethod(ids = R.id.menu_licence)
-    public void viewLicence(final ActionEx action) {
+    @ActionMethod(ids = R.id.menu_about)
+    public void about(final ActionEx action) {
+        final ActionDialogBuilder b = new ActionDialogBuilder(this, getController());
+        final WebView view = new WebView(this);
 
+        final String content = getLicence();
+        view.loadDataWithBaseURL("file:///fake/not_used", content, "text/html", "UTF-8", "");
+
+        b.setTitle(R.string.menu_about);
+        b.setView(view);
+        b.setPositiveButton(android.R.string.ok, 0);
+        b.show();
+    }
+
+    private String getLicence() {
+        try {
+            final InputStream input = getAssets().open("about.html");
+            final int size = input.available();
+            final byte[] buffer = new byte[size];
+            input.read(buffer);
+            input.close();
+            final String text = new String(buffer, "UTF8");
+            return text;
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     @ActionMethod(ids = R.id.menu_close)
@@ -85,10 +113,10 @@ public class MainActivity extends AbstractActionActivity<MainActivity, ActionCon
         }
 
         @Override
-        protected Boolean doInBackground(IFontProvider... params) {
+        protected Boolean doInBackground(final IFontProvider... params) {
             boolean res = true;
-            for (IFontProvider ifp : params) {
-                for (FontPack fp : ifp) {
+            for (final IFontProvider ifp : params) {
+                for (final FontPack fp : ifp) {
                     publishProgress(getString(R.string.msg_installing_pack, fp.name));
                     res &= FontpackApp.esfm.install(fp);
                 }
@@ -97,9 +125,9 @@ public class MainActivity extends AbstractActionActivity<MainActivity, ActionCon
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(final Boolean result) {
             super.onPostExecute(result);
-            CheckBox removeView = (CheckBox) findViewById(R.id.remove);
+            final CheckBox removeView = (CheckBox) findViewById(R.id.remove);
             if (result && removeView.isChecked()) {
                 FontpackApp.uninstall();
                 finish();

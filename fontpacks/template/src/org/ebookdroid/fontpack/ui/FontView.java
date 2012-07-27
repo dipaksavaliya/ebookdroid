@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.ebookdroid.fontpack.FontpackApp;
 import org.ebookdroid.fontpack.R;
+import org.emdev.common.fonts.SystemFontProvider;
 import org.emdev.common.fonts.data.FontFamily;
 import org.emdev.common.fonts.data.FontFamilyType;
 import org.emdev.common.fonts.data.FontInfo;
 import org.emdev.common.fonts.data.FontPack;
+import org.emdev.common.fonts.data.FontStyle;
 import org.emdev.common.fonts.typeface.TypefaceEx;
 import org.emdev.utils.MathUtils;
 
@@ -39,7 +41,11 @@ public class FontView extends View {
     }
 
     protected void init() {
-        final int textSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
+        final TypefaceEx system = FontpackApp.sfm.getFontPack(SystemFontProvider.SYSTEM_FONT_PACK).getTypeface(
+                FontFamilyType.SANS, FontStyle.REGULAR);
+
+        final int textSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, getResources()
+                .getDisplayMetrics());
         final int offsetX = textSize;
         final int offsetY = textSize;
 
@@ -55,11 +61,10 @@ public class FontView extends View {
             for (final FontFamily fm : fp) {
                 for (final FontInfo fi : fm) {
                     final TypefaceEx font = fp.getTypeface(fm.type, fi.style);
-                    System.out.println(font);
                     final String name = fp.name + ": " + fm.type.getResValue() + " " + fi.style.getResValue();
                     final String value = getTextString(fm.type);
 
-                    final Line nameLine = new Line(x, y, textSize, font, name);
+                    final Line nameLine = new Line(x, y, textSize, system, name);
                     lines.add(nameLine);
                     y += nameLine.height + interval1;
 
@@ -123,6 +128,10 @@ public class FontView extends View {
             this.text = text;
 
             this.paint = new TextPaint();
+            this.paint.setAntiAlias(true);
+            this.paint.setFilterBitmap(true);
+            this.paint.setDither(true);
+
             this.paint.setTextSize(textSize);
             this.paint.setTypeface(font.typeface);
             this.paint.setFakeBoldText(font.fakeBold);

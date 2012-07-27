@@ -1,6 +1,6 @@
 [
 {
-    name : "Free fonts",
+    name : "FreeFonts",
     mono :
     {
          "regular"     : "FreeMono/FreeMono.ttf" ,
@@ -24,7 +24,31 @@
     }
 },
 {
-    name   : "Free URW fonts",
+    name : "NimbusL free fonts",
+    mono :
+    {
+         "regular"     : "NimbusL/NimbusMonL-Regu.ttf" ,
+         "italic"      : "NimbusL/NimbusMonL-ReguObli.ttf" ,
+         "bold"        : "NimbusL/NimbusMonL-Bold.ttf" ,
+         "bold italic" : "NimbusL/NimbusMonL-BoldObli.ttf"
+    },
+    sans :
+    {
+         "regular"     : "NimbusL/NimbusSanL-Regu.ttf" ,
+         "italic"      : "NimbusL/NimbusSanL-ReguItal.ttf" ,
+         "bold"        : "NimbusL/NimbusSanL-Bold.ttf" ,
+         "bold italic" : "NimbusL/NimbusSanL-BoldItal.ttf"
+    },
+    serif :
+    {
+         "regular"     : "NimbusL/NimbusRomNo9L-Regu.ttf" ,
+         "italic"      : "NimbusL/NimbusRomNo9L-ReguItal.ttf" ,
+         "bold"        : "NimbusL/NimbusRomNo9L-Medi.ttf" ,
+         "bold italic" : "NimbusL/NimbusRomNo9L-MediItal.ttf"
+    }
+},
+{
+    name   : "Free URW symbol fonts",
     symbol :
     {
          "regular"     : "URW/StandardSymL.ttf"
