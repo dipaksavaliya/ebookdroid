@@ -1,7 +1,7 @@
 #summary Wiki index
   * [http://code.google.com/p/ebookdroid/wiki/FeatureRequests FeatureRequests]
-  * [http://code.google.com/p/ebookdroid/wiki/ChangeLog ChangeLog]
-  * [http://code.google.com/p/ebookdroid/wiki/MimeTypes Mime Types]
-  * [http://code.google.com/p/ebookdroid/wiki/preferences Preferences]
+  * [http://code.google.com/p/ebookdroid/wiki/ChangeLog Список изменений]
+  * [http://code.google.com/p/ebookdroid/wiki/MimeTypes Типы файлов]
+  * [http://code.google.com/p/ebookdroid/wiki/preferences Настройки]
+  * [http://code.google.com/p/ebookdroid/wiki/Development Разработка]
   * [http://code.google.com/p/ebookdroid/wiki/FAQ FAQ]
-                        
