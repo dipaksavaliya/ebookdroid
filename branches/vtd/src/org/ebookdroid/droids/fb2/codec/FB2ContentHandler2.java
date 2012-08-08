@@ -186,7 +186,8 @@ public class FB2ContentHandler2 extends FB2BaseHandler {
             int innerType = nav.getTokenType(inner);
             switch (innerType) {
                 case VTDNav.TOKEN_ATTR_NAME:
-                    String attrName = nav.toString(inner);
+                    String[] qName = nav.toString(inner).split(":");
+                    String attrName = qName[qName.length-1];
                     int attrIndex = Arrays.binarySearch(tag.attributes, attrName);
                     if (attrIndex >= 0) {
                         String attrValue = nav.toString(inner + 1);
@@ -204,10 +205,6 @@ public class FB2ContentHandler2 extends FB2BaseHandler {
 
         return last;
     }
-
-    // public void startElement2(FB2Tag t, String... attributes) throws NavException {
-    // System.out.println("startElement(" + t + ", " + Arrays.toString(attributes) + ")");
-    // }
 
     public void startElement(FB2Tag t, String... attributes) throws NavException {
 
@@ -419,10 +416,6 @@ public class FB2ContentHandler2 extends FB2BaseHandler {
         return w.get(ch, st, len, style);
     }
 
-    // public void endElement2(FB2Tag t) throws NavException {
-    // System.out.println("endElement(" + t + ")");
-    // }
-    //
     public void endElement(FB2Tag t) {
         if (tmpTagContent.length() > 0) {
             processTagContent();
