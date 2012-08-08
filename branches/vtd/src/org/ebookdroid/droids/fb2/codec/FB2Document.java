@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 
 import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,10 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -42,8 +45,15 @@ import org.emdev.utils.LengthUtils;
 import org.xml.sax.InputSource;
 
 import com.ximpleware.VTDGen;
+import com.ximpleware.VTDGenEx;
 
 public class FB2Document implements CodecDocument {
+
+    private static boolean USE_DUCKBILL_PARSER = true;
+
+    private static boolean USE_VTD_EX_PARSER = true;
+
+    private static boolean USE_PULL_PARSER = true;
 
     private static boolean USE_VTD_PARSER = true;
 
@@ -61,11 +71,19 @@ public class FB2Document implements CodecDocument {
         content.loadFonts();
         final long t2 = System.currentTimeMillis();
         System.out.println("Fonts preloading: " + (t2 - t1) + " ms");
-        if (USE_VTD_PARSER) {
+
+        if (USE_DUCKBILL_PARSER) {
+            parseContent5(fileName);
+        } else if (USE_VTD_EX_PARSER) {
+            parseContent4(fileName);
+        } else if (USE_PULL_PARSER) {
+            parseContent3(fileName);
+        } else if (USE_VTD_PARSER) {
             parseContent2(fileName);
         } else {
             parseContent(fileName);
         }
+
         System.out.println("Words=" + Words.words + ", uniques=" + Words.uniques);
 
         final long t3 = System.currentTimeMillis();
@@ -133,8 +151,8 @@ public class FB2Document implements CodecDocument {
 
         final long t1 = System.currentTimeMillis();
         try {
-
-            final InputStream inStream = getInputStream(fileName, resources);
+            final AtomicLong size = new AtomicLong();
+            final InputStream inStream = getInputStream(fileName, size, resources);
 
             if (inStream != null) {
 
@@ -182,6 +200,140 @@ public class FB2Document implements CodecDocument {
         }
     }
 
+    private void parseContent3(final String fileName) {
+        final FB2ContentHandler3 h = new FB2ContentHandler3(content);
+        final List<Closeable> resources = new ArrayList<Closeable>();
+
+        final long t1 = System.currentTimeMillis();
+        try {
+            final AtomicLong size = new AtomicLong();
+            final InputStream inStream = getInputStream(fileName, size, resources);
+
+            if (inStream != null) {
+                final char[] chars = loadContent(inStream, size, resources);
+
+                final long t2 = System.currentTimeMillis();
+                System.out.println("PULL  load: " + (t2 - t1) + " ms");
+
+                final CharArrayReader rr = new CharArrayReader(chars, 0, (int) size.get());
+                resources.add(rr);
+                h.parse(rr);
+
+                final long t3 = System.currentTimeMillis();
+                System.out.println("PULL parse: " + (t3 - t2) + " ms");
+            }
+        } catch (final Exception e) {
+            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
+        } finally {
+            for (final Closeable r : resources) {
+                try {
+                    if (r != null) {
+                        r.close();
+                    }
+                } catch (final IOException e) {
+                }
+            }
+            resources.clear();
+        }
+    }
+
+    private void parseContent4(final String fileName) {
+        final FB2ContentHandler4 h = new FB2ContentHandler4(content);
+        final List<Closeable> resources = new ArrayList<Closeable>();
+
+        final long t1 = System.currentTimeMillis();
+        try {
+            final AtomicLong size = new AtomicLong();
+            final InputStream inStream = getInputStream(fileName, size, resources);
+
+            if (inStream != null) {
+                final char[] chars = loadContent(inStream, size, resources);
+
+                final long t2 = System.currentTimeMillis();
+                System.out.println("VTDEx  load: " + (t2 - t1) + " ms");
+
+                final VTDGenEx gen = new VTDGenEx();
+                gen.setDoc(chars, 0, (int) size.get());
+                gen.parse(false);
+
+                final long t3 = System.currentTimeMillis();
+                System.out.println("VTDEx parse: " + (t3 - t2) + " ms");
+
+                h.parse(gen);
+
+                final long t4 = System.currentTimeMillis();
+                System.out.println("VTDEx  scan: " + (t4 - t3) + " ms");
+            }
+        } catch (final Exception e) {
+            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
+        } finally {
+            for (final Closeable r : resources) {
+                try {
+                    if (r != null) {
+                        r.close();
+                    }
+                } catch (final IOException e) {
+                }
+            }
+            resources.clear();
+        }
+    }
+
+    private void parseContent5(final String fileName) {
+        final FB2ContentHandler5 h = new FB2ContentHandler5(content);
+        final List<Closeable> resources = new ArrayList<Closeable>();
+
+        final long t1 = System.currentTimeMillis();
+        try {
+            final AtomicLong size = new AtomicLong();
+            final InputStream inStream = getInputStream(fileName, size, resources);
+
+            if (inStream != null) {
+                final char[] chars = loadContent(inStream, size, resources);
+
+                final long t2 = System.currentTimeMillis();
+                System.out.println("DUCK  load: " + (t2 - t1) + " ms");
+
+                h.parse(chars, (int) size.get());
+
+                final long t4 = System.currentTimeMillis();
+                System.out.println("DUCK  parse: " + (t4 - t2) + " ms");
+            }
+        } catch (final Exception e) {
+            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
+        } finally {
+            for (final Closeable r : resources) {
+                try {
+                    if (r != null) {
+                        r.close();
+                    }
+                } catch (final IOException e) {
+                }
+            }
+            resources.clear();
+        }
+    }
+
+    private char[] loadContent(final InputStream inStream, final AtomicLong size, final List<Closeable> resources)
+            throws IOException, UnsupportedEncodingException {
+        final String encoding = getEncoding(inStream);
+        final Reader isr = new InputStreamReader(inStream, encoding);
+        resources.add(isr);
+
+        final char[] chars = new char[(int) size.get()];
+        int offset = 0;
+        for (int len = chars.length; offset < len;) {
+            final int n = isr.read(chars, offset, len);
+            if (n == -1) {
+                break;
+            }
+            offset += n;
+            len -= n;
+        }
+        size.set(offset);
+        return chars;
+    }
+
     private String getEncoding(final InputStream inStream) throws IOException {
         String encoding = "utf-8";
         final char[] buffer = new char[256];
@@ -221,8 +373,8 @@ public class FB2Document implements CodecDocument {
         return encoding;
     }
 
-    private InputStream getInputStream(final String fileName, final List<Closeable> resources) throws IOException,
-            FileNotFoundException {
+    private InputStream getInputStream(final String fileName, final AtomicLong size, final List<Closeable> resources)
+            throws IOException, FileNotFoundException {
         InputStream inStream = null;
 
         if (fileName.endsWith("zip")) {
@@ -232,6 +384,7 @@ public class FB2Document implements CodecDocument {
             while (entries.hasMoreElements()) {
                 final ZipArchiveEntry entry = entries.nextElement();
                 if (!entry.isDirectory() && entry.getName().endsWith("fb2")) {
+                    size.set(entry.getSize());
                     inStream = entry.open();
                     resources.add(inStream);
                     break;
@@ -239,7 +392,9 @@ public class FB2Document implements CodecDocument {
             }
             resources.add(zipArchive);
         } else {
-            inStream = new FileInputStream(fileName);
+            final File f = new File(fileName);
+            size.set(f.length());
+            inStream = new FileInputStream(f);
             resources.add(inStream);
         }
         return inStream;

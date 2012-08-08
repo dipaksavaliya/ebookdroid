@@ -149,4 +149,10 @@ public class StrBuilder {
         value[count++] = ch;
     }
 
+    @Override
+    public String toString() {
+        return new String(value, 0, count);
+    }
+
+
 }
