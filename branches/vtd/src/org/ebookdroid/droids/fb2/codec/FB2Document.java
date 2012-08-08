@@ -5,7 +5,6 @@ import static org.ebookdroid.droids.fb2.codec.FB2Page.MARGIN_Y;
 import static org.ebookdroid.droids.fb2.codec.FB2Page.PAGE_HEIGHT;
 import static org.ebookdroid.droids.fb2.codec.FB2Page.PAGE_WIDTH;
 
-import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
@@ -18,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,37 +32,46 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.emdev.common.archives.zip.ZipArchive;
 import org.emdev.common.archives.zip.ZipArchiveEntry;
-import org.emdev.common.fonts.FontManager;
-import org.emdev.common.fonts.data.FontStyle;
-import org.emdev.common.textmarkup.TextStyle;
 import org.emdev.common.textmarkup.JustificationMode;
 import org.emdev.common.textmarkup.MarkupTitle;
+import org.emdev.common.textmarkup.TextStyle;
 import org.emdev.common.textmarkup.Words;
 import org.emdev.common.textmarkup.line.HorizontalRule;
 import org.emdev.common.textmarkup.line.Line;
 import org.emdev.utils.LengthUtils;
 import org.xml.sax.InputSource;
 
+import com.ximpleware.VTDGen;
+
 public class FB2Document implements CodecDocument {
+
+    private static boolean USE_VTD_PARSER = true;
+
     private final ArrayList<FB2Page> pages = new ArrayList<FB2Page>();
 
     private final List<OutlineLink> outline = new ArrayList<OutlineLink>();
 
     private final ParsedContent content = new ParsedContent();
 
-    public FB2Document(final String fileName) {
-        final SAXParserFactory spf = SAXParserFactory.newInstance();
+    private final SAXParserFactory spf = SAXParserFactory.newInstance();
 
+    public FB2Document(final String fileName) {
+        Words.clear();
         final long t1 = System.currentTimeMillis();
         content.loadFonts();
         final long t2 = System.currentTimeMillis();
         System.out.println("Fonts preloading: " + (t2 - t1) + " ms");
-        parseContent(spf, fileName);
-        final long t3 = System.currentTimeMillis();
-        System.out.println("SAX parser: " + (t3 - t2) + " ms");
+        if (USE_VTD_PARSER) {
+            parseContent2(fileName);
+        } else {
+            parseContent(fileName);
+        }
         System.out.println("Words=" + Words.words + ", uniques=" + Words.uniques);
 
-        final List<Line> documentLines = content.createLines(content.getMarkupStream(null), PAGE_WIDTH - 2 * MARGIN_X, JustificationMode.Justify);
+        final long t3 = System.currentTimeMillis();
+
+        final List<Line> documentLines = content.createLines(content.getMarkupStream(null), PAGE_WIDTH - 2 * MARGIN_X,
+                JustificationMode.Justify);
         createPages(documentLines);
 
         content.clear();
@@ -72,14 +81,13 @@ public class FB2Document implements CodecDocument {
         System.out.println("Markup: " + (t4 - t3) + " ms");
     }
 
-
-    private void createPages(List<Line> documentLines) {
+    private void createPages(final List<Line> documentLines) {
         pages.clear();
         if (LengthUtils.isEmpty(documentLines)) {
             return;
         }
 
-        for (Line line : documentLines) {
+        for (final Line line : documentLines) {
             FB2Page lastPage = getLastPage();
 
             if (lastPage.contentHeight + 2 * MARGIN_Y + line.getTotalHeight() > PAGE_HEIGHT) {
@@ -89,7 +97,7 @@ public class FB2Document implements CodecDocument {
             }
 
             lastPage.appendLine(line);
-            MarkupTitle title = line.getTitle();
+            final MarkupTitle title = line.getTitle();
             if (title != null) {
                 addTitle(title);
             }
@@ -119,67 +127,18 @@ public class FB2Document implements CodecDocument {
         }
     }
 
-    private void parseContent(final SAXParserFactory spf, final String fileName) {
+    private void parseContent(final String fileName) {
         final FB2ContentHandler h = new FB2ContentHandler(content);
         final List<Closeable> resources = new ArrayList<Closeable>();
 
+        final long t1 = System.currentTimeMillis();
         try {
-            InputStream inStream = null;
 
-            if (fileName.endsWith("zip")) {
-                final ZipArchive zipArchive = new ZipArchive(new File(fileName));
+            final InputStream inStream = getInputStream(fileName, resources);
 
-                final Enumeration<ZipArchiveEntry> entries = zipArchive.entries();
-                while (entries.hasMoreElements()) {
-                    final ZipArchiveEntry entry = entries.nextElement();
-                    if (!entry.isDirectory() && entry.getName().endsWith("fb2")) {
-                        inStream = entry.open();
-                        resources.add(inStream);
-                        break;
-                    }
-                }
-                resources.add(zipArchive);
-            } else {
-                inStream = new FileInputStream(fileName);
-                resources.add(inStream);
-            }
             if (inStream != null) {
 
-                String encoding = "utf-8";
-                final char[] buffer = new char[256];
-                boolean found = false;
-                int len = 0;
-                while (len < 256) {
-                    final int val = inStream.read();
-                    if (len == 0 && (val == 0xEF || val == 0xBB || val == 0xBF)) {
-                        continue;
-                    }
-                    buffer[len++] = (char) val;
-                    if (val == '>') {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) {
-                    final String xmlheader = new String(buffer, 0, len).trim();
-                    if (xmlheader.startsWith("<?xml") && xmlheader.endsWith("?>")) {
-                        final int index = xmlheader.indexOf("encoding");
-                        if (index > 0) {
-                            final int startIndex = xmlheader.indexOf('"', index);
-                            if (startIndex > 0) {
-                                final int endIndex = xmlheader.indexOf('"', startIndex + 1);
-                                if (endIndex > 0) {
-                                    encoding = xmlheader.substring(startIndex + 1, endIndex);
-                                    System.out.println("XML encoding:" + encoding);
-                                }
-                            }
-                        }
-                    } else {
-                        throw new RuntimeException("FB2 document can not be opened: " + "Invalid header");
-                    }
-                } else {
-                    throw new RuntimeException("FB2 document can not be opened: " + "Header not found");
-                }
+                final String encoding = getEncoding(inStream);
 
                 final Reader isr = new BufferedReader(new InputStreamReader(inStream, encoding), 32 * 1024);
                 resources.add(isr);
@@ -202,7 +161,116 @@ public class FB2Document implements CodecDocument {
                 }
             }
             resources.clear();
+            final long t2 = System.currentTimeMillis();
+            System.out.println("SAX parser: " + (t2 - t1) + " ms");
         }
+    }
+
+    private void parseContent2(final String fileName) {
+        final FB2ContentHandler2 h = new FB2ContentHandler2(content);
+
+        try {
+            final long t1 = System.currentTimeMillis();
+            final VTDGen inStream = parse(fileName);
+            final long t2 = System.currentTimeMillis();
+            System.out.println("VTD parse: " + (t2 - t1) + " ms");
+            h.parse(inStream);
+            final long t3 = System.currentTimeMillis();
+            System.out.println("VTD scan: " + (t3 - t2) + " ms");
+        } catch (final Exception e) {
+            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
+        }
+    }
+
+    private String getEncoding(final InputStream inStream) throws IOException {
+        String encoding = "utf-8";
+        final char[] buffer = new char[256];
+        boolean found = false;
+        int len = 0;
+        while (len < 256) {
+            final int val = inStream.read();
+            if (len == 0 && (val == 0xEF || val == 0xBB || val == 0xBF)) {
+                continue;
+            }
+            buffer[len++] = (char) val;
+            if (val == '>') {
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            final String xmlheader = new String(buffer, 0, len).trim();
+            if (xmlheader.startsWith("<?xml") && xmlheader.endsWith("?>")) {
+                final int index = xmlheader.indexOf("encoding");
+                if (index > 0) {
+                    final int startIndex = xmlheader.indexOf('"', index);
+                    if (startIndex > 0) {
+                        final int endIndex = xmlheader.indexOf('"', startIndex + 1);
+                        if (endIndex > 0) {
+                            encoding = xmlheader.substring(startIndex + 1, endIndex);
+                            System.out.println("XML encoding:" + encoding);
+                        }
+                    }
+                }
+            } else {
+                throw new RuntimeException("FB2 document can not be opened: " + "Invalid header");
+            }
+        } else {
+            throw new RuntimeException("FB2 document can not be opened: " + "Header not found");
+        }
+        return encoding;
+    }
+
+    private InputStream getInputStream(final String fileName, final List<Closeable> resources) throws IOException,
+            FileNotFoundException {
+        InputStream inStream = null;
+
+        if (fileName.endsWith("zip")) {
+            final ZipArchive zipArchive = new ZipArchive(new File(fileName));
+
+            final Enumeration<ZipArchiveEntry> entries = zipArchive.entries();
+            while (entries.hasMoreElements()) {
+                final ZipArchiveEntry entry = entries.nextElement();
+                if (!entry.isDirectory() && entry.getName().endsWith("fb2")) {
+                    inStream = entry.open();
+                    resources.add(inStream);
+                    break;
+                }
+            }
+            resources.add(zipArchive);
+        } else {
+            inStream = new FileInputStream(fileName);
+            resources.add(inStream);
+        }
+        return inStream;
+    }
+
+    private VTDGen parse(final String fileName) throws IOException {
+        if (fileName.endsWith("zip")) {
+            final ZipArchive zipArchive = new ZipArchive(new File(fileName));
+            try {
+                final Enumeration<ZipArchiveEntry> entries = zipArchive.entries();
+                while (entries.hasMoreElements()) {
+                    final ZipArchiveEntry entry = entries.nextElement();
+                    if (!entry.isDirectory() && entry.getName().endsWith("fb2")) {
+                        final VTDGen parser = new VTDGen();
+                        if (parser.parseZIPFile(fileName, entry.getName(), false)) {
+                            return parser;
+                        }
+                        throw new IOException("Parsing failed");
+                    }
+                }
+            } finally {
+                zipArchive.close();
+            }
+        } else {
+            final VTDGen parser = new VTDGen();
+            if (parser.parseFile(fileName, false)) {
+                return parser;
+            }
+            throw new IOException("Parsing failed");
+        }
+        return null;
     }
 
     @Override
@@ -251,7 +319,6 @@ public class FB2Document implements CodecDocument {
     public Bitmap getEmbeddedThumbnail() {
         return content.getCoverImage();
     }
-
 
     public void addTitle(final MarkupTitle title) {
         outline.add(new OutlineLink(title.title, "#" + pages.size(), title.level));

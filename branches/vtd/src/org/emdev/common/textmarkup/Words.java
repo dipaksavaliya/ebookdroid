@@ -46,6 +46,11 @@ public class Words {
         return e;
     }
 
+    public static void clear() {
+        words = 0;
+        uniques = 0;
+    }
+
     static class FB2Word {
 
         int hash;
