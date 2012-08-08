@@ -5,6 +5,7 @@ import static org.ebookdroid.droids.fb2.codec.FB2Page.MARGIN_Y;
 import static org.ebookdroid.droids.fb2.codec.FB2Page.PAGE_HEIGHT;
 import static org.ebookdroid.droids.fb2.codec.FB2Page.PAGE_WIDTH;
 
+import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
@@ -49,14 +50,6 @@ import com.ximpleware.VTDGenEx;
 
 public class FB2Document implements CodecDocument {
 
-    private static boolean USE_DUCKBILL_PARSER = true;
-
-    private static boolean USE_VTD_EX_PARSER = true;
-
-    private static boolean USE_PULL_PARSER = true;
-
-    private static boolean USE_VTD_PARSER = true;
-
     private final ArrayList<FB2Page> pages = new ArrayList<FB2Page>();
 
     private final List<OutlineLink> outline = new ArrayList<OutlineLink>();
@@ -72,16 +65,23 @@ public class FB2Document implements CodecDocument {
         final long t2 = System.currentTimeMillis();
         System.out.println("Fonts preloading: " + (t2 - t1) + " ms");
 
-        if (USE_DUCKBILL_PARSER) {
-            parseContent5(fileName);
-        } else if (USE_VTD_EX_PARSER) {
-            parseContent4(fileName);
-        } else if (USE_PULL_PARSER) {
-            parseContent3(fileName);
-        } else if (USE_VTD_PARSER) {
-            parseContent2(fileName);
-        } else {
-            parseContent(fileName);
+        switch (AppSettings.current().fb2XmlParser) {
+            case 1:
+                parseContent3(fileName);
+                break;
+            case 2:
+                parseContent2(fileName);
+                break;
+            case 3:
+                parseContent4(fileName);
+                break;
+            case 4:
+                parseContent5(fileName);
+                break;
+            case 0:
+            default:
+                parseContent(fileName);
+                break;
         }
 
         System.out.println("Words=" + Words.words + ", uniques=" + Words.uniques);

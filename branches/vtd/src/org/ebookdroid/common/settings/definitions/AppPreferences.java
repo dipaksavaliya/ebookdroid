@@ -204,6 +204,9 @@ public interface AppPreferences {
 
     /* =============== FB2 Format-specific settings =============== */
 
+    IntegerPreferenceDefinition FB2_XML_PARSER = new IntegerPreferenceDefinition(pref_fb2_xmlparser_id,
+            pref_fb2_xmlparser_standard, pref_fb2_xmlparser_standard, pref_fb2_xmlparser_duckbill);
+
     StringPreferenceDefinition FB2_FONT_PACK = new StringPreferenceDefinition(pref_fb2fontpack_id,
             pref_fb2fontpack_defvalue);
 

@@ -158,6 +158,8 @@ public class AppSettings implements AppPreferences, BookPreferences, IBackupAgen
 
     /* =============== FB2 Format-specific settings =============== */
 
+    public final int fb2XmlParser;
+
     public final String fb2FontPack;
 
     public final FontSize fontSize;
@@ -245,6 +247,7 @@ public class AppSettings implements AppPreferences, BookPreferences, IBackupAgen
         symbolFontPack = SYMBOL_FONT_PACK.getPreferenceValue(prefs);
         dingbatFontPack = DINGBAT_FONT_PACK.getPreferenceValue(prefs);
         /* =============== FB2 Format-specific settings =============== */
+        fb2XmlParser = FB2_XML_PARSER.getPreferenceValue(prefs);
         fb2FontPack = FB2_FONT_PACK.getPreferenceValue(prefs);
         fontSize = FB2_FONT_SIZE.getPreferenceValue(prefs);
         fb2HyphenEnabled = FB2_HYPHEN.getPreferenceValue(prefs);

@@ -54,6 +54,29 @@
     <string translatable="false" name="pref_dingbatfontpack_id">dingbatfontpack</string>
     <string translatable="false" name="pref_dingbatfontpack_defvalue"></string>
 
+    <string translatable="false" name="pref_fb2_xmlparser_id">fb2xmlparser</string>
+    <string translatable="false" name="pref_fb2_xmlparser_standard">0</string>
+    <string translatable="false" name="pref_fb2_xmlparser_pull">1</string>
+    <string translatable="false" name="pref_fb2_xmlparser_vtd">2</string>
+    <string translatable="false" name="pref_fb2_xmlparser_vtd_ex">3</string>
+    <string translatable="false" name="pref_fb2_xmlparser_duckbill">4</string>
+
+    <string-array name="pref_fb2_xmlparser_entries" translatable="false">
+        <item>@string/list_fb2_xmlparser_standard</item>
+        <item>@string/list_fb2_xmlparser_pull</item>
+        <item>@string/list_fb2_xmlparser_vtd</item>
+        <item>@string/list_fb2_xmlparser_vtd_ex</item>
+        <item>@string/list_fb2_xmlparser_duckbill</item>
+    </string-array>
+    <string-array name="pref_fb2_xmlparser_values" translatable="false">
+        <item>@string/pref_fb2_xmlparser_standard</item>
+        <item>@string/pref_fb2_xmlparser_pull</item>
+        <item>@string/pref_fb2_xmlparser_vtd</item>
+        <item>@string/pref_fb2_xmlparser_vtd_ex</item>
+        <item>@string/pref_fb2_xmlparser_duckbill</item>
+    </string-array>
+
+
     <string translatable="false" name="pref_fb2fontpack_id">fb2fontpack</string>
     <string translatable="false" name="pref_fb2fontpack_defvalue">System, sans</string>
 
