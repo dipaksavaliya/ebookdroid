@@ -82,9 +82,9 @@ public class FB2Page extends AbstractCodecPage {
                         Rect bounds = new Rect();
                         textElement.getTextBounds(bounds);
 
-
-                        rects.add(new RectF((x - 3) / FB2Page.PAGE_WIDTH, (bottom + bounds.top - 3) / FB2Page.PAGE_HEIGHT, (x + w + 3)
-                                / FB2Page.PAGE_WIDTH, (bottom + bounds.bottom + 3) / FB2Page.PAGE_HEIGHT));
+                        rects.add(new RectF((x - 3) / FB2Page.PAGE_WIDTH, (bottom + bounds.top - 3)
+                                / FB2Page.PAGE_HEIGHT, (x + w + 3) / FB2Page.PAGE_WIDTH, (bottom + bounds.bottom + 3)
+                                / FB2Page.PAGE_HEIGHT));
                     }
                 }
                 x += w;
@@ -96,6 +96,16 @@ public class FB2Page extends AbstractCodecPage {
 
     @Override
     public void recycle() {
+    }
+
+    void finalRecycle() {
+        for (Line l : lines) {
+            l.recycle();
+        }
+        lines.clear();
+        for (Line l : noteLines) {
+            l.recycle();
+        }
     }
 
     @Override

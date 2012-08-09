@@ -19,7 +19,7 @@ public class PullParser {
         final XmlPullParser p = f.newPullParser();
         p.setInput(r);
 
-        FB2Tag tag = FB2Tag.unknownTag;
+        FB2Tag tag = FB2Tag.UNKNOWN;
         int skipUntilSiblingOrParent = -1;
 
         final String[] tagAttrs = new String[2];
@@ -52,7 +52,7 @@ public class PullParser {
                 tags[depth] = tag;
                 maxDepth = depth;
 
-                if (tag.tag == FB2Tag.UNKNOWN) {
+                if (tag == FB2Tag.UNKNOWN) {
                     skipUntilSiblingOrParent = depth;
                     continue;
                 }

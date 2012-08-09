@@ -22,12 +22,14 @@ import org.emdev.common.textmarkup.MarkupElement;
 import org.emdev.common.textmarkup.MarkupEndDocument;
 import org.emdev.common.textmarkup.RenderingStyle;
 import org.emdev.common.textmarkup.TextStyle;
+import org.emdev.common.textmarkup.Words;
 import org.emdev.common.textmarkup.image.DiskImageData;
 import org.emdev.common.textmarkup.image.IImageData;
 import org.emdev.common.textmarkup.image.MemoryImageData;
 import org.emdev.common.textmarkup.line.Image;
 import org.emdev.common.textmarkup.line.Line;
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.collections.SparseArrayEx;
 
 public class ParsedContent {
 
@@ -37,6 +39,8 @@ public class ParsedContent {
 
     private final TreeMap<String, Image> images = new TreeMap<String, Image>();
     private final TreeMap<String, ArrayList<Line>> notes = new TreeMap<String, ArrayList<Line>>();
+
+    public final SparseArrayEx<Words> words = new SparseArrayEx<Words>();
 
     private String cover;
 
@@ -61,6 +65,18 @@ public class ParsedContent {
                 value.clear();
             }
         }
+        streams.clear();
+    }
+
+    public void recycle() {
+        for (Image image : images.values()) {
+            image.data.recycle();
+        }
+        images.clear();
+        for(Words w : words) {
+            w.recycle();
+        }
+        words.clear();
     }
 
     public ArrayList<MarkupElement> getMarkupStream(final String streamName) {

@@ -21,7 +21,7 @@ public class VTDParser {
             return;
         }
 
-        FB2Tag tag = FB2Tag.unknownTag;
+        FB2Tag tag = FB2Tag.UNKNOWN;
         int skipUntilSiblingOrParent = -1;
 
         int first = nav.getCurrentIndex();
@@ -59,7 +59,7 @@ public class VTDParser {
                 tags[depth] = tag;
                 maxDepth = depth;
 
-                if (tag.tag == FB2Tag.UNKNOWN) {
+                if (tag == FB2Tag.UNKNOWN) {
                     skipUntilSiblingOrParent = depth;
                     ci++;
                     continue;

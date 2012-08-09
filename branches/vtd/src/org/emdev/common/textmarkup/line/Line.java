@@ -7,9 +7,9 @@ import android.graphics.Canvas;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.emdev.common.textmarkup.TextStyle;
 import org.emdev.common.textmarkup.JustificationMode;
 import org.emdev.common.textmarkup.MarkupTitle;
+import org.emdev.common.textmarkup.TextStyle;
 import org.emdev.utils.LengthUtils;
 
 public class Line {
@@ -30,6 +30,17 @@ public class Line {
     public Line(int lineWidth, JustificationMode jm) {
         this.maxLineWidth = lineWidth;
         justification = jm;
+    }
+
+    public void recycle() {
+        elements.clear();
+        if (footnotes != null) {
+            for (Line l : footnotes) {
+                l.recycle();
+            }
+            footnotes.clear();
+            footnotes = null;
+        }
     }
 
     public Line append(final AbstractLineElement element) {
@@ -148,6 +159,5 @@ public class Line {
     public MarkupTitle getTitle() {
         return this.title;
     }
-
 
 }

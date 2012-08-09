@@ -50,6 +50,15 @@ public class Words {
         return e;
     }
 
+    public void recycle() {
+        all.clear();
+
+        for (Buffer b : buffers) {
+            b.chars = null;
+        }
+        buffers.clear();
+    }
+
     public static void clear() {
         words = 0;
         uniques = 0;
@@ -118,7 +127,7 @@ public class Words {
 
     static class Buffer {
 
-        final char[] chars = new char[4 * 1024];
+        char[] chars = new char[4 * 1024];
         int size;
 
         public int append(char[] ch, int start, int len) {

@@ -20,7 +20,7 @@ public class VTDExParser {
             return;
         }
 
-        FB2Tag tag = FB2Tag.unknownTag;
+        FB2Tag tag = FB2Tag.UNKNOWN;
         int skipUntilSiblingOrParent = -1;
 
         final int first = nav.getCurrentIndex();
@@ -48,7 +48,7 @@ public class VTDExParser {
             if (type == VTDNav.TOKEN_STARTING_TAG) {
                 char[] buf = nav.toRawString(ci, range);
                 final String name = new String(buf, range[0], range[1]);
-                tag = FB2Tag.getTagByName(name);
+                tag = FB2Tag.getTagByName(buf, range[0], range[1]);
 
                 for (int d = maxDepth; d >= depth; d--) {
                     if (tags[d] != null) {
@@ -59,7 +59,7 @@ public class VTDExParser {
                 tags[depth] = tag;
                 maxDepth = depth;
 
-                if (tag.tag == FB2Tag.UNKNOWN) {
+                if (tag == FB2Tag.UNKNOWN) {
                     skipUntilSiblingOrParent = depth;
                     ci++;
                     continue;

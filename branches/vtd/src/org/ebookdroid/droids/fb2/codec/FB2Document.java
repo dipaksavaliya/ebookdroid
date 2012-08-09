@@ -470,6 +470,11 @@ public class FB2Document implements CodecDocument {
 
     @Override
     public void recycle() {
+        content.recycle();
+        for(FB2Page p : pages) {
+            p.finalRecycle();
+        }
+        pages.clear();
     }
 
     void commitPage() {

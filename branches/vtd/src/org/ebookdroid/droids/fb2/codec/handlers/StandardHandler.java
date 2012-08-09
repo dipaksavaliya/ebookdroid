@@ -3,8 +3,6 @@ package org.ebookdroid.droids.fb2.codec.handlers;
 import org.ebookdroid.droids.fb2.codec.FB2Tag;
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
-import android.util.SparseArray;
-
 import java.util.ArrayList;
 
 import org.emdev.common.lang.StrBuilder;
@@ -50,8 +48,6 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
 
     protected final StrBuilder tmpTagContent = new StrBuilder(16 * 1024);
 
-    protected final SparseArray<Words> words = new SparseArray<Words>();
-
     protected int sectionLevel = -1;
 
     protected boolean skipContent = true;
@@ -79,8 +75,8 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
             processTagContent();
         }
 
-        switch (tag.tag) {
-            case FB2Tag.P:
+        switch (tag) {
+            case P:
                 paragraphParsing = true;
                 if (!parsingNotes) {
                     if (!inTitle) {
@@ -92,17 +88,17 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     }
                 }
                 break;
-            case FB2Tag.V:
+            case V:
                 paragraphParsing = true;
                 markupStream.add(crs.paint.pOffset);
                 markupStream.add(crs.paint.vOffset);
                 break;
-            case FB2Tag.BINARY:
+            case BINARY:
                 tmpBinaryName = attributes[0];
                 tmpBinaryContents.setLength(0);
                 parsingBinary = true;
                 break;
-            case FB2Tag.BODY:
+            case BODY:
                 if (!documentStarted && !documentEnded) {
                     documentStarted = true;
                     skipContent = false;
@@ -117,7 +113,7 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     crs = new RenderingStyle(parsedContent, TextStyle.FOOTNOTE);
                 }
                 break;
-            case FB2Tag.SECTION:
+            case SECTION:
                 if (parsingNotes) {
                     currentStream = attributes[0];
                     if (currentStream != null) {
@@ -131,7 +127,7 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     sectionLevel++;
                 }
                 break;
-            case FB2Tag.TITLE:
+            case TITLE:
                 if (!parsingNotes) {
                     setTitleStyle(!inSection ? TextStyle.MAIN_TITLE : TextStyle.SECTION_TITLE);
                     markupStream.add(crs.jm);
@@ -143,31 +139,31 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                 }
                 inTitle = true;
                 break;
-            case FB2Tag.CITE:
+            case CITE:
                 inCite = true;
                 setEmphasisStyle();
                 markupStream.add(emptyLine(crs.textSize));
                 markupStream.add(MarkupParagraphEnd.E);
                 break;
-            case FB2Tag.SUBTITLE:
+            case SUBTITLE:
                 paragraphParsing = true;
                 markupStream.add(setSubtitleStyle().jm);
                 markupStream.add(emptyLine(crs.textSize));
                 markupStream.add(MarkupParagraphEnd.E);
                 break;
-            case FB2Tag.TEXT_AUTHOR:
+            case TEXT_AUTHOR:
                 paragraphParsing = true;
                 markupStream.add(setTextAuthorStyle(inCite).jm);
                 markupStream.add(crs.paint.pOffset);
                 break;
-            case FB2Tag.DATE:
+            case DATE:
                 if (documentStarted && !documentEnded || parsingNotes) {
                     paragraphParsing = true;
                     markupStream.add(setTextAuthorStyle(inCite).jm);
                     markupStream.add(crs.paint.pOffset);
                 }
                 break;
-            case FB2Tag.A:
+            case A:
                 if (paragraphParsing) {
                     if ("note".equalsIgnoreCase(attributes[1])) {
                         final String note = attributes[0];
@@ -180,37 +176,37 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     }
                 }
                 break;
-            case FB2Tag.EMPTY_LINE:
+            case EMPTY_LINE:
                 markupStream.add(emptyLine(crs.textSize));
                 markupStream.add(MarkupParagraphEnd.E);
                 break;
-            case FB2Tag.POEM:
+            case POEM:
                 markupStream.add(MarkupParagraphEnd.E);
                 markupStream.add(emptyLine(crs.textSize));
                 markupStream.add(setPoemStyle().jm);
                 break;
-            case FB2Tag.STRONG:
+            case STRONG:
                 setBoldStyle();
                 break;
-            case FB2Tag.SUP:
+            case SUP:
                 setSupStyle();
                 spaceNeeded = false;
                 break;
-            case FB2Tag.SUB:
+            case SUB:
                 setSubStyle();
                 spaceNeeded = false;
                 break;
-            case FB2Tag.STRIKETHROUGH:
+            case STRIKETHROUGH:
                 setStrikeThrough();
                 break;
-            case FB2Tag.EMPHASIS:
+            case EMPHASIS:
                 setEmphasisStyle();
                 break;
-            case FB2Tag.EPIGRAPH:
+            case EPIGRAPH:
                 markupStream.add(MarkupParagraphEnd.E);
                 markupStream.add(setEpigraphStyle().jm);
                 break;
-            case FB2Tag.IMAGE:
+            case IMAGE:
                 final String ref = attributes[0];
                 if (cover) {
                     parsedContent.setCover(ref);
@@ -226,23 +222,23 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     }
                 }
                 break;
-            case FB2Tag.COVERPAGE:
+            case COVERPAGE:
                 cover = true;
                 break;
-            case FB2Tag.ANNOTATION:
+            case ANNOTATION:
                 skipContent = false;
                 break;
-            case FB2Tag.TABLE:
+            case TABLE:
                 currentTable = new MarkupTable();
                 markupStream.add(currentTable);
                 break;
-            case FB2Tag.TR:
+            case TR:
                 if (currentTable != null) {
                     currentTable.addRow();
                 }
                 break;
-            case FB2Tag.TD:
-            case FB2Tag.TH:
+            case TD:
+            case TH:
                 if (currentTable != null) {
                     final int rowCount = currentTable.getRowCount();
                     final Cell c = currentTable.new Cell();
@@ -250,7 +246,7 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     final String streamId = currentTable.uuid + ":" + rowCount + ":"
                             + currentTable.getColCount(rowCount - 1);
                     c.stream = streamId;
-                    c.hasBackground = tag.tag == FB2Tag.TH;
+                    c.hasBackground = tag == FB2Tag.TH;
                     final String align = attributes[0];
                     if ("right".equals(align)) {
                         c.align = JustificationMode.Right;
@@ -275,15 +271,15 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
         }
         spaceNeeded = true;
         final ArrayList<MarkupElement> markupStream = parsedContent.getMarkupStream(currentStream);
-        switch (tag.tag) {
-            case FB2Tag.P:
-            case FB2Tag.V:
+        switch (tag) {
+            case P:
+            case V:
                 if (!skipContent) {
                     markupStream.add(MarkupParagraphEnd.E);
                 }
                 paragraphParsing = false;
                 break;
-            case FB2Tag.BINARY:
+            case BINARY:
                 if (tmpBinaryContents.length() > 0) {
                     parsedContent.addImage(tmpBinaryName, tmpBinaryContents.toString());
                     tmpBinaryName = null;
@@ -291,11 +287,11 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                 }
                 parsingBinary = false;
                 break;
-            case FB2Tag.BODY:
+            case BODY:
                 parsingNotes = false;
                 currentStream = null;
                 break;
-            case FB2Tag.SECTION:
+            case SECTION:
                 if (parsingNotes) {
                     noteId = -1;
                     noteFirstWord = true;
@@ -307,7 +303,7 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     }
                 }
                 break;
-            case FB2Tag.TITLE:
+            case TITLE:
                 inTitle = false;
                 skipContent = false;
                 if (!parsingNotes) {
@@ -317,77 +313,77 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     markupStream.add(setPrevStyle().jm);
                 }
                 break;
-            case FB2Tag.CITE:
+            case CITE:
                 inCite = false;
                 markupStream.add(emptyLine(crs.textSize));
                 markupStream.add(MarkupParagraphEnd.E);
                 markupStream.add(setPrevStyle().jm);
                 break;
-            case FB2Tag.SUBTITLE:
+            case SUBTITLE:
                 markupStream.add(MarkupParagraphEnd.E);
                 markupStream.add(emptyLine(crs.textSize));
                 markupStream.add(MarkupParagraphEnd.E);
                 markupStream.add(setPrevStyle().jm);
                 paragraphParsing = false;
                 break;
-            case FB2Tag.TEXT_AUTHOR:
-            case FB2Tag.DATE:
+            case TEXT_AUTHOR:
+            case DATE:
                 markupStream.add(MarkupParagraphEnd.E);
                 markupStream.add(setPrevStyle().jm);
                 paragraphParsing = false;
                 break;
-            case FB2Tag.STANZA:
+            case STANZA:
                 markupStream.add(emptyLine(crs.textSize));
                 markupStream.add(MarkupParagraphEnd.E);
                 break;
-            case FB2Tag.POEM:
+            case POEM:
                 markupStream.add(emptyLine(crs.textSize));
                 markupStream.add(MarkupParagraphEnd.E);
                 markupStream.add(setPrevStyle().jm);
                 break;
-            case FB2Tag.STRONG:
+            case STRONG:
                 setPrevStyle();
                 spaceNeeded = false;
                 break;
-            case FB2Tag.STRIKETHROUGH:
+            case STRIKETHROUGH:
                 setPrevStyle();
                 break;
-            case FB2Tag.SUP:
+            case SUP:
                 setPrevStyle();
                 if (markupStream.get(markupStream.size() - 1) instanceof MarkupNoSpace) {
                     markupStream.remove(markupStream.size() - 1);
                 }
                 break;
-            case FB2Tag.SUB:
+            case SUB:
                 setPrevStyle();
                 if (markupStream.get(markupStream.size() - 1) instanceof MarkupNoSpace) {
                     markupStream.remove(markupStream.size() - 1);
                 }
                 break;
-            case FB2Tag.EMPHASIS:
+            case EMPHASIS:
                 setPrevStyle();
                 spaceNeeded = false;
                 break;
-            case FB2Tag.EPIGRAPH:
+            case EPIGRAPH:
                 markupStream.add(setPrevStyle().jm);
                 break;
-            case FB2Tag.COVERPAGE:
+            case COVERPAGE:
                 cover = false;
                 break;
-            case FB2Tag.A:
+            case A:
                 if (paragraphParsing) {
                     skipContent = false;
                 }
                 break;
-            case FB2Tag.ANNOTATION:
+            case ANNOTATION:
                 skipContent = true;
                 parsedContent.getMarkupStream(null).add(MarkupEndPage.E);
                 break;
-            case FB2Tag.TABLE:
+            case TABLE:
                 currentTable = null;
                 break;
-            case FB2Tag.TD:
-            case FB2Tag.TH:
+            case TD:
+            case TH:
                 paragraphParsing = false;
                 currentStream = oldStream;
                 break;
@@ -469,15 +465,17 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
 
     protected TextElement text(final char[] ch, final int st, final int len, final RenderingStyle style,
             boolean persistent) {
-        if (useUniqueTextElements) {
-            Words w = words.get(style.paint.key);
-            if (w == null) {
-                w = new Words();
-                words.append(style.paint.key, w);
-            }
-            return w.get(ch, st, len, style, persistent);
+        if (!useUniqueTextElements && persistent) {
+            return new TextElement(ch, st, len, style);
         }
-        return new TextElement(ch, st, len, style);
+
+        Words w = parsedContent.words.get(style.paint.key);
+        if (w == null) {
+            w = new Words();
+            parsedContent.words.append(style.paint.key, w);
+        }
+        return w.get(ch, st, len, style, persistent);
+
     }
 
 }
