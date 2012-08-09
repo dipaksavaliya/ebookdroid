@@ -10,6 +10,12 @@ import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
+import org.ebookdroid.droids.fb2.codec.handlers.StandardHandler;
+import org.ebookdroid.droids.fb2.codec.parsers.DuckbillParser;
+import org.ebookdroid.droids.fb2.codec.parsers.PullParser;
+import org.ebookdroid.droids.fb2.codec.parsers.SaxParser;
+import org.ebookdroid.droids.fb2.codec.parsers.VTDExParser;
+import org.ebookdroid.droids.fb2.codec.parsers.VTDParser;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
@@ -31,9 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.emdev.common.archives.zip.ZipArchive;
 import org.emdev.common.archives.zip.ZipArchiveEntry;
 import org.emdev.common.textmarkup.JustificationMode;
@@ -43,7 +46,6 @@ import org.emdev.common.textmarkup.Words;
 import org.emdev.common.textmarkup.line.HorizontalRule;
 import org.emdev.common.textmarkup.line.Line;
 import org.emdev.utils.LengthUtils;
-import org.xml.sax.InputSource;
 
 import com.ximpleware.VTDGen;
 import com.ximpleware.VTDGenEx;
@@ -56,8 +58,6 @@ public class FB2Document implements CodecDocument {
 
     private final ParsedContent content = new ParsedContent();
 
-    private final SAXParserFactory spf = SAXParserFactory.newInstance();
-
     public FB2Document(final String fileName) {
         Words.clear();
         final long t1 = System.currentTimeMillis();
@@ -67,20 +67,20 @@ public class FB2Document implements CodecDocument {
 
         switch (AppSettings.current().fb2XmlParser) {
             case 1:
-                parseContent3(fileName);
+                parseWithPull(fileName);
                 break;
             case 2:
-                parseContent2(fileName);
+                parseWithVTD(fileName);
                 break;
             case 3:
-                parseContent4(fileName);
+                parseWithVTDEx(fileName);
                 break;
             case 4:
-                parseContent5(fileName);
+                parseWithDuckbill(fileName);
                 break;
             case 0:
             default:
-                parseContent(fileName);
+                parseWithSax(fileName);
                 break;
         }
 
@@ -145,8 +145,8 @@ public class FB2Document implements CodecDocument {
         }
     }
 
-    private void parseContent(final String fileName) {
-        final FB2ContentHandler h = new FB2ContentHandler(content);
+    private void parseWithSax(final String fileName) {
+        final StandardHandler h = new StandardHandler(content);
         final List<Closeable> resources = new ArrayList<Closeable>();
 
         final long t1 = System.currentTimeMillis();
@@ -160,10 +160,9 @@ public class FB2Document implements CodecDocument {
 
                 final Reader isr = new BufferedReader(new InputStreamReader(inStream, encoding), 32 * 1024);
                 resources.add(isr);
-                final InputSource is = new InputSource();
-                is.setCharacterStream(isr);
-                final SAXParser parser = spf.newSAXParser();
-                parser.parse(is, h);
+
+                SaxParser p = new SaxParser();
+                p.parse(isr, h);
             }
         } catch (final StopParsingException e) {
             // do nothing
@@ -184,15 +183,18 @@ public class FB2Document implements CodecDocument {
         }
     }
 
-    private void parseContent2(final String fileName) {
-        final FB2ContentHandler2 h = new FB2ContentHandler2(content);
+    private void parseWithVTD(final String fileName) {
+        final StandardHandler h = new StandardHandler(content);
 
         try {
             final long t1 = System.currentTimeMillis();
             final VTDGen inStream = parse(fileName);
             final long t2 = System.currentTimeMillis();
             System.out.println("VTD parse: " + (t2 - t1) + " ms");
-            h.parse(inStream);
+
+            VTDParser p = new VTDParser();
+            p.parse(inStream, h);
+
             final long t3 = System.currentTimeMillis();
             System.out.println("VTD scan: " + (t3 - t2) + " ms");
         } catch (final Exception e) {
@@ -200,8 +202,8 @@ public class FB2Document implements CodecDocument {
         }
     }
 
-    private void parseContent3(final String fileName) {
-        final FB2ContentHandler3 h = new FB2ContentHandler3(content);
+    private void parseWithPull(final String fileName) {
+        final StandardHandler h = new StandardHandler(content);
         final List<Closeable> resources = new ArrayList<Closeable>();
 
         final long t1 = System.currentTimeMillis();
@@ -217,7 +219,9 @@ public class FB2Document implements CodecDocument {
 
                 final CharArrayReader rr = new CharArrayReader(chars, 0, (int) size.get());
                 resources.add(rr);
-                h.parse(rr);
+
+                PullParser p = new PullParser();
+                p.parse(rr, h);
 
                 final long t3 = System.currentTimeMillis();
                 System.out.println("PULL parse: " + (t3 - t2) + " ms");
@@ -237,8 +241,8 @@ public class FB2Document implements CodecDocument {
         }
     }
 
-    private void parseContent4(final String fileName) {
-        final FB2ContentHandler4 h = new FB2ContentHandler4(content);
+    private void parseWithVTDEx(final String fileName) {
+        final StandardHandler h = new StandardHandler(content, false);
         final List<Closeable> resources = new ArrayList<Closeable>();
 
         final long t1 = System.currentTimeMillis();
@@ -259,7 +263,8 @@ public class FB2Document implements CodecDocument {
                 final long t3 = System.currentTimeMillis();
                 System.out.println("VTDEx parse: " + (t3 - t2) + " ms");
 
-                h.parse(gen);
+                VTDExParser p = new VTDExParser();
+                p.parse(gen, h);
 
                 final long t4 = System.currentTimeMillis();
                 System.out.println("VTDEx  scan: " + (t4 - t3) + " ms");
@@ -279,8 +284,8 @@ public class FB2Document implements CodecDocument {
         }
     }
 
-    private void parseContent5(final String fileName) {
-        final FB2ContentHandler5 h = new FB2ContentHandler5(content);
+    private void parseWithDuckbill(final String fileName) {
+        final StandardHandler h = new StandardHandler(content, false);
         final List<Closeable> resources = new ArrayList<Closeable>();
 
         final long t1 = System.currentTimeMillis();
@@ -294,7 +299,8 @@ public class FB2Document implements CodecDocument {
                 final long t2 = System.currentTimeMillis();
                 System.out.println("DUCK  load: " + (t2 - t1) + " ms");
 
-                h.parse(chars, (int) size.get());
+                DuckbillParser p = new DuckbillParser();
+                p.parse(chars, (int) size.get(), h);
 
                 final long t4 = System.currentTimeMillis();
                 System.out.println("DUCK  parse: " + (t4 - t2) + " ms");

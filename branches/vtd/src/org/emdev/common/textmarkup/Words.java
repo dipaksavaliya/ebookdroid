@@ -17,28 +17,32 @@ public class Words {
 
     final LinkedList<Buffer> buffers = new LinkedList<Buffer>();
 
-    public TextElement get(final char[] ch, final int st, final int len, final RenderingStyle style) {
+    public TextElement get(final char[] ch, final int st, final int len, final RenderingStyle style, boolean persistent) {
         words++;
 
         key.reuse(ch, st, len);
 
         TextElement e = all.get(key);
         if (e == null) {
-            char[] arr = null;
-            int index = 0;
-            if (!buffers.isEmpty()) {
-                Buffer b = buffers.getFirst();
-                index = b.append(ch, st, len);
-                if (index != -1) {
+            char[] arr = ch;
+            int index = st;
+
+            if (!persistent) {
+                if (!buffers.isEmpty()) {
+                    Buffer b = buffers.getFirst();
+                    index = b.append(ch, st, len);
+                    if (index != -1) {
+                        arr = b.chars;
+                    }
+                }
+                if (arr == null) {
+                    Buffer b = new Buffer();
+                    index = b.append(ch, st, len);
                     arr = b.chars;
+                    buffers.addFirst(b);
                 }
             }
-            if (arr == null) {
-                Buffer b = new Buffer();
-                index = b.append(ch, st, len);
-                arr = b.chars;
-                buffers.addFirst(b);
-            }
+
             e = new TextElement(arr, index, len, style);
             all.put(new FB2Word(arr, index, len, key.hash), e);
             uniques++;
@@ -114,7 +118,7 @@ public class Words {
 
     static class Buffer {
 
-        final char[] chars = new char[4*1024];
+        final char[] chars = new char[4 * 1024];
         int size;
 
         public int append(char[] ch, int start, int len) {

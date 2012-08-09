@@ -34,12 +34,10 @@ public class VTDGenEx {
 
         @Override
         final public int getChar() throws EOFException, ParseException, EncodingException {
-            int a;
             if (offset >= endOffset) {
                 throw e;
             }
-            a = XMLDoc[offset++];
-            return a;
+            return XMLDoc[offset++];
         }
 
         @Override
@@ -683,10 +681,16 @@ public class VTDGenEx {
                                     break;
                                 }
                                 if (ch == '&') {
-                                    // as in vtd spec, we mark attr val with entities
-                                    if (!XMLChar.isValidChar(entityIdentifier())) {
+                                    int startOfEntityBody = offset;
+                                    int entity = entityIdentifier();
+                                    if (!XMLChar.isValidChar(entity)) {
                                         throw new ParseException("Error in attr: Invalid XML char" + formatLineNumber());
                                     }
+                                    XMLDoc[startOfEntityBody - 1] = (char) entity;
+                                    for(int i=startOfEntityBody; i < offset; i++) {
+                                        XMLDoc[i] = 0;
+                                    }
+                                    // as in vtd spec, we mark attr val with entities
                                 }
                             } else {
                                 throw new ParseException("Error in attr: Invalid XML char" + formatLineNumber());
@@ -1432,9 +1436,12 @@ public class VTDGenEx {
             // temp_offset = offset-1;
             parser_state = STATE_TEXT;
         } else if (ch == '&') {
-            // has_amp = true;
-            // temp_offset = offset-1;
-            entityIdentifier();
+            int startOfEntityBody = offset;
+            int entity = entityIdentifier();
+            XMLDoc[startOfEntityBody - 1] = (char) entity;
+            for(int i=startOfEntityBody; i < offset; i++) {
+                XMLDoc[i] = 0;
+            }
             parser_state = STATE_TEXT;
             // temp_offset = offset;
         } else if (ch == ']') {
@@ -1494,9 +1501,12 @@ public class VTDGenEx {
                 // temp_offset = offset;
                 parser_state = STATE_TEXT;
             } else if (ch == '&') {
-                // has_amp = true;
-                // temp_offset = offset;
-                entityIdentifier();
+                int startOfEntityBody = offset;
+                int entity = entityIdentifier();
+                XMLDoc[startOfEntityBody - 1] = (char) entity;
+                for(int i=startOfEntityBody; i < offset; i++) {
+                    XMLDoc[i] = 0;
+                }
                 parser_state = STATE_TEXT;
             } else if (ch == ']') {
                 if (r.skipChar(']')) {
@@ -2064,7 +2074,12 @@ public class VTDGenEx {
                     parser_state = STATE_TEXT;
                 } else if (ch == '&') {
                     // has_amp = true;
-                    entityIdentifier();
+                    int startOfEntityBody = offset;
+                    int entity = entityIdentifier();
+                    XMLDoc[startOfEntityBody - 1] = (char) entity;
+                    for(int i=startOfEntityBody; i < offset; i++) {
+                        XMLDoc[i] = 0;
+                    }
                     parser_state = STATE_TEXT;
                 } else if (ch == ']') {
                     if (r.skipChar(']')) {
@@ -2158,7 +2173,12 @@ public class VTDGenEx {
         } else if (ch == '&') {
             // has_amp = true;
             // temp_offset = offset;
-            entityIdentifier();
+            int startOfEntityBody = offset;
+            int entity = entityIdentifier();
+            XMLDoc[startOfEntityBody - 1] = (char) entity;
+            for(int i=startOfEntityBody; i < offset; i++) {
+                XMLDoc[i] = 0;
+            }
             parser_state = STATE_TEXT;
         } else if (ch == ']') {
             if (r.skipChar(']')) {
@@ -2619,10 +2639,14 @@ public class VTDGenEx {
 
     private void handleOtherTextChar(final int ch) throws ParseException {
         if (ch == '&') {
-            // has_amp = true;
-            if (!XMLChar.isValidChar(entityIdentifier())) {
+            int startOfEntityBody = offset;
+            int entity = entityIdentifier();
+            if (!XMLChar.isValidChar(entity)) {
                 throw new ParseException("Error in text content: Invalid char in text content " + formatLineNumber());
-                // parser_state = STATE_TEXT;
+            }
+            XMLDoc[startOfEntityBody - 1] = (char) entity;
+            for(int i=startOfEntityBody; i < offset; i++) {
+                XMLDoc[i] = 0;
             }
         } else if (ch == ']') {
             if (r.skipChar(']')) {
@@ -2639,10 +2663,12 @@ public class VTDGenEx {
 
     private void handleOtherTextChar2(final int ch) throws ParseException {
         if (ch == '&') {
-            // has_amp = true;
-            // temp_offset = offset;
-            entityIdentifier();
-            // parser_state = STATE_TEXT;
+            int startOfEntityBody = offset;
+            int entity = entityIdentifier();
+            XMLDoc[startOfEntityBody - 1] = (char) entity;
+            for(int i=startOfEntityBody; i < offset; i++) {
+                XMLDoc[i] = 0;
+            }
         } else if (ch == ']') {
             if (r.skipChar(']')) {
                 while (r.skipChar(']')) {

@@ -1,11 +1,11 @@
-package org.ebookdroid.droids.fb2.codec;
+package org.ebookdroid.droids.fb2.codec.handlers;
+
+import org.ebookdroid.droids.fb2.codec.FB2Tag;
+import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
 import android.util.SparseArray;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.emdev.common.lang.StrBuilder;
 import org.emdev.common.textmarkup.JustificationMode;
@@ -26,189 +26,52 @@ import org.emdev.common.textmarkup.Words;
 import org.emdev.common.textmarkup.line.TextElement;
 import org.emdev.utils.StringUtils;
 
-import com.ximpleware.NavException;
-import com.ximpleware.VTDGenEx;
-import com.ximpleware.VTDNav;
-import com.ximpleware.VTDNavEx;
+public class StandardHandler extends BaseHandler implements IContentHandler {
 
-public class FB2ContentHandler4 extends FB2BaseHandler {
+    protected boolean documentStarted = false, documentEnded = false;
 
-    private boolean documentStarted = false, documentEnded = false;
+    protected boolean inSection = false;
 
-    private boolean inSection = false;
+    protected boolean paragraphParsing = false;
 
-    private boolean paragraphParsing = false;
+    protected boolean cover = false;
 
-    private boolean cover = false;
+    protected String tmpBinaryName = null;
+    protected boolean parsingNotes = false;
+    protected boolean parsingBinary = false;
+    protected boolean inTitle = false;
+    protected boolean inCite = false;
+    protected boolean noteFirstWord = true;
 
-    private String tmpBinaryName = null;
-    private boolean parsingNotes = false;
-    private boolean parsingBinary = false;
-    private boolean inTitle = false;
-    private boolean inCite = false;
-    private int noteId = -1;
-    private boolean noteFirstWord = true;
+    protected boolean spaceNeeded = true;
 
-    private boolean spaceNeeded = true;
+    protected final StringBuilder tmpBinaryContents = new StringBuilder(64 * 1024);
+    protected final StringBuilder title = new StringBuilder();
 
-    private static final Pattern notesPattern = Pattern.compile("n([0-9]+)|n_([0-9]+)|note_([0-9]+)|.*?([0-9]+)");
-    private final StringBuilder tmpBinaryContents = new StringBuilder(64 * 1024);
-    private final StringBuilder title = new StringBuilder();
+    protected final StrBuilder tmpTagContent = new StrBuilder(16 * 1024);
 
-    private final StrBuilder tmpTagContent = new StrBuilder(16 * 1024);
+    protected final SparseArray<Words> words = new SparseArray<Words>();
 
-    final SparseArray<Words> words = new SparseArray<Words>();
+    protected int sectionLevel = -1;
 
-    int sectionLevel = -1;
+    protected boolean skipContent = true;
 
-    private boolean skipContent = true;
+    protected MarkupTable currentTable;
 
-    private MarkupTable currentTable;
+    protected boolean useUniqueTextElements;
 
-    public FB2ContentHandler4(ParsedContent content) {
+    public StandardHandler(final ParsedContent content) {
         super(content);
+        this.useUniqueTextElements = true;
     }
 
-    public void parse(VTDGenEx inStream) throws NavException {
-        VTDNavEx nav = inStream.getNav();
-
-        boolean res = nav.toElement(VTDNav.ROOT);
-        if (!res) {
-            return;
-        }
-
-        FB2Tag tag = FB2Tag.unknownTag;
-        int skipUntilSiblingOrParent = -1;
-
-        int first = nav.getCurrentIndex();
-        int last = nav.getTokenCount();
-
-        String[] tagAttrs = new String[2];
-        FB2Tag[] tags = new FB2Tag[1024];
-
-        StrBuilder buf = new StrBuilder(1024);
-
-        int maxDepth = -1;
-        for (int ci = first; ci < last;) {
-            final int depth = nav.getTokenDepth(ci);
-            final int type = nav.getTokenType(ci);
-
-            if (skipUntilSiblingOrParent != -1) {
-                if (type == VTDNav.TOKEN_STARTING_TAG && depth <= skipUntilSiblingOrParent) {
-                    skipUntilSiblingOrParent = -1;
-                } else {
-                    ci++;
-                    continue;
-                }
-            }
-
-            if (type == VTDNav.TOKEN_STARTING_TAG) {
-                String name = nav.toRawString(ci);
-                tag = FB2Tag.getTagByName(name);
-
-                for (int d = maxDepth; d >= depth; d--) {
-                    if (tags[d] != null) {
-                        endElement(tags[d]);
-                        tags[d] = null;
-                    }
-                }
-                tags[depth] = tag;
-                maxDepth = depth;
-
-                if (tag.tag == FB2Tag.UNKNOWN) {
-                    skipUntilSiblingOrParent = depth;
-                    ci++;
-                    continue;
-                }
-
-                if (tag.attributes.length > 0) {
-                    ci = fillAtributes(nav, ci + 1, last, tag, tagAttrs);
-                    startElement(tag, tagAttrs);
-                } else {
-                    ci = skipAtributes(nav, ci + 1, last);
-                    startElement(tag);
-                }
-                continue;
-            }
-
-            for (int d = maxDepth; d > depth; d--) {
-                if (tags[d] != null) {
-                    endElement(tags[d]);
-                    tags[d] = null;
-                }
-            }
-            maxDepth = depth;
-
-            if (type == VTDNav.TOKEN_CHARACTER_DATA || type == VTDNav.TOKEN_CDATA_VAL) {
-                if (tag.processText) {
-                    buf.setLength(0);
-                    nav.toString(ci, buf);
-                    char[] charArray = buf.getValue();
-                    characters(charArray, 0, buf.length());
-                }
-                ci++;
-                continue;
-            }
-
-            ci++;
-        }
-
-        for (int d = maxDepth; d >= 0; d--) {
-            if (tags[d] != null) {
-                endElement(tags[d]);
-                tags[d] = null;
-            }
-        }
-
-        inStream.clear();
+    public StandardHandler(final ParsedContent content, boolean useUniqueTextElements) {
+        super(content);
+        this.useUniqueTextElements = useUniqueTextElements;
     }
 
-    private int skipAtributes(VTDNavEx nav, int first, int last) throws NavException {
-        for (int inner = first; inner < last; inner++) {
-            int innerType = nav.getTokenType(inner);
-            switch (innerType) {
-                case VTDNav.TOKEN_ATTR_NAME:
-                case VTDNav.TOKEN_ATTR_NS:
-                case VTDNav.TOKEN_ATTR_VAL:
-                    break;
-                default:
-                    return inner;
-            }
-        }
-        return last;
-    }
-
-    private int fillAtributes(VTDNavEx nav, int first, int last, FB2Tag tag, String[] tagAttrs) throws NavException {
-        for (int i = 0; i < tag.attributes.length; i++) {
-            tagAttrs[i] = null;
-        }
-
-        for (int inner = first; inner < last; inner++) {
-            int innerType = nav.getTokenType(inner);
-            switch (innerType) {
-                case VTDNav.TOKEN_ATTR_NAME:
-                    String[] qName = nav.toString(inner).split(":");
-                    String attrName = qName[qName.length-1];
-                    int attrIndex = Arrays.binarySearch(tag.attributes, attrName);
-                    if (attrIndex >= 0) {
-                        String attrValue = nav.toString(inner + 1);
-                        tagAttrs[attrIndex] = attrValue;
-                    }
-                    inner++;
-                    break;
-                case VTDNav.TOKEN_ATTR_NS:
-                case VTDNav.TOKEN_ATTR_VAL:
-                    break;
-                default:
-                    return inner;
-            }
-        }
-
-        return last;
-    }
-
-    public void startElement(FB2Tag t, String... attributes) throws NavException {
-
+    @Override
+    public void startElement(final FB2Tag tag, final String... attributes) {
         spaceNeeded = true;
         final ArrayList<MarkupElement> markupStream = parsedContent.getMarkupStream(currentStream);
 
@@ -216,7 +79,7 @@ public class FB2ContentHandler4 extends FB2BaseHandler {
             processTagContent();
         }
 
-        switch (t.tag) {
+        switch (tag.tag) {
             case FB2Tag.P:
                 paragraphParsing = true;
                 if (!parsingNotes) {
@@ -259,7 +122,8 @@ public class FB2ContentHandler4 extends FB2BaseHandler {
                     currentStream = attributes[0];
                     if (currentStream != null) {
                         final String n = getNoteId(currentStream, true);
-                        parsedContent.getMarkupStream(currentStream).add(text(n.toCharArray(), 0, n.length(), crs));
+                        parsedContent.getMarkupStream(currentStream).add(
+                                text(n.toCharArray(), 0, n.length(), crs, true));
                         parsedContent.getMarkupStream(currentStream).add(crs.paint.fixedSpace);
                     }
                 } else {
@@ -305,10 +169,10 @@ public class FB2ContentHandler4 extends FB2BaseHandler {
                 break;
             case FB2Tag.A:
                 if (paragraphParsing) {
-                    if ("note".equalsIgnoreCase(attributes[0])) {
-                        String note = attributes[1];
+                    if ("note".equalsIgnoreCase(attributes[1])) {
+                        final String note = attributes[0];
                         markupStream.add(new MarkupNote(note));
-                        String prettyNote = " " + getNoteId(note, false);
+                        final String prettyNote = " " + getNoteId(note, false);
                         markupStream.add(MarkupNoSpace._instance);
                         markupStream.add(new TextElement(prettyNote.toCharArray(), 0, prettyNote.length(),
                                 new RenderingStyle(crs, Script.SUPER)));
@@ -386,7 +250,7 @@ public class FB2ContentHandler4 extends FB2BaseHandler {
                     final String streamId = currentTable.uuid + ":" + rowCount + ":"
                             + currentTable.getColCount(rowCount - 1);
                     c.stream = streamId;
-                    c.hasBackground = t.tag == FB2Tag.TH;
+                    c.hasBackground = tag.tag == FB2Tag.TH;
                     final String align = attributes[0];
                     if ("right".equals(align)) {
                         c.align = JustificationMode.Right;
@@ -404,26 +268,14 @@ public class FB2ContentHandler4 extends FB2BaseHandler {
         tmpTagContent.setLength(0);
     }
 
-    private MarkupElement emptyLine(final int textSize) {
-        return crs.paint.emptyLine;
-    }
-
-    private TextElement text(final char[] ch, final int st, final int len, final RenderingStyle style) {
-        Words w = words.get(style.paint.key);
-        if (w == null) {
-            w = new Words();
-            words.append(style.paint.key, w);
-        }
-        return w.get(ch, st, len, style);
-    }
-
-    public void endElement(FB2Tag t) {
+    @Override
+    public void endElement(final FB2Tag tag) {
         if (tmpTagContent.length() > 0) {
             processTagContent();
         }
         spaceNeeded = true;
         final ArrayList<MarkupElement> markupStream = parsedContent.getMarkupStream(currentStream);
-        switch (t.tag) {
+        switch (tag.tag) {
             case FB2Tag.P:
             case FB2Tag.V:
                 if (!skipContent) {
@@ -542,10 +394,37 @@ public class FB2ContentHandler4 extends FB2BaseHandler {
         }
     }
 
-    private void processTagContent() {
+    @Override
+    public boolean skipCharacters() {
+        return skipContent
+                || (!(documentStarted && !documentEnded) && !paragraphParsing && !parsingBinary && !parsingNotes);
+    }
+
+    @Override
+    public void characters(final char[] ch, final int start, final int length, final boolean persistent) {
+        if (parsingBinary) {
+            tmpBinaryContents.append(ch, start, length);
+        } else {
+            if (persistent) {
+                processText(ch, start, length, persistent);
+            } else {
+                tmpTagContent.append(ch, start, length);
+            }
+        }
+    }
+
+    protected void processTagContent() {
+
         final int length = tmpTagContent.length();
         final int start = 0;
-        char[] ch = tmpTagContent.getValue();
+        final char[] ch = tmpTagContent.getValue();
+
+        processText(ch, start, length, false);
+
+        tmpTagContent.setLength(0);
+    }
+
+    protected void processText(final char[] ch, final int start, final int length, boolean persistent) {
         if (inTitle) {
             title.append(ch, start, length);
         }
@@ -575,7 +454,7 @@ public class FB2ContentHandler4 extends FB2BaseHandler {
                         }
                     }
                 }
-                markupStream.add(text(ch, st, len, crs));
+                markupStream.add(text(ch, st, len, crs, persistent));
                 if (crs.script != null) {
                     markupStream.add(MarkupNoSpace._instance);
                 }
@@ -586,36 +465,19 @@ public class FB2ContentHandler4 extends FB2BaseHandler {
             }
             spaceNeeded = false;
         }
-        tmpTagContent.setLength(0);
     }
 
-    @Override
-    public void characters(final char[] ch, final int start, final int length) {
-        if (skipContent
-                || (!(documentStarted && !documentEnded) && !paragraphParsing && !parsingBinary && !parsingNotes)) {
-            return;
-        }
-        if (parsingBinary) {
-            tmpBinaryContents.append(ch, start, length);
-        } else {
-            tmpTagContent.append(ch, start, length);
-        }
-    }
-
-    private String getNoteId(String noteName, boolean bracket) {
-        final Matcher matcher = notesPattern.matcher(noteName);
-        String n = noteName;
-        if (matcher.matches()) {
-            for (int i = 1; i <= matcher.groupCount(); i++) {
-                if (matcher.group(i) != null) {
-                    noteId = Integer.parseInt(matcher.group(i));
-                    n = "" + noteId + (bracket ? ")" : "");
-                    break;
-                }
-                noteId = -1;
+    protected TextElement text(final char[] ch, final int st, final int len, final RenderingStyle style,
+            boolean persistent) {
+        if (useUniqueTextElements) {
+            Words w = words.get(style.paint.key);
+            if (w == null) {
+                w = new Words();
+                words.append(style.paint.key, w);
             }
+            return w.get(ch, st, len, style, persistent);
         }
-        return n;
+        return new TextElement(ch, st, len, style);
     }
 
 }

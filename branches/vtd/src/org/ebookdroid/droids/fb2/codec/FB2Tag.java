@@ -3,7 +3,7 @@ package org.ebookdroid.droids.fb2.codec;
 import java.util.Arrays;
 import java.util.HashMap;
 
-final class FB2Tag {
+public final class FB2Tag {
 
     public static final byte UNKNOWN = 0;
     public static final byte P = 1;
