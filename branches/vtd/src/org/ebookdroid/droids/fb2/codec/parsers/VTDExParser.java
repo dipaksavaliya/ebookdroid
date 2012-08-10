@@ -47,8 +47,7 @@ public class VTDExParser {
 
             if (type == VTDNav.TOKEN_STARTING_TAG) {
                 char[] buf = nav.toRawString(ci, range);
-                final String name = new String(buf, range[0], range[1]);
-                tag = FB2Tag.getTagByName(buf, range[0], range[1]);
+               tag = FB2Tag.getTagByName3(buf, range[0], range[1]);
 
                 for (int d = maxDepth; d >= depth; d--) {
                     if (tags[d] != null) {

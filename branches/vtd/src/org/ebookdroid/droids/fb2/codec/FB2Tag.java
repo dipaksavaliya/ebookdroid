@@ -3,6 +3,8 @@ package org.ebookdroid.droids.fb2.codec;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.emdev.utils.collections.SymbolTree;
+
 public enum FB2Tag {
 
     /** **/
@@ -87,16 +89,18 @@ public enum FB2Tag {
     TH("th", FB2TagId.TH, true, true, "align");
 
     private static final HashMap<String, FB2Tag> tagsByName = new HashMap<String, FB2Tag>(256, 0.2f);
+    private static final SymbolTree<FB2Tag> tagsTree = new SymbolTree<FB2Tag>();
 
     static {
         for (FB2Tag t : values()) {
             tagsByName.put(t.name, t);
+            tagsTree.add(t, t.name);
         }
     }
 
     public final byte tag;
     public final String name;
-    private final char[] _name;
+    public final char[] _name;
     public final boolean processChildren;
     public final boolean processText;
     public final String[] attributes;
@@ -118,20 +122,6 @@ public enum FB2Tag {
         return name;
     }
 
-    public static byte getTagIdByName(String name) {
-        FB2Tag tag = tagsByName.get(name);
-        if (tag == null) {
-            final String upperCaseName = name.toLowerCase().intern();
-            tag = tagsByName.get(upperCaseName);
-            if (tag == null) {
-                tag = UNKNOWN;
-                tagsByName.put(upperCaseName, tag);
-            }
-            tagsByName.put(name, tag);
-        }
-        return tag.tag;
-    }
-
     public static FB2Tag getTagByName(String name) {
         FB2Tag tag = tagsByName.get(name);
         if (tag == null) {
@@ -146,7 +136,7 @@ public enum FB2Tag {
         return tag;
     }
 
-    public static FB2Tag getTagByName(char[] ch, int start, int length) {
+    public static FB2Tag getTagByName1(char[] ch, int start, int length) {
         switch (length) {
             case 1:
                 switch (ch[start]) {
@@ -197,4 +187,54 @@ public enum FB2Tag {
                 return UNKNOWN;
         }
     }
+
+    public static FB2Tag getTagByName2(char[] ch, int start, int length) {
+        FB2Tag fb2Tag = tagsTree.get(ch, start, length);
+        return fb2Tag != null ? fb2Tag : UNKNOWN;
+    }
+
+    public static FB2Tag getTagByName3(char[] ch, int start, int length) {
+        switch (length) {
+            case 1:
+                switch (ch[start]) {
+                    case 'p':
+                        return P;
+                    case 'v':
+                        return V;
+                    case 'a':
+                        return A;
+                }
+                return UNKNOWN;
+            case 2:
+                switch (ch[start]) {
+                    case 't':
+                        switch (ch[start + 1]) {
+                            case 'r':
+                                return TR;
+                            case 'd':
+                                return TD;
+                            case 'h':
+                                return TH;
+                        }
+                        return UNKNOWN;
+                }
+                return UNKNOWN;
+            case 3:
+                if (ch[start] == 's' && ch[start+1] == 'u') {
+                    if (ch[start+2] == 'p') {
+                       return SUP;
+                    } else if (ch[start+2] == 'b') {
+                        return SUB;
+                    }
+                }
+                return UNKNOWN;
+            default:
+                FB2Tag t = tagsTree.get(ch, start, length);
+                return t != null ? t : UNKNOWN;
+            case 0:
+                return UNKNOWN;
+        }
+    }
+
+
 }

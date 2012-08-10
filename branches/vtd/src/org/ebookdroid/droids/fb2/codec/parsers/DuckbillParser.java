@@ -37,7 +37,7 @@ public class DuckbillParser {
                     // Process END_TAG token
                     final int tagNameStart = r.XmlOffset;
                     r.skipTagName();
-                    final FB2Tag tag = FB2Tag.getTagByName(r.XmlDoc, tagNameStart, r.XmlOffset - tagNameStart);
+                    final FB2Tag tag = FB2Tag.getTagByName1(r.XmlDoc, tagNameStart, r.XmlOffset - tagNameStart);
                     handler.endElement(tag);
                     r.skipTo('>');
                     r.XmlOffset++;
@@ -47,7 +47,7 @@ public class DuckbillParser {
                 // Process START_TAG token
                 final int tagNameStart = r.XmlOffset;
                 r.skipTagName();
-                final FB2Tag tag = FB2Tag.getTagByName(r.XmlDoc, tagNameStart, r.XmlOffset - tagNameStart);
+                final FB2Tag tag = FB2Tag.getTagByName1(r.XmlDoc, tagNameStart, r.XmlOffset - tagNameStart);
 
                 // Process tag attributes
                 if (tag.attributes.length == 0) {
