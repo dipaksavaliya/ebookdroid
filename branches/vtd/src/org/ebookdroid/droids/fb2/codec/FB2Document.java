@@ -183,6 +183,46 @@ public class FB2Document implements CodecDocument {
         }
     }
 
+    private void parseWithPreloadedSax(final String fileName) {
+        final StandardHandler h = new StandardHandler(content);
+        final List<Closeable> resources = new ArrayList<Closeable>();
+
+        final long t1 = System.currentTimeMillis();
+        try {
+            final AtomicLong size = new AtomicLong();
+            final InputStream inStream = getInputStream(fileName, size, resources);
+
+            if (inStream != null) {
+                final char[] chars = loadContent(inStream, size, resources);
+
+                final long t2 = System.currentTimeMillis();
+                System.out.println("SAX  load: " + (t2 - t1) + " ms");
+
+                final CharArrayReader rr = new CharArrayReader(chars, 0, (int) size.get());
+                resources.add(rr);
+
+                SaxParser p = new SaxParser();
+                p.parse(rr, h);
+            }
+        } catch (final StopParsingException e) {
+            // do nothing
+        } catch (final Exception e) {
+            throw new RuntimeException("FB2 document can not be opened: " + e.getMessage(), e);
+        } finally {
+            for (final Closeable r : resources) {
+                try {
+                    if (r != null) {
+                        r.close();
+                    }
+                } catch (final IOException e) {
+                }
+            }
+            resources.clear();
+            final long t2 = System.currentTimeMillis();
+            System.out.println("SAX parser: " + (t2 - t1) + " ms");
+        }
+    }
+
     private void parseWithVTD(final String fileName) {
         final StandardHandler h = new StandardHandler(content);
 
