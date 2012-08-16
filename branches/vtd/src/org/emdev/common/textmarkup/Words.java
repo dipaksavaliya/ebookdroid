@@ -24,10 +24,12 @@ public class Words {
 
         TextElement e = all.get(key);
         if (e == null) {
-            char[] arr = ch;
-            int index = st;
-
-            if (!persistent) {
+            char[] arr = null;
+            int index = 0;
+            if (persistent) {
+                arr = ch;
+                index = st;
+            } else {
                 if (!buffers.isEmpty()) {
                     Buffer b = buffers.getFirst();
                     index = b.append(ch, st, len);
