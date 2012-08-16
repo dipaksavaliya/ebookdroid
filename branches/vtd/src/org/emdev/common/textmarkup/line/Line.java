@@ -26,6 +26,7 @@ public class Line {
     private JustificationMode justification = JustificationMode.Justify;
     private MarkupTitle title;
     private int maxLineWidth;
+    private volatile boolean recycled;
 
     public Line(int lineWidth, JustificationMode jm) {
         this.maxLineWidth = lineWidth;
@@ -33,6 +34,7 @@ public class Line {
     }
 
     public void recycle() {
+        recycled = true;
         elements.clear();
         if (footnotes != null) {
             for (Line l : footnotes) {
@@ -71,7 +73,7 @@ public class Line {
     public void render(final Canvas c, final int x, final int y, float left, float right) {
         ensureJustification();
         float x1 = x;
-        for (int i = 0, n = elements.size(); i < n; i++) {
+        for (int i = 0, n = elements.size(); i < n && !recycled ; i++) {
             final AbstractLineElement e = elements.get(i);
             x1 += e.render(c, y, (int) x1, spaceWidth, left, right);
         }
