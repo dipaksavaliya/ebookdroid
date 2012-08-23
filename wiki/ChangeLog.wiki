@@ -1,4 +1,16 @@
 #labels Featured
+= EBookDroid v1.5.1 changelog =
+
+=== Configuration and settings ===
+ * UI Language preference added.
+ * Book settings backup preference added.
+
+=== Other changes ===
+ * Italian localization actualized
+
+== Bug fixes ==
+ * Various bugs fixed.
+
 = EBookDroid v1.5.0 changelog =
 
 === PDF & FB2 fonts ===
