@@ -8,7 +8,7 @@ Supported the file in following formats:
  * XPS (OpenXPS)
  * comics books (cbz,cbr)
  * FictionBook (fb2, fb2.zip)
-     
+
 This software contain:
  * [http://www.mupdf.com/ MuPDF]
  * [http://djvu.sourceforge.net/ DjVuLibre]
@@ -20,3 +20,7 @@ On Google Play Market:
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.nimbusl NimbusL font pack]
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.freefonts FreeFonts font pack]
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.urwsymbol URW Symbol font pack]
+
+On Google Code:
+ * [http://code.google.com/p/ebookdroid/downloads/list EBookDroid]
+ * [http://code.google.com/p/ebookdroid-fontpacks/downloads/list EBookDroid font packs]
