@@ -9,7 +9,7 @@
  * ZoomToColumn tap action
 
 === Improved book formats support ===
- * FB2: added support of <br>, <ul> and <li> tags.
+ * FB2: added support of &lt;br&gt;, &lt;ul&gt; and &lt;li&gt; tags.
  * FB2: fixed section processing and outline structure.
  * PDF: added workaround support of invalid \Qq operand.
 
