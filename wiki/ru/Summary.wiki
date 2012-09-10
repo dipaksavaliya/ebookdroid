@@ -12,6 +12,7 @@ Supported the file in following formats:
 This software contain:
  * [http://www.mupdf.com/ MuPDF]
  * [http://djvu.sourceforge.net/ DjVuLibre]
+ * [http://vtd-xml.sourceforge.net/ VTD-XML]
  * [http://www.rarlab.com/ unrar]
 
 On Google Play Market:
