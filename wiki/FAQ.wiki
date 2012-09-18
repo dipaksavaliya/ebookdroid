@@ -1,13 +1,13 @@
-== Q: How to obtain the program's log file? ==
+== Q: How to obtain the program's log file ==
 == A: ==
 === 1. On the PC, using Android SDK ===
-Connect your device to PC and issue the command _"adb logcat"_.
+Connect your device to a PC running Android SDK and issue the command _"adb logcat"_.
 === 2. On the device ===
 There are many apps on the Market that allow you to see and save the log file directly on the device.
 For example:
  * https://market.android.com/details?id=com.nolanlawson.logcat
  * https://market.android.com/details?id=org.jtb.alogcat
 
-== Q: How to open document from external file manager? ==
+== Q: How to open document from an external file manager ==
 == A: ==
-EbookDroid uses MIME types to handle different file types. Unfortunately, Android and lot of file managers might not support all MIME types. When this happens, you will not be able to open said files directly form the file manager. Some file managers allow you to add new MIME types and associate it with the corresponding file extension. Refer to your file manager manual or use internal file manager. All MIME types supported by EBookDroid are listed [MimeTypes here].
+EbookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly form the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further istructions on how to do that. All MIME types supported by EBookDroid are listed [MimeTypes here].
