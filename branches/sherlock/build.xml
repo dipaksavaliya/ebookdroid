@@ -1,4 +1,4 @@
-<project name="EBookDroid" basedir="." default="EBookDroid-dev">
+<project name="EBookDroid-sherlock" basedir="." default="EBookDroid-dev">
 
     <tstamp>
         <format property="debug.version" pattern="yyyyMMdd.HHmmss" />
@@ -9,6 +9,10 @@
 
     <property name="out.debug.file" location="${out.absolute.dir}/${ant.project.name}-${debug.version}.apk" />
     <property name="out.release.file" location="${out.absolute.dir}/${ant.project.name}-release.apk" />
+
+	<path id="project.libraries">
+		<pathelement path="sherlock" />
+	</path>
 
     <path id="project.libraries.jars" />
     <path id="project.libraries.libs" />
