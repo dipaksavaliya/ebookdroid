@@ -5,9 +5,6 @@ import org.ebookdroid.ui.about.AboutActivity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 
 import org.emdev.ui.actions.ActionController;
@@ -15,7 +12,12 @@ import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.IActionParameter;
 
-public abstract class AbstractActionActivity<A extends Activity, C extends ActionController<A>> extends Activity {
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
+
+public abstract class AbstractActionActivity<A extends Activity, C extends ActionController<A>> extends SherlockActivity {
 
     public static final String MENU_ITEM_SOURCE = "source";
     public static final String ACTIVITY_RESULT_DATA = "activityResultData";
@@ -52,7 +54,7 @@ public abstract class AbstractActionActivity<A extends Activity, C extends Actio
     protected abstract C createController();
 
     @Override
-    public final boolean onOptionsItemSelected(final MenuItem item) {
+    public final boolean onOptionsItemSelected(final com.actionbarsherlock.view.MenuItem item) {
         final int actionId = item.getItemId();
         final ActionEx action = getController().getOrCreateAction(actionId);
         if (action.getMethod().isValid()) {
@@ -75,10 +77,39 @@ public abstract class AbstractActionActivity<A extends Activity, C extends Actio
         }
     }
 
+    protected void setMenuSource(final android.view.Menu menu, final Object source) {
+        for (int i = 0, n = menu.size(); i < n; i++) {
+            final android.view.MenuItem item = menu.getItem(i);
+            final android.view.SubMenu subMenu = item.getSubMenu();
+            if (subMenu != null) {
+                setMenuSource(subMenu, source);
+            } else {
+                final int itemId = item.getItemId();
+                getController().getOrCreateAction(itemId).putValue(MENU_ITEM_SOURCE, source);
+            }
+        }
+    }
+
     protected void setMenuParameters(final Menu menu, final IActionParameter... parameters) {
         for (int i = 0, n = menu.size(); i < n; i++) {
             final MenuItem item = menu.getItem(i);
             final SubMenu subMenu = item.getSubMenu();
+            if (subMenu != null) {
+                setMenuParameters(subMenu, parameters);
+            } else {
+                final int itemId = item.getItemId();
+                final ActionEx action = getController().getOrCreateAction(itemId);
+                for (final IActionParameter p : parameters) {
+                    action.addParameter(p);
+                }
+            }
+        }
+    }
+
+    protected void setMenuParameters(final android.view.Menu menu, final IActionParameter... parameters) {
+        for (int i = 0, n = menu.size(); i < n; i++) {
+            final android.view.MenuItem item = menu.getItem(i);
+            final android.view.SubMenu subMenu = item.getSubMenu();
             if (subMenu != null) {
                 setMenuParameters(subMenu, parameters);
             } else {
@@ -107,8 +138,24 @@ public abstract class AbstractActionActivity<A extends Activity, C extends Actio
         }
     }
 
+    protected void setMenuItemEnabled(final android.view.Menu menu, final boolean enabled, final int viewId, final int enabledResId,
+            final int disabledResId) {
+        final android.view.MenuItem v = menu.findItem(viewId);
+        if (v != null) {
+            v.setIcon(enabled ? enabledResId : disabledResId);
+            v.setEnabled(enabled);
+        }
+    }
+
     protected void setMenuItemChecked(final Menu menu, final boolean checked, final int viewId) {
         final MenuItem v = menu.findItem(viewId);
+        if (v != null) {
+            v.setChecked(checked);
+        }
+    }
+
+    protected void setMenuItemChecked(final android.view.Menu menu, final boolean checked, final int viewId) {
+        final android.view.MenuItem v = menu.findItem(viewId);
         if (v != null) {
             v.setChecked(checked);
         }
@@ -123,8 +170,17 @@ public abstract class AbstractActionActivity<A extends Activity, C extends Actio
         }
     }
 
+    protected void setMenuItemChecked(final android.view.Menu menu, final boolean checked, final int viewId, final int checkedResId,
+            final int uncheckedResId) {
+        final android.view.MenuItem v = menu.findItem(viewId);
+        if (v != null) {
+            v.setChecked(checked);
+            v.setIcon(checked ? checkedResId : uncheckedResId);
+        }
+    }
+
     @Override
-    public boolean onContextItemSelected(final MenuItem item) {
+    public boolean onContextItemSelected(final android.view.MenuItem item) {
         final int actionId = item.getItemId();
         final ActionEx action = getController().getOrCreateAction(actionId);
         if (action.getMethod().isValid()) {

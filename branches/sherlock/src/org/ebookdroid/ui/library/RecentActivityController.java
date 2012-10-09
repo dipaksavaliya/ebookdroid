@@ -563,26 +563,17 @@ public class RecentActivityController extends ActionController<RecentActivity> i
     @Override
     public void showProgress(final boolean show) {
         final RecentActivity activity = getManagedComponent();
-        final ProgressBar progress = (ProgressBar) activity.findViewById(R.id.recentprogress);
-        if (progress != null) {
-            if (show) {
-                progress.setVisibility(View.VISIBLE);
-            } else {
-                progress.setVisibility(View.GONE);
-            }
-        } else {
-            activity.runOnUiThread(new Runnable() {
+        activity.runOnUiThread(new Runnable() {
 
-                @Override
-                public void run() {
-                    try {
-                        activity.setProgressBarIndeterminateVisibility(show);
-                        activity.getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
-                    } catch (final Throwable e) {
-                    }
+            @Override
+            public void run() {
+                try {
+                    activity.setProgressBarIndeterminateVisibility(show);
+                    activity.getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
+                } catch (final Throwable e) {
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override

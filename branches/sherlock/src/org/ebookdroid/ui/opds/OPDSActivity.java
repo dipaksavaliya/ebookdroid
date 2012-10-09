@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
@@ -24,6 +22,9 @@ import org.emdev.common.log.LogManager;
 import org.emdev.ui.AbstractActionActivity;
 import org.emdev.ui.actions.params.Constant;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+
 public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActivityController> {
 
     public final LogContext LCTX;
@@ -31,8 +32,6 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
     private static final AtomicLong SEQ = new AtomicLong();
 
     ExpandableListView list;
-
-    Menu optionsMenu;
 
     public OPDSActivity() {
         LCTX = LogManager.root().lctx(this.getClass().getSimpleName(), true).lctx("" + SEQ.getAndIncrement(), true);
@@ -105,19 +104,10 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
      */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        final MenuInflater inflater = getMenuInflater();
+        final MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.opdsmenu, menu);
-
-        this.optionsMenu = menu;
-        updateNavigation(optionsMenu, getController().adapter.getCurrentFeed());
+        updateNavigation(menu, getController().adapter.getCurrentFeed());
         return true;
-    }
-
-    @Override
-    public boolean onMenuOpened(final int featureId, final Menu menu) {
-        this.optionsMenu = menu;
-        updateNavigation(optionsMenu, getController().adapter.getCurrentFeed());
-        return super.onMenuOpened(featureId, menu);
     }
 
     @Override
@@ -156,7 +146,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
     }
 
     protected void onCreateContextMenu(final ContextMenu menu) {
-        final MenuInflater inflater = getMenuInflater();
+        final android.view.MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.opds_defmenu, menu);
 
         final Feed feed = getController().adapter.getCurrentFeed();
@@ -165,7 +155,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
     }
 
     protected void onCreateFeedContextMenu(final ContextMenu menu, final Feed feed) {
-        final MenuInflater inflater = getMenuInflater();
+        final android.view.MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.opds_feedmenu, menu);
 
         menu.setHeaderTitle(getFeedTitle(feed));
@@ -175,7 +165,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
     }
 
     protected void onCreateFacetContextMenu(final ContextMenu menu, final Feed feed, final Feed facet) {
-        final MenuInflater inflater = getMenuInflater();
+        final android.view.MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.opds_facetmenu, menu);
 
         menu.setHeaderTitle(getFeedTitle(facet));
@@ -185,7 +175,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
     }
 
     protected void onCreateBookContextMenu(final ContextMenu menu, final Book book) {
-        final MenuInflater inflater = getMenuInflater();
+        final android.view.MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.opds_bookmenu, menu);
 
         menu.setHeaderTitle(book.title);
@@ -193,7 +183,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
     }
 
     protected void onCreateLinkContextMenu(final ContextMenu menu, final Book book, final Link link) {
-        final MenuInflater inflater = getMenuInflater();
+        final android.view.MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.opds_bookmenu, menu);
 
         menu.setHeaderTitle(book.title);
@@ -224,17 +214,41 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
         }
     }
 
+    protected void updateNavigation(final android.view.Menu menu, final Feed feed) {
+        final boolean canUp = feed != null;
+        final boolean canNext = feed != null && feed.next != null;
+        final boolean canPrev = feed != null && feed.prev != null;
+
+        if (menu != null) {
+            if (AndroidVersion.lessThan3x) {
+                setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_menu_nav_up_enabled,
+                        R.drawable.opds_menu_nav_up_disabled);
+                setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_menu_nav_next_enabled,
+                        R.drawable.opds_menu_nav_next_disabled);
+                setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_menu_nav_prev_enabled,
+                        R.drawable.opds_menu_nav_prev_disabled);
+            } else {
+                setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_actionbar_nav_up_enabled,
+                        R.drawable.opds_actionbar_nav_up_disabled);
+                setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_actionbar_nav_next_enabled,
+                        R.drawable.opds_actionbar_nav_next_disabled);
+                setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_actionbar_nav_prev_enabled,
+                        R.drawable.opds_actionbar_nav_prev_disabled);
+            }
+        }
+    }
+
     protected String getFeedTitle(final Feed feed) {
         return feed != null ? feed.title : getResources().getString(R.string.opds);
     }
 
     protected void onCurrrentFeedChanged(final Feed feed) {
-        updateNavigation(optionsMenu, feed);
         setTitle(getFeedTitle(feed));
         findViewById(R.id.opdsaddfeed).setVisibility(feed != null ? View.GONE : View.VISIBLE);
+        this.invalidateOptionsMenu();
     }
 
     protected void onFeedLoaded(final Feed feed) {
-        updateNavigation(optionsMenu, feed);
+        this.invalidateOptionsMenu();
     }
 }

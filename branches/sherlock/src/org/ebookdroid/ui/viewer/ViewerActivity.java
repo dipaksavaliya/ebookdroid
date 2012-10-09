@@ -19,8 +19,6 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -31,20 +29,16 @@ import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
 import org.emdev.ui.AbstractActionActivity;
-import org.emdev.ui.actions.ActionMethodDef;
-import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.uimanager.IUIManager;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
-@ActionTarget(
-// action list
-actions = {
-// start
-@ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout")
-// finish
-})
-public class ViewerActivity extends AbstractActionActivity<ViewerActivity, ViewerActivityController> {
+import com.actionbarsherlock.app.ActionBar.OnMenuVisibilityListener;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+
+public class ViewerActivity extends AbstractActionActivity<ViewerActivity, ViewerActivityController> implements
+        OnMenuVisibilityListener {
 
     private static final int DIALOG_GOTO = 0;
 
@@ -68,11 +62,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
 
     private TouchManagerView touchView;
 
-    private boolean menuClosedCalled;
-
     private ManualCropView cropControls;
-
-    private Menu optionsMenu;
 
     /**
      * Instantiates a new base viewer activity.
@@ -276,7 +266,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
         menu.clear();
         menu.setHeaderTitle(R.string.app_name);
         menu.setHeaderIcon(R.drawable.application_icon);
-        final MenuInflater inflater = getMenuInflater();
+        final android.view.MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.mainmenu_context, menu);
         updateOptionsMenu(menu);
     }
@@ -290,7 +280,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
     public boolean onCreateOptionsMenu(final Menu menu) {
         menu.clear();
 
-        final MenuInflater inflater = getMenuInflater();
+        final MenuInflater inflater = getSupportMenuInflater();
 
         if (hasNormalMenu()) {
             inflater.inflate(R.menu.mainmenu, menu);
@@ -298,8 +288,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
             inflater.inflate(R.menu.mainmenu_context, menu);
         }
 
-        this.optionsMenu = menu;
-        updateOptionsMenu(optionsMenu);
+        updateOptionsMenu(menu);
 
         return true;
     }
@@ -308,20 +297,15 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
         return AndroidVersion.lessThan4x || IUIManager.instance.isTabletUi(this) || AppSettings.current().showTitle;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see android.app.Activity#onMenuOpened(int, android.view.Menu)
-     */
     @Override
-    public boolean onMenuOpened(final int featureId, final Menu menu) {
-        view.changeLayoutLock(true);
-        IUIManager.instance.onMenuOpened(this);
-
-        this.optionsMenu = menu;
-        updateOptionsMenu(optionsMenu);
-
-        return super.onMenuOpened(featureId, menu);
+    public void onMenuVisibilityChanged(boolean isVisible) {
+        if (isVisible) {
+            view.changeLayoutLock(true);
+            IUIManager.instance.onMenuOpened(this);
+        } else {
+            IUIManager.instance.onMenuClosed(this);
+            view.changeLayoutLock(false);
+        }
     }
 
     protected void updateOptionsMenu(final Menu menu) {
@@ -345,30 +329,25 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
                 R.drawable.viewer_menu_split_pages_off);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see android.app.Activity#onPanelClosed(int, android.view.Menu)
-     */
-    @Override
-    public void onPanelClosed(final int featureId, final Menu menu) {
-        menuClosedCalled = false;
-        super.onPanelClosed(featureId, menu);
-        if (!menuClosedCalled) {
-            onOptionsMenuClosed(menu);
+    protected void updateOptionsMenu(final android.view.Menu menu) {
+        if (menu == null) {
+            return;
         }
-    }
+        final AppSettings as = AppSettings.current();
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see android.app.Activity#onOptionsMenuClosed(android.view.Menu)
-     */
-    @Override
-    public void onOptionsMenuClosed(final Menu menu) {
-        menuClosedCalled = true;
-        IUIManager.instance.onMenuClosed(this);
-        view.changeLayoutLock(false);
+        setMenuItemChecked(menu, as.fullScreen, R.id.mainmenu_fullscreen);
+        setMenuItemChecked(menu, as.showTitle, R.id.mainmenu_showtitle);
+        setMenuItemChecked(menu, getZoomControls().getVisibility() == View.VISIBLE, R.id.mainmenu_zoom);
+
+        final BookSettings bs = getController().getBookSettings();
+        if (bs == null) {
+            return;
+        }
+
+        setMenuItemChecked(menu, bs.nightMode, R.id.mainmenu_nightmode);
+        setMenuItemChecked(menu, bs.cropPages, R.id.mainmenu_croppages);
+        setMenuItemChecked(menu, bs.splitPages, R.id.mainmenu_splitpages, R.drawable.viewer_menu_split_pages,
+                R.drawable.viewer_menu_split_pages_off);
     }
 
     @Override

@@ -27,8 +27,6 @@ import android.text.Editable;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.AbsListView;
@@ -38,7 +36,6 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import java.io.File;
@@ -53,8 +50,6 @@ import org.emdev.ui.actions.ActionController;
 import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
-import org.emdev.ui.actions.ActionMethodDef;
-import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.actions.params.EditableValue;
 import org.emdev.ui.uimanager.IUIManager;
@@ -62,31 +57,9 @@ import org.emdev.utils.CompareUtils;
 import org.emdev.utils.FileUtils;
 import org.emdev.utils.LayoutUtils;
 
-@ActionTarget(
-// action list
-actions = {
-        // start
-        @ActionMethodDef(id = R.id.browserhome, method = "goHome"),
-        @ActionMethodDef(id = R.id.browserupfolder, method = "goUp"),
-        @ActionMethodDef(id = R.id.mainmenu_settings, method = "showSettings"),
-        @ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout"),
-        @ActionMethodDef(id = R.id.browserrecent, method = "goRecent"),
-        @ActionMethodDef(id = R.id.mainmenu_opds, method = "goOPDSBrowser"),
-        @ActionMethodDef(id = R.id.bookmenu_open, method = "openBook"),
-        @ActionMethodDef(id = R.id.bookmenu_removefromrecent, method = "removeBookFromRecents"),
-        @ActionMethodDef(id = R.id.bookmenu_cleardata, method = "removeCachedBookFiles"),
-        @ActionMethodDef(id = R.id.bookmenu_deletesettings, method = "removeBookSettings"),
-        @ActionMethodDef(id = R.id.bookmenu_copy, method = "copyBook"),
-        @ActionMethodDef(id = R.id.bookmenu_move, method = "copyBook"),
-        @ActionMethodDef(id = R.id.actions_doCopyBook, method = "doCopyBook"),
-        @ActionMethodDef(id = R.id.actions_doMoveBook, method = "doMoveBook"),
-        @ActionMethodDef(id = R.id.bookmenu_rename, method = "renameBook"),
-        @ActionMethodDef(id = R.id.actions_doRenameBook, method = "doRenameBook"),
-        @ActionMethodDef(id = R.id.bookmenu_delete, method = "deleteBook"),
-        @ActionMethodDef(id = R.id.actions_doDeleteBook, method = "doDeleteBook")
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 
-// finish
-})
 public class BrowserActivity extends AbstractActionActivity<BrowserActivity, ActionController<BrowserActivity>>
         implements IBrowserActivity {
 
@@ -95,8 +68,6 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Act
     private static final String CURRENT_DIRECTORY = "currentDirectory";
 
     private ViewFlipper viewflipper;
-    private TextView header;
-    private Menu optionsMenu;
 
     public BrowserActivity() {
         this.filter = new CompositeFilter(false, DirectoryFilter.NOT_HIDDEN, LibSettings.current().allowedFileTypes);
@@ -111,19 +82,12 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Act
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IUIManager.instance.setTitleVisible(this, !AndroidVersion.lessThan3x, true);
+        IUIManager.instance.setTitleVisible(this, true, true);
         setContentView(R.layout.browser);
 
         adapter = new BrowserAdapter(filter);
-        header = (TextView) findViewById(R.id.browsertext);
         viewflipper = (ViewFlipper) findViewById(R.id.browserflip);
         viewflipper.addView(LayoutUtils.fillInParent(viewflipper, new FileBrowserView(this, adapter)));
-
-        if (AndroidVersion.VERSION == 3) {
-            setActionForView(R.id.browserhome);
-            setActionForView(R.id.browserupfolder);
-            setActionForView(R.id.browserrecent);
-        }
     }
 
     @Override
@@ -147,21 +111,12 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Act
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        final MenuInflater inflater = getMenuInflater();
+        final MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.browsermenu, menu);
 
-        this.optionsMenu = menu;
-        updateOptionsMenu(optionsMenu);
+        updateOptionsMenu(menu);
 
         return true;
-    }
-
-    @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        this.optionsMenu = menu;
-        updateOptionsMenu(optionsMenu);
-
-        return super.onMenuOpened(featureId, menu);
     }
 
     protected void updateOptionsMenu(Menu optionsMenu) {
@@ -221,19 +176,8 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Act
     @Override
     public void setCurrentDir(final File newDir) {
         adapter.setCurrentDirectory(newDir);
-
-        if (AndroidVersion.lessThan3x) {
-            header.setText(newDir.getAbsolutePath());
-            final ImageView view = (ImageView) findViewById(R.id.browserupfolder);
-            if (view != null) {
-                // final boolean hasParent = newDir.getParentFile() != null;
-                // view.setImageResource(hasParent ? R.drawable.browser_actionbar_nav_up_enabled
-                // : R.drawable.browser_actionbar_nav_up_disabled);
-            }
-        } else {
-            setTitle(newDir.getAbsolutePath());
-            updateOptionsMenu(optionsMenu);
-        }
+        setTitle(newDir.getAbsolutePath());
+        this.invalidateOptionsMenu();
     }
 
     @Override
@@ -312,7 +256,7 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Act
         }
 
         if (source instanceof File) {
-            final MenuInflater inflater = getMenuInflater();
+            final android.view.MenuInflater inflater = getMenuInflater();
             final File node = (File) source;
             final String path = node.getAbsolutePath();
 

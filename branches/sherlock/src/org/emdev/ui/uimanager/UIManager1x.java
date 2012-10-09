@@ -9,6 +9,8 @@ import android.view.WindowManager;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.actionbarsherlock.app.SherlockActivity;
+
 public class UIManager1x implements IUIManager {
 
     private static final int FLAG_FULLSCREEN = WindowManager.LayoutParams.FLAG_FULLSCREEN;
@@ -34,20 +36,47 @@ public class UIManager1x implements IUIManager {
 
     @Override
     public void setTitleVisible(final Activity activity, final boolean visible, final boolean firstTime) {
-        if (firstTime) {
-            try {
-                final Window window = activity.getWindow();
-                if (!visible) {
-                    window.requestFeature(Window.FEATURE_NO_TITLE);
-                } else {
+        if (activity instanceof SherlockActivity) {
+            SherlockActivity sa = (SherlockActivity) activity;
+            if (firstTime) {
+                try {
+                    final Window window = activity.getWindow();
+                    window.requestFeature((int) com.actionbarsherlock.view.Window.FEATURE_ACTION_BAR);
                     window.requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
                     activity.setProgressBarIndeterminate(true);
                     activity.setProgressBarIndeterminateVisibility(true);
                     window.setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, 1);
+                } catch (final Throwable th) {
+                    LCTX.e("Error on requestFeature call: " + th.getMessage());
                 }
+            }
+            try {
+                if (visible) {
+                    sa.getSupportActionBar().show();
+                } else {
+                    sa.getSupportActionBar().hide();
+                }
+                sa.invalidateOptionsMenu();
                 data.get(activity.getComponentName()).titleVisible = visible;
             } catch (final Throwable th) {
                 LCTX.e("Error on requestFeature call: " + th.getMessage());
+            }
+        } else {
+            if (firstTime) {
+                try {
+                    final Window window = activity.getWindow();
+                    if (!visible) {
+                        window.requestFeature(Window.FEATURE_NO_TITLE);
+                    } else {
+                        window.requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+                        activity.setProgressBarIndeterminate(true);
+                        activity.setProgressBarIndeterminateVisibility(true);
+                        window.setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, 1);
+                    }
+                    data.get(activity.getComponentName()).titleVisible = visible;
+                } catch (final Throwable th) {
+                    LCTX.e("Error on requestFeature call: " + th.getMessage());
+                }
             }
         }
     }

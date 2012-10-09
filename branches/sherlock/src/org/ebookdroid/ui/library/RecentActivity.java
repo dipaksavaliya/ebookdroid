@@ -17,8 +17,6 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -30,21 +28,14 @@ import android.widget.ViewFlipper;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
 import org.emdev.ui.AbstractActionActivity;
-import org.emdev.ui.actions.ActionMethodDef;
-import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.uimanager.IUIManager;
 
-@ActionTarget(
-// actions
-actions = {
-// start
-@ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout")
-// finish
-})
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+
 public class RecentActivity extends AbstractActionActivity<RecentActivity, RecentActivityController> {
 
     public final LogContext LCTX;
@@ -59,7 +50,6 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
     BookcaseView bookcaseView;
     RecentBooksView recentBooksView;
     LibraryView libraryView;
-    Menu optionsMenu;
 
     public RecentActivity() {
         super();
@@ -86,14 +76,9 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
             return;
         }
 
-        IUIManager.instance.setTitleVisible(this, !AndroidVersion.lessThan3x, true);
+        IUIManager.instance.setTitleVisible(this, true, true);
 
         setContentView(R.layout.recent);
-
-        if (AndroidVersion.lessThan3x) {
-            // Old layout with custom title bar
-            libraryButton = (ImageView) findViewById(R.id.recent_showlibrary);
-        }
 
         viewflipper = (ViewFlipper) findViewById(R.id.recentflip);
 
@@ -103,14 +88,6 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
         } else {
             getController().onCreate();
         }
-
-        if (AndroidVersion.VERSION == 3) {
-            setActionForView(R.id.recent_showlibrary);
-            setActionForView(R.id.recent_showbrowser);
-            setActionForView(R.id.ShelfLeftButton);
-            setActionForView(R.id.ShelfCaption);
-            setActionForView(R.id.ShelfRightButton);
-        }
     }
 
     @Override
@@ -119,7 +96,6 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
             LCTX.d("onResume()");
         }
         super.onResume();
-        updateOptionsMenu(optionsMenu);
         getController().onResume();
     }
 
@@ -150,21 +126,10 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        final MenuInflater inflater = getMenuInflater();
+        final MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.recentmenu, menu);
-
-        this.optionsMenu = menu;
-        updateOptionsMenu(optionsMenu);
-
+        updateOptionsMenu(menu);
         return true;
-    }
-
-    @Override
-    public boolean onMenuOpened(final int featureId, final Menu menu) {
-        this.optionsMenu = menu;
-        updateOptionsMenu(optionsMenu);
-
-        return super.onMenuOpened(featureId, menu);
     }
 
     protected void updateOptionsMenu(final Menu menu) {
@@ -208,7 +173,7 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
         if (source instanceof BookNode) {
             final BookNode node = (BookNode) source;
 
-            final MenuInflater inflater = getMenuInflater();
+            final android.view.MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.book_menu, menu);
 
             menu.setHeaderTitle(node.path);
@@ -222,7 +187,7 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
         } else if (source instanceof BookShelfAdapter) {
             final BookShelfAdapter a = (BookShelfAdapter) source;
 
-            final MenuInflater inflater = getMenuInflater();
+            final android.view.MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.library_menu, menu);
 
             menu.setHeaderTitle(a.name);
@@ -252,7 +217,7 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
                 libraryButton.setImageResource(R.drawable.recent_actionbar_library);
             }
         }
-        updateOptionsMenu(optionsMenu);
+        this.invalidateOptionsMenu();
     }
 
     int getViewMode() {
