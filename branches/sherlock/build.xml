@@ -10,13 +10,6 @@
     <property name="out.debug.file" location="${out.absolute.dir}/${ant.project.name}-${debug.version}.apk" />
     <property name="out.release.file" location="${out.absolute.dir}/${ant.project.name}-release.apk" />
 
-	<path id="project.libraries">
-		<pathelement path="sherlock" />
-	</path>
-
-    <path id="project.libraries.jars" />
-    <path id="project.libraries.libs" />
-
     <import file="${basedir}/build.core.xml" />
 
     <property name="arm.mk" location="jni/Application.mk" />
