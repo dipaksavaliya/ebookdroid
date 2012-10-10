@@ -202,7 +202,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         }
 
         final LibSettings libSettings = LibSettings.current();
-        if (libSettings.getUseBookcase()) {
+        if (libSettings.useBookcase) {
             if (firstResume) {
                 bookshelfAdapter.startScan();
             }
@@ -331,7 +331,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         final Editable value = action.getParameter("input");
         final String searchQuery = value.toString();
         if (bookshelfAdapter.startSearch(searchQuery)) {
-            if (LibSettings.current().getUseBookcase()) {
+            if (LibSettings.current().useBookcase) {
                 getManagedComponent().showBookshelf(BooksAdapter.SEARCH_INDEX);
             }
         }
@@ -432,7 +432,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         if (f.delete()) {
             CacheManager.clear(book.path);
             final LibSettings libSettings = LibSettings.current();
-            if (libSettings.getUseBookcase()) {
+            if (libSettings.useBookcase) {
                 bookshelfAdapter.startScan();
             } else {
                 libraryAdapter.startScan();
@@ -528,7 +528,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
 
     @ActionMethod(ids = { R.id.recent_showlibrary, R.id.recent_showrecent })
     public void goLibrary(final ActionEx action) {
-        if (!LibSettings.current().getUseBookcase()) {
+        if (!LibSettings.current().useBookcase) {
             final int viewMode = getManagedComponent().getViewMode();
             if (viewMode == RecentActivity.VIEW_RECENT) {
                 changeLibraryView(RecentActivity.VIEW_LIBRARY);
@@ -604,7 +604,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         final FileExtensionFilter filter = newSettings.allowedFileTypes;
         if (diff.isUseBookcaseChanged()) {
 
-            if (newSettings.getUseBookcase()) {
+            if (newSettings.useBookcase) {
                 recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), filter);
                 getManagedComponent().showBookcase(bookshelfAdapter, recentAdapter);
             } else {
@@ -614,7 +614,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         }
 
         if (diff.isAutoScanDirsChanged()) {
-            if (newSettings.getUseBookcase()) {
+            if (newSettings.useBookcase) {
                 bookshelfAdapter.startScan();
             } else {
                 libraryAdapter.startScan();
@@ -623,7 +623,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         }
         if (diff.isAllowedFileTypesChanged()) {
             recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), filter);
-            if (newSettings.getUseBookcase()) {
+            if (newSettings.useBookcase) {
                 bookshelfAdapter.startScan();
             } else {
                 libraryAdapter.startScan();
@@ -644,7 +644,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
     }
 
     public void changeLibraryView(final int view) {
-        if (!LibSettings.current().getUseBookcase()) {
+        if (!LibSettings.current().useBookcase) {
             getManagedComponent().changeLibraryView(view);
             if (view == RecentActivity.VIEW_LIBRARY) {
                 libraryAdapter.startScan();

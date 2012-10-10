@@ -135,6 +135,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
 
         super.onResume();
         IUIManager.instance.onResume(this);
+        this.invalidateOptionsMenu();
 
         getController().afterResume();
     }
@@ -294,7 +295,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
     }
 
     protected boolean hasNormalMenu() {
-        return AndroidVersion.lessThan4x || IUIManager.instance.isTabletUi(this) || AppSettings.current().showTitle;
+        return IUIManager.instance.isTabletUi(this) || AppSettings.current().showTitle;
     }
 
     @Override
@@ -362,11 +363,11 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
     @Override
     public final boolean dispatchKeyEvent(final KeyEvent event) {
         view.checkFullScreenMode();
-        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
-            if (!hasNormalMenu()) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && !hasNormalMenu()) {
                 getController().getOrCreateAction(R.id.actions_openOptionsMenu).run();
-                return true;
             }
+            return true;
         }
 
         if (getController().dispatchKeyEvent(event)) {

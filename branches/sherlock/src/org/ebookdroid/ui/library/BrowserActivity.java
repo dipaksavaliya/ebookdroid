@@ -41,7 +41,6 @@ import android.widget.ViewFlipper;
 import java.io.File;
 import java.io.FileFilter;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.filesystem.CompositeFilter;
 import org.emdev.common.filesystem.DirectoryFilter;
 import org.emdev.common.filesystem.PathFromUri;
@@ -213,19 +212,17 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Act
 
     @Override
     public void showProgress(final boolean show) {
-        if (!AndroidVersion.lessThan3x) {
-            runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
 
-                @Override
-                public void run() {
-                    try {
-                        setProgressBarIndeterminateVisibility(show);
-                        getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
-                    } catch (final Throwable e) {
-                    }
+            @Override
+            public void run() {
+                try {
+                    setProgressBarIndeterminateVisibility(show);
+                    getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
+                } catch (final Throwable e) {
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override

@@ -63,7 +63,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.backup.BackupManager;
 import org.emdev.common.filesystem.PathFromUri;
 import org.emdev.common.log.LogContext;
@@ -534,31 +533,32 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.mainmenu_fullscreen)
     public void toggleFullScreen(final ActionEx action) {
-        if (!AndroidVersion.lessThan3x) {
-            AppSettings.toggleFullScreen();
-        }
+        AppSettings.toggleFullScreen();
+        getManagedComponent().invalidateOptionsMenu();
     }
 
     @ActionMethod(ids = R.id.mainmenu_showtitle)
     public void toggleTitleVisibility(final ActionEx action) {
-        if (!AndroidVersion.lessThan3x) {
-            AppSettings.toggleTitleVisibility();
-        }
+        AppSettings.toggleTitleVisibility();
+        getManagedComponent().invalidateOptionsMenu();
     }
 
     @ActionMethod(ids = R.id.mainmenu_nightmode)
     public void toggleNightMode(final ActionEx action) {
         SettingsManager.toggleNightMode(bookSettings);
+        getManagedComponent().invalidateOptionsMenu();
     }
 
     @ActionMethod(ids = R.id.mainmenu_splitpages)
     public void toggleSplitPages(final ActionEx action) {
         SettingsManager.toggleSplitPages(bookSettings);
+        getManagedComponent().invalidateOptionsMenu();
     }
 
     @ActionMethod(ids = R.id.mainmenu_croppages)
     public void toggleCropPages(final ActionEx action) {
         SettingsManager.toggleCropPages(bookSettings);
+        getManagedComponent().invalidateOptionsMenu();
     }
 
     @ActionMethod(ids = R.id.mainmenu_thumbnail)
@@ -687,6 +687,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 mcv.initControls();
             }
         }
+        getManagedComponent().invalidateOptionsMenu();
     }
 
     public final boolean dispatchKeyEvent(final KeyEvent event) {

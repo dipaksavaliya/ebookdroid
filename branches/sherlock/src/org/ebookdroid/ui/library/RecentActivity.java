@@ -137,7 +137,7 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
             return;
         }
 
-        if (!LibSettings.current().getUseBookcase()) {
+        if (!LibSettings.current().useBookcase) {
             final int viewMode = getViewMode();
             final boolean showLibraryAvailable = viewMode == RecentActivity.VIEW_RECENT;
             setMenuItemVisible(menu, showLibraryAvailable, R.id.recent_showlibrary);

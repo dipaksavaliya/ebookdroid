@@ -191,51 +191,37 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
     }
 
     protected void updateNavigation(final Menu menu, final Feed feed) {
+        if (menu == null) {
+            return;
+        }
+
         final boolean canUp = feed != null;
         final boolean canNext = feed != null && feed.next != null;
         final boolean canPrev = feed != null && feed.prev != null;
 
-        if (menu != null) {
-            if (AndroidVersion.lessThan3x) {
-                setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_menu_nav_up_enabled,
-                        R.drawable.opds_menu_nav_up_disabled);
-                setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_menu_nav_next_enabled,
-                        R.drawable.opds_menu_nav_next_disabled);
-                setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_menu_nav_prev_enabled,
-                        R.drawable.opds_menu_nav_prev_disabled);
-            } else {
-                setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_actionbar_nav_up_enabled,
-                        R.drawable.opds_actionbar_nav_up_disabled);
-                setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_actionbar_nav_next_enabled,
-                        R.drawable.opds_actionbar_nav_next_disabled);
-                setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_actionbar_nav_prev_enabled,
-                        R.drawable.opds_actionbar_nav_prev_disabled);
-            }
-        }
+        setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_actionbar_nav_up_enabled,
+                R.drawable.opds_actionbar_nav_up_disabled);
+        setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_actionbar_nav_next_enabled,
+                R.drawable.opds_actionbar_nav_next_disabled);
+        setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_actionbar_nav_prev_enabled,
+                R.drawable.opds_actionbar_nav_prev_disabled);
     }
 
     protected void updateNavigation(final android.view.Menu menu, final Feed feed) {
+        if (menu == null) {
+            return;
+        }
+
         final boolean canUp = feed != null;
         final boolean canNext = feed != null && feed.next != null;
         final boolean canPrev = feed != null && feed.prev != null;
 
-        if (menu != null) {
-            if (AndroidVersion.lessThan3x) {
-                setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_menu_nav_up_enabled,
-                        R.drawable.opds_menu_nav_up_disabled);
-                setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_menu_nav_next_enabled,
-                        R.drawable.opds_menu_nav_next_disabled);
-                setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_menu_nav_prev_enabled,
-                        R.drawable.opds_menu_nav_prev_disabled);
-            } else {
-                setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_actionbar_nav_up_enabled,
-                        R.drawable.opds_actionbar_nav_up_disabled);
-                setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_actionbar_nav_next_enabled,
-                        R.drawable.opds_actionbar_nav_next_disabled);
-                setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_actionbar_nav_prev_enabled,
-                        R.drawable.opds_actionbar_nav_prev_disabled);
-            }
-        }
+        setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_actionbar_nav_up_enabled,
+                R.drawable.opds_actionbar_nav_up_disabled);
+        setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_actionbar_nav_next_enabled,
+                R.drawable.opds_actionbar_nav_next_disabled);
+        setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_actionbar_nav_prev_enabled,
+                R.drawable.opds_actionbar_nav_prev_disabled);
     }
 
     protected String getFeedTitle(final Feed feed) {
