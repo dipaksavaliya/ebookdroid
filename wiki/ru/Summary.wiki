@@ -20,6 +20,7 @@ On Google Play Market:
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.legacy Legacy font pack]
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.nimbusl NimbusL font pack]
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.freefonts FreeFonts font pack]
+ * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.scada Scada font pack]
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.urwsymbol URW Symbol font pack]
 
 On Google Code:
