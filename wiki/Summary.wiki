@@ -2,14 +2,14 @@
 
 EBookDroid is an open source (GPL'ed) document viewer for Android based on the [http://code.google.com/p/vudroid VuDroid] code base.
 
-Supported the file in following formats:
+Supported file formats:
  * PDF
  * DjVu
  * XPS (OpenXPS)
  * comics books (cbz,cbr)
  * FictionBook (fb2, fb2.zip)
 
-This software contain:
+This software contains:
  * [http://www.mupdf.com/ MuPDF]
  * [http://djvu.sourceforge.net/ DjVuLibre]
  * [http://vtd-xml.sourceforge.net/ VTD-XML]
