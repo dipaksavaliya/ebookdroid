@@ -38,14 +38,14 @@ Sometimes it is useful to be able to manually select a specific portion of page 
 
 For example, some whitepapers carry disclaimers or website addresses on the side of the page: showing a full page with all margins or a page automatically cropped to include the side text would result in unnecessary waste of screen area. EBookDroid allows you to select only what you want to read, and it does so with unique flexibility.
 
-The custom crop menu can be accessed only through the View... menu and by subsequently selecting "*Custom crop*". You will have to select the desired viewable area by dragging the corners of a rectangular selection on the current page. Double tapping on the page will bring up a context menu with the following options:
+The custom crop menu can be accessed only through the View... menu and by subsequently selecting "*Manual Crop*". You will then have to select the desired viewable area by dragging the corners of a rectangular selection on the current page. Once you are satisfied with your selections, _double tap_ inside the area. This will bring up a context menu with the following relevant options:
 
  * Crop current page only
  * Crop all pages
  * Crop all even (odd) pages
  * Crop even and odd pages, symmetrically
 
-Ebookdroid can crop all pages with the same area pattern, can crop even and odd pages with a symmetric area pattern, or can crop even and odd pages with two different patterns. This will allow you to maximize content magnification of virtually every document.
+EBookDroid can crop all pages with the same area pattern, but it can also crop even and odd pages with a vertically symmetric area pattern, or with two different patterns. This will allow you to maximize content magnification of virtually every document.
 
 
 For example, some booktexts have a main text column on the right of each page and a smaller wide margin that can carry pictures or comments. Being the relevant content area the same for every page, these book are best viewed by selecting "*Crop all pages*" after having highlighted the area of interest.
