@@ -10,61 +10,62 @@ For example:
 
 == Q: How can I  have EBookDroid automatically open a certain type of file using an external file manager? ==
 == A: ==
-EbookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly form the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further istructions on how to do that. All MIME types supported by EBookDroid are listed [MimeTypes here].
+EbookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly from the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further istructions on how to do that. All MIME types supported by EBookDroid are listed [MimeTypes here].
 
-== Q: How can I maximize the viewable area in Ebookdroid? ==
+== Q: How can I maximize viewable area in Ebookdroid? ==
 == A: ==
-EbookDroid offers several features to make the most out of the - usually scarce - screen real estate of tablets and smartphones. Apart from the ordinary zoom level (manually selectable either by pinching in and out or by means of a slider at the bottom of the screen), the following methods can be used to magnify the relevant parts of the document:
+EbookDroid offers several features to make the most out of the - usually scarce - screen real estate of tablets and smartphones. Apart from the ordinary zoom level (manually selectable either by pinching in and out or by means of a slider at the bottom of the screen), the following methods can be used to magnify relevant parts of a document:
 
  * Split pages
  * Automatic crop margins
  * Manually crop margins (select and lock viewable area)
  * Zoom to a selected column of text
 
-These methods are usually not necessarily mutually exclusive as it is for example possible to split a landscape page in two portrait pages, each one with its own margins automatically cropped and it will still be possible to zoom in and out of single columns of text with a simple gesture. Please note that all these features can be applied on a per book basis, as EBookDroid will remember each book's specific settings.
+These methods are not necessarily mutually exclusive as it is for example possible to split a landscape page into two portrait pages, each one with its own margins automatically cropped and it will still be possible to zoom in and out of single columns of text with a simple gesture. Please note that all these features can be applied on a per book basis, as EBookDroid will remember each book's specific settings.
 
 === Split pages ===
 Some documents show two pages side by side in a single landscape view. EBookDroid can show half landscape page at the time in portrait mode, effectively splitting a single large landscape page into two subsequent portrait pages. This functionality is easily accessed by checking "Split page" in the More... View... menu. It can also be set as a default behavior for all books, although you'll rarely need to do so.
 
 === Crop margins (automatic) ===
-Most documents (books, whitepapers, tutorials) are have a page layout with wide empty margins around the page's content. While this is desirable in a printed document, it represents a waste of screen real estate on handheld devices such as smartphones and tablets. By checking the option "*Crop margins*" in the View... menu, you can have EBookDroid strip those margins away for you. 
+Most documents (books, whitepapers, tutorials)share a page layout characterized by wide empty margins around the page's content. While this is usually desirable in a printed document, it represents a waste of screen real estate on handheld devices such as smartphones and tablets. By checking the option "*Crop margins*" in the View... menu, you can have EBookDroid automatically strip those margins away for you. 
 
-This option can be set as a default for all books (by checking it from the General Settings menu) or on a per book basis (by setting it from the View... menu or the Book settings menu).
+This option can be set as a default for all books (by checking it in the General Settings menu) or on a per book basis (by accessing it from the View... menu or the Book Settings menu).
 
-When automatic crop is enable, you can zoom in by pinching in and return to the cropped version of the page by simply zooming out.
+When (automatic) Crop Margins is enabled, you can zoom in by pinching in and return to the cropped version of the page by simply zooming out.
 
 === Crop margins (manual) ===
-Sometimes it is useful to be able to manually select a specific portion of page to be shown on screen and lock that particular view. This happens when the document has a particular structure that would fool the algorithm behind automatic crop, because it could be preferable to show the same page size no matter the contente, or simply because the relevant content at a particular time is located only on certain parts of the page.
+Sometimes it is useful to be able to manually select a specific portion of page to be shown on screen and lock that particular view. This is the case when the document has a structure that would fool the algorithm used by the automatic Crop Margin function, or when it is preferable to a have a fixed sized (albeit enhanced) viewable area, or simply when the relevant content is only part of the complete content on the page.
 
-For example, some whitepapers carry disclaimers or website addresses on the side of the page: showing a full page with all margins or a page automatically cropped to include the side text would result in unnecessary waste of screen area. EBookDroid allows you to select only what you want to read, and it does so with unique flexibility.
+For example, some whitepapers carry disclaimers or website addresses on the side of the page: showing a full page with intact margins or a page automatically cropped to include the side text would result in unnecessary waste of screen area. EBookDroid allows you to select only what you want to read, and it does so with unique flexibility.
 
-The manual crop menu works in every visualization mode but can only be set in single page mode. It can be accessed through the View... menu by selecting "*Manual Crop*". You will be presentend with a customizable rectangular selection on top of the current (single) page.  By dragging handles at the opposite corners of the rectangular selection, you will be able to define the portion of the page that will be shown on the screen (viewable area). Once you are satisfied with your selections, _double tap_ inside the area. This will bring up a context menu with the following relevant options:
+The Manual Crop menu works in every visualization mode but _it can only be set in *single page* mode_. It can be accessed via the View... menu by selecting "*Manual Crop*". If you are in Single Page mode, you will be presentend with a customizable rectangular selection on top of the current (single) page.  By dragging handles at the opposite corners of the rectangular selection, you will be able to define the portion of the page that will be shown on the screen (viewable area). Once you are satisfied with your selection, _double tap_ inside the area. This will bring up a context menu with the following relevant options:
 
  * Crop current page only
  * Crop all pages
  * Crop all even (odd) pages
  * Crop even and odd pages, symmetrically
 
-EBookDroid can crop all pages with the same area pattern, but it can also crop even and odd pages with a vertically symmetric area patterns, or with two different patterns. This will allow you to maximize content magnification of virtually every document.
+EBookDroid can crop all pages with the same area pattern, but it can also crop even and odd pages with vertically symmetric area patterns, or with two different patterns. This will allow you to maximize content magnification in virtually every document.
 
 
-For example, some booktexts have a main text column on the right of each page and a smaller wide margin that can carry pictures or comments. Being the relevant content area the same for every page, these book are best viewed by selecting "*Crop all pages*" after having highlighted the area of interest.
+For example, some textbooks have the main body of text always on the right of each page and a wide margin that can carry pictures or comments always on the left (or the other way around). Being the relevant content area the same for every page, these book are best viewed by selecting "*Crop all pages*" after having highlighted the area of interest.
 
 
-Other textbooks have a symmetric layout, with the main column of text placed on the left for even pages and on the right for odd pages (or the other way around). These books are best served by selecting the area of interest on one page (it does not matter if it's even or odd) and then choosing "*Crop all even (odd) pages symmetrically*". The area for the specular pages will be automatically set by EBookDroid.
+Other textbooks have a symmetric layout, with the main body of text placed on the left for even pages and on the right for odd pages (or the other way around). These books are best served by selecting the area of interest on one page (it does not matter if it's even or odd) and then choosing "*Crop all even (odd) pages symmetrically*". The area for the specular pages will be automatically set by EBookDroid.
 
 
-Other documents present a certain type of content on one page and a different kind of content on the next page (for example, a picture on the left and text/comment on the right). EBookDroid's flexible Manual Crop allow you to select two different viewable areas for even and odd pages. Just repeat the Manual Crop procedure twice for two subsequent pages: each time, select the desired viewable area, double tap inside it and choose "*Crop all even (odd) pages*". Again, you do not need to worry which pages are are the odd or even; you just need to repeat the procedure for two (adjacent) pages. 
+Other documents present a certain type of content on one page and a different kind of content on the next one (for example, a picture on the left page and text/comment on the right page). 
+EBookDroid's flexible Manual Crop feature allow you to select two distinct viewable areas for even and odd pages. Just repeat the Manual Crop procedure twice for two subsequent pages: each time, select the desired viewable area, double tap inside it and choose "*Crop all even (odd) pages*". Again, you do not need to worry which pages are are the odd or even; you just need to repeat the procedure for two (adjacent) pages. 
 
 
-Once you have set the desired viewable area with Custom Crop, you can scroll, change page, zoom in and out and be sure to be able to return to the same view by pinching out. The area selected represents now the new page size for the document (to be specific: for one, all, all even or odd pages according to your choice).
+Once you have set the desired viewable area with Manual Crop, you can scroll, change page, zoom in and out and be sure to be able to return to the same view by pinching out. The area selected represents now the new page size for your document (to be specific: for one, all, all even or odd pages according to your choice).
 
-You can remove manual crop settings via the same menu you use to set them: View... , "Custom crop", double click on the selected area and then choose one of the options:
+You can remove manual crop settings via the same menu you use to set them: View... , "Manual crop", double click on the selected area and then choose one of the options:
 
  * Remove crop settings from current page(s)
  * Remove all crop setting
 
-The former will remove any (manual) crop settings associated with the current page or set of pages. This means that it can be used to remove crop settings from a single page, from all pages, from all even (or odd, but not both) pages, according to what had previously been chosen. To remove all (manual) crop settings from the selected document just choose "Remove all crop settings". This won't affect the automatic crop setting the document might have.
+The first option will remove any (manual) crop settings associated with the current page or set of pages. This means that it can be used to remove crop settings from a single page, from all pages, from all even (or odd, but not both) pages, according to what had previously been chosen. To remove all (manual) crop settings from the selected document just choose "Remove all crop settings". This won't affect the automatic crop setting the document might have.
 
 The last option in Manual Crop settings, 
 
@@ -73,7 +74,11 @@ The last option in Manual Crop settings,
 simply takes you back to the area selection screen. You can exit the Manual Crop submenu by using the back button on your device.
 
 === Zoom to column ===
-Zoom to Column is a feature that allows you to fit the width of selected columns to the screen. This is useful for reading multiple column documents, like newspapers, magazines, scientific papers, some textbooks and whitepapers. There is no menu to directly access this feature, whose action can be associated to a particular gesture (a tap, a long tap or a double tap, whatever suits you) in the "Tap Configuration" menu.  Repeating the gesture on the magnified column will take you back at the previous level of magnification (be it full page, a custom level or one imposed via automatic or manual crop settings).
+Zoom to Column is a feature that allows you to fit the width of a selected column to the screen. This is useful for reading multiple column documents, like newspapers, magazines, scientific papers, some textbooks and whitepapers. There is no menu to directly access this feature, whose action can be associated to a particular gesture (a tap, a long tap or a double tap, whatever suits you) in the "Tap Configuration" menu.  Repeating the gesture on the magnified column will take you back at the previous level of magnification (be it full page, a custom level or one imposed via automatic or manual crop settings).
+
+== Q: When I try to select the area for Manual Crop nothing happens. Why? ==
+== A: ==
+Although the viewable area selection affects all viewing modes, setting the area for Manual Crop requires your document to be displayed in Single Page mode. Please turn on Single Page mode before trying to set Manual Crop's viewable area, otherwise you will not be able to see the resizable rectangular selection superposed to the current (single) page.
 
 == Q: Why can I turn pages only in vertical? ==
 == A: ==
@@ -85,12 +90,12 @@ You can add your own tapping areas by means of the "Configure Taps" menu. You ca
 EBookDroid requires Internet access in order to provide OPDS functionality.
 Unlike many other e-book readers on the market, EBookDroid is open source, which means that everyone can read the source code and see what the program does and does not. You do not have to trust the developers: if you are not into software developing, you can ask a programmer you personally trust to look at the source code to see if something muddy is going on.
 
-== Q: EBookdroid is too slow for my tastes: can I speed it up a bit? ==
+== Q: On my device, EBookdroid is too slow for my tastes: can I speed it up a bit? ==
 == A: ==
-The first thing to do is getting the version of EBookDroid optimized for your particular architecture. See the download page for version optimized for Arm A8 or A9 and for Neon support.
+The first thing to do is getting a version of EBookDroid optimized for your device's particular architecture. Please refer to the download page on this website for versions optimized for different architectures (like for Arm A8 or A9 with Neon support).
 
 
-If you are using an optimized version of EBookDroid and your device is still sluggish, you can try fiddling with Advanced Settings. These are settings that affect performance but need to be balanced on a per device basis in order to avoid having the opposite effect to that intended. 
+If you are using an optimized version of EBookDroid and your browsing still feel sluggish, you can try fiddling with Advanced Settings. These are settings that affect performance but need to be balanced on a per device basis to avoid having the opposite effect to that intended. 
 For example: you can make EBookDroid load a certain number of pages (default is zero) into memory. The more pages you load into memory, the faster it will be moving from one to the next. But too many pages will drain your memory (sometimes unnecessarily, for example if you do not need to fast-browse and you take some time to read each page). Some users believe that setting to 3 the "Number of pages to load into memory" is a good compromise. Your mileage may vary.
 
 
