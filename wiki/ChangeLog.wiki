@@ -1,5 +1,20 @@
 #labels Featured
 
+= EBookDroid v1.5.5 changelog =
+
+=== UI changes ===
+ * Document scrolling has been tuned
+
+
+= EBookDroid v1.5.4 changelog =
+
+=== Other changes ===
+ * Arm7 version removed from Market
+
+== Bug fixes ==
+ * Some minor issues fixed
+
+
 = EBookDroid v1.5.3 changelog =
 
 == New features ==
