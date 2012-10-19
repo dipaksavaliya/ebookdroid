@@ -1,8 +1,8 @@
 package org.ebookdroid.droids.fb2.codec.handlers;
 
 import org.ebookdroid.droids.fb2.codec.FB2Page;
-import org.ebookdroid.droids.fb2.codec.FB2Tag;
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
+import org.ebookdroid.droids.fb2.codec.tags.FB2Tag;
 
 import java.util.ArrayList;
 
@@ -24,9 +24,10 @@ import org.emdev.common.textmarkup.RenderingStyle.Script;
 import org.emdev.common.textmarkup.TextStyle;
 import org.emdev.common.textmarkup.Words;
 import org.emdev.common.textmarkup.line.TextElement;
+import org.emdev.common.xml.tags.XmlTag;
 import org.emdev.utils.StringUtils;
 
-public class StandardHandler extends BaseHandler implements IContentHandler {
+public class StandardHandler extends BaseHandler {
 
     protected boolean documentStarted = false, documentEnded = false;
 
@@ -71,15 +72,15 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
     }
 
     @Override
-    public boolean parseAttributes(final FB2Tag tag) {
-        if (tag == FB2Tag.P) {
+    public boolean parseAttributes(final XmlTag tag) {
+        if (tag == FB2Tag.P.tag) {
             return parseNotesInParagraphs && tag.attributes.length > 0;
         }
         return tag.attributes.length > 0;
     }
 
     @Override
-    public void startElement(final FB2Tag tag, final String... attributes) {
+    public void startElement(final XmlTag tag, final String... attributes) {
         spaceNeeded = true;
         final ArrayList<MarkupElement> markupStream = parsedContent.getMarkupStream(currentStream);
 
@@ -87,7 +88,7 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
             processTagContent();
         }
 
-        switch (tag) {
+        switch (tag.tag) {
             case P:
                 paragraphParsing = true;
                 if (!parsingNotes) {
@@ -290,7 +291,7 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
                     final String streamId = currentTable.uuid + ":" + rowCount + ":"
                             + currentTable.getColCount(rowCount - 1);
                     c.stream = streamId;
-                    c.hasBackground = tag == FB2Tag.TH;
+                    c.hasBackground = tag == FB2Tag.TH.tag;
                     final String align = attributes[0];
                     if ("right".equals(align)) {
                         c.align = JustificationMode.Right;
@@ -310,13 +311,13 @@ public class StandardHandler extends BaseHandler implements IContentHandler {
     }
 
     @Override
-    public void endElement(final FB2Tag tag) {
+    public void endElement(final XmlTag tag) {
         if (tmpTagContent.length() > 0) {
             processTagContent();
         }
         spaceNeeded = true;
         final ArrayList<MarkupElement> markupStream = parsedContent.getMarkupStream(currentStream);
-        switch (tag) {
+        switch (tag.tag) {
             case LI:
                 markupStream.add(new MarkupExtraSpace(-(int) (crs.paint.pOffset.width * ulLevel)));
             case P:

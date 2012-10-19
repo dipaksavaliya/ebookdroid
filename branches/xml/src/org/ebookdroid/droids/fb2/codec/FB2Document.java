@@ -11,9 +11,7 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
 import org.ebookdroid.droids.fb2.codec.handlers.StandardHandler;
-import org.ebookdroid.droids.fb2.codec.parsers.DuckbillParser;
-import org.ebookdroid.droids.fb2.codec.parsers.SaxParser;
-import org.ebookdroid.droids.fb2.codec.parsers.VTDExParser;
+import org.ebookdroid.droids.fb2.codec.tags.FB2TagFactory;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;
@@ -43,6 +41,9 @@ import org.emdev.common.textmarkup.TextStyle;
 import org.emdev.common.textmarkup.Words;
 import org.emdev.common.textmarkup.line.HorizontalRule;
 import org.emdev.common.textmarkup.line.Line;
+import org.emdev.common.xml.parsers.DuckbillParser;
+import org.emdev.common.xml.parsers.SaxParser;
+import org.emdev.common.xml.parsers.VTDExParser;
 import org.emdev.utils.LengthUtils;
 
 import com.ximpleware.VTDGenEx;
@@ -185,7 +186,7 @@ public class FB2Document extends AbstractCodecDocument {
                 resources.add(isr);
 
                 final SaxParser p = new SaxParser();
-                p.parse(isr, h);
+                p.parse(isr, FB2TagFactory.instance, h);
             }
         } catch (final StopParsingException e) {
             // do nothing
@@ -229,7 +230,7 @@ public class FB2Document extends AbstractCodecDocument {
                 System.out.println("VTDEx parse: " + (t3 - t2) + " ms");
 
                 final VTDExParser p = new VTDExParser();
-                p.parse(gen, h);
+                p.parse(gen, FB2TagFactory.instance, h);
 
                 final long t4 = System.currentTimeMillis();
                 System.out.println("VTDEx  scan: " + (t4 - t3) + " ms");
@@ -265,7 +266,7 @@ public class FB2Document extends AbstractCodecDocument {
                 System.out.println("DUCK  load: " + (t2 - t1) + " ms");
 
                 final DuckbillParser p = new DuckbillParser();
-                p.parse(chars, (int) size.get(), h);
+                p.parse(chars, (int) size.get(), FB2TagFactory.instance, h);
 
                 final long t4 = System.currentTimeMillis();
                 System.out.println("DUCK  parse: " + (t4 - t2) + " ms");

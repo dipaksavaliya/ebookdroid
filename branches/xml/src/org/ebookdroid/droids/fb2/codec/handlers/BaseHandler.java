@@ -1,6 +1,7 @@
 package org.ebookdroid.droids.fb2.codec.handlers;
 
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
+import org.ebookdroid.droids.fb2.codec.tags.FB2TagId;
 
 import java.util.LinkedList;
 import java.util.regex.Matcher;
@@ -11,8 +12,9 @@ import org.emdev.common.textmarkup.JustificationMode;
 import org.emdev.common.textmarkup.MarkupElement;
 import org.emdev.common.textmarkup.RenderingStyle;
 import org.emdev.common.textmarkup.TextStyle;
+import org.emdev.common.xml.IContentHandler;
 
-public abstract class BaseHandler implements IContentHandler {
+public abstract class BaseHandler implements IContentHandler, FB2TagId {
 
     protected static final Pattern notesPattern = Pattern.compile("n([0-9]+)|n_([0-9]+)|note_([0-9]+)|.*?([0-9]+)");
 

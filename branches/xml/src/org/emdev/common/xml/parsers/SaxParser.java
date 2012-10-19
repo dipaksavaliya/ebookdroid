@@ -1,7 +1,4 @@
-package org.ebookdroid.droids.fb2.codec.parsers;
-
-import org.ebookdroid.droids.fb2.codec.FB2Tag;
-import org.ebookdroid.droids.fb2.codec.handlers.IContentHandler;
+package org.emdev.common.xml.parsers;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -10,6 +7,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.emdev.common.xml.IContentHandler;
+import org.emdev.common.xml.IXmlTagFactory;
+import org.emdev.common.xml.tags.XmlTag;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -21,14 +21,16 @@ public class SaxParser extends DefaultHandler {
 
     private final String[] attrs = new String[2];
 
-    private final FB2Tag[] stack = new FB2Tag[64];
+    private final XmlTag[] stack = new XmlTag[64];
 
     private int depth;
 
+    private IXmlTagFactory factory;
     private IContentHandler handler;
 
-    public void parse(final Reader isr, final IContentHandler handler) throws ParserConfigurationException,
+    public void parse(final Reader isr, final IXmlTagFactory factory, final IContentHandler handler) throws ParserConfigurationException,
             SAXException, IOException {
+        this.factory = factory;
         this.handler = handler;
         this.depth = 0;
 
@@ -42,7 +44,7 @@ public class SaxParser extends DefaultHandler {
     public void startElement(final String uri, final String localName, final String qName, final Attributes attributes)
             throws SAXException {
 
-        final FB2Tag tag = FB2Tag.getTagByName(qName);
+        final XmlTag tag = factory.getTagByName(qName);
         stack[depth++] = tag;
 
         if (handler.parseAttributes(tag)) {
@@ -64,7 +66,7 @@ public class SaxParser extends DefaultHandler {
 
     @Override
     public void endElement(final String uri, final String localName, final String qName) {
-        final FB2Tag tag = stack[--depth];
+        final XmlTag tag = stack[--depth];
         handler.endElement(tag);
     }
 }

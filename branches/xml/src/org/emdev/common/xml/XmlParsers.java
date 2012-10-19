@@ -1,11 +1,11 @@
-package org.ebookdroid.droids.fb2.codec.parsers;
+package org.emdev.common.xml;
 
 import org.ebookdroid.R;
 
 import org.emdev.BaseDroidApp;
 import org.emdev.utils.enums.ResourceConstant;
 
-public enum FB2Parsers implements ResourceConstant {
+public enum XmlParsers implements ResourceConstant {
 
     /**
      *
@@ -22,7 +22,7 @@ public enum FB2Parsers implements ResourceConstant {
 
     private final String resValue;
 
-    private FB2Parsers(final int resId) {
+    private XmlParsers(final int resId) {
         this.resValue = BaseDroidApp.context.getString(resId);
     }
 
