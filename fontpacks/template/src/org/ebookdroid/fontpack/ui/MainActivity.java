@@ -25,12 +25,12 @@ public class MainActivity extends AbstractActionActivity<MainActivity, ActionCon
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (FontpackApp.EBOOKDROID_VERSION == 0) {
+        if (FontpackApp.EBOOKDROID_VERSION == -1) {
             showErrorDlg(R.string.msg_no_ebookdroid);
             return;
         }
 
-        if (FontpackApp.EBOOKDROID_VERSION < 1499) {
+        if (0 < FontpackApp.EBOOKDROID_VERSION && FontpackApp.EBOOKDROID_VERSION < 1499) {
             showErrorDlg(R.string.msg_old_ebookdroid);
             return;
         }

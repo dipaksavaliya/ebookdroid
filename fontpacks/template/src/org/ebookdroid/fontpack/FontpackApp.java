@@ -29,7 +29,7 @@ public class FontpackApp extends BaseDroidApp {
     public void onCreate() {
         super.onCreate();
 
-        EBOOKDROID_VERSION = 0;
+        EBOOKDROID_VERSION = -1;
         final PackageManager pm = getPackageManager();
         try {
             final PackageInfo pi = pm.getPackageInfo(EBOOKDROID_PACKAGE, 0);
