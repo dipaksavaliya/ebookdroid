@@ -23,6 +23,8 @@ The following extra parameters are supported to customize book viewer:
 ||*Name*||*Type*||*Values*||*Description*||
 ||persistent||Boolean||true/false||if true, all book preference changes (including position and zoom level) should be stored in DB||
 ||pageIndex||String||numberic string||The page number (started from 0) to be shown||
+||offsetX||String||floating string||The horizontal offset on defined page: [0, 1]||
+||offsetY||String||floating string||The vertical offset on defined page: [0, 1]||
 ||viewMode||String|| One of the following strings:<ul><li>VERTICALL_SCROLL</li><li>HORIZONTAL_SCROLL</li><li>SINGLE_PAGE</li></ul>|| Defines the book view mode||
 ||animationType||String|| One of the following strings:<ul><li>NONE CURLER</li><li>CURLER_DYNAMIC</li><li>CURLER_NATURAL</li><li>SLIDER</li><li>FADER</li><li>SQUEEZER</li></ul>|| Defines the animation type for single page mode||
 ||pageAlign||String|| One of the following strings:<ul><li>WIDTH</li><li>HEIGHT</li><li>AUTO</li></ul>|| Defines the page align type for single page mode||
