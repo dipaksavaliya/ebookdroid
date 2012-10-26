@@ -1,5 +1,6 @@
 package org.emdev.common.xml;
 
+import org.emdev.common.textmarkup.text.ITextProvider;
 import org.emdev.common.xml.tags.XmlTag;
 
 
@@ -11,7 +12,7 @@ public interface IContentHandler {
 
     boolean skipCharacters();
 
-    void characters(final char[] ch, final int start, final int length, boolean persistent);
+    void characters(final ITextProvider p, final int start, final int length);
 
     void endElement(final XmlTag tag);
 

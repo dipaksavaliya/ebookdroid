@@ -4,26 +4,16 @@ import org.ebookdroid.droids.fb2.codec.FB2Page;
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
 import org.ebookdroid.droids.fb2.codec.tags.FB2Tag;
 
-import java.util.ArrayList;
-
-import org.emdev.common.lang.StrBuilder;
 import org.emdev.common.textmarkup.JustificationMode;
-import org.emdev.common.textmarkup.MarkupElement;
-import org.emdev.common.textmarkup.MarkupEndDocument;
-import org.emdev.common.textmarkup.MarkupEndPage;
-import org.emdev.common.textmarkup.MarkupExtraSpace;
-import org.emdev.common.textmarkup.MarkupImageRef;
-import org.emdev.common.textmarkup.MarkupNoSpace;
-import org.emdev.common.textmarkup.MarkupNote;
-import org.emdev.common.textmarkup.MarkupParagraphEnd;
+import org.emdev.common.textmarkup.MarkupStream;
 import org.emdev.common.textmarkup.MarkupTable;
 import org.emdev.common.textmarkup.MarkupTable.Cell;
-import org.emdev.common.textmarkup.MarkupTitle;
+import org.emdev.common.textmarkup.MarkupTag;
 import org.emdev.common.textmarkup.RenderingStyle;
 import org.emdev.common.textmarkup.RenderingStyle.Script;
 import org.emdev.common.textmarkup.TextStyle;
-import org.emdev.common.textmarkup.Words;
-import org.emdev.common.textmarkup.line.TextElement;
+import org.emdev.common.textmarkup.text.ITextProvider;
+import org.emdev.common.textmarkup.text.TextProvider;
 import org.emdev.common.xml.tags.XmlTag;
 import org.emdev.utils.StringUtils;
 
@@ -50,17 +40,13 @@ public class StandardHandler extends BaseHandler {
     protected final StringBuilder tmpBinaryContents = new StringBuilder(64 * 1024);
     protected final StringBuilder title = new StringBuilder();
 
-    protected final StrBuilder tmpTagContent = new StrBuilder(16 * 1024);
-
     protected int sectionLevel = -1;
 
     protected boolean skipContent = true;
 
     protected MarkupTable currentTable;
 
-    protected boolean useUniqueTextElements;
-
-    private static final char[] BULLET = "\u2022 ".toCharArray();
+    private static final ITextProvider BULLET = new TextProvider("\u2022 ");
 
     public StandardHandler(final ParsedContent content) {
         this(content, true);
@@ -68,7 +54,6 @@ public class StandardHandler extends BaseHandler {
 
     public StandardHandler(final ParsedContent content, final boolean useUniqueTextElements) {
         super(content);
-        this.useUniqueTextElements = useUniqueTextElements;
     }
 
     @Override
@@ -82,18 +67,14 @@ public class StandardHandler extends BaseHandler {
     @Override
     public void startElement(final XmlTag tag, final String... attributes) {
         spaceNeeded = true;
-        final ArrayList<MarkupElement> markupStream = parsedContent.getMarkupStream(currentStream);
-
-        if (tmpTagContent.length() > 0) {
-            processTagContent();
-        }
+        final MarkupStream markupStream = parsedContent.getMarkupStream(currentStream);
 
         switch (tag.tag) {
             case P:
                 paragraphParsing = true;
                 if (!parsingNotes) {
                     if (!inTitle) {
-                        markupStream.add(crs.paint.pOffset);
+                        markupStream.fixedWhiteSpace(crs.paint.pOffset);
                     } else {
                         if (title.length() > 0) {
                             title.append(" ");
@@ -103,28 +84,27 @@ public class StandardHandler extends BaseHandler {
                     currentStream = attributes[0];
                     if (currentStream != null) {
                         final String n = getNoteId(currentStream, true);
-                        parsedContent.getMarkupStream(currentStream).add(
-                                text(n.toCharArray(), 0, n.length(), crs, true));
-                        parsedContent.getMarkupStream(currentStream).add(crs.paint.fixedSpace);
+                        parsedContent.getMarkupStream(currentStream).text(parsedContent, new TextProvider(n), crs);
+                        parsedContent.getMarkupStream(currentStream).fixedWhiteSpace(crs.paint.fixedSpace);
                         noteFirstWord = true;
                     }
                 }
                 break;
             case UL:
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.endParagraph();
                 ulLevel++;
                 break;
             case LI:
                 paragraphParsing = true;
-                markupStream.add(new MarkupExtraSpace((int) (crs.paint.pOffset.width * ulLevel)));
-                markupStream.add(new TextElement(BULLET, 0, BULLET.length, crs));
-                markupStream.add(MarkupNoSpace._instance);
+                markupStream.extraSpace(((int) (crs.paint.pOffset.width * ulLevel)));
+                markupStream.text(parsedContent, BULLET, crs);
+                markupStream.noSpace();
                 break;
             case V:
                 paragraphParsing = true;
-                markupStream.add(crs.paint.pOffset);
-                markupStream.add(crs.paint.vOffset);
+                markupStream.fixedWhiteSpace(crs.paint.pOffset);
+                markupStream.fixedWhiteSpace(crs.paint.vOffset);
                 break;
             case BINARY:
                 tmpBinaryName = attributes[0];
@@ -140,19 +120,19 @@ public class StandardHandler extends BaseHandler {
                 if ("notes".equals(attributes[0])) {
                     if (documentStarted) {
                         documentEnded = true;
-                        parsedContent.getMarkupStream(null).add(new MarkupEndDocument());
+                        parsedContent.getMarkupStream(null).endDocument();
                     }
                     parsingNotes = true;
-                    crs = new RenderingStyle(parsedContent, TextStyle.FOOTNOTE);
+                    crs = RenderingStyle.get(parsedContent, TextStyle.FOOTNOTE);
                 }
                 if ("footnotes".equals(attributes[0])) {
                     if (documentStarted) {
                         documentEnded = true;
-                        parsedContent.getMarkupStream(null).add(new MarkupEndDocument());
+                        parsedContent.getMarkupStream(null).endDocument();
                     }
                     parsingNotes = true;
                     parseNotesInParagraphs = true;
-                    crs = new RenderingStyle(parsedContent, TextStyle.FOOTNOTE);
+                    crs = RenderingStyle.get(parsedContent, TextStyle.FOOTNOTE);
                 }
                 break;
             case SECTION:
@@ -161,9 +141,8 @@ public class StandardHandler extends BaseHandler {
                         currentStream = attributes[0];
                         if (currentStream != null) {
                             final String n = getNoteId(currentStream, true);
-                            parsedContent.getMarkupStream(currentStream).add(
-                                    text(n.toCharArray(), 0, n.length(), crs, true));
-                            parsedContent.getMarkupStream(currentStream).add(crs.paint.fixedSpace);
+                            parsedContent.getMarkupStream(currentStream).text(parsedContent, new TextProvider(n), crs);
+                            parsedContent.getMarkupStream(currentStream).fixedWhiteSpace(crs.paint.fixedSpace);
                             noteFirstWord = true;
                         }
                     }
@@ -174,9 +153,9 @@ public class StandardHandler extends BaseHandler {
             case TITLE:
                 if (!parsingNotes) {
                     setTitleStyle(!isInSection() ? TextStyle.MAIN_TITLE : TextStyle.SECTION_TITLE);
-                    markupStream.add(crs.jm);
-                    markupStream.add(emptyLine(crs.textSize));
-                    markupStream.add(MarkupParagraphEnd.E);
+                    markupStream.justify(crs.jm);
+                    markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                    markupStream.endParagraph();
                     title.setLength(0);
                 } else {
                     skipContent = true;
@@ -185,50 +164,50 @@ public class StandardHandler extends BaseHandler {
                 break;
             case CITE:
                 inCite = true;
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
-                markupStream.add(new MarkupExtraSpace(FB2Page.PAGE_WIDTH / 6));
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.endParagraph();
+                markupStream.extraSpace(FB2Page.PAGE_WIDTH / 6);
                 break;
             case SUBTITLE:
                 paragraphParsing = true;
-                markupStream.add(setSubtitleStyle().jm);
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
+                markupStream.justify(setSubtitleStyle().jm);
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.endParagraph();
                 break;
             case TEXT_AUTHOR:
                 paragraphParsing = true;
-                markupStream.add(setTextAuthorStyle(inCite).jm);
-                markupStream.add(crs.paint.pOffset);
+                markupStream.justify(setTextAuthorStyle(inCite).jm);
+                markupStream.fixedWhiteSpace(crs.paint.pOffset);
                 break;
             case DATE:
                 if (documentStarted && !documentEnded || parsingNotes) {
                     paragraphParsing = true;
-                    markupStream.add(setTextAuthorStyle(inCite).jm);
-                    markupStream.add(crs.paint.pOffset);
+                    markupStream.justify(setTextAuthorStyle(inCite).jm);
+                    markupStream.fixedWhiteSpace(crs.paint.pOffset);
                 }
                 break;
             case A:
                 if (paragraphParsing) {
                     if ("note".equalsIgnoreCase(attributes[1])) {
                         final String note = attributes[0];
-                        markupStream.add(new MarkupNote(note));
                         final String prettyNote = " " + getNoteId(note, false);
-                        markupStream.add(MarkupNoSpace._instance);
-                        markupStream.add(new TextElement(prettyNote.toCharArray(), 0, prettyNote.length(),
-                                new RenderingStyle(crs, Script.SUPER)));
+                        final int ref = parsedContent.getNoteRef(note);
+                        markupStream.note(ref);
+                        markupStream.noSpace();
+                        markupStream.text(parsedContent, new TextProvider(prettyNote), RenderingStyle.get(crs, Script.SUPER));
                         skipContent = true;
                     }
                 }
                 break;
             case EMPTY_LINE:
             case BR:
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.endParagraph();
                 break;
             case POEM:
-                markupStream.add(MarkupParagraphEnd.E);
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(setPoemStyle().jm);
+                markupStream.endParagraph();
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.justify(setPoemStyle().jm);
                 break;
             case STRONG:
                 setBoldStyle();
@@ -248,22 +227,23 @@ public class StandardHandler extends BaseHandler {
                 setEmphasisStyle();
                 break;
             case EPIGRAPH:
-                markupStream.add(MarkupParagraphEnd.E);
-                markupStream.add(setEpigraphStyle().jm);
+                markupStream.endParagraph();
+                markupStream.justify(setEpigraphStyle().jm);
                 break;
             case IMAGE:
-                final String ref = attributes[0];
+                final String name = attributes[0];
                 if (cover) {
-                    parsedContent.setCover(ref);
+                    parsedContent.setCover(name);
                 } else {
                     if (!paragraphParsing) {
-                        markupStream.add(emptyLine(crs.textSize));
-                        markupStream.add(MarkupParagraphEnd.E);
+                        markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                        markupStream.endParagraph();
                     }
-                    markupStream.add(new MarkupImageRef(ref, paragraphParsing));
+                    int ref = parsedContent.getImageRef(name);
+                    markupStream.imageRef(ref, paragraphParsing);
                     if (!paragraphParsing) {
-                        markupStream.add(emptyLine(crs.textSize));
-                        markupStream.add(MarkupParagraphEnd.E);
+                        markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                        markupStream.endParagraph();
                     }
                 }
                 break;
@@ -275,7 +255,7 @@ public class StandardHandler extends BaseHandler {
                 break;
             case TABLE:
                 currentTable = new MarkupTable();
-                markupStream.add(currentTable);
+                // markupStream.add(currentTable);
                 break;
             case TR:
                 if (currentTable != null) {
@@ -307,30 +287,26 @@ public class StandardHandler extends BaseHandler {
             default:
                 break;
         }
-        tmpTagContent.setLength(0);
     }
 
     @Override
     public void endElement(final XmlTag tag) {
-        if (tmpTagContent.length() > 0) {
-            processTagContent();
-        }
         spaceNeeded = true;
-        final ArrayList<MarkupElement> markupStream = parsedContent.getMarkupStream(currentStream);
+        final MarkupStream markupStream = parsedContent.getMarkupStream(currentStream);
         switch (tag.tag) {
             case LI:
-                markupStream.add(new MarkupExtraSpace(-(int) (crs.paint.pOffset.width * ulLevel)));
+                markupStream.extraSpace(-(int) (crs.paint.pOffset.width * ulLevel));
             case P:
             case V:
                 if (!skipContent) {
-                    markupStream.add(MarkupParagraphEnd.E);
+                    markupStream.endParagraph();
                 }
                 paragraphParsing = false;
                 break;
             case UL:
                 ulLevel--;
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
+                markupStream.fixedWhiteSpace(crs.paint.emptyLine);
+                markupStream.endParagraph();
                 break;
             case BINARY:
                 if (tmpBinaryContents.length() > 0) {
@@ -350,7 +326,7 @@ public class StandardHandler extends BaseHandler {
                     noteId = -1;
                 } else {
                     if (isInSection()) {
-                        markupStream.add(MarkupEndPage.E);
+                        markupStream.endPage();
                         sectionLevel--;
                     }
                 }
@@ -359,39 +335,39 @@ public class StandardHandler extends BaseHandler {
                 inTitle = false;
                 skipContent = false;
                 if (!parsingNotes) {
-                    markupStream.add(new MarkupTitle(title.toString(), sectionLevel));
-                    markupStream.add(emptyLine(crs.textSize));
-                    markupStream.add(MarkupParagraphEnd.E);
-                    markupStream.add(setPrevStyle().jm);
+                    markupStream.title(title.toString(), sectionLevel);
+                    markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                    markupStream.endParagraph();
+                    markupStream.justify(setPrevStyle().jm);
                 }
                 break;
             case CITE:
                 inCite = false;
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
-                markupStream.add(new MarkupExtraSpace(-FB2Page.PAGE_WIDTH / 6));
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.endParagraph();
+                markupStream.extraSpace(-FB2Page.PAGE_WIDTH / 6);
                 break;
             case SUBTITLE:
-                markupStream.add(MarkupParagraphEnd.E);
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
-                markupStream.add(setPrevStyle().jm);
+                markupStream.endParagraph();
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.endParagraph();
+                markupStream.justify(setPrevStyle().jm);
                 paragraphParsing = false;
                 break;
             case TEXT_AUTHOR:
             case DATE:
-                markupStream.add(MarkupParagraphEnd.E);
-                markupStream.add(setPrevStyle().jm);
+                markupStream.endParagraph();
+                markupStream.justify(setPrevStyle().jm);
                 paragraphParsing = false;
                 break;
             case STANZA:
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.endParagraph();
                 break;
             case POEM:
-                markupStream.add(emptyLine(crs.textSize));
-                markupStream.add(MarkupParagraphEnd.E);
-                markupStream.add(setPrevStyle().jm);
+                markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
+                markupStream.endParagraph();
+                markupStream.justify(setPrevStyle().jm);
                 break;
             case STRONG:
                 setPrevStyle();
@@ -401,15 +377,10 @@ public class StandardHandler extends BaseHandler {
                 setPrevStyle();
                 break;
             case SUP:
-                setPrevStyle();
-                if (markupStream.get(markupStream.size() - 1) instanceof MarkupNoSpace) {
-                    markupStream.remove(markupStream.size() - 1);
-                }
-                break;
             case SUB:
                 setPrevStyle();
-                if (markupStream.get(markupStream.size() - 1) instanceof MarkupNoSpace) {
-                    markupStream.remove(markupStream.size() - 1);
+                if (markupStream.lastTag() == MarkupTag.MarkupNoSpace) {
+                    markupStream.noSpaceOff();
                 }
                 break;
             case EMPHASIS:
@@ -417,7 +388,7 @@ public class StandardHandler extends BaseHandler {
                 spaceNeeded = false;
                 break;
             case EPIGRAPH:
-                markupStream.add(setPrevStyle().jm);
+                markupStream.justify(setPrevStyle().jm);
                 break;
             case COVERPAGE:
                 cover = false;
@@ -429,7 +400,7 @@ public class StandardHandler extends BaseHandler {
                 break;
             case ANNOTATION:
                 skipContent = true;
-                parsedContent.getMarkupStream(null).add(MarkupEndPage.E);
+                parsedContent.getMarkupStream(null).endPage();
                 break;
             case TABLE:
                 currentTable = null;
@@ -455,39 +426,26 @@ public class StandardHandler extends BaseHandler {
     }
 
     @Override
-    public void characters(final char[] ch, final int start, final int length, final boolean persistent) {
+    public void characters(final ITextProvider p, final int start, final int length) {
         if (parsingBinary) {
-            tmpBinaryContents.append(ch, start, length);
+            tmpBinaryContents.append(p.text(), start, length);
         } else {
-            if (persistent) {
-                processText(ch, start, length, persistent);
-            } else {
-                tmpTagContent.append(ch, start, length);
-            }
+            processText(p, start, length);
         }
     }
 
-    protected void processTagContent() {
-
-        final int length = tmpTagContent.length();
-        final int start = 0;
-        final char[] ch = tmpTagContent.getValue();
-
-        processText(ch, start, length, false);
-
-        tmpTagContent.setLength(0);
-    }
-
-    protected void processText(final char[] ch, final int start, final int length, final boolean persistent) {
+    protected void processText(final ITextProvider ch, final int start, final int length) {
+        char[] text = ch.text();
         if (inTitle) {
-            title.append(ch, start, length);
+            title.append(text, start, length);
         }
-        final int count = StringUtils.split(ch, start, length, starts, lengths);
+        final int count = StringUtils.split(text, start, length, starts, lengths);
 
         if (count > 0) {
-            final ArrayList<MarkupElement> markupStream = parsedContent.getMarkupStream(currentStream);
-            if (!spaceNeeded && !Character.isWhitespace(ch[start])) {
-                markupStream.add(MarkupNoSpace._instance);
+            final MarkupStream markupStream = parsedContent.getMarkupStream(currentStream);
+            char c = text[start];
+            if (!spaceNeeded && !Character.isWhitespace(c)) {
+                markupStream.noSpace();
             }
             spaceNeeded = true;
 
@@ -497,38 +455,22 @@ public class StandardHandler extends BaseHandler {
                 if (parsingNotes) {
                     if (noteFirstWord) {
                         noteFirstWord = false;
-                        int id = getNoteId(ch, st, len);
+                        int id = getNoteId(text, st, len);
                         if (id == noteId) {
                             continue;
                         }
                     }
                 }
-                markupStream.add(text(ch, st, len, crs, persistent));
-                if (crs.script != null) {
-                    markupStream.add(MarkupNoSpace._instance);
+                markupStream.text(parsedContent, ch, st, len, crs);
+                if (crs.script != Script.NONE) {
+                    markupStream.noSpace();
                 }
             }
-            if (Character.isWhitespace(ch[start + length - 1])) {
-                markupStream.add(MarkupNoSpace._instance);
-                markupStream.add(crs.paint.space);
+            if (Character.isWhitespace(text[start + length - 1])) {
+                markupStream.noSpace();
+                markupStream.whiteSpace(crs.paint.space);
             }
             spaceNeeded = false;
         }
     }
-
-    protected TextElement text(final char[] ch, final int st, final int len, final RenderingStyle style,
-            final boolean persistent) {
-        if (!useUniqueTextElements && persistent) {
-            return new TextElement(ch, st, len, style);
-        }
-
-        Words w = parsedContent.words.get(style.paint.key);
-        if (w == null) {
-            w = new Words();
-            parsedContent.words.append(style.paint.key, w);
-        }
-        return w.get(ch, st, len, style, persistent);
-
-    }
-
 }

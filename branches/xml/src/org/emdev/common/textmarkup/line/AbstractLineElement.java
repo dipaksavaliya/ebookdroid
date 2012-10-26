@@ -1,15 +1,16 @@
 package org.emdev.common.textmarkup.line;
 
-
 import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 
 import android.graphics.RectF;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import org.emdev.common.textmarkup.MarkupTag;
 import org.emdev.common.textmarkup.RenderingStyle;
 import org.emdev.utils.LengthUtils;
-
 
 public abstract class AbstractLineElement implements LineElement {
 
@@ -23,6 +24,12 @@ public abstract class AbstractLineElement implements LineElement {
 
     public AbstractLineElement(final RectF rect) {
         this(rect.width(), (int) rect.height());
+    }
+
+    public static void write(DataOutputStream out, MarkupTag tag, float width, int height) throws IOException {
+        out.writeByte(tag.ordinal());
+        out.writeFloat(width);
+        out.writeInt(height);
     }
 
     @Override

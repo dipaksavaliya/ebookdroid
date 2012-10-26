@@ -2,6 +2,7 @@ package org.emdev.common.xml.parsers;
 
 import java.util.Arrays;
 
+import org.emdev.common.textmarkup.text.TextProvider;
 import org.emdev.common.xml.IContentHandler;
 import org.emdev.common.xml.IXmlTagFactory;
 import org.emdev.common.xml.tags.XmlTag;
@@ -14,13 +15,15 @@ public class DuckbillParser {
 
         int charsStart = -1;
 
+        TextProvider docProvider = new TextProvider(r.XmlDoc);
+
         while (r.XmlOffset < length) {
             // Check if START_TAG, END_TAG or COMMENT tokens
             if (r.skipChar('<')) {
                 // Process text of parent element in case of START_TAG or current element in case of END_TAG
                 if (charsStart != -1) {
                     if (!handler.skipCharacters()) {
-                        handler.characters(r.XmlDoc, charsStart, r.XmlOffset - 1 - charsStart, true);
+                        handler.characters(docProvider, charsStart, r.XmlOffset - 1 - charsStart);
                     }
                     charsStart = -1;
                 }

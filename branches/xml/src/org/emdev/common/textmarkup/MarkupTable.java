@@ -3,6 +3,8 @@ package org.emdev.common.textmarkup;
 
 import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +27,10 @@ public class MarkupTable implements MarkupElement {
     public final String uuid = UUID.randomUUID().toString();
 
     final ArrayList<ArrayList<Cell>> rows = new ArrayList<ArrayList<Cell>>();
+
+    @Override
+    public void publishToStream(DataOutputStream out) throws IOException {
+    }
 
     @Override
     public void publishToLines(ArrayList<Line> lines, LineCreationParams params) {

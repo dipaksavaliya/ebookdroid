@@ -12,6 +12,7 @@ import org.emdev.common.textmarkup.JustificationMode;
 import org.emdev.common.textmarkup.MarkupElement;
 import org.emdev.common.textmarkup.RenderingStyle;
 import org.emdev.common.textmarkup.TextStyle;
+import org.emdev.common.textmarkup.line.LineFixedWhiteSpace;
 import org.emdev.common.xml.IContentHandler;
 
 public abstract class BaseHandler implements IContentHandler, FB2TagId {
@@ -36,7 +37,7 @@ public abstract class BaseHandler implements IContentHandler, FB2TagId {
     public BaseHandler(final ParsedContent content) {
         parsedContent = content;
         currentStream = null;
-        crs = new RenderingStyle(content, TextStyle.TEXT);
+        crs = RenderingStyle.get(content, TextStyle.TEXT);
     }
 
     protected final RenderingStyle setPrevStyle() {
@@ -48,67 +49,67 @@ public abstract class BaseHandler implements IContentHandler, FB2TagId {
 
     protected final RenderingStyle setTitleStyle(final TextStyle font) {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(crs, font, JustificationMode.Center);
+        crs = RenderingStyle.get(crs, font, JustificationMode.Center);
         return crs;
     }
 
     protected final RenderingStyle setEpigraphStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(parsedContent, crs, JustificationMode.Right,
+        crs = RenderingStyle.get(parsedContent, crs, JustificationMode.Right,
                 org.emdev.common.fonts.data.FontStyle.ITALIC);
         return crs;
     }
 
     protected final RenderingStyle setBoldStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(parsedContent, crs, true);
+        crs = RenderingStyle.get(parsedContent, crs, true);
         return crs;
     }
 
     protected final RenderingStyle setSupStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(crs, RenderingStyle.Script.SUPER);
+        crs = RenderingStyle.get(crs, RenderingStyle.Script.SUPER);
         return crs;
     }
 
     protected final RenderingStyle setSubStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(crs, RenderingStyle.Script.SUB);
+        crs = RenderingStyle.get(crs, RenderingStyle.Script.SUB);
         return crs;
     }
 
     protected final RenderingStyle setStrikeThrough() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(crs, RenderingStyle.Strike.THROUGH);
+        crs = RenderingStyle.get(crs, RenderingStyle.Strike.THROUGH);
         return crs;
     }
 
     protected final RenderingStyle setEmphasisStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(parsedContent, crs, FontStyle.ITALIC);
+        crs = RenderingStyle.get(parsedContent, crs, FontStyle.ITALIC);
         return crs;
     }
 
     protected final RenderingStyle setSubtitleStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(parsedContent, crs, TextStyle.SUBTITLE, JustificationMode.Center, FontStyle.BOLD);
+        crs = RenderingStyle.get(parsedContent, crs, TextStyle.SUBTITLE, JustificationMode.Center, FontStyle.BOLD);
         return crs;
     }
 
     protected final RenderingStyle setTextAuthorStyle(final boolean italic) {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(parsedContent, crs, TextStyle.TEXT, JustificationMode.Right, italic ? FontStyle.ITALIC
+        crs = RenderingStyle.get(parsedContent, crs, TextStyle.TEXT, JustificationMode.Right, italic ? FontStyle.ITALIC
                 : FontStyle.REGULAR);
         return crs;
     }
 
     protected final RenderingStyle setPoemStyle() {
         renderingStates.addFirst(crs);
-        crs = new RenderingStyle(parsedContent, crs, TextStyle.TEXT, JustificationMode.Left, FontStyle.ITALIC);
+        crs = RenderingStyle.get(parsedContent, crs, TextStyle.TEXT, JustificationMode.Left, FontStyle.ITALIC);
         return crs;
     }
 
-    protected MarkupElement emptyLine(final int textSize) {
+    protected LineFixedWhiteSpace emptyLine(final int textSize) {
         return crs.paint.emptyLine;
     }
 

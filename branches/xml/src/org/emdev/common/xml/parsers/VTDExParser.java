@@ -2,6 +2,7 @@ package org.emdev.common.xml.parsers;
 
 import java.util.Arrays;
 
+import org.emdev.common.textmarkup.text.TextProvider;
 import org.emdev.common.xml.IContentHandler;
 import org.emdev.common.xml.IXmlTagFactory;
 import org.emdev.common.xml.tags.XmlTag;
@@ -86,7 +87,7 @@ public class VTDExParser {
             if (type == VTDNavEx.TOKEN_CHARACTER_DATA || type == VTDNavEx.TOKEN_CDATA_VAL) {
                 if (tag.processText && !handler.skipCharacters()) {
                     final char[] buf = nav.toRawString(ci, range);
-                    handler.characters(buf, range[0], range[1], true);
+                    handler.characters(new TextProvider(buf), range[0], range[1]);
                 }
                 ci++;
                 continue;

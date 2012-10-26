@@ -6,6 +6,9 @@ import android.graphics.Paint;
 import android.graphics.PixelXorXfermode;
 import android.graphics.Rect;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.emdev.common.textmarkup.image.IImageData;
 
 public class Image extends AbstractLineElement {
@@ -39,5 +42,10 @@ public class Image extends AbstractLineElement {
             }
         }
         return width;
+    }
+
+    @Override
+    public void publishToStream(DataOutputStream out) throws IOException {
+        throw new RuntimeException("Image cannot be added to markup stream");
     }
 }

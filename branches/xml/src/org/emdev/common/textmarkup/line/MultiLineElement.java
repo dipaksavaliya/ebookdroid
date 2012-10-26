@@ -1,11 +1,12 @@
 package org.emdev.common.textmarkup.line;
 
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.emdev.utils.LengthUtils;
@@ -20,8 +21,7 @@ public class MultiLineElement extends AbstractLineElement {
     private boolean hasBackground;
     final static Paint paint = new Paint();
 
-    public MultiLineElement(int cellWidth, int maxHeight, List<Line> cellLines, boolean hasBorder,
-            boolean hasBackground) {
+    public MultiLineElement(int cellWidth, int maxHeight, List<Line> cellLines, boolean hasBorder, boolean hasBackground) {
         super(cellWidth, maxHeight);
         this.lines = cellLines;
         this.hasBorder = hasBorder;
@@ -74,5 +74,9 @@ public class MultiLineElement extends AbstractLineElement {
         }
     }
 
+    @Override
+    public void publishToStream(DataOutputStream out) throws IOException {
+        throw new RuntimeException("Multiline element cannot be added to markup stream");
+    }
 
 }
