@@ -2,20 +2,29 @@ package org.emdev.common.textmarkup.line;
 
 import org.ebookdroid.droids.fb2.codec.FB2Page;
 import org.ebookdroid.droids.fb2.codec.LineCreationParams;
+import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
 import android.graphics.Canvas;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.emdev.common.textmarkup.JustificationMode;
+import org.emdev.common.textmarkup.MarkupStream;
+import org.emdev.common.textmarkup.MarkupStream.IMarkupStreamCallback;
+import org.emdev.common.textmarkup.MarkupTag;
 import org.emdev.common.textmarkup.MarkupTitle;
+import org.emdev.common.textmarkup.RenderingStyle;
 import org.emdev.common.textmarkup.TextStyle;
+import org.emdev.common.textmarkup.text.ITextProvider;
 import org.emdev.utils.LengthUtils;
+import org.emdev.utils.bytes.ByteArray.DataArrayInputStream;
+
+import com.ximpleware.FastIntBuffer;
 
 public class Line {
 
-    public final ArrayList<AbstractLineElement> elements = new ArrayList<AbstractLineElement>();
     private int height;
     float width = 0;
     private boolean hasNonWhiteSpaces = false;
@@ -26,19 +35,25 @@ public class Line {
     private boolean justified;
     private JustificationMode justification = JustificationMode.Justify;
     private MarkupTitle title;
-    private int maxLineWidth;
+    private final int maxLineWidth;
     private volatile boolean recycled;
 
-    public Line(int lineWidth, JustificationMode jm) {
+    private final ParsedContent content;
+    private final MarkupStream stream;
+    public final FastIntBuffer elements = new FastIntBuffer(5);
+    private LineFixedWhiteSpace prefix;
+
+    public Line(final ParsedContent content, final MarkupStream stream, final int lineWidth, final JustificationMode jm) {
+        this.content = content;
+        this.stream = stream;
         this.maxLineWidth = lineWidth;
         justification = jm;
     }
 
     public void recycle() {
         recycled = true;
-        elements.clear();
         if (footnotes != null) {
-            for (Line l : footnotes) {
+            for (final Line l : footnotes) {
                 l.recycle();
             }
             footnotes.clear();
@@ -46,19 +61,53 @@ public class Line {
         }
     }
 
-    public Line append(final AbstractLineElement element) {
-        elements.add(element);
-        if (element.height > height) {
-            height = element.height;
+    public Line addText(final ITextProvider chars, final float width, final int height, final int start,
+            final int length, final int offset, final RenderingStyle style) {
+
+        final int position = content.postMarkup.text(chars, width, height, start, length, offset, style);
+        if (position != -1) {
+            append(MarkupTag.TextElement, width, height, position, true);
         }
-        if (element instanceof LineFixedWhiteSpace) {
+        return this;
+    }
+
+    public Line append(final MarkupTag tag, final float ewidth, final int eheight, final IMarkupStreamCallback callback) {
+        final int position = content.postMarkup.add(callback);
+        if (position != -1) {
+            append(tag, ewidth, eheight, position, true);
+        }
+        return this;
+    }
+
+    public Line append(final MarkupTag tag, final float ewidth, final int eheight) {
+        final int position = content.postMarkup.lineElement(tag, ewidth, eheight);
+        if (position != -1) {
+            append(tag, ewidth, eheight, position, true);
+        }
+        return this;
+    }
+
+    public Line append(final MarkupTag tag, final float ewidth, final int eheight, final int position) {
+        return append(tag, ewidth, eheight, position, false);
+    }
+
+    public Line append(final MarkupTag tag, final float ewidth, final int eheight, final int position,
+            final boolean internal) {
+        final int ordinal = tag.ordinal();
+        elements.append(ordinal | (internal ? 0x80 : 0x00));
+        elements.append(position);
+
+        if (eheight > height) {
+            height = eheight;
+        }
+        if (tag == MarkupTag.LineFixedWhiteSpace) {
             // Do nothing
-        } else if (element instanceof LineWhiteSpace) {
+        } else if (tag == MarkupTag.LineWhiteSpace) {
             sizeableCount++;
         } else {
             hasNonWhiteSpaces = true;
         }
-        width += element.width;
+        width += ewidth;
         return this;
     }
 
@@ -71,22 +120,67 @@ public class Line {
         return h;
     }
 
-    public void render(final Canvas c, final int x, final int y, float left, float right, final int nightmode) {
+    public void render(final Canvas c, final int x, final int y, final float left, final float right,
+            final int nightmode) {
         ensureJustification();
         float x1 = x;
-        for (int i = 0, n = elements.size(); i < n && !recycled ; i++) {
-            final AbstractLineElement e = elements.get(i);
-            x1 += e.render(c, y, (int) x1, spaceWidth, left, right, nightmode);
+
+        if (prefix != null) {
+            x1 += prefix.width;
+        }
+
+        for (int i = 0, n = elements.size(); i < n && !recycled;) {
+            final int ttag = elements.intAt(i++);
+            final boolean internal = (ttag & 0x80) != 0;
+            final MarkupTag tag = MarkupTag.values()[ttag & 0x7F];
+            final int position = elements.intAt(i++);
+
+            try {
+                final DataArrayInputStream in = internal ? content.postMarkup.in : stream.in;
+                in.position(position + 1);
+                x1 = renderTag(tag, in, c, y, left, right, nightmode, x1);
+            } catch (final IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
-    public static Line getLastLine(final ArrayList<Line> lines, LineCreationParams params) {
+    public float renderTag(final MarkupTag tag, final DataArrayInputStream in, final Canvas c, final int y,
+            final float left, final float right, final int nightmode, float x1) throws IOException {
+        switch (tag) {
+            case HorizontalRule:
+                x1 += HorizontalRule.render(in, c, y, (int) x1, spaceWidth, left, right, nightmode);
+                break;
+            case Image:
+                x1 += Image.render(content, in, c, y, (int) x1, spaceWidth, left, right, nightmode);
+                break;
+            case LineFixedWhiteSpace: {
+                final float width = in.readFloat();
+                final int height = in.readInt();
+                x1 += width;
+            }
+                break;
+            case LineWhiteSpace: {
+                final float width = in.readFloat();
+                final int height = in.readInt();
+                x1 += width + spaceWidth;
+            }
+                break;
+            case TextElement:
+                x1 += TextElement.render(content, in, c, y, (int) x1, spaceWidth, left, right, nightmode);
+                break;
+        }
+        return x1;
+    }
+
+    public static Line getLastLine(final ParsedContent content, final MarkupStream stream, final ArrayList<Line> lines,
+            final LineCreationParams params) {
         if (lines.size() == 0) {
-            lines.add(new Line(params.maxLineWidth, params.jm));
+            lines.add(new Line(content, stream, params.maxLineWidth, params.jm));
         }
         Line fb2Line = lines.get(lines.size() - 1);
         if (fb2Line.committed) {
-            fb2Line = new Line(params.maxLineWidth, params.jm);
+            fb2Line = new Line(content, stream, params.maxLineWidth, params.jm);
             lines.add(fb2Line);
         }
         return fb2Line;
@@ -97,7 +191,7 @@ public class Line {
             switch (justification) {
                 case Center:
                     final float x = (maxLineWidth - (width)) / 2;
-                    elements.add(0, new LineFixedWhiteSpace(x, height));
+                    prefix = new LineFixedWhiteSpace(x, height);
                     break;
                 case Left:
                     break;
@@ -110,7 +204,7 @@ public class Line {
                     break;
                 case Right:
                     final float x1 = (maxLineWidth - (width));
-                    elements.add(0, new LineFixedWhiteSpace(x1, height));
+                    prefix = new LineFixedWhiteSpace(x1, height);
                     break;
             }
             justified = true;
@@ -125,15 +219,15 @@ public class Line {
         return footnotes;
     }
 
-    public void addNote(final List<Line> noteLines) {
+    public void addNote(final MarkupStream stream, final List<Line> noteLines) {
         if (noteLines == null) {
             return;
         }
         if (footnotes == null) {
             footnotes = new ArrayList<Line>();
-            final Line lastLine = new Line(FB2Page.PAGE_WIDTH / 4, justification);
+            final Line lastLine = new Line(content, stream, FB2Page.PAGE_WIDTH / 4, justification);
             footnotes.add(lastLine);
-            lastLine.append(new HorizontalRule(FB2Page.PAGE_WIDTH / 4, TextStyle.FOOTNOTE.getFontSize()));
+            lastLine.append(MarkupTag.HorizontalRule, FB2Page.PAGE_WIDTH / 4, TextStyle.FOOTNOTE.getFontSize());
             lastLine.applyJustification(JustificationMode.Left);
         }
         footnotes.addAll(noteLines);
@@ -155,7 +249,7 @@ public class Line {
         return true;
     }
 
-    public void setTitle(MarkupTitle fb2MarkupTitle) {
+    public void setTitle(final MarkupTitle fb2MarkupTitle) {
         this.title = fb2MarkupTitle;
     }
 
@@ -164,16 +258,10 @@ public class Line {
     }
 
     public boolean isEmpty() {
-        if (LengthUtils.isEmpty(elements)) {
+        if (elements.size() == 0) {
             return true;
         }
-        for (AbstractLineElement e : elements) {
-            if (e instanceof LineFixedWhiteSpace || e instanceof LineWhiteSpace) {
-                continue;
-            }
-            return false;
-        }
-        return true;
+        return !hasNonWhiteSpaces;
     }
 
 }

@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.emdev.common.textmarkup.MarkupTag;
 import org.emdev.utils.LengthUtils;
 
 public class MultiLineElement extends AbstractLineElement {
@@ -22,7 +23,7 @@ public class MultiLineElement extends AbstractLineElement {
     final static Paint paint = new Paint();
 
     public MultiLineElement(int cellWidth, int maxHeight, List<Line> cellLines, boolean hasBorder, boolean hasBackground) {
-        super(cellWidth, maxHeight);
+        super(MarkupTag.MultiLineElement, cellWidth, maxHeight);
         this.lines = cellLines;
         this.hasBorder = hasBorder;
         this.hasBackground = hasBackground;
@@ -63,15 +64,15 @@ public class MultiLineElement extends AbstractLineElement {
     }
 
     public void applyNotes(Line line) {
-        if (LengthUtils.isNotEmpty(lines)) {
-            for (Line l : lines) {
-                final List<Line> notes = l.getFootNotes();
-                if (LengthUtils.isNotEmpty(notes)) {
-                    notes.remove(0);
-                    line.addNote(notes);
-                }
-            }
-        }
+//        if (LengthUtils.isNotEmpty(lines)) {
+//            for (Line l : lines) {
+//                final List<Line> notes = l.getFootNotes();
+//                if (LengthUtils.isNotEmpty(notes)) {
+//                    notes.remove(0);
+//                    line.addNote(notes);
+//                }
+//            }
+//        }
     }
 
     @Override

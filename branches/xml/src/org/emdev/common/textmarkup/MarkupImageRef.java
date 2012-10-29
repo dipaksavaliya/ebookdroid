@@ -2,13 +2,14 @@ package org.emdev.common.textmarkup;
 
 import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.emdev.common.textmarkup.line.AbstractLineElement;
 import org.emdev.common.textmarkup.line.Image;
 import org.emdev.common.textmarkup.line.Line;
+import org.emdev.utils.bytes.ByteArray.DataArrayInputStream;
 
 public class MarkupImageRef implements MarkupElement {
 
@@ -21,18 +22,7 @@ public class MarkupImageRef implements MarkupElement {
     }
 
     @Override
-    public void publishToLines(final ArrayList<Line> lines, final LineCreationParams params) {
-        final Image image = params.content.getImage(ref, inline);
-        if (image != null) {
-            if (!inline) {
-                final Line line = new Line(params.maxLineWidth, params.jm);
-                line.append(image);
-                line.applyJustification(JustificationMode.Center);
-                lines.add(line);
-            } else {
-                image.publishToLines(lines, params);
-            }
-        }
+    public void publishToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params) {
     }
 
     @Override
@@ -46,20 +36,19 @@ public class MarkupImageRef implements MarkupElement {
         out.writeBoolean(inline);
     }
 
-    public static void publishToLines(DataInputStream in, ArrayList<Line> lines, LineCreationParams params) throws IOException {
-        int ref = in.readInt();
-        boolean inline = in.readBoolean();
+    public static void addToLines(MarkupStream stream, ArrayList<Line> lines,
+            LineCreationParams params) throws IOException {
+        int ref = stream.in.readInt();
+        boolean inline = stream.in.readBoolean();
 
         final Image image = params.content.getImage(ref, inline);
         if (image != null) {
             if (!inline) {
-                final Line line = new Line(params.maxLineWidth, params.jm);
-                line.append(image);
+                final Line line = new Line(params.content, stream, params.maxLineWidth, params.jm);
                 line.applyJustification(JustificationMode.Center);
                 lines.add(line);
-            } else {
-                image.publishToLines(lines, params);
             }
+            AbstractLineElement.addToLines(stream, MarkupTag.Image, -1, image, image.width, image.height, lines, params);
         }
     }
 

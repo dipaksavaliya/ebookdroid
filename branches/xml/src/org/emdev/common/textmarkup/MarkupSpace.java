@@ -16,7 +16,7 @@ public class MarkupSpace implements MarkupElement {
     public static final MarkupSpace E = new MarkupSpace();
 
     @Override
-    public void publishToLines(final ArrayList<Line> lines, final LineCreationParams params) {
+    public void publishToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params) {
         params.insertSpace = true;
     }
 

@@ -11,19 +11,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.emdev.common.textmarkup.JustificationMode;
+import org.emdev.common.textmarkup.MarkupTag;
 import org.emdev.common.textmarkup.TextStyle;
-import org.emdev.common.textmarkup.line.AbstractLineElement;
 import org.emdev.common.textmarkup.line.Line;
-import org.emdev.common.textmarkup.line.LineFixedWhiteSpace;
-import org.emdev.common.textmarkup.line.LineWhiteSpace;
-import org.emdev.common.textmarkup.line.TextElement;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.MatrixUtils;
 
@@ -70,30 +66,31 @@ public class FB2Page extends AbstractCodecPage {
     }
 
     private float searchText(final ArrayList<Line> lines, final char[] pattern, final List<RectF> rects, float y) {
-        for (int i = 0, n = lines.size(); i < n; i++) {
-            final Line line = lines.get(i);
-            final float bottom = y + line.getHeight();
-            line.ensureJustification();
-            float x = FB2Page.MARGIN_X;
-            for (int i1 = 0, n1 = line.elements.size(); i1 < n1; i1++) {
-                final AbstractLineElement e = line.elements.get(i1);
-                final float w = e.width + (e instanceof LineWhiteSpace ? line.spaceWidth : 0);
-                if (e instanceof TextElement) {
-                    final TextElement textElement = (TextElement) e;
-                    if (textElement.indexOfIgnoreCases(pattern) != -1) {
-                        final Rect bounds = new Rect();
-                        textElement.getTextBounds(bounds);
-
-                        rects.add(new RectF((x - 3) / FB2Page.PAGE_WIDTH, (bottom + bounds.top - 3)
-                                / FB2Page.PAGE_HEIGHT, (x + w + 3) / FB2Page.PAGE_WIDTH, (bottom + bounds.bottom + 3)
-                                / FB2Page.PAGE_HEIGHT));
-                    }
-                }
-                x += w;
-            }
-            y = bottom;
-        }
-        return y;
+//        for (int i = 0, n = lines.size(); i < n; i++) {
+//            final Line line = lines.get(i);
+//            final float bottom = y + line.getHeight();
+//            line.ensureJustification();
+//            float x = FB2Page.MARGIN_X;
+//            for (int i1 = 0, n1 = line.elements.size(); i1 < n1; i1++) {
+//                final AbstractLineElement e = line.elements.get(i1);
+//                final float w = e.width + (e instanceof LineWhiteSpace ? line.spaceWidth : 0);
+//                if (e instanceof TextElement) {
+//                    final TextElement textElement = (TextElement) e;
+//                    if (textElement.indexOfIgnoreCases(pattern) != -1) {
+//                        final Rect bounds = new Rect();
+//                        textElement.getTextBounds(bounds);
+//
+//                        rects.add(new RectF((x - 3) / FB2Page.PAGE_WIDTH, (bottom + bounds.top - 3)
+//                                / FB2Page.PAGE_HEIGHT, (x + w + 3) / FB2Page.PAGE_WIDTH, (bottom + bounds.bottom + 3)
+//                                / FB2Page.PAGE_HEIGHT));
+//                    }
+//                }
+//                x += w;
+//            }
+//            y = bottom;
+//        }
+//        return y;
+        return 0;
     }
 
     @Override
@@ -168,13 +165,13 @@ public class FB2Page extends AbstractCodecPage {
         contentHeight += line.getHeight();
     }
 
-    public void commit() {
+    public void commit(ParsedContent content) {
         if (committed) {
             return;
         }
         final int h = FB2Page.PAGE_HEIGHT - contentHeight - 2 * FB2Page.MARGIN_Y;
         if (h > 0) {
-            lines.add(new Line(0, JustificationMode.Center).append(new LineFixedWhiteSpace(0, h)));
+            lines.add(new Line(content, null, 0, JustificationMode.Center).append(MarkupTag.LineFixedWhiteSpace, 0, h));
             contentHeight += h;
         }
         for (final Line line : noteLines) {

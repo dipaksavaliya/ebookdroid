@@ -33,36 +33,36 @@ public class MarkupTable implements MarkupElement {
     }
 
     @Override
-    public void publishToLines(ArrayList<Line> lines, LineCreationParams params) {
-        if (getRowCount() > 0) {
-            final int cellWidth = params.maxLineWidth / getMaxColCount();
-            for (int i = 0, n = rows.size(); i < n; i++) {
-                final int colCount = getColCount(i);
-                ArrayList<List<Line>> cells = new ArrayList<List<Line>>(colCount);
-                Line row = new Line(params.maxLineWidth, params.jm);
-                cells.clear();
-                int maxHeight = 0;
-                for (int j = 0; j < colCount; j++) {
-                    final Cell cell = rows.get(i).get(j);
-                    final List<Line> cellLines = params.content.getStreamLines(cell.stream,
-                            cellWidth - DOUBLE_BORDER_WIDTH, cell.align);
-                    cells.add(cellLines);
-                    final int height = MultiLineElement.calcHeight(cellLines);
-                    if (height > maxHeight) {
-                        maxHeight = height;
-                    }
-                }
-                for (int j = 0; j < colCount; j++) {
-                    List<Line> list = cells.get(j);
-                    final MultiLineElement cell = new MultiLineElement(cellWidth, maxHeight + DOUBLE_BORDER_WIDTH, list, true, rows.get(i).get(j).hasBackground);
-                    row.append(cell);
-                    cell.applyNotes(row);
-                }
-
-                row.applyJustification(JustificationMode.Center);
-                lines.add(row);
-            }
-        }
+    public void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
+//        if (getRowCount() > 0) {
+//            final int cellWidth = params.maxLineWidth / getMaxColCount();
+//            for (int i = 0, n = rows.size(); i < n; i++) {
+//                final int colCount = getColCount(i);
+//                ArrayList<List<Line>> cells = new ArrayList<List<Line>>(colCount);
+//                Line row = new Line(params.maxLineWidth, params.jm);
+//                cells.clear();
+//                int maxHeight = 0;
+//                for (int j = 0; j < colCount; j++) {
+//                    final Cell cell = rows.get(i).get(j);
+//                    final List<Line> cellLines = params.content.getStreamLines(cell.stream,
+//                            cellWidth - DOUBLE_BORDER_WIDTH, cell.align);
+//                    cells.add(cellLines);
+//                    final int height = MultiLineElement.calcHeight(cellLines);
+//                    if (height > maxHeight) {
+//                        maxHeight = height;
+//                    }
+//                }
+//                for (int j = 0; j < colCount; j++) {
+//                    List<Line> list = cells.get(j);
+//                    final MultiLineElement cell = new MultiLineElement(cellWidth, maxHeight + DOUBLE_BORDER_WIDTH, list, true, rows.get(i).get(j).hasBackground);
+//                    row.append(cell);
+//                    cell.applyNotes(row);
+//                }
+//
+//                row.applyJustification(JustificationMode.Center);
+//                lines.add(row);
+//            }
+//        }
     }
 
     private int getMaxColCount() {

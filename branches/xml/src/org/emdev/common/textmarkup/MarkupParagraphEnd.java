@@ -18,7 +18,7 @@ public class MarkupParagraphEnd implements MarkupElement {
     }
 
     @Override
-    public void publishToLines(ArrayList<Line> lines, LineCreationParams params) {
+    public void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
         if (LengthUtils.isEmpty(lines)) {
             return;
         }

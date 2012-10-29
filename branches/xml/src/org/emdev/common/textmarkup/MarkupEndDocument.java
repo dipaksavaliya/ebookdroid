@@ -13,7 +13,7 @@ import org.emdev.common.textmarkup.line.Line;
 public class MarkupEndDocument implements MarkupElement {
 
     @Override
-    public void publishToLines(ArrayList<Line> lines, LineCreationParams params) {
+    public void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
     }
 
     @Override

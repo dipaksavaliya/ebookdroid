@@ -2,7 +2,6 @@ package org.emdev.common.textmarkup;
 
 import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,8 +19,8 @@ public class MarkupTitle implements MarkupElement {
     }
 
     @Override
-    public void publishToLines(final ArrayList<Line> lines, final LineCreationParams params) {
-        Line.getLastLine(lines, params).setTitle(this);
+    public void publishToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params) {
+        // Line.getLastLine(params.content, lines, params).setTitle(this);
     }
 
     @Override
@@ -32,19 +31,19 @@ public class MarkupTitle implements MarkupElement {
     public static void write(final DataOutputStream out, final String title, final int level) throws IOException {
         final byte[] bytes = title.getBytes();
         out.writeByte(MarkupTag.MarkupTitle.ordinal());
-        out.writeInt(bytes.length + 1);
         out.writeByte(level);
+        out.writeInt(bytes.length);
         out.write(bytes);
     }
 
-    public static void publishToLines(final DataInputStream in, final ArrayList<Line> lines,
+    public static void addToLines(final MarkupStream stream, final ArrayList<Line> lines,
             final LineCreationParams params) throws IOException {
-        final int length = in.readInt() - 1;
-        final int level = in.readByte();
+        final int level = stream.in.readByte();
+        final int length = stream.in.readInt();
         final byte[] bytes = new byte[length];
-        in.read(bytes);
+        stream.in.read(bytes);
         String title = new String(bytes);
-        Line.getLastLine(lines, params).setTitle(new MarkupTitle(title, level));
+        Line.getLastLine(params.content, stream, lines, params).setTitle(new MarkupTitle(title, level));
     }
 
 }

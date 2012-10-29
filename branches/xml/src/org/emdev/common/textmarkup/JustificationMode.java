@@ -2,12 +2,12 @@ package org.emdev.common.textmarkup;
 
 import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.emdev.common.textmarkup.line.Line;
+import org.emdev.utils.bytes.ByteArray.DataArrayInputStream;
 
 public enum JustificationMode implements MarkupElement {
 
@@ -24,7 +24,7 @@ public enum JustificationMode implements MarkupElement {
     Justify;
 
     @Override
-    public void publishToLines(ArrayList<Line> lines, LineCreationParams params) {
+    public void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
         params.jm = this;
     }
 
@@ -38,9 +38,9 @@ public enum JustificationMode implements MarkupElement {
         out.writeByte(jm.ordinal());
     }
 
-    public static void publishToLines(DataInputStream in, ArrayList<Line> lines, LineCreationParams params)
+    public static void addToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params)
             throws IOException {
-        JustificationMode jm = JustificationMode.values()[in.readByte()];
-        jm.publishToLines(lines, params);
+        JustificationMode jm = JustificationMode.values()[stream.in.readByte()];
+        jm.publishToLines(stream, lines, params);
     }
 }

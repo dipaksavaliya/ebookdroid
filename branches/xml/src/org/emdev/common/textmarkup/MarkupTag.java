@@ -15,11 +15,11 @@ public enum MarkupTag {
     MarkupTitle(-1),
 
     HorizontalRule(8),
-    Image(0),
+    Image(12),
     LineFixedWhiteSpace(8),
     LineWhiteSpace(8),
     MultiLineElement(0),
-    TextElement(36);
+    TextElement(4 + 4 + 8 + 4 + 4 + 4 + 8);
 
     public final int size;
     public final boolean fixed;

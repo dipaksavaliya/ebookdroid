@@ -14,11 +14,11 @@ public class MarkupEndPage extends Line implements MarkupElement {
     public static final MarkupElement E = new MarkupEndPage();
 
     private MarkupEndPage() {
-        super(0, JustificationMode.Left);
+        super(null, null, 0, JustificationMode.Left);
     }
 
     @Override
-    public void publishToLines(final ArrayList<Line> lines, final LineCreationParams params) {
+    public void publishToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params) {
         if (!lines.isEmpty() && lines.get(lines.size() - 1) == E) {
             return;
         }

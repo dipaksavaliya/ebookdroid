@@ -19,7 +19,7 @@ public class MarkupNoSpace implements MarkupElement {
     public static final MarkupNoSpace E = new MarkupNoSpace();
 
     @Override
-    public void publishToLines(ArrayList<Line> lines, LineCreationParams params) {
+    public void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
         params.insertSpace = false;
     }
 

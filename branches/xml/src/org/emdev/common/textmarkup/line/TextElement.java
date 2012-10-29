@@ -1,28 +1,28 @@
 package org.emdev.common.textmarkup.line;
 
-import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.droids.fb2.codec.LineCreationParams;
+import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.emdev.common.textmarkup.MarkupStream;
 import org.emdev.common.textmarkup.MarkupTag;
 import org.emdev.common.textmarkup.RenderingStyle;
 import org.emdev.common.textmarkup.RenderingStyle.Script;
 import org.emdev.common.textmarkup.RenderingStyle.Strike;
 import org.emdev.common.textmarkup.text.ITextProvider;
-import org.emdev.utils.HyphenationUtils;
+import org.emdev.utils.bytes.ByteArray.DataArrayInputStream;
 
 public class TextElement extends AbstractLineElement {
 
-    private static final int[] starts = new int[100];
-    private static final int[] lengths = new int[100];
-    private static final float[] parts = new float[100];
+    static final int[] starts = new int[100];
+    static final int[] lengths = new int[100];
+    static final float[] parts = new float[100];
 
     public final ITextProvider chars;
     public final int start;
@@ -31,44 +31,15 @@ public class TextElement extends AbstractLineElement {
 
     public final RenderingStyle style;
 
-    public TextElement(final ITextProvider ch, final RenderingStyle style) {
-        super(style.paint.measureText(ch.text(), 0, ch.size()), style.script == Script.SUPER ? style.textSize * 5 / 2
-                : style.textSize);
-        this.chars = ch;
-        this.start = 0;
-        this.length = ch.size();
-        this.style = style;
-        this.offset = style.script == Script.SUPER ? (-style.textSize)
-                : style.script == Script.SUB ? style.textSize / 2 : 0;
-    }
-
     public TextElement(final ITextProvider ch, final int st, final int len, final RenderingStyle style) {
-        super(style.paint.measureText(ch.text(), st, len), style.script == Script.SUPER ? style.textSize * 5 / 2
-                : style.textSize);
+        super(MarkupTag.TextElement, style.paint.measureText(ch.text(), st, len),
+                style.script == Script.SUPER ? style.textSize * 5 / 2 : style.textSize);
         this.chars = ch;
         this.start = st;
         this.length = len;
         this.style = style;
         this.offset = style.script == Script.SUPER ? (-style.textSize)
                 : style.script == Script.SUB ? style.textSize / 2 : 0;
-    }
-
-    TextElement(final TextElement original, final int st, final int len, final float width) {
-        super(width, original.style.textSize);
-        this.chars = original.chars;
-        this.start = st;
-        this.length = len;
-        this.style = original.style;
-        this.offset = original.offset;
-    }
-
-    public TextElement(ITextProvider p, float width, int height, int start2, int length2, int offset2, RenderingStyle style) {
-        super(width, height);
-        this.chars = p;
-        this.start = start2;
-        this.length = length2;
-        this.offset = offset2;
-        this.style= style;
     }
 
     @Override
@@ -87,19 +58,15 @@ public class TextElement extends AbstractLineElement {
         out.writeLong(style.key);
     }
 
-    public static void publishToLines(DataInputStream in, ArrayList<Line> lines, LineCreationParams params) throws IOException {
-        float width = in.readFloat();
-        int height = in.readInt();
-        long id = in.readLong();
-        int start = in.readInt();
-        int length = in.readInt();
-        int offset = in.readInt();
-        long key = in.readLong();
+    public static void addToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params)
+            throws IOException {
+        final int position = stream.in.position() - 1;
+        final float width = stream.in.readFloat();
+        final int height = stream.in.readInt();
 
-        ITextProvider p = params.content.getTextProvider(id);
-        RenderingStyle style = RenderingStyle.get(params.content, key);
-        new TextElement(p, width, height, start, length, offset, style).publishToLines(lines, params);
+        stream.in.position(position + MarkupTag.TextElement.size);
 
+        AbstractLineElement.addToLines(stream, MarkupTag.TextElement, position, null, width, height, lines, params);
     }
 
     @Override
@@ -116,45 +83,29 @@ public class TextElement extends AbstractLineElement {
         return width;
     }
 
-    @Override
-    public AbstractLineElement[] split(final float remaining) {
-        if (!AppSettings.current().fb2HyphenEnabled) {
-            return null;
-        }
-        final int count = HyphenationUtils.hyphenateWord(chars.text(), start, length, starts, lengths);
-        if (count == 0) {
-            return null;
-        }
+    public static float render(ParsedContent content, DataArrayInputStream in, Canvas c, int y, int x,
+            float spaceWidth, float left, float right, int nightmode) throws IOException {
 
-        final float dwidth = this.style.defis.width;
-        final int firstStart = this.start;
-        int firstLen = 0;
+        final float width = in.readFloat();
+        in.skipInt();
+        final long id = in.readLong();
+        final int start = in.readInt();
+        final int length = in.readInt();
+        final int offset = in.readInt();
+        final long key = in.readLong();
 
-        float summ = dwidth;
-        int next = 0;
+        final ITextProvider chars = content.getTextProvider(id);
+        final RenderingStyle style = RenderingStyle.get(content, key);
 
-        for (; next < parts.length; next++) {
-            final float width = style.paint.measureText(chars.text(), starts[next], lengths[next]);
-            final float total = summ + width;
-            if (total > remaining) {
-                break;
+        if (left < x + width && x < right) {
+            final int yy = y + offset;
+            c.drawText(chars.text(), start, length, x, yy, style.paint);
+            if (style.strike == Strike.THROUGH) {
+                c.drawLine(x, yy - style.textSize / 4, x + width, yy - style.textSize / 4, style.paint);
+                c.drawRect(x, yy - style.textSize / 4, x + width, yy - style.textSize / 4 + 1, style.paint);
             }
-            summ = total;
-            firstLen += lengths[next];
         }
-
-        if (next == 0) {
-            return null;
-        }
-
-        final int secondStart = starts[next];
-        final int secondLength = this.length - (starts[next] - this.start);
-
-        final TextElement first = new TextElement(this, firstStart, firstLen, summ - dwidth);
-        final TextElement second = new TextElement(this, secondStart, secondLength, this.width - first.width);
-
-        final AbstractLineElement[] result = { first, this.style.defis, second };
-        return result;
+        return width;
     }
 
     public int indexOf(final char[] pattern) {

@@ -33,6 +33,7 @@ import org.emdev.common.textmarkup.text.ITextProvider;
 public class ParsedContent {
 
     final MarkupStream docMarkup = new MarkupStream(null);
+    public final MarkupStream postMarkup = new MarkupStream(null);
 
     final HashMap<String, MarkupStream> streams = new HashMap<String, MarkupStream>();
 
@@ -120,8 +121,9 @@ public class ParsedContent {
                 data = new DiskImageData((MemoryImageData) data);
             }
             final int ref = getImageRef(name);
-            inlineImages.set(ref, new Image(data, true));
-            standaloneImages.set(ref, new Image(data, false));
+            inlineImages.set(ref, new Image(ref, data, true));
+            standaloneImages.set(ref, new Image(ref, data, false));
+            return ref;
         }
         return -1;
     }
@@ -175,25 +177,6 @@ public class ParsedContent {
         return note;
     }
 
-    public List<Line> getNote(final String noteName) {
-        int ref = getNoteRef(noteName);
-        ArrayList<Line> note = notes.get(ref);
-        if (note != null) {
-            return note;
-        }
-
-        MarkupStream stream = getMarkupStream(noteName);
-        if (MarkupStream.isEmpty(stream) && noteName.startsWith("#")) {
-            stream = getMarkupStream(noteName.substring(1));
-        }
-        if (stream != null) {
-            note = createLines(stream, PAGE_WIDTH - 2 * MARGIN_X, JustificationMode.Justify);
-            notes.set(ref, note);
-        }
-
-        return note;
-    }
-
     ArrayList<Line> createLines(final MarkupStream markup, final int maxLineWidth, final JustificationMode jm) {
         final ArrayList<Line> lines = new ArrayList<Line>();
         if (MarkupStream.isNotEmpty(markup)) {
@@ -209,14 +192,6 @@ public class ParsedContent {
             }
         }
         return lines;
-    }
-
-    public List<Line> getStreamLines(final String streamName, final int maxWidth, final JustificationMode jm) {
-        final MarkupStream stream = getMarkupStream(streamName);
-        if (stream != null) {
-            return createLines(stream, maxWidth, jm);
-        }
-        return null;
     }
 
     public void setCover(final String value) {

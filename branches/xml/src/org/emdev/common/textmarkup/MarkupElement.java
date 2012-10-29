@@ -12,5 +12,5 @@ public interface MarkupElement {
 
     void publishToStream(DataOutputStream out) throws IOException;
 
-    void publishToLines(ArrayList<Line> lines, LineCreationParams params);
+    void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params);
 }
