@@ -97,14 +97,14 @@ public abstract class BaseHandler implements IContentHandler, FB2TagId {
 
     protected final RenderingStyle setTextAuthorStyle(final boolean italic) {
         renderingStates.addFirst(crs);
-        crs = RenderingStyle.get(parsedContent, crs, TextStyle.TEXT, JustificationMode.Right, italic ? FontStyle.ITALIC
+        crs = RenderingStyle.get(parsedContent, crs, JustificationMode.Right, italic ? FontStyle.ITALIC
                 : FontStyle.REGULAR);
         return crs;
     }
 
     protected final RenderingStyle setPoemStyle() {
         renderingStates.addFirst(crs);
-        crs = RenderingStyle.get(parsedContent, crs, TextStyle.TEXT, JustificationMode.Left, FontStyle.ITALIC);
+        crs = RenderingStyle.get(parsedContent, crs, JustificationMode.Left, FontStyle.ITALIC);
         return crs;
     }
 
