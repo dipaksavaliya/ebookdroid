@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 import org.emdev.common.textmarkup.JustificationMode;
 import org.emdev.common.textmarkup.MarkupStream;
+import org.emdev.common.textmarkup.MarkupTag;
 
 public class LineStream implements Collection<Line> {
 
@@ -27,6 +28,11 @@ public class LineStream implements Collection<Line> {
     public Line add(final MarkupStream stream) {
         final Line line = new Line(params.content, stream, params.maxLineWidth, params.jm);
         lines.add(line);
+
+        if (params.extraSpace > 0) {
+            line.append(MarkupTag.LineFixedWhiteSpace, params.extraSpace, 0);
+        }
+
         return line;
     }
 

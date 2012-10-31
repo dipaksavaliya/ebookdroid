@@ -49,16 +49,16 @@ public abstract class AbstractLineElement implements LineElement {
             throws IOException {
 
         Line line = lines.last(stream);
-        final LineWhiteSpace space = RenderingStyle.getTextPaint(lines.params.content,
-                Math.max(line.getHeight(), eheight)).space;
+        final LineWhiteSpace space = RenderingStyle.getTextPaint(lines.params.content, Math.max(line.getHeight(), eheight)).space;
+
         float remaining = lines.params.maxLineWidth - (line.width + space.width);
         if (remaining <= 0) {
             line = lines.add(stream);
             remaining = lines.params.maxLineWidth;
         }
-        if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
-            line.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
-        }
+//        if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
+//            line.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
+//        }
 
         if (ewidth <= remaining) {
             if (line.hasNonWhiteSpaces() && lines.params.insertSpace) {
@@ -153,9 +153,9 @@ public abstract class AbstractLineElement implements LineElement {
                     style.defis.length, style.defis.offset, style.defis.style);
 
             final Line newline = lines.add(stream);
-            if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
-                newline.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
-            }
+//            if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
+//                newline.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
+//            }
 
             newline.addText(chars, ewidth - (summ - dwidth), eheight, secondStart, secondLength, offset, style);
 
@@ -214,9 +214,9 @@ public abstract class AbstractLineElement implements LineElement {
             line.addText(chars, summ, eheight, firstStart, firstLen, offset, style);
 
             final Line newline = lines.add(stream);
-            if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
-                newline.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
-            }
+//            if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
+//                newline.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
+//            }
 
             newline.addText(chars, ewidth - summ, eheight, secondStart, secondLength, offset, style);
 
