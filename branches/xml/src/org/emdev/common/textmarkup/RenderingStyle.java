@@ -229,7 +229,33 @@ public class RenderingStyle {
         this.key = paint.key + (jm.ordinal() << 32) + (script.ordinal() << 34) + (strike.ordinal() << 36);
     }
 
-    public static RenderingStyle get(ParsedContent content, long key) {
+    public static RenderingStyle get(final ParsedContent content, final TypefaceEx face, final TextStyle text) {
+        final int textSize = text.getFontSize();
+        final CustomTextPaint paint = getTextPaint(face, textSize);
+        final JustificationMode jm = JustificationMode.Justify;
+
+        final long key = paint.key + (jm.ordinal() << 32);
+        RenderingStyle style = styles.get(key, null);
+        if (style == null) {
+            style = new RenderingStyle(content, face, text);
+            styles.put(key, style);
+        }
+        return style;
+    }
+
+    private RenderingStyle(final ParsedContent content, final TypefaceEx face, final TextStyle text) {
+        this.textSize = text.getFontSize();
+        this.jm = JustificationMode.Justify;
+        this.face = face;
+        this.paint = getTextPaint(face, this.textSize);
+        this.script = Script.NONE;
+        this.strike = Strike.NONE;
+
+        this.defis = new TextElement(STP, 0, 1, this);
+        this.key = paint.key + (jm.ordinal() << 32) + (script.ordinal() << 34) + (strike.ordinal() << 36);
+    }
+
+    public static RenderingStyle get(final ParsedContent content, final long key) {
         RenderingStyle style = styles.get(key, null);
         if (style == null) {
             style = new RenderingStyle(content, TextStyle.TEXT);
@@ -265,4 +291,5 @@ public class RenderingStyle {
     public static enum Strike {
         NONE, THROUGH, UNDER;
     }
+
 }

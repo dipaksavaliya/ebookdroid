@@ -19,7 +19,8 @@ public enum MarkupTag {
     LineFixedWhiteSpace(8),
     LineWhiteSpace(8),
     MultiLineElement(0),
-    TextElement(4 + 4 + 8 + 4 + 4 + 4 + 8);
+    TextElement(4 + 4 + 8 + 4 + 4 + 4 + 8),
+    TextPreElement(4 + 4 + 8 + 4 + 4 + 4 + 8);
 
     public final int size;
     public final boolean fixed;

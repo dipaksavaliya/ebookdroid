@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.emdev.common.fonts.FontManager;
+import org.emdev.common.fonts.SystemFontProvider;
 import org.emdev.common.fonts.data.FontFamilyType;
 import org.emdev.common.fonts.data.FontStyle;
 import org.emdev.common.fonts.typeface.TypefaceEx;
@@ -48,6 +49,7 @@ public class ParsedContent {
     private String cover;
 
     public TypefaceEx[] fonts;
+    public TypefaceEx mono;
 
     public void loadFonts() {
         final FontStyle[] styles = FontStyle.values();
@@ -58,6 +60,7 @@ public class ParsedContent {
             fonts[style.ordinal()] = font;
             RenderingStyle.getTextPaint(font, TextStyle.TEXT.getFontSize());
         }
+        mono = FontManager.getFont(SystemFontProvider.SYSTEM_FONT_PACK, FontFamilyType.MONO, FontStyle.REGULAR);
     }
 
     public void clear() {

@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import org.emdev.common.fonts.data.FontStyle;
 import org.emdev.common.textmarkup.JustificationMode;
-import org.emdev.common.textmarkup.MarkupElement;
 import org.emdev.common.textmarkup.RenderingStyle;
 import org.emdev.common.textmarkup.TextStyle;
 import org.emdev.common.textmarkup.line.LineFixedWhiteSpace;
@@ -106,6 +105,12 @@ public abstract class BaseHandler implements IContentHandler, FB2TagId {
     protected final RenderingStyle setPoemStyle() {
         renderingStates.addFirst(crs);
         crs = RenderingStyle.get(parsedContent, crs, TextStyle.TEXT, JustificationMode.Left, FontStyle.ITALIC);
+        return crs;
+    }
+
+    protected final RenderingStyle setPreformatted() {
+        renderingStates.addFirst(crs);
+        crs = RenderingStyle.get(parsedContent, parsedContent.mono, TextStyle.PREFORMATTED);
         return crs;
     }
 

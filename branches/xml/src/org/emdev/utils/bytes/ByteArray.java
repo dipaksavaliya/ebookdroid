@@ -41,7 +41,7 @@ public class ByteArray {
         }
 
         @Override
-        public void write(final byte[] buffer, int offset, int len) {
+        public void write(final byte[] buffer, final int offset, final int  len) {
             if (len == 0) {
                 return;
             }
@@ -59,17 +59,17 @@ public class ByteArray {
             }
 
             System.arraycopy(buffer, offset, buffers.get(firstBuf), dstPos, rem);
-            offset += rem;
-            len -= rem;
+            int off = offset + rem;
+            int length = len - rem;
             size += rem;
 
-            while (len > 0) {
+            while (length > 0) {
                 final byte[] buf = new byte[SIZE];
                 buffers.add(buf);
-                final int toCopy = Math.min(len, SIZE);
-                System.arraycopy(buffer, offset, buf, 0, toCopy);
-                offset += toCopy;
-                len -= toCopy;
+                final int toCopy = Math.min(length, SIZE);
+                System.arraycopy(buffer, off, buf, 0, toCopy);
+                off += toCopy;
+                length -= toCopy;
                 size += toCopy;
             }
         }

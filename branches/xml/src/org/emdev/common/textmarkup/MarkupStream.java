@@ -4,7 +4,6 @@ package org.emdev.common.textmarkup;
 import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import org.emdev.common.textmarkup.line.Line;
 import org.emdev.common.textmarkup.line.LineFixedWhiteSpace;
 import org.emdev.common.textmarkup.line.LineWhiteSpace;
 import org.emdev.common.textmarkup.line.TextElement;
+import org.emdev.common.textmarkup.line.TextPreElement;
 import org.emdev.common.textmarkup.text.ITextProvider;
 import org.emdev.utils.bytes.ByteArray;
 
@@ -220,6 +220,24 @@ public class MarkupStream extends ByteArray {
         return this;
     }
 
+    public MarkupStream textPre(ParsedContent content, ITextProvider chars, int start, int length, RenderingStyle style) {
+        final float width = style.paint.measureText(chars.text(), start, length);
+        final int height = style.script == Script.SUPER ? style.textSize * 5 / 2 : style.textSize;
+        final int offset = style.script == Script.SUPER ? (-style.textSize)
+                : style.script == Script.SUB ? style.textSize / 2 : 0;
+
+        try {
+            TextPreElement.write(out, width, height, chars, start, length, offset, style);
+        } catch (final IOException ex) {
+            ex.printStackTrace();
+        }
+
+        content.addTextProvider(chars);
+
+        lastTag = MarkupTag.TextPreElement;
+        return this;
+    }
+
     public MarkupStream text(final ParsedContent content, final ITextProvider chars, final int start, final int length,
             final RenderingStyle style) {
         final float width = style.paint.measureText(chars.text(), start, length);
@@ -274,7 +292,8 @@ public class MarkupStream extends ByteArray {
     public void publishToLines(final ArrayList<Line> lines, final LineCreationParams params) throws IOException {
 
         while (in.available() > 0) {
-            final MarkupTag tag = MarkupTag.values()[in.readByte()];
+            int ord = in.readByte() & 0x7F;
+            final MarkupTag tag = MarkupTag.values()[ord];
             switch (tag) {
                 case MarkupEndDocument:
                     return;
@@ -314,7 +333,8 @@ public class MarkupStream extends ByteArray {
                 case TextElement:
                     TextElement.addToLines(this, lines, params);
                     break;
-                default:
+                case TextPreElement:
+                    TextPreElement.addToLines(this, lines, params);
                     break;
             }
         }

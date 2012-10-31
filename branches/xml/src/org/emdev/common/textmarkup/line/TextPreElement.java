@@ -18,7 +18,7 @@ import org.emdev.common.textmarkup.RenderingStyle.Strike;
 import org.emdev.common.textmarkup.text.ITextProvider;
 import org.emdev.utils.bytes.ByteArray.DataArrayInputStream;
 
-public class TextElement extends AbstractLineElement {
+public class TextPreElement extends AbstractLineElement {
 
     static final int[] starts = new int[100];
     static final int[] lengths = new int[100];
@@ -31,8 +31,8 @@ public class TextElement extends AbstractLineElement {
 
     public final RenderingStyle style;
 
-    public TextElement(final ITextProvider ch, final int st, final int len, final RenderingStyle style) {
-        super(MarkupTag.TextElement, style.paint.measureText(ch.text(), st, len),
+    public TextPreElement(final ITextProvider ch, final int st, final int len, final RenderingStyle style) {
+        super(MarkupTag.TextPreElement, style.paint.measureText(ch.text(), st, len),
                 style.script == Script.SUPER ? style.textSize * 5 / 2 : style.textSize);
         this.chars = ch;
         this.start = st;
@@ -50,7 +50,7 @@ public class TextElement extends AbstractLineElement {
     public static void write(final DataOutputStream out, final float width, final int height,
             final ITextProvider chars, final int start, final int length, final int offset, final RenderingStyle style)
             throws IOException {
-        write(out, MarkupTag.TextElement, width, height);
+        write(out, MarkupTag.TextPreElement, width, height);
         out.writeLong(chars.id());
         out.writeInt(start);
         out.writeInt(length);
@@ -64,9 +64,9 @@ public class TextElement extends AbstractLineElement {
         final float width = stream.in.readFloat();
         final int height = stream.in.readInt();
 
-        stream.in.position(position + MarkupTag.TextElement.size + 1);
+        stream.in.position(position + MarkupTag.TextPreElement.size + 1);
 
-        AbstractLineElement.addToLines(stream, MarkupTag.TextElement, position, null, width, height, lines, params);
+        AbstractLineElement.addToLines(stream, MarkupTag.TextPreElement, position, null, width, height, lines, params);
     }
 
     @Override

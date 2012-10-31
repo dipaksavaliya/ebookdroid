@@ -169,6 +169,9 @@ public class Line {
             case TextElement:
                 x1 += TextElement.render(content, in, c, y, (int) x1, spaceWidth, left, right, nightmode);
                 break;
+            case TextPreElement:
+                x1 += TextPreElement.render(content, in, c, y, (int) x1, spaceWidth, left, right, nightmode);
+                break;
         }
         return x1;
     }

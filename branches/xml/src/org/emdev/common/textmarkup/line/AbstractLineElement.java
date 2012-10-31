@@ -72,6 +72,8 @@ public abstract class AbstractLineElement implements LineElement {
             boolean splitted = false;
             if (tag == MarkupTag.TextElement && AppSettings.current().fb2HyphenEnabled) {
                 splitted = split(stream, params, lines, line, space, position, remaining);
+            } else if (tag == MarkupTag.TextPreElement && AppSettings.current().fb2HyphenEnabled) {
+                splitted = splitPre(stream, params, lines, line, space, position, remaining);
             }
             if (!splitted) {
                 line = new Line(params.content, stream, params.maxLineWidth, params.jm);
@@ -158,4 +160,65 @@ public abstract class AbstractLineElement implements LineElement {
             in.position(prev);
         }
     }
+
+    public static boolean splitPre(MarkupStream stream, LineCreationParams params, ArrayList<Line> lines, Line line, final LineWhiteSpace space, int position, final float remaining) throws IOException {
+        ParsedContent content = params.content;
+        DataArrayInputStream in = stream.in;
+        int prev = in.position(position + 1);
+
+        try {
+            final float ewidth = in.readFloat();
+            final int eheight = in.readInt();
+            final long id = in.readLong();
+            final int start = in.readInt();
+            final int length = in.readInt();
+            final int offset = in.readInt();
+            final long key = in.readLong();
+
+            final ITextProvider chars = content.getTextProvider(id);
+            final RenderingStyle style = RenderingStyle.get(content, key);
+
+            final int firstStart = start;
+            int firstLen = 0;
+            int secondStart = start;
+
+            float summ = 0;
+
+            for (int i = start; i < start + length; i++) {
+                final float width = style.paint.measureText(chars.text(), i, 1);
+                final float total = summ + width;
+                if (total > remaining) {
+                    break;
+                }
+                summ = total;
+                firstLen++;
+                secondStart++;
+            }
+
+            if (secondStart == firstStart) {
+                return false;
+            }
+
+            final int secondLength = length - firstLen;
+
+            if (line.hasNonWhiteSpaces() && params.insertSpace) {
+                line.append(MarkupTag.LineWhiteSpace, space.width, space.height);
+            }
+
+            line.addText(chars, summ, eheight, firstStart, firstLen, offset, style);
+
+            Line newline = new Line(params.content, stream, params.maxLineWidth, params.jm);
+            if (params.extraSpace > 0 && line.elements.size() == 0) {
+                newline.append(MarkupTag.LineFixedWhiteSpace, params.extraSpace, 0);
+            }
+            lines.add(newline);
+
+            newline.addText(chars, ewidth - summ, eheight, secondStart, secondLength, offset, style);
+
+            return true;
+        } finally {
+            in.position(prev);
+        }
+    }
+
 }

@@ -22,6 +22,7 @@ public class StandardHandler extends BaseHandler {
     protected boolean documentStarted = false, documentEnded = false;
 
     protected boolean paragraphParsing = false;
+    protected boolean paragraphOffsetRequired = false;
 
     protected int ulLevel = 0;
 
@@ -46,6 +47,11 @@ public class StandardHandler extends BaseHandler {
 
     protected MarkupTable currentTable;
 
+    private boolean parsingPreformatted = false;
+    private int parsingPreformattedLevel = -1;
+    private int parsingPreformattedLines = 0;
+    protected int tagLevel = 0;
+
     private static final ITextProvider BULLET = new TextProvider("\u2022 ");
 
     public StandardHandler(final ParsedContent content) {
@@ -66,6 +72,7 @@ public class StandardHandler extends BaseHandler {
 
     @Override
     public void startElement(final XmlTag tag, final String... attributes) {
+        tagLevel++;
         spaceNeeded = true;
         final MarkupStream markupStream = parsedContent.getMarkupStream(currentStream);
 
@@ -74,7 +81,8 @@ public class StandardHandler extends BaseHandler {
                 paragraphParsing = true;
                 if (!parsingNotes) {
                     if (!inTitle) {
-                        markupStream.fixedWhiteSpace(crs.paint.pOffset);
+                        // markupStream.fixedWhiteSpace(crs.paint.pOffset);
+                        paragraphOffsetRequired = true;
                     } else {
                         if (title.length() > 0) {
                             title.append(" ");
@@ -239,7 +247,7 @@ public class StandardHandler extends BaseHandler {
                         markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
                         markupStream.endParagraph();
                     }
-                    int ref = parsedContent.getImageRef(name);
+                    final int ref = parsedContent.getImageRef(name);
                     markupStream.imageRef(ref, paragraphParsing);
                     if (!paragraphParsing) {
                         markupStream.fixedWhiteSpace(emptyLine(crs.textSize));
@@ -284,6 +292,13 @@ public class StandardHandler extends BaseHandler {
                     currentStream = streamId;
                 }
                 break;
+            case CODE:
+                parsingPreformatted = true;
+                parsingPreformattedLevel = tagLevel;
+                parsingPreformattedLines = 0;
+                setPreformatted();
+                paragraphOffsetRequired = false;
+                break;
             default:
                 break;
         }
@@ -291,6 +306,7 @@ public class StandardHandler extends BaseHandler {
 
     @Override
     public void endElement(final XmlTag tag) {
+        tagLevel--;
         spaceNeeded = true;
         final MarkupStream markupStream = parsedContent.getMarkupStream(currentStream);
         switch (tag.tag) {
@@ -410,6 +426,13 @@ public class StandardHandler extends BaseHandler {
                 paragraphParsing = false;
                 currentStream = oldStream;
                 break;
+            case CODE:
+                setPrevStyle();
+                parsingPreformatted = false;
+                parsingPreformattedLevel = -1;
+                if (!paragraphParsing) {
+                    markupStream.endParagraph();
+                }
             default:
                 break;
         }
@@ -435,42 +458,61 @@ public class StandardHandler extends BaseHandler {
     }
 
     protected void processText(final ITextProvider ch, final int start, final int length) {
-        char[] text = ch.text();
+        final char[] text = ch.text();
         if (inTitle) {
             title.append(text, start, length);
         }
-        final int count = StringUtils.split(text, start, length, starts, lengths);
+        final MarkupStream markupStream = parsedContent.getMarkupStream(currentStream);
+        if (paragraphOffsetRequired) {
+            markupStream.fixedWhiteSpace(crs.paint.pOffset);
+            paragraphOffsetRequired = false;
+        }
+        if (!parsingPreformatted || tagLevel > parsingPreformattedLevel) {
 
-        if (count > 0) {
-            final MarkupStream markupStream = parsedContent.getMarkupStream(currentStream);
-            char c = text[start];
-            if (!spaceNeeded && !Character.isWhitespace(c)) {
-                markupStream.noSpace();
-            }
-            spaceNeeded = true;
+            final int count = StringUtils.split(text, start, length, starts, lengths, false);
 
-            for (int i = 0; i < count; i++) {
-                final int st = starts[i];
-                final int len = lengths[i];
-                if (parsingNotes) {
-                    if (noteFirstWord) {
-                        noteFirstWord = false;
-                        int id = getNoteId(text, st, len);
-                        if (id == noteId) {
-                            continue;
-                        }
-                    }
-                }
-                markupStream.text(parsedContent, ch, st, len, crs);
-                if (crs.script != Script.NONE) {
+            if (count > 0) {
+                final char c = text[start];
+                if (!spaceNeeded && !Character.isWhitespace(c)) {
                     markupStream.noSpace();
                 }
+                spaceNeeded = true;
+
+                for (int i = 0; i < count; i++) {
+                    final int st = starts[i];
+                    final int len = lengths[i];
+                    if (parsingNotes) {
+                        if (noteFirstWord) {
+                            noteFirstWord = false;
+                            final int id = getNoteId(text, st, len);
+                            if (id == noteId) {
+                                continue;
+                            }
+                        }
+                    }
+                    markupStream.text(parsedContent, ch, st, len, crs);
+                    if (crs.script != Script.NONE) {
+                        markupStream.noSpace();
+                    }
+                }
+                if (Character.isWhitespace(text[start + length - 1])) {
+                    markupStream.noSpace();
+                    markupStream.whiteSpace(crs.paint.space);
+                }
+                spaceNeeded = false;
             }
-            if (Character.isWhitespace(text[start + length - 1])) {
-                markupStream.noSpace();
-                markupStream.whiteSpace(crs.paint.space);
+        } else {
+            final int count = StringUtils.split(text, start, length, starts, lengths, true);
+            if (count > 0) {
+                for (int i = 0; i < count; i++) {
+                    final int st = starts[i];
+                    final int len = lengths[i];
+                    if (!paragraphParsing || (parsingPreformattedLines++) > 0) {
+                        markupStream.endParagraph();
+                    }
+                    markupStream.textPre(parsedContent, ch, st, len, crs);
+                }
             }
-            spaceNeeded = false;
         }
     }
 }
