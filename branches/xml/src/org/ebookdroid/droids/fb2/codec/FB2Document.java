@@ -39,6 +39,7 @@ import org.emdev.common.textmarkup.MarkupTag;
 import org.emdev.common.textmarkup.MarkupTitle;
 import org.emdev.common.textmarkup.TextStyle;
 import org.emdev.common.textmarkup.line.Line;
+import org.emdev.common.textmarkup.line.LineStream;
 import org.emdev.common.xml.parsers.DuckbillParser;
 import org.emdev.common.xml.parsers.VTDExParser;
 import org.emdev.utils.LengthUtils;
@@ -73,7 +74,7 @@ public class FB2Document extends AbstractCodecDocument {
 
         final long t3 = System.currentTimeMillis();
 
-        final List<Line> documentLines = content.createLines(content.getMarkupStream(null), PAGE_WIDTH - 2 * MARGIN_X,
+        final LineStream documentLines = content.createLines(content.getMarkupStream(null), PAGE_WIDTH - 2 * MARGIN_X,
                 JustificationMode.Justify);
         createPages(content, documentLines);
 
@@ -89,7 +90,7 @@ public class FB2Document extends AbstractCodecDocument {
         System.gc();
     }
 
-    private void createPages(ParsedContent content, final List<Line> documentLines) {
+    private void createPages(ParsedContent content, final LineStream documentLines) {
         pages.clear();
         if (LengthUtils.isEmpty(documentLines)) {
             return;
@@ -110,7 +111,7 @@ public class FB2Document extends AbstractCodecDocument {
                 addTitle(title);
             }
 
-            final List<Line> footnotes = line.getFootNotes();
+            final LineStream footnotes = line.getFootNotes();
             if (footnotes != null) {
                 final Iterator<Line> iterator = footnotes.iterator();
                 if (lastPage.noteLines.size() > 0 && iterator.hasNext()) {

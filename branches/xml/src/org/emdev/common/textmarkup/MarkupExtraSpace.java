@@ -1,13 +1,9 @@
 package org.emdev.common.textmarkup;
 
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import org.emdev.common.textmarkup.line.Line;
-import org.emdev.utils.bytes.ByteArray.DataArrayInputStream;
+import org.emdev.common.textmarkup.line.LineStream;
 
 public class MarkupExtraSpace implements MarkupElement {
 
@@ -18,8 +14,8 @@ public class MarkupExtraSpace implements MarkupElement {
     }
 
     @Override
-    public void publishToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params) {
-        params.extraSpace += this.extraSpace;
+    public void publishToLines(final MarkupStream stream, final LineStream lines) {
+        lines.params.extraSpace += this.extraSpace;
     }
 
     @Override
@@ -32,10 +28,8 @@ public class MarkupExtraSpace implements MarkupElement {
         out.writeInt(extraSpace);
     }
 
-    public static void addToLines(final MarkupStream stream, final ArrayList<Line> lines,
-            final LineCreationParams params) throws IOException {
-
+    public static void addToLines(final MarkupStream stream, final LineStream lines) throws IOException {
         final int extraSpace = stream.in.readInt();
-        params.extraSpace += extraSpace;
+        lines.params.extraSpace += extraSpace;
     }
 }

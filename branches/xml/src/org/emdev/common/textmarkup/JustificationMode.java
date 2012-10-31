@@ -1,13 +1,9 @@
 package org.emdev.common.textmarkup;
 
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import org.emdev.common.textmarkup.line.Line;
-import org.emdev.utils.bytes.ByteArray.DataArrayInputStream;
+import org.emdev.common.textmarkup.line.LineStream;
 
 public enum JustificationMode implements MarkupElement {
 
@@ -24,23 +20,22 @@ public enum JustificationMode implements MarkupElement {
     Justify;
 
     @Override
-    public void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
-        params.jm = this;
+    public void publishToLines(final MarkupStream stream, final LineStream lines) {
+        lines.params.jm = this;
     }
 
     @Override
-    public void publishToStream(DataOutputStream out) throws IOException {
+    public void publishToStream(final DataOutputStream out) throws IOException {
         write(out, this);
     }
 
-    public static void write(DataOutputStream out, JustificationMode jm) throws IOException {
+    public static void write(final DataOutputStream out, final JustificationMode jm) throws IOException {
         out.writeByte(MarkupTag.JustificationMode.ordinal());
         out.writeByte(jm.ordinal());
     }
 
-    public static void addToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params)
-            throws IOException {
-        JustificationMode jm = JustificationMode.values()[stream.in.readByte()];
-        jm.publishToLines(stream, lines, params);
+    public static void addToLines(final MarkupStream stream, final LineStream lines) throws IOException {
+        final JustificationMode jm = JustificationMode.values()[stream.in.readByte()];
+        jm.publishToLines(stream, lines);
     }
 }

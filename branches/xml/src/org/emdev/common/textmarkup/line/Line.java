@@ -1,14 +1,11 @@
 package org.emdev.common.textmarkup.line;
 
 import org.ebookdroid.droids.fb2.codec.FB2Page;
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
 import android.graphics.Canvas;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.emdev.common.textmarkup.JustificationMode;
 import org.emdev.common.textmarkup.MarkupStream;
@@ -28,7 +25,7 @@ public class Line {
     private int height;
     float width = 0;
     private boolean hasNonWhiteSpaces = false;
-    private List<Line> footnotes;
+    private LineStream footnotes;
     public boolean committed;
     private int sizeableCount;
     public float spaceWidth;
@@ -156,13 +153,13 @@ public class Line {
                 break;
             case LineFixedWhiteSpace: {
                 final float width = in.readFloat();
-                final int height = in.readInt();
+                in.skipInt();
                 x1 += width;
             }
                 break;
             case LineWhiteSpace: {
                 final float width = in.readFloat();
-                final int height = in.readInt();
+                in.skipInt();
                 x1 += width + spaceWidth;
             }
                 break;
@@ -172,21 +169,10 @@ public class Line {
             case TextPreElement:
                 x1 += TextPreElement.render(content, in, c, y, (int) x1, spaceWidth, left, right, nightmode);
                 break;
+            default:
+                break;
         }
         return x1;
-    }
-
-    public static Line getLastLine(final ParsedContent content, final MarkupStream stream, final ArrayList<Line> lines,
-            final LineCreationParams params) {
-        if (lines.size() == 0) {
-            lines.add(new Line(content, stream, params.maxLineWidth, params.jm));
-        }
-        Line fb2Line = lines.get(lines.size() - 1);
-        if (fb2Line.committed) {
-            fb2Line = new Line(content, stream, params.maxLineWidth, params.jm);
-            lines.add(fb2Line);
-        }
-        return fb2Line;
     }
 
     public void ensureJustification() {
@@ -218,18 +204,17 @@ public class Line {
         return hasNonWhiteSpaces;
     }
 
-    public List<Line> getFootNotes() {
+    public LineStream getFootNotes() {
         return footnotes;
     }
 
-    public void addNote(final MarkupStream stream, final List<Line> noteLines) {
+    public void addNote(final MarkupStream stream, final LineStream noteLines) {
         if (noteLines == null) {
             return;
         }
         if (footnotes == null) {
-            footnotes = new ArrayList<Line>();
-            final Line lastLine = new Line(content, stream, FB2Page.PAGE_WIDTH / 4, justification);
-            footnotes.add(lastLine);
+            footnotes = new LineStream(content, noteLines.params.jm, noteLines.params.maxLineWidth);
+            final Line lastLine = footnotes.add(stream, FB2Page.PAGE_WIDTH / 4, justification);
             lastLine.append(MarkupTag.HorizontalRule, FB2Page.PAGE_WIDTH / 4, TextStyle.FOOTNOTE.getFontSize());
             lastLine.applyJustification(JustificationMode.Left);
         }

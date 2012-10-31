@@ -11,7 +11,6 @@ import android.support.v4.util.LongSparseArray;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -28,7 +27,7 @@ import org.emdev.common.textmarkup.image.DiskImageData;
 import org.emdev.common.textmarkup.image.IImageData;
 import org.emdev.common.textmarkup.image.MemoryImageData;
 import org.emdev.common.textmarkup.line.Image;
-import org.emdev.common.textmarkup.line.Line;
+import org.emdev.common.textmarkup.line.LineStream;
 import org.emdev.common.textmarkup.text.ITextProvider;
 
 public class ParsedContent {
@@ -44,7 +43,7 @@ public class ParsedContent {
 
     private final TreeMap<Integer, String> noteNames = new TreeMap<Integer, String>();
     private final TreeMap<String, Integer> noteRefs = new TreeMap<String, Integer>();
-    private final ArrayList<ArrayList<Line>> notes = new ArrayList<ArrayList<Line>>();
+    private final ArrayList<LineStream> notes = new ArrayList<LineStream>();
 
     private String cover;
 
@@ -158,12 +157,12 @@ public class ParsedContent {
         return ref;
     }
 
-    public List<Line> getNote(final int ref) {
+    public LineStream getNote(final int ref) {
         String noteName = noteNames.get(ref);
         if (noteName == null) {
             return null;
         }
-        ArrayList<Line> note = notes.get(ref);
+        LineStream note = notes.get(ref);
         if (note != null) {
             return note;
         }
@@ -180,16 +179,14 @@ public class ParsedContent {
         return note;
     }
 
-    ArrayList<Line> createLines(final MarkupStream markup, final int maxLineWidth, final JustificationMode jm) {
-        final ArrayList<Line> lines = new ArrayList<Line>();
+    LineStream createLines(final MarkupStream markup, final int maxLineWidth, final JustificationMode jm) {
+        final LineCreationParams params = new LineCreationParams(this, jm, maxLineWidth);
+        final LineStream lines = new LineStream(params);
+
         if (MarkupStream.isNotEmpty(markup)) {
-            final LineCreationParams params = new LineCreationParams();
-            params.jm = jm;
-            params.maxLineWidth = maxLineWidth;
-            params.content = this;
 
             try {
-                markup.publishToLines(lines, params);
+                markup.publishToLines(lines);
             } catch (final IOException ex) {
                 ex.printStackTrace();
             }

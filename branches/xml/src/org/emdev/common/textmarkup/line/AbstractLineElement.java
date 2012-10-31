@@ -1,14 +1,12 @@
 package org.emdev.common.textmarkup.line;
 
 import org.ebookdroid.common.settings.AppSettings;
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
 import android.graphics.RectF;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.emdev.common.textmarkup.MarkupStream;
 import org.emdev.common.textmarkup.MarkupStream.IMarkupStreamCallback;
@@ -34,33 +32,36 @@ public abstract class AbstractLineElement implements LineElement {
         this(tag, rect.width(), (int) rect.height());
     }
 
-    public static void write(DataOutputStream out, MarkupTag tag, float width, int height) throws IOException {
+    public static void write(final DataOutputStream out, final MarkupTag tag, final float width, final int height)
+            throws IOException {
         out.writeByte(tag.ordinal());
         out.writeFloat(width);
         out.writeInt(height);
     }
 
     @Override
-    public final void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
+    public final void publishToLines(final MarkupStream stream, final LineStream lines) {
         throw new RuntimeException("Cannot be called");
     }
 
-    public static final void addToLines(MarkupStream stream, MarkupTag tag, int position, IMarkupStreamCallback callback, float ewidth,
-            int eheight, ArrayList<Line> lines, LineCreationParams params) throws IOException {
-        Line line = Line.getLastLine(params.content, stream, lines, params);
-        final LineWhiteSpace space = RenderingStyle.getTextPaint(params.content, Math.max(line.getHeight(), eheight)).space;
-        float remaining = params.maxLineWidth - (line.width + space.width);
+    public static final void addToLines(final MarkupStream stream, final MarkupTag tag, final int position,
+            final IMarkupStreamCallback callback, final float ewidth, final int eheight, final LineStream lines)
+            throws IOException {
+
+        Line line = lines.last(stream);
+        final LineWhiteSpace space = RenderingStyle.getTextPaint(lines.params.content,
+                Math.max(line.getHeight(), eheight)).space;
+        float remaining = lines.params.maxLineWidth - (line.width + space.width);
         if (remaining <= 0) {
-            line = new Line(params.content, stream, params.maxLineWidth, params.jm);
-            lines.add(line);
-            remaining = params.maxLineWidth;
+            line = lines.add(stream);
+            remaining = lines.params.maxLineWidth;
         }
-        if (params.extraSpace > 0 && line.elements.size() == 0) {
-            line.append(MarkupTag.LineFixedWhiteSpace, params.extraSpace, 0);
+        if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
+            line.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
         }
 
         if (ewidth <= remaining) {
-            if (line.hasNonWhiteSpaces() && params.insertSpace) {
+            if (line.hasNonWhiteSpaces() && lines.params.insertSpace) {
                 line.append(MarkupTag.LineWhiteSpace, space.width, space.height);
             }
             if (position >= 0) {
@@ -71,16 +72,15 @@ public abstract class AbstractLineElement implements LineElement {
         } else {
             boolean splitted = false;
             if (tag == MarkupTag.TextElement && AppSettings.current().fb2HyphenEnabled) {
-                splitted = split(stream, params, lines, line, space, position, remaining);
+                splitted = split(stream, lines, line, space, position, remaining);
             } else if (tag == MarkupTag.TextPreElement && AppSettings.current().fb2HyphenEnabled) {
-                splitted = splitPre(stream, params, lines, line, space, position, remaining);
+                splitted = splitPre(stream, lines, line, space, position, remaining);
             }
             if (!splitted) {
-                line = new Line(params.content, stream, params.maxLineWidth, params.jm);
-                if (params.extraSpace > 0 && line.elements.size() == 0) {
-                    line.append(MarkupTag.LineFixedWhiteSpace, params.extraSpace, 0);
+                line = lines.add(stream);
+                if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
+                    line.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
                 }
-                lines.add(line);
                 if (position >= 0) {
                     line.append(tag, ewidth, eheight, position, false);
                 } else {
@@ -89,13 +89,15 @@ public abstract class AbstractLineElement implements LineElement {
             }
 
         }
-        params.insertSpace = true;
+        lines.params.insertSpace = true;
     }
 
-    public static boolean split(MarkupStream stream, LineCreationParams params, ArrayList<Line> lines, Line line, final LineWhiteSpace space, int position, final float remaining) throws IOException {
-        ParsedContent content = params.content;
-        DataArrayInputStream in = stream.in;
-        int prev = in.position(position + 1);
+    public static boolean split(final MarkupStream stream, final LineStream lines, final Line line,
+            final LineWhiteSpace space, final int position, final float remaining) throws IOException {
+
+        final ParsedContent content = lines.params.content;
+        final DataArrayInputStream in = stream.in;
+        final int prev = in.position(position + 1);
 
         try {
             final float ewidth = in.readFloat();
@@ -109,7 +111,8 @@ public abstract class AbstractLineElement implements LineElement {
             final ITextProvider chars = content.getTextProvider(id);
             final RenderingStyle style = RenderingStyle.get(content, key);
 
-            final int count = HyphenationUtils.hyphenateWord(chars.text(), start, length, TextElement.starts, TextElement.lengths);
+            final int count = HyphenationUtils.hyphenateWord(chars.text(), start, length, TextElement.starts,
+                    TextElement.lengths);
             if (count == 0) {
                 return false;
             }
@@ -122,7 +125,8 @@ public abstract class AbstractLineElement implements LineElement {
             int next = 0;
 
             for (; next < TextElement.parts.length; next++) {
-                final float width = style.paint.measureText(chars.text(), TextElement.starts[next], TextElement.lengths[next]);
+                final float width = style.paint.measureText(chars.text(), TextElement.starts[next],
+                        TextElement.lengths[next]);
                 final float total = summ + width;
                 if (total > remaining) {
                     break;
@@ -138,20 +142,20 @@ public abstract class AbstractLineElement implements LineElement {
             final int secondStart = TextElement.starts[next];
             final int secondLength = length - (TextElement.starts[next] - start);
 
-            if (line.hasNonWhiteSpaces() && params.insertSpace) {
+            if (line.hasNonWhiteSpaces() && lines.params.insertSpace) {
                 line.append(MarkupTag.LineWhiteSpace, space.width, space.height);
             }
 
             line.addText(chars, summ - dwidth, eheight, firstStart, firstLen, offset, style);
 
             content.addTextProvider(style.defis.chars);
-            line.addText(style.defis.chars, style.defis.width, style.defis.height, style.defis.start, style.defis.length, style.defis.offset, style.defis.style);
+            line.addText(style.defis.chars, style.defis.width, style.defis.height, style.defis.start,
+                    style.defis.length, style.defis.offset, style.defis.style);
 
-            Line newline = new Line(params.content, stream, params.maxLineWidth, params.jm);
-            if (params.extraSpace > 0 && line.elements.size() == 0) {
-                newline.append(MarkupTag.LineFixedWhiteSpace, params.extraSpace, 0);
+            final Line newline = lines.add(stream);
+            if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
+                newline.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
             }
-            lines.add(newline);
 
             newline.addText(chars, ewidth - (summ - dwidth), eheight, secondStart, secondLength, offset, style);
 
@@ -161,10 +165,12 @@ public abstract class AbstractLineElement implements LineElement {
         }
     }
 
-    public static boolean splitPre(MarkupStream stream, LineCreationParams params, ArrayList<Line> lines, Line line, final LineWhiteSpace space, int position, final float remaining) throws IOException {
-        ParsedContent content = params.content;
-        DataArrayInputStream in = stream.in;
-        int prev = in.position(position + 1);
+    public static boolean splitPre(final MarkupStream stream, final LineStream lines, final Line line,
+            final LineWhiteSpace space, final int position, final float remaining) throws IOException {
+
+        final ParsedContent content = lines.params.content;
+        final DataArrayInputStream in = stream.in;
+        final int prev = in.position(position + 1);
 
         try {
             final float ewidth = in.readFloat();
@@ -201,17 +207,16 @@ public abstract class AbstractLineElement implements LineElement {
 
             final int secondLength = length - firstLen;
 
-            if (line.hasNonWhiteSpaces() && params.insertSpace) {
+            if (line.hasNonWhiteSpaces() && lines.params.insertSpace) {
                 line.append(MarkupTag.LineWhiteSpace, space.width, space.height);
             }
 
             line.addText(chars, summ, eheight, firstStart, firstLen, offset, style);
 
-            Line newline = new Line(params.content, stream, params.maxLineWidth, params.jm);
-            if (params.extraSpace > 0 && line.elements.size() == 0) {
-                newline.append(MarkupTag.LineFixedWhiteSpace, params.extraSpace, 0);
+            final Line newline = lines.add(stream);
+            if (lines.params.extraSpace > 0 && line.elements.size() == 0) {
+                newline.append(MarkupTag.LineFixedWhiteSpace, lines.params.extraSpace, 0);
             }
-            lines.add(newline);
 
             newline.addText(chars, ewidth - summ, eheight, secondStart, secondLength, offset, style);
 

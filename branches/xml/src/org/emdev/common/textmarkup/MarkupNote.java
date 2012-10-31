@@ -1,13 +1,10 @@
 package org.emdev.common.textmarkup;
 
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.emdev.common.textmarkup.line.Line;
+import org.emdev.common.textmarkup.line.LineStream;
 import org.emdev.utils.LengthUtils;
 
 public class MarkupNote implements MarkupElement {
@@ -19,12 +16,7 @@ public class MarkupNote implements MarkupElement {
     }
 
     @Override
-    public void publishToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params) {
-//        final List<Line> note = params.content.getNote(ref);
-//        if (note != null && LengthUtils.isNotEmpty(lines)) {
-//            final Line line = Line.getLastLine(lines, params);
-//            line.addNote(note);
-//        }
+    public void publishToLines(final MarkupStream stream, final LineStream lines) {
     }
 
     @Override
@@ -37,12 +29,12 @@ public class MarkupNote implements MarkupElement {
         out.writeInt(ref);
     }
 
-    public static void addToLines(final MarkupStream stream, final ArrayList<Line> lines,
-            final LineCreationParams params) throws IOException {
+    public static void addToLines(final MarkupStream stream, final LineStream lines) throws IOException {
+
         final int ref = stream.in.readInt();
-        final List<Line> note = params.content.getNote(ref);
+        final LineStream note = lines.params.content.getNote(ref);
         if (note != null && LengthUtils.isNotEmpty(lines)) {
-            final Line line = Line.getLastLine(params.content, stream, lines, params);
+            final Line line = lines.last(stream);
             line.addNote(stream, note);
         }
     }

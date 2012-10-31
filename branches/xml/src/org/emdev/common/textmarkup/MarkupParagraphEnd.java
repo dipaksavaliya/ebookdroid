@@ -1,13 +1,10 @@
 package org.emdev.common.textmarkup;
 
-
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.emdev.common.textmarkup.line.Line;
+import org.emdev.common.textmarkup.line.LineStream;
 import org.emdev.utils.LengthUtils;
 
 public class MarkupParagraphEnd implements MarkupElement {
@@ -18,27 +15,28 @@ public class MarkupParagraphEnd implements MarkupElement {
     }
 
     @Override
-    public void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
+    public void publishToLines(final MarkupStream stream, final LineStream lines) {
         if (LengthUtils.isEmpty(lines)) {
             return;
         }
-        final Line last = lines.get(lines.size() - 1);
-        final JustificationMode lastJm = params.jm == JustificationMode.Justify ? JustificationMode.Left : params.jm;
+        final Line last = lines.last();
+        final JustificationMode lastJm = lines.params.jm == JustificationMode.Justify ? JustificationMode.Left
+                : lines.params.jm;
         for (int i = lines.size() - 1; i >= 0; i--) {
-            Line l = lines.get(i);
+            final Line l = lines.get(i);
             if (l.committed) {
                 break;
             }
-            l.applyJustification(l != last ? params.jm : lastJm);
+            l.applyJustification(l != last ? lines.params.jm : lastJm);
         }
     }
 
     @Override
-    public void publishToStream(DataOutputStream out) throws IOException {
+    public void publishToStream(final DataOutputStream out) throws IOException {
         write(out);
     }
 
-    public static void write(DataOutputStream out) throws IOException {
+    public static void write(final DataOutputStream out) throws IOException {
         out.writeByte(MarkupTag.MarkupParagraphEnd.ordinal());
     }
 }

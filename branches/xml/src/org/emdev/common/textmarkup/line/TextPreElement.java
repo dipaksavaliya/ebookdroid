@@ -1,6 +1,5 @@
 package org.emdev.common.textmarkup.line;
 
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
 import android.graphics.Canvas;
@@ -8,7 +7,6 @@ import android.graphics.Rect;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.emdev.common.textmarkup.MarkupStream;
 import org.emdev.common.textmarkup.MarkupTag;
@@ -58,15 +56,14 @@ public class TextPreElement extends AbstractLineElement {
         out.writeLong(style.key);
     }
 
-    public static void addToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params)
-            throws IOException {
+    public static void addToLines(MarkupStream stream, final LineStream lines) throws IOException {
         final int position = stream.in.position() - 1;
         final float width = stream.in.readFloat();
         final int height = stream.in.readInt();
 
         stream.in.position(position + MarkupTag.TextPreElement.size + 1);
 
-        AbstractLineElement.addToLines(stream, MarkupTag.TextPreElement, position, null, width, height, lines, params);
+        AbstractLineElement.addToLines(stream, MarkupTag.TextPreElement, position, null, width, height, lines);
     }
 
     @Override

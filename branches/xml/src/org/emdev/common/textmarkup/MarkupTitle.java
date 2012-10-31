@@ -1,12 +1,9 @@
 package org.emdev.common.textmarkup;
 
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import org.emdev.common.textmarkup.line.Line;
+import org.emdev.common.textmarkup.line.LineStream;
 
 public class MarkupTitle implements MarkupElement {
 
@@ -19,8 +16,7 @@ public class MarkupTitle implements MarkupElement {
     }
 
     @Override
-    public void publishToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params) {
-        // Line.getLastLine(params.content, lines, params).setTitle(this);
+    public void publishToLines(final MarkupStream stream, final LineStream lines) {
     }
 
     @Override
@@ -36,14 +32,14 @@ public class MarkupTitle implements MarkupElement {
         out.write(bytes);
     }
 
-    public static void addToLines(final MarkupStream stream, final ArrayList<Line> lines,
-            final LineCreationParams params) throws IOException {
+    public static void addToLines(final MarkupStream stream, final LineStream lines) throws IOException {
         final int level = stream.in.readByte();
         final int length = stream.in.readInt();
         final byte[] bytes = new byte[length];
         stream.in.read(bytes);
-        String title = new String(bytes);
-        Line.getLastLine(params.content, stream, lines, params).setTitle(new MarkupTitle(title, level));
+
+        final String title = new String(bytes);
+        lines.last(stream).setTitle(new MarkupTitle(title, level));
     }
 
 }

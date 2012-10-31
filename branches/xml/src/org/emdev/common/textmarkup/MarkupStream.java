@@ -1,17 +1,14 @@
 package org.emdev.common.textmarkup;
 
-
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
 import org.ebookdroid.droids.fb2.codec.ParsedContent;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.emdev.common.textmarkup.RenderingStyle.Script;
 import org.emdev.common.textmarkup.line.AbstractLineElement;
-import org.emdev.common.textmarkup.line.Line;
 import org.emdev.common.textmarkup.line.LineFixedWhiteSpace;
+import org.emdev.common.textmarkup.line.LineStream;
 import org.emdev.common.textmarkup.line.LineWhiteSpace;
 import org.emdev.common.textmarkup.line.TextElement;
 import org.emdev.common.textmarkup.line.TextPreElement;
@@ -38,7 +35,7 @@ public class MarkupStream extends ByteArray {
         return this;
     }
 
-    public int add(IMarkupStreamCallback callback) {
+    public int add(final IMarkupStreamCallback callback) {
         try {
             final int position = size();
             callback.write(out);
@@ -220,7 +217,8 @@ public class MarkupStream extends ByteArray {
         return this;
     }
 
-    public MarkupStream textPre(ParsedContent content, ITextProvider chars, int start, int length, RenderingStyle style) {
+    public MarkupStream textPre(final ParsedContent content, final ITextProvider chars, final int start,
+            final int length, final RenderingStyle style) {
         final float width = style.paint.measureText(chars.text(), start, length);
         final int height = style.script == Script.SUPER ? style.textSize * 5 / 2 : style.textSize;
         final int offset = style.script == Script.SUPER ? (-style.textSize)
@@ -257,8 +255,9 @@ public class MarkupStream extends ByteArray {
         return this;
     }
 
-    public int text(final ITextProvider chars, final float width, final int height, final int start, final int length, final int offset, final RenderingStyle style) {
-        int position = size();
+    public int text(final ITextProvider chars, final float width, final int height, final int start, final int length,
+            final int offset, final RenderingStyle style) {
+        final int position = size();
 
         try {
             TextElement.write(out, width, height, chars, start, length, offset, style);
@@ -289,52 +288,52 @@ public class MarkupStream extends ByteArray {
         return s == null || s.isEmpty();
     }
 
-    public void publishToLines(final ArrayList<Line> lines, final LineCreationParams params) throws IOException {
+    public void publishToLines(final LineStream lines) throws IOException {
 
         while (in.available() > 0) {
-            int ord = in.readByte() & 0x7F;
+            final int ord = in.readByte() & 0x7F;
             final MarkupTag tag = MarkupTag.values()[ord];
             switch (tag) {
                 case MarkupEndDocument:
                     return;
                 case JustificationMode:
-                    JustificationMode.addToLines(this, lines, params);
+                    JustificationMode.addToLines(this, lines);
                     break;
                 case MarkupEndPage:
-                    MarkupEndPage.E.publishToLines(this, lines, params);
+                    MarkupEndPage.E.publishToLines(this, lines);
                     break;
                 case MarkupExtraSpace:
-                    MarkupExtraSpace.addToLines(this, lines, params);
+                    MarkupExtraSpace.addToLines(this, lines);
                     break;
                 case MarkupImageRef:
-                    MarkupImageRef.addToLines(this, lines, params);
+                    MarkupImageRef.addToLines(this, lines);
                     break;
                 case MarkupNoSpace:
-                    MarkupNoSpace.E.publishToLines(this, lines, params);
+                    MarkupNoSpace.E.publishToLines(this, lines);
                     break;
                 case MarkupSpace:
-                    MarkupSpace.E.publishToLines(this, lines, params);
+                    MarkupSpace.E.publishToLines(this, lines);
                     break;
                 case MarkupNote:
-                    MarkupNote.addToLines(this, lines, params);
+                    MarkupNote.addToLines(this, lines);
                     break;
                 case MarkupParagraphEnd:
-                    MarkupParagraphEnd.E.publishToLines(this, lines, params);
+                    MarkupParagraphEnd.E.publishToLines(this, lines);
                     break;
                 case MarkupTitle:
-                    MarkupTitle.addToLines(this, lines, params);
+                    MarkupTitle.addToLines(this, lines);
                     break;
                 case LineFixedWhiteSpace:
-                    LineFixedWhiteSpace.addToLines(this, lines, params);
+                    LineFixedWhiteSpace.addToLines(this, lines);
                     break;
                 case LineWhiteSpace:
-                    LineWhiteSpace.addToLines(this, lines, params);
+                    LineWhiteSpace.addToLines(this, lines);
                     break;
                 case TextElement:
-                    TextElement.addToLines(this, lines, params);
+                    TextElement.addToLines(this, lines);
                     break;
                 case TextPreElement:
-                    TextPreElement.addToLines(this, lines, params);
+                    TextPreElement.addToLines(this, lines);
                     break;
             }
         }

@@ -1,12 +1,9 @@
 package org.emdev.common.textmarkup.line;
 
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
-
 import android.graphics.Canvas;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.emdev.common.textmarkup.MarkupStream;
 import org.emdev.common.textmarkup.MarkupTag;
@@ -28,12 +25,11 @@ public class LineFixedWhiteSpace extends AbstractLineElement {
         write(out, MarkupTag.LineFixedWhiteSpace, width, height);
     }
 
-    public static void addToLines(MarkupStream stream, final ArrayList<Line> lines,
-            final LineCreationParams params) throws IOException {
+    public static void addToLines(MarkupStream stream, final LineStream lines) throws IOException {
         final int position = stream.in.position() - 1;
         final float width = stream.in.readFloat();
         final int height = stream.in.readInt();
 
-        AbstractLineElement.addToLines(stream, MarkupTag.LineFixedWhiteSpace, position, null, width, height, lines, params);
+        AbstractLineElement.addToLines(stream, MarkupTag.LineFixedWhiteSpace, position, null, width, height, lines);
     }
 }

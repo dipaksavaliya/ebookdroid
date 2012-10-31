@@ -31,8 +31,7 @@ public enum TextStyle {
     /**
     *
     */
-    PREFORMATTED(0.75f),
-    ;
+    PREFORMATTED(0.75f), ;
 
     public static final int TEXT_SIZE = 24;
 

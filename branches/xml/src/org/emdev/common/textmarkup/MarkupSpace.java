@@ -1,12 +1,9 @@
 package org.emdev.common.textmarkup;
 
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import org.emdev.common.textmarkup.line.Line;
+import org.emdev.common.textmarkup.line.LineStream;
 
 public class MarkupSpace implements MarkupElement {
 
@@ -16,8 +13,8 @@ public class MarkupSpace implements MarkupElement {
     public static final MarkupSpace E = new MarkupSpace();
 
     @Override
-    public void publishToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params) {
-        params.insertSpace = true;
+    public void publishToLines(final MarkupStream stream, final LineStream lines) {
+        lines.params.insertSpace = true;
     }
 
     @Override

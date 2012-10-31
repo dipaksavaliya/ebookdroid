@@ -8,7 +8,6 @@ import android.graphics.Rect;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.emdev.common.textmarkup.MarkupStream;
 import org.emdev.common.textmarkup.MarkupTag;
@@ -58,7 +57,7 @@ public class TextElement extends AbstractLineElement {
         out.writeLong(style.key);
     }
 
-    public static void addToLines(MarkupStream stream, final ArrayList<Line> lines, final LineCreationParams params)
+    public static void addToLines(MarkupStream stream, final LineStream lines)
             throws IOException {
         final int position = stream.in.position() - 1;
         final float width = stream.in.readFloat();
@@ -66,7 +65,7 @@ public class TextElement extends AbstractLineElement {
 
         stream.in.position(position + MarkupTag.TextElement.size + 1);
 
-        AbstractLineElement.addToLines(stream, MarkupTag.TextElement, position, null, width, height, lines, params);
+        AbstractLineElement.addToLines(stream, MarkupTag.TextElement, position, null, width, height, lines);
     }
 
     @Override

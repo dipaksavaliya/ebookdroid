@@ -1,22 +1,18 @@
 package org.emdev.common.textmarkup;
 
-
-import org.ebookdroid.droids.fb2.codec.LineCreationParams;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import org.emdev.common.textmarkup.line.Line;
+import org.emdev.common.textmarkup.line.LineStream;
 import org.emdev.common.textmarkup.line.MultiLineElement;
 import org.emdev.utils.LengthUtils;
 
 public class MarkupTable implements MarkupElement {
 
-
     public class Cell {
+
         public JustificationMode align = JustificationMode.Left;
         public String stream;
         public boolean hasBackground;
@@ -29,40 +25,41 @@ public class MarkupTable implements MarkupElement {
     final ArrayList<ArrayList<Cell>> rows = new ArrayList<ArrayList<Cell>>();
 
     @Override
-    public void publishToStream(DataOutputStream out) throws IOException {
+    public void publishToStream(final DataOutputStream out) throws IOException {
     }
 
     @Override
-    public void publishToLines(MarkupStream stream, ArrayList<Line> lines, LineCreationParams params) {
-//        if (getRowCount() > 0) {
-//            final int cellWidth = params.maxLineWidth / getMaxColCount();
-//            for (int i = 0, n = rows.size(); i < n; i++) {
-//                final int colCount = getColCount(i);
-//                ArrayList<List<Line>> cells = new ArrayList<List<Line>>(colCount);
-//                Line row = new Line(params.maxLineWidth, params.jm);
-//                cells.clear();
-//                int maxHeight = 0;
-//                for (int j = 0; j < colCount; j++) {
-//                    final Cell cell = rows.get(i).get(j);
-//                    final List<Line> cellLines = params.content.getStreamLines(cell.stream,
-//                            cellWidth - DOUBLE_BORDER_WIDTH, cell.align);
-//                    cells.add(cellLines);
-//                    final int height = MultiLineElement.calcHeight(cellLines);
-//                    if (height > maxHeight) {
-//                        maxHeight = height;
-//                    }
-//                }
-//                for (int j = 0; j < colCount; j++) {
-//                    List<Line> list = cells.get(j);
-//                    final MultiLineElement cell = new MultiLineElement(cellWidth, maxHeight + DOUBLE_BORDER_WIDTH, list, true, rows.get(i).get(j).hasBackground);
-//                    row.append(cell);
-//                    cell.applyNotes(row);
-//                }
-//
-//                row.applyJustification(JustificationMode.Center);
-//                lines.add(row);
-//            }
-//        }
+    public void publishToLines(final MarkupStream stream, final LineStream lines) {
+        // if (getRowCount() > 0) {
+        // final int cellWidth = params.maxLineWidth / getMaxColCount();
+        // for (int i = 0, n = rows.size(); i < n; i++) {
+        // final int colCount = getColCount(i);
+        // ArrayList<List<Line>> cells = new ArrayList<List<Line>>(colCount);
+        // Line row = new Line(params.maxLineWidth, params.jm);
+        // cells.clear();
+        // int maxHeight = 0;
+        // for (int j = 0; j < colCount; j++) {
+        // final Cell cell = rows.get(i).get(j);
+        // final List<Line> cellLines = params.content.getStreamLines(cell.stream,
+        // cellWidth - DOUBLE_BORDER_WIDTH, cell.align);
+        // cells.add(cellLines);
+        // final int height = MultiLineElement.calcHeight(cellLines);
+        // if (height > maxHeight) {
+        // maxHeight = height;
+        // }
+        // }
+        // for (int j = 0; j < colCount; j++) {
+        // List<Line> list = cells.get(j);
+        // final MultiLineElement cell = new MultiLineElement(cellWidth, maxHeight + DOUBLE_BORDER_WIDTH, list, true,
+        // rows.get(i).get(j).hasBackground);
+        // row.append(cell);
+        // cell.applyNotes(row);
+        // }
+        //
+        // row.applyJustification(JustificationMode.Center);
+        // lines.add(row);
+        // }
+        // }
     }
 
     private int getMaxColCount() {
@@ -82,7 +79,7 @@ public class MarkupTable implements MarkupElement {
         rows.add(new ArrayList<Cell>());
     }
 
-    public void addCol(Cell c) {
+    public void addCol(final Cell c) {
         if (LengthUtils.isNotEmpty(rows)) {
             rows.get(rows.size() - 1).add(c);
         }
@@ -92,7 +89,7 @@ public class MarkupTable implements MarkupElement {
         return rows.size();
     }
 
-    public int getColCount(int row) {
+    public int getColCount(final int row) {
         if (row >= 0 && row < rows.size()) {
             return rows.get(row).size();
         }
