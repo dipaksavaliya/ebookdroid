@@ -9,10 +9,10 @@
 * File browser opens on first directory from set of autoscan dirs.
 
 === Improved book formats support ===
-* [PDF] MuPDF library updated up to actual version.
-* [FB2] <code> tag support
-* [FB2] Fixed width of punctuation symbols under Android 4.x
-* [FB2] Various fixed and optimizations
+* PDF: MuPDF library updated up to actual version.
+* FB2: <code> tag support
+* FB2: Fixed width of punctuation symbols under Android 4.x
+* FB2: Various fixed and optimizations
 
 === Tap/keyboard actions ===
 * All options menu actions available to bind.
