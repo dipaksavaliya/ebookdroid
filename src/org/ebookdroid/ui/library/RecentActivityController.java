@@ -24,7 +24,6 @@ import org.ebookdroid.ui.library.dialogs.FolderDlg;
 import org.ebookdroid.ui.library.tasks.CopyBookTask;
 import org.ebookdroid.ui.library.tasks.MoveBookTask;
 import org.ebookdroid.ui.library.tasks.RenameBookTask;
-import org.ebookdroid.ui.opds.OPDSActivity;
 import org.ebookdroid.ui.settings.SettingsUI;
 import org.ebookdroid.ui.viewer.ViewerActivity;
 
@@ -94,8 +93,6 @@ actions = {
         @ActionMethodDef(id = R.id.ShelfRightButton, method = "selectNextShelf"),
         @ActionMethodDef(id = R.id.recent_showbrowser, method = "goFileBrowser"),
         @ActionMethodDef(id = R.id.recent_showlibrary, method = "goLibrary"),
-        @ActionMethodDef(id = R.id.recent_showrecent, method = "goLibrary"),
-        @ActionMethodDef(id = R.id.mainmenu_opds, method = "goOPDSBrowser"),
         @ActionMethodDef(id = R.id.recentmenu_backupsettings, method = "backupSettings"),
         @ActionMethodDef(id = R.id.mainmenu_close, method = "close")
 // finish
@@ -518,7 +515,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         getManagedComponent().showNextBookshelf();
     }
 
-    @ActionMethod(ids = { R.id.recent_showlibrary, R.id.recent_showrecent })
+    @ActionMethod(ids = { R.id.recent_showlibrary})
     public void goLibrary(final ActionEx action) {
         if (!LibSettings.current().getUseBookcase()) {
             final int viewMode = getManagedComponent().getViewMode();
@@ -533,12 +530,6 @@ public class RecentActivityController extends ActionController<RecentActivity> i
     @ActionMethod(ids = R.id.recent_showbrowser)
     public void goFileBrowser(final ActionEx action) {
         final Intent myIntent = new Intent(getManagedComponent(), BrowserActivity.class);
-        getManagedComponent().startActivity(myIntent);
-    }
-
-    @ActionMethod(ids = R.id.mainmenu_opds)
-    public void goOPDSBrowser(final ActionEx action) {
-        final Intent myIntent = new Intent(getManagedComponent(), OPDSActivity.class);
         getManagedComponent().startActivity(myIntent);
     }
 

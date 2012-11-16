@@ -71,8 +71,6 @@ public interface IView {
 
     PointF getBase(RectF viewRect);
 
-    void checkFullScreenMode();
-
     boolean post(Runnable r);
 
     Bitmaps createBitmaps(final String nodeId, final IBitmapRef orig, final Rect bitmapBounds, final boolean invert);

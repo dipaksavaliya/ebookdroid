@@ -10,9 +10,7 @@ public interface INotificationManager {
     /* OldestNotificationManager for Android 1.5 */
     AndroidVersion.VERSION == 3 ? new OldestNotificationManager() :
     /* CompatibilityNotificationManager for Android 1.6 - 2.x */
-    AndroidVersion.lessThan3x ? new CompatibilityNotificationManager() :
-    /* ModernNotificationManager for Android 3.0+ */
-    new ModernNotificationManager();
+    new CompatibilityNotificationManager();
 
     int notify(final CharSequence title, final CharSequence message, final Intent intent);
 

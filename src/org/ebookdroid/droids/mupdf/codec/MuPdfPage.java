@@ -1,6 +1,5 @@
 package org.ebookdroid.droids.mupdf.codec;
 
-import org.ebookdroid.EBookDroidLibraryLoader;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.common.settings.AppSettings;
@@ -119,16 +118,6 @@ public class MuPdfPage extends AbstractCodecPage {
         final int height = viewbox.height();
         final int nightmode = viewState != null && viewState.nightMode && viewState.positiveImagesInNightMode ? 1 : 0;
         final int slowcmyk = AppSettings.current().slowCMYK ? 1 : 0;
-
-        if (EBookDroidLibraryLoader.nativeGraphicsAvailable && AppSettings.current().useNativeGraphics) {
-            final IBitmapRef bmp = BitmapManager.getBitmap("PDF page", width, height, MuPdfContext.NATIVE_BITMAP_CFG);
-            boolean res = renderPageBitmap(docHandle, pageHandle, mRect, ctm, bmp.getBitmap(), nightmode, slowcmyk);
-            if (res) {
-                return bmp;
-            }
-            BitmapManager.release(bmp);
-            return null;
-        }
 
         final int[] bufferarray = new int[width * height];
         renderPage(docHandle, pageHandle, mRect, ctm, bufferarray, nightmode, slowcmyk);

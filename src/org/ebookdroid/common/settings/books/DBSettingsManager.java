@@ -96,7 +96,6 @@ public class DBSettingsManager extends SQLiteOpenHelper implements IDBAdapter, I
         }
     }
 
-    @Override
     public void onDowngrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
         upgragingInstance = db;
         LCTX.i("Downgrading from version " + oldVersion + " to version " + newVersion);

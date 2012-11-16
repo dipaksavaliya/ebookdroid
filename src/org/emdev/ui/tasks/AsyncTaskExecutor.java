@@ -8,14 +8,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.utils.collections.ArrayDeque;
 
 public class AsyncTaskExecutor {
 
     static final AsyncTaskExecutor DEFAULT = new AsyncTaskExecutor(10, 5, 128, 1, "AsyncTask");
 
-    static final boolean USE_PARALLEL_AS_DEFAULT = AndroidVersion.lessThan3x;
+    static final boolean USE_PARALLEL_AS_DEFAULT = true;
 
     private final ThreadFactory threadFactory;
     private final BlockingQueue<Runnable> poolWorkQueue;

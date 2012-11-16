@@ -14,7 +14,7 @@
             android:id="@+id/bookmarkPage"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="fill_parent"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
             android:ellipsize="marquee"
             android:gravity="center_vertical"
             android:max="100"

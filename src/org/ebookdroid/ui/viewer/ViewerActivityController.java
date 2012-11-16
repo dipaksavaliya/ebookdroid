@@ -65,7 +65,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.backup.BackupManager;
 import org.emdev.common.content.ContentScheme;
 import org.emdev.common.filesystem.PathFromUri;
@@ -534,9 +533,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.mainmenu_showtitle)
     public void toggleTitleVisibility(final ActionEx action) {
-        if (!AndroidVersion.lessThan3x) {
-            AppSettings.toggleTitleVisibility();
-        }
     }
 
     @ActionMethod(ids = R.id.mainmenu_nightmode)

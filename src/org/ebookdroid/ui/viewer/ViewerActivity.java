@@ -28,7 +28,6 @@ import android.widget.Toast;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
 import org.emdev.ui.AbstractActionActivity;
@@ -299,7 +298,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
     }
 
     protected boolean hasNormalMenu() {
-        return AndroidVersion.lessThan4x || IUIManager.instance.isTabletUi(this) || AppSettings.current().showTitle;
+        return true;
     }
 
     /**
@@ -319,13 +318,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
         final AppSettings as = AppSettings.current();
 
         setMenuItemChecked(menu, as.fullScreen, R.id.mainmenu_fullscreen);
-
-        if (!AndroidVersion.lessThan3x) {
-            setMenuItemChecked(menu, as.showTitle, R.id.mainmenu_showtitle);
-        } else {
-            setMenuItemVisible(menu, false, R.id.mainmenu_showtitle);
-        }
-
+        setMenuItemVisible(menu, false, R.id.mainmenu_showtitle);
         setMenuItemChecked(menu, getZoomControls().getVisibility() == View.VISIBLE, R.id.mainmenu_zoom);
 
         final BookSettings bs = getController().getBookSettings();
@@ -385,7 +378,6 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
 
     @Override
     public final boolean dispatchKeyEvent(final KeyEvent event) {
-        view.checkFullScreenMode();
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
             if (!hasNormalMenu()) {
                 getController().getOrCreateAction(R.id.actions_openOptionsMenu).run();

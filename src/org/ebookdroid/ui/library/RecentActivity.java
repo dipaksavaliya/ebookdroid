@@ -95,14 +95,11 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
             return;
         }
 
-        IUIManager.instance.setTitleVisible(this, !AndroidVersion.lessThan3x, true);
+        IUIManager.instance.setTitleVisible(this, false, true);
 
         setContentView(R.layout.recent);
 
-        if (AndroidVersion.lessThan3x) {
-            // Old layout with custom title bar
-            libraryButton = (ImageView) findViewById(R.id.recent_showlibrary);
-        }
+        libraryButton = (ImageView) findViewById(R.id.recent_showlibrary);
 
         final RecentActivityController c = restoreController();
         if (c != null) {
@@ -168,10 +165,8 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
             final int viewMode = getViewMode();
             final boolean showLibraryAvailable = viewMode == RecentActivity.VIEW_RECENT;
             setMenuItemVisible(menu, showLibraryAvailable, R.id.recent_showlibrary);
-            setMenuItemVisible(menu, !showLibraryAvailable, R.id.recent_showrecent);
         } else {
             setMenuItemVisible(menu, false, R.id.recent_showlibrary);
-            setMenuItemVisible(menu, false, R.id.recent_showrecent);
         }
     }
 

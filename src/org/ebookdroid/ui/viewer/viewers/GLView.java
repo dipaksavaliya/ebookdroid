@@ -42,8 +42,6 @@ public final class GLView extends GLRootView implements IView, SurfaceHolder.Cal
 
     protected final Flag layoutFlag = new Flag();
 
-    protected final FullScreenCallback fullScreenCallback;
-
     public GLView(final IActivityController baseActivity) {
         super(baseActivity.getContext());
 
@@ -53,8 +51,6 @@ public final class GLView extends GLRootView implements IView, SurfaceHolder.Cal
         setKeepScreenOn(AppSettings.current().keepScreenOn);
         setFocusable(true);
         setFocusableInTouchMode(true);
-
-        fullScreenCallback = FullScreenCallback.get(baseActivity.getActivity(), this);
 
         drawThread = new DrawThread(null);
         scrollThread = new ScrollEventThread(base, this);
@@ -201,26 +197,12 @@ public final class GLView extends GLRootView implements IView, SurfaceHolder.Cal
     public boolean onTouchEvent(final MotionEvent ev) {
         mRenderLock.lock();
         try {
-            checkFullScreenMode();
-
             if (base.getDocumentController().onTouchEvent(ev)) {
                 return true;
             }
             return super.onTouchEvent(ev);
         } finally {
             mRenderLock.unlock();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.ui.viewer.IView#checkFullScreenMode()
-     */
-    @Override
-    public void checkFullScreenMode() {
-        if (fullScreenCallback != null) {
-            fullScreenCallback.checkFullScreenMode();
         }
     }
 
