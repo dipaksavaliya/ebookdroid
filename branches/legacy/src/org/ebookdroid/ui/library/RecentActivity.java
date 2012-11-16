@@ -2,16 +2,13 @@ package org.ebookdroid.ui.library;
 
 import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
-import org.ebookdroid.common.settings.LibSettings;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
 import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.ui.library.adapters.BookNode;
 import org.ebookdroid.ui.library.adapters.BookShelfAdapter;
-import org.ebookdroid.ui.library.adapters.BooksAdapter;
 import org.ebookdroid.ui.library.adapters.LibraryAdapter;
 import org.ebookdroid.ui.library.adapters.RecentAdapter;
-import org.ebookdroid.ui.library.views.BookcaseView;
 import org.ebookdroid.ui.library.views.LibraryView;
 import org.ebookdroid.ui.library.views.RecentBooksView;
 
@@ -19,7 +16,6 @@ import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -66,7 +62,6 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
     private ViewFlipper viewflipper;
 
     ImageView libraryButton;
-    BookcaseView bookcaseView;
     RecentBooksView recentBooksView;
     LibraryView libraryView;
 
@@ -161,13 +156,9 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
 
     @Override
     protected void updateMenuItems(final Menu menu) {
-        if (!LibSettings.current().getUseBookcase()) {
-            final int viewMode = getViewMode();
-            final boolean showLibraryAvailable = viewMode == RecentActivity.VIEW_RECENT;
-            setMenuItemVisible(menu, showLibraryAvailable, R.id.recent_showlibrary);
-        } else {
-            setMenuItemVisible(menu, false, R.id.recent_showlibrary);
-        }
+        final int viewMode = getViewMode();
+        final boolean showLibraryAvailable = viewMode == RecentActivity.VIEW_RECENT;
+        setMenuItemVisible(menu, showLibraryAvailable, R.id.recent_showlibrary);
     }
 
     @Override
@@ -214,8 +205,7 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
         menu.findItem(R.id.bookmenu_recentgroup).setVisible(bs != null);
 
         final BookShelfAdapter bookShelf = getController().getBookShelf(node);
-        final BookShelfAdapter current = bookcaseView != null ? getController().getBookShelf(
-                bookcaseView.getCurrentList()) : null;
+        final BookShelfAdapter current = null;
         menu.findItem(R.id.bookmenu_openbookshelf).setVisible(
                 bookShelf != null && current != null && bookShelf != current);
 
@@ -281,38 +271,6 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
     int getViewMode() {
         final ViewFlipper vf = getViewflipper();
         return vf != null ? vf.getDisplayedChild() : VIEW_RECENT;
-    }
-
-    void showBookshelf(final int shelfIndex) {
-        if (bookcaseView != null) {
-            bookcaseView.setCurrentList(shelfIndex);
-        }
-    }
-
-    void showNextBookshelf() {
-        if (bookcaseView != null) {
-            bookcaseView.nextList();
-        }
-    }
-
-    void showPrevBookshelf() {
-        if (bookcaseView != null) {
-            bookcaseView.prevList();
-        }
-    }
-
-    void showBookcase(final BooksAdapter bookshelfAdapter, final RecentAdapter recentAdapter) {
-        final ViewFlipper vf = getViewflipper();
-        vf.removeAllViews();
-        if (bookcaseView == null) {
-            bookcaseView = (BookcaseView) LayoutInflater.from(this).inflate(R.layout.bookcase_view, vf, false);
-            bookcaseView.init(bookshelfAdapter);
-        }
-        vf.addView(bookcaseView, 0);
-
-        if (libraryButton != null) {
-            libraryButton.setImageResource(R.drawable.recent_actionbar_library);
-        }
     }
 
     void showLibrary(final LibraryAdapter libraryAdapter, final RecentAdapter recentAdapter) {

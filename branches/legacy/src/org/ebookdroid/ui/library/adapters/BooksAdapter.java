@@ -4,12 +4,8 @@ import org.ebookdroid.R;
 import org.ebookdroid.common.notifications.INotificationManager;
 import org.ebookdroid.common.settings.LibSettings;
 import org.ebookdroid.ui.library.IBrowserActivity;
-import org.ebookdroid.ui.library.views.BookshelfView;
 
 import android.database.DataSetObserver;
-import android.os.Parcelable;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,7 +30,7 @@ import org.emdev.utils.StringUtils;
 import org.emdev.utils.collections.SparseArrayEx;
 import org.emdev.utils.collections.TLIterator;
 
-public class BooksAdapter extends PagerAdapter implements FileSystemScanner.Listener, Iterable<BookShelfAdapter> {
+public class BooksAdapter implements FileSystemScanner.Listener, Iterable<BookShelfAdapter> {
 
     public final static int SERVICE_SHELVES = 2;
 
@@ -81,51 +77,12 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
     }
 
     @Override
-    public void destroyItem(final View collection, final int position, final Object view) {
-        ((ViewPager) collection).removeView((View) view);
-        ((View) view).destroyDrawingCache();
-    }
-
-    @Override
-    public void finishUpdate(final View arg0) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public TLIterator<BookShelfAdapter> iterator() {
         return data.iterator();
     }
 
-    @Override
     public int getCount() {
         return getListCount();
-    }
-
-    @Override
-    public Object instantiateItem(final View arg0, final int arg1) {
-        final BookshelfView view = new BookshelfView(base, arg0, getList(arg1));
-        ((ViewPager) arg0).addView(view, 0);
-        return view;
-    }
-
-    @Override
-    public boolean isViewFromObject(final View arg0, final Object arg1) {
-        return arg0.equals(arg1);
-    }
-
-    @Override
-    public void restoreState(final Parcelable arg0, final ClassLoader arg1) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public Parcelable saveState() {
-        return null;
-    }
-
-    @Override
-    public void startUpdate(final View arg0) {
-        // TODO Auto-generated method stub
     }
 
     private void addShelf(final BookShelfAdapter a) {
@@ -475,9 +432,7 @@ public class BooksAdapter extends PagerAdapter implements FileSystemScanner.List
         }
     }
 
-    @Override
     public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
         for (final DataSetObserver dso : _dsoList) {
             dso.onChanged();
         }
