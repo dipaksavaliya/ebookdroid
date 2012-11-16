@@ -10,7 +10,6 @@ import android.content.SharedPreferences.Editor;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.backup.BackupManager;
 import org.emdev.common.backup.IBackupAgent;
 import org.emdev.common.filesystem.FileExtensionFilter;
@@ -45,7 +44,7 @@ public class LibSettings implements LibPreferences, IBackupAgent {
 
     /* =============== Browser settings =============== */
 
-    
+
 
     /* =============== */
 
@@ -124,7 +123,6 @@ public class LibSettings implements LibPreferences, IBackupAgent {
 
     public static class Diff {
 
-        private static final int D_UseBookcase = 0x0001 << 0;
         private static final int D_AutoScanDirs = 0x0001 << 1;
         private static final int D_AllowedFileTypes = 0x0001 << 2;
         private static final int D_CacheLocation = 0x0001 << 3;
@@ -137,9 +135,6 @@ public class LibSettings implements LibPreferences, IBackupAgent {
             if (firstTime) {
                 mask = 0xFFFFFFFF;
             } else if (news != null) {
-                if (false != false) {
-                    mask |= D_UseBookcase;
-                }
                 if (!olds.autoScanDirs.equals(news.autoScanDirs)) {
                     mask |= D_AutoScanDirs;
                 }
@@ -154,10 +149,6 @@ public class LibSettings implements LibPreferences, IBackupAgent {
 
         public boolean isFirstTime() {
             return firstTime;
-        }
-
-        public boolean isUseBookcaseChanged() {
-            return 0 != (mask & D_UseBookcase);
         }
 
         public boolean isAutoScanDirsChanged() {

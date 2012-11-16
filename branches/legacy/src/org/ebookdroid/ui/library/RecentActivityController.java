@@ -557,10 +557,6 @@ public class RecentActivityController extends ActionController<RecentActivity> i
     public void onLibSettingsChanged(final LibSettings oldSettings, final LibSettings newSettings,
             final LibSettings.Diff diff) {
         final FileExtensionFilter filter = newSettings.allowedFileTypes;
-        if (diff.isUseBookcaseChanged()) {
-            getManagedComponent().showLibrary(libraryAdapter, recentAdapter);
-            return;
-        }
 
         if (diff.isAutoScanDirsChanged()) {
             libraryAdapter.startScan();
@@ -570,6 +566,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
             recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), filter);
             libraryAdapter.startScan();
         }
+
         IUIManager.instance.invalidateOptionsMenu(getManagedComponent());
     }
 
