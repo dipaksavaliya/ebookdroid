@@ -25,8 +25,6 @@ public class LibSettings implements LibPreferences, IBackupAgent {
 
     /* =============== Browser settings =============== */
 
-    public final boolean useBookcase;
-
     public final Set<String> autoScanDirs;
 
     public final String searchBookQuery;
@@ -39,7 +37,6 @@ public class LibSettings implements LibPreferences, IBackupAgent {
         BackupManager.addAgent(this);
         final SharedPreferences prefs = SettingsManager.prefs;
         /* =============== Browser settings =============== */
-        useBookcase = USE_BOOK_CASE.getPreferenceValue(prefs);
         autoScanDirs = AUTO_SCAN_DIRS.getPreferenceValue(prefs);
         searchBookQuery = SEARCH_BOOK_QUERY.getPreferenceValue(prefs);
         allowedFileTypes = FILE_TYPE_FILTER.getFilter(prefs);
@@ -48,9 +45,7 @@ public class LibSettings implements LibPreferences, IBackupAgent {
 
     /* =============== Browser settings =============== */
 
-    public boolean getUseBookcase() {
-        return !AndroidVersion.is1x && useBookcase;
-    }
+    
 
     /* =============== */
 
@@ -142,7 +137,7 @@ public class LibSettings implements LibPreferences, IBackupAgent {
             if (firstTime) {
                 mask = 0xFFFFFFFF;
             } else if (news != null) {
-                if (olds.getUseBookcase() != news.getUseBookcase()) {
+                if (false != false) {
                     mask |= D_UseBookcase;
                 }
                 if (!olds.autoScanDirs.equals(news.autoScanDirs)) {

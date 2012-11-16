@@ -55,7 +55,6 @@ import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.ActionMethodDef;
 import org.emdev.ui.actions.ActionTarget;
-import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.actions.params.EditableValue;
 import org.emdev.ui.uimanager.IUIManager;
@@ -114,8 +113,6 @@ public class RecentActivityController extends ActionController<RecentActivity> i
     private RecentAdapter recentAdapter;
     private LibraryAdapter libraryAdapter;
     private BooksAdapter bookshelfAdapter;
-
-    private boolean firstResume = true;
 
     private final ThumbnailFile def = CacheManager.getThumbnailFile(".");
 
@@ -187,25 +184,13 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         }
 
         final LibSettings libSettings = LibSettings.current();
-        if (libSettings.getUseBookcase()) {
-            if (firstResume) {
-                bookshelfAdapter.startScan();
-            }
-            recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), libSettings.allowedFileTypes);
-            final int currentList = getManagedComponent().bookcaseView.getCurrentList();
-            final BookShelfAdapter list = bookshelfAdapter.getList(currentList);
-            list.notifyDataSetInvalidated();
-        } else {
-            if (getManagedComponent().getViewMode() == RecentActivity.VIEW_RECENT) {
-                if (SettingsManager.getRecentBook() == null) {
-                    changeLibraryView(RecentActivity.VIEW_LIBRARY);
-                } else {
-                    recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), libSettings.allowedFileTypes);
-                }
+        if (getManagedComponent().getViewMode() == RecentActivity.VIEW_RECENT) {
+            if (SettingsManager.getRecentBook() == null) {
+                changeLibraryView(RecentActivity.VIEW_LIBRARY);
+            } else {
+                recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), libSettings.allowedFileTypes);
             }
         }
-
-        firstResume = false;
     }
 
     protected void onPause() {
@@ -317,11 +302,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
     public void searchBook(final ActionEx action) {
         final Editable value = action.getParameter("input");
         final String searchQuery = value.toString();
-        if (bookshelfAdapter.startSearch(searchQuery)) {
-            if (LibSettings.current().getUseBookcase()) {
-                getManagedComponent().showBookshelf(BooksAdapter.SEARCH_INDEX);
-            }
-        }
+        bookshelfAdapter.startSearch(searchQuery);
     }
 
     @ActionMethod(ids = R.id.mainmenu_settings)
@@ -417,11 +398,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         if (f.delete()) {
             CacheManager.clear(book.path);
             final LibSettings libSettings = LibSettings.current();
-            if (libSettings.getUseBookcase()) {
-                bookshelfAdapter.startScan();
-            } else {
-                libraryAdapter.startScan();
-            }
+            libraryAdapter.startScan();
             recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), libSettings.allowedFileTypes);
         }
     }
@@ -457,16 +434,6 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         SettingsUI.showBookSettings(getManagedComponent(), book.path);
     }
 
-    @ActionMethod(ids = R.id.bookmenu_openbookshelf)
-    public void openBookShelf(final ActionEx action) {
-        final BookNode book = action.getParameter(AbstractActionActivity.MENU_ITEM_SOURCE);
-        final BookShelfAdapter bookShelf = getBookShelf(book);
-        if (bookShelf != null) {
-            final int pos = bookshelfAdapter.getShelfPosition(bookShelf);
-            getManagedComponent().showBookshelf(pos);
-        }
-    }
-
     @ActionMethod(ids = R.id.bookmenu_openbookfolder)
     public void openBookFolder(final ActionEx action) {
         final BookNode book = action.getParameter(AbstractActionActivity.MENU_ITEM_SOURCE);
@@ -499,31 +466,13 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         }
     }
 
-    @ActionMethod(ids = R.id.actions_selectShelf)
-    public void selectShelf(final ActionEx action) {
-        final Integer item = action.getParameter(IActionController.DIALOG_ITEM_PROPERTY);
-        getManagedComponent().showBookshelf(item);
-    }
-
-    @ActionMethod(ids = R.id.ShelfLeftButton)
-    public void selectPrevShelf(final ActionEx action) {
-        getManagedComponent().showPrevBookshelf();
-    }
-
-    @ActionMethod(ids = R.id.ShelfRightButton)
-    public void selectNextShelf(final ActionEx action) {
-        getManagedComponent().showNextBookshelf();
-    }
-
-    @ActionMethod(ids = { R.id.recent_showlibrary})
+    @ActionMethod(ids = { R.id.recent_showlibrary })
     public void goLibrary(final ActionEx action) {
-        if (!LibSettings.current().getUseBookcase()) {
-            final int viewMode = getManagedComponent().getViewMode();
-            if (viewMode == RecentActivity.VIEW_RECENT) {
-                changeLibraryView(RecentActivity.VIEW_LIBRARY);
-            } else if (viewMode == RecentActivity.VIEW_LIBRARY) {
-                changeLibraryView(RecentActivity.VIEW_RECENT);
-            }
+        final int viewMode = getManagedComponent().getViewMode();
+        if (viewMode == RecentActivity.VIEW_RECENT) {
+            changeLibraryView(RecentActivity.VIEW_LIBRARY);
+        } else if (viewMode == RecentActivity.VIEW_LIBRARY) {
+            changeLibraryView(RecentActivity.VIEW_RECENT);
         }
     }
 
@@ -609,31 +558,17 @@ public class RecentActivityController extends ActionController<RecentActivity> i
             final LibSettings.Diff diff) {
         final FileExtensionFilter filter = newSettings.allowedFileTypes;
         if (diff.isUseBookcaseChanged()) {
-
-            if (newSettings.getUseBookcase()) {
-                recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), filter);
-                getManagedComponent().showBookcase(bookshelfAdapter, recentAdapter);
-            } else {
-                getManagedComponent().showLibrary(libraryAdapter, recentAdapter);
-            }
+            getManagedComponent().showLibrary(libraryAdapter, recentAdapter);
             return;
         }
 
         if (diff.isAutoScanDirsChanged()) {
-            if (newSettings.getUseBookcase()) {
-                bookshelfAdapter.startScan();
-            } else {
-                libraryAdapter.startScan();
-            }
+            libraryAdapter.startScan();
             return;
         }
         if (diff.isAllowedFileTypesChanged()) {
             recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), filter);
-            if (newSettings.getUseBookcase()) {
-                bookshelfAdapter.startScan();
-            } else {
-                libraryAdapter.startScan();
-            }
+            libraryAdapter.startScan();
         }
         IUIManager.instance.invalidateOptionsMenu(getManagedComponent());
     }
@@ -651,7 +586,8 @@ public class RecentActivityController extends ActionController<RecentActivity> i
     }
 
     public void changeLibraryView(final int view) {
-        if (!LibSettings.current().getUseBookcase()) {
+        LibSettings r = LibSettings.current();
+        if (!false) {
             getManagedComponent().changeLibraryView(view);
             if (view == RecentActivity.VIEW_LIBRARY) {
                 libraryAdapter.startScan();
