@@ -5,12 +5,6 @@
         android:summary="@string/pref_browser_category_summary"
         android:title="@string/pref_browser_category" >
 
-        <CheckBoxPreference
-            android:defaultValue="@string/pref_usebookcase_defvalue"
-            android:key="@string/pref_usebookcase_id"
-            android:summary="@string/pref_usebookcase_summary"
-            android:title="@string/pref_usebookcase_title" />
-
         <EditTextPreference
             android:defaultValue="@string/pref_brautoscandir_defvalue"
             android:key="@string/pref_brautoscandir_id"
