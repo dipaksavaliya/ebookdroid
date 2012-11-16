@@ -16,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ExpandableListAdapter;
@@ -84,7 +83,7 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
             c.onCreate();
         }
 
-        IUIManager.instance.setTitleVisible(this, !AndroidVersion.lessThan3x, true);
+        IUIManager.instance.setTitleVisible(this, false, true);
         setContentView(R.layout.browser);
 
         header = (TextView) findViewById(R.id.browsertext);
@@ -128,17 +127,12 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
     void setTitle(final File dir) {
 
         String path = dir.getAbsolutePath();
-        if (AndroidVersion.lessThan3x) {
-            header.setText(path);
-            final ImageView view = (ImageView) findViewById(R.id.browserupfolder);
-            if (view != null) {
-                final boolean hasParent = dir.getParentFile() != null;
-                view.setImageResource(hasParent ? R.drawable.browser_actionbar_nav_up_enabled
-                        : R.drawable.browser_actionbar_nav_up_disabled);
-            }
-        } else {
-            setTitle(path);
-            IUIManager.instance.invalidateOptionsMenu(this);
+        header.setText(path);
+        final ImageView view = (ImageView) findViewById(R.id.browserupfolder);
+        if (view != null) {
+            final boolean hasParent = dir.getParentFile() != null;
+            view.setImageResource(hasParent ? R.drawable.browser_actionbar_nav_up_enabled
+                    : R.drawable.browser_actionbar_nav_up_disabled);
         }
     }
 
@@ -157,19 +151,6 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
     }
 
     public void showProgress(final boolean show) {
-        if (!AndroidVersion.lessThan3x) {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        setProgressBarIndeterminateVisibility(show);
-                        getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
-                    } catch (final Throwable e) {
-                    }
-                }
-            });
-        }
     }
 
     @Override

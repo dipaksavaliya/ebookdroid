@@ -35,7 +35,7 @@ public abstract class AbstractActionActivity<A extends Activity, C extends Actio
         return getController();
     }
 
-    @SuppressWarnings({ "unchecked", "deprecation" })
+    @SuppressWarnings({ "unchecked" })
     public final C restoreController() {
         final Object last = this.getLastNonConfigurationInstance();
         if (last instanceof ActionController) {

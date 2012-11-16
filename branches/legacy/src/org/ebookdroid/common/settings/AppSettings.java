@@ -101,10 +101,6 @@ public class AppSettings implements AppPreferences, BookPreferences, IBackupAgen
 
     public final int drawThreadPriority;
 
-    public final boolean useNativeGraphics;
-
-    public final boolean hwaEnabled;
-
     public final int bitmapSize;
 
     public final boolean bitmapFileringEnabled;
@@ -225,8 +221,6 @@ public class AppSettings implements AppPreferences, BookPreferences, IBackupAgen
         decodingThreads = DECODING_THREADS.getPreferenceValue(prefs);
         decodingThreadPriority = DECODE_THREAD_PRIORITY.getPreferenceValue(prefs);
         drawThreadPriority = DRAW_THREAD_PRIORITY.getPreferenceValue(prefs);
-        useNativeGraphics = USE_NATIVE_GRAPHICS.getPreferenceValue(prefs);
-        hwaEnabled = HWA_ENABLED.getPreferenceValue(prefs);
         bitmapSize = BITMAP_SIZE.getPreferenceValue(prefs);
         bitmapFileringEnabled = BITMAP_FILTERING.getPreferenceValue(prefs);
         textureReuseEnabled = REUSE_TEXTURES.getPreferenceValue(prefs);

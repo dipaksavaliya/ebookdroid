@@ -9,7 +9,6 @@ import org.ebookdroid.common.settings.definitions.LibPreferences;
 import org.ebookdroid.common.settings.definitions.OpdsPreferences;
 import org.ebookdroid.common.settings.types.CacheLocation;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
-import org.ebookdroid.common.settings.types.DocumentViewType;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.curl.PageAnimationType;
 
@@ -19,15 +18,12 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceGroup;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.ui.preference.SeekBarPreference;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.enums.EnumUtils;
@@ -62,7 +58,6 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
     public void decorateSettings() {
         decoratePreference(getRoot());
         decorateBrowserSettings();
-        decorateOpdsSettings();
         decorateMemorySettings();
         decorateRenderSettings();
         decorateTypeSpecificSettings();
@@ -91,13 +86,7 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
         });
     }
 
-    public void decorateOpdsSettings() {
-    }
-
     public void decorateMemorySettings() {
-        addViewTypeListener(VIEW_TYPE.key, HWA_ENABLED.key);
-
-        setHWA(AppSettings.current().viewType, HWA_ENABLED.key);
     }
 
     public void decorateRenderSettings() {
@@ -129,27 +118,6 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
             final Preference pref = findPreference(relatedKey);
             if (pref != null) {
                 pref.setEnabled(type == DocumentViewMode.SINGLE_PAGE);
-            }
-        }
-    }
-
-    public void setHWA(final DocumentViewType type, final String hwaPrefKey) {
-        final Preference hwaPref = findPreference(hwaPrefKey);
-        if (hwaPref != null) {
-            Class<? extends Preference> clazz = hwaPref.getClass();
-            try {
-                final Method setCheckedMethod = clazz.getMethod("setChecked", boolean.class);
-                final Method setEnabledMethod = clazz.getMethod("setEnabled", boolean.class);
-                if ((type == DocumentViewType.SURFACE) || AndroidVersion.lessThan3x) {
-                    setCheckedMethod.invoke(hwaPref, false);
-                    setEnabledMethod.invoke(hwaPref, false);
-                } else {
-                    setEnabledMethod.invoke(hwaPref, true);
-                }
-            } catch (NoSuchMethodException e) {
-            } catch (IllegalArgumentException e) {
-            } catch (IllegalAccessException e) {
-            } catch (InvocationTargetException e) {
             }
         }
     }
@@ -265,10 +233,6 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
         addListener(source, new ViewModeListener(targets));
     }
 
-    protected void addViewTypeListener(final String source, final String target) {
-        addListener(source, new ViewTypeListener(target));
-    }
-
     protected static class CompositeListener implements OnPreferenceChangeListener {
 
         final List<OnPreferenceChangeListener> listeners = new LinkedList<Preference.OnPreferenceChangeListener>();
@@ -318,22 +282,5 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
             enableSinglePageModeSetting(type, relatedKeys);
             return true;
         }
-    }
-
-    protected class ViewTypeListener implements OnPreferenceChangeListener {
-
-        private final String relatedKey;
-
-        public ViewTypeListener(final String relatedKey) {
-            this.relatedKey = relatedKey;
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
-            final DocumentViewType dvt = EnumUtils.getByResValue(DocumentViewType.class, newValue.toString(), null);
-            setHWA(dvt, relatedKey);
-            return true;
-        }
-
     }
 }

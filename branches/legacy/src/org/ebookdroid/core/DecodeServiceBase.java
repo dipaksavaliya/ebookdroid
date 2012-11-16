@@ -97,7 +97,6 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public int getPixelFormat() {
         final Config cfg = getBitmapConfig();
         switch (cfg) {

@@ -13,7 +13,6 @@ import org.ebookdroid.ui.library.dialogs.FolderDlg;
 import org.ebookdroid.ui.library.tasks.CopyBookTask;
 import org.ebookdroid.ui.library.tasks.MoveBookTask;
 import org.ebookdroid.ui.library.tasks.RenameBookTask;
-import org.ebookdroid.ui.opds.OPDSActivity;
 import org.ebookdroid.ui.settings.SettingsUI;
 import org.ebookdroid.ui.viewer.ViewerActivity;
 
@@ -24,7 +23,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.KeyEvent;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -33,7 +31,6 @@ import java.io.FileFilter;
 import java.util.Set;
 
 import org.emdev.BaseDroidApp;
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.filesystem.CompositeFilter;
 import org.emdev.common.filesystem.DirectoryFilter;
 import org.emdev.common.filesystem.PathFromUri;
@@ -58,7 +55,6 @@ actions = {
         @ActionMethodDef(id = R.id.browserupfolder, method = "goUp"),
         @ActionMethodDef(id = R.id.mainmenu_settings, method = "showSettings"),
         @ActionMethodDef(id = R.id.browserrecent, method = "goRecent"),
-        @ActionMethodDef(id = R.id.mainmenu_opds, method = "goOPDSBrowser"),
         @ActionMethodDef(id = R.id.actions_goToBookmark, method = "openBook"),
         @ActionMethodDef(id = R.id.bookmenu_removefromrecent, method = "removeBookFromRecents"),
         @ActionMethodDef(id = R.id.bookmenu_cleardata, method = "removeCachedBookFiles"),
@@ -166,13 +162,6 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
         activity.finish();
     }
 
-    @ActionMethod(ids = R.id.mainmenu_opds)
-    public void goOPDSBrowser(final ActionEx action) {
-        final BrowserActivity activity = getManagedComponent();
-        final Intent myIntent = new Intent(activity, OPDSActivity.class);
-        activity.startActivity(myIntent);
-    }
-
     @Override
     public void showDocument(final Uri uri, final Bookmark b) {
         final BrowserActivity activity = getManagedComponent();
@@ -194,21 +183,6 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
 
     @Override
     public void showProgress(final boolean show) {
-        final BrowserActivity activity = getManagedComponent();
-
-        if (!AndroidVersion.lessThan3x) {
-            activity.runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        activity.setProgressBarIndeterminateVisibility(show);
-                        activity.getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
-                    } catch (final Throwable e) {
-                    }
-                }
-            });
-        }
     }
 
     @Override
