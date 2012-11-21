@@ -1,7 +1,9 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.bitmaps.BBBitmaps;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.common.bitmaps.RawBitmap;
 import org.ebookdroid.common.cache.DocumentCacheFile.PageInfo;
@@ -154,7 +156,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     @Override
-    public void decodeComplete(final CodecPage codecPage, final IBitmapRef bitmap, final Rect bitmapBounds,
+    public void decodeComplete(final CodecPage codecPage, final ByteBufferBitmap bitmap, final Rect bitmapBounds,
             final RectF croppedPageBounds) {
 
         try {
@@ -169,17 +171,15 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                 final boolean correctExposure = bs.exposure != AppPreferences.EXPOSURE.defValue;
 
                 if (correctContrast || correctExposure || bs.autoLevels) {
-                    final RawBitmap raw = new RawBitmap(bitmap, bitmapBounds);
                     if (correctContrast) {
-                        raw.contrast(bs.contrast);
+                        bitmap.contrast(bs.contrast);
                     }
                     if (correctExposure) {
-                        raw.exposure(bs.exposure - AppPreferences.EXPOSURE.defValue);
+                        bitmap.exposure(bs.exposure - AppPreferences.EXPOSURE.defValue);
                     }
                     if (bs.autoLevels) {
-                        raw.autoLevels();
+                        bitmap.autoLevels();
                     }
-                    bitmap.setPixels(raw);
                 }
             }
 
@@ -199,7 +199,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             BitmapManager.clear("PageTreeNode OutOfMemoryError: ");
             stopDecodingThisNode(null);
         } finally {
-            BitmapManager.release(bitmap);
+//            BitmapManager.release(bitmap);
         }
     }
 
@@ -299,19 +299,12 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             return bitmaps != null ? bitmaps.drawGL(canvas, paint, viewBase, targetRect, clipRect) : false;
         }
 
-        public Bitmaps reuse(final String nodeId, final IBitmapRef bitmap, final Rect bitmapBounds) {
+        public Bitmaps reuse(final String nodeId, final ByteBufferBitmap bitmap, final Rect bitmapBounds) {
             final BookSettings bs = page.base.getBookSettings();
             final AppSettings app = AppSettings.current();
             final boolean invert = bs != null ? bs.nightMode : app.nightMode;
-            if (app.textureReuseEnabled) {
-                final Bitmaps bitmaps = ref.get();
-                if (bitmaps != null) {
-                    if (bitmaps.reuse(nodeId, bitmap, bitmapBounds, invert)) {
-                        return bitmaps;
-                    }
-                }
-            }
-            return page.base.getView().createBitmaps(nodeId, bitmap, bitmapBounds, invert);
+
+            return new BBBitmaps(nodeId, bitmap, bitmapBounds, invert);
         }
 
         public boolean hasBitmaps() {

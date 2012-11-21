@@ -19,9 +19,9 @@ public final class RawBitmap {
         this.pixels = new int[width * height];
     }
 
-    public RawBitmap(final IBitmapRef bitmap, final Rect srcRect) {
-        width = srcRect.width();
-        height = srcRect.height();
+    public RawBitmap(final IBitmapRef bitmap, final int w, final int h) {
+        width = w;
+        height = h;
         hasAlpha = ((AbstractBitmapRef)bitmap).hasAlpha;
         pixels = new int[width * height];
 

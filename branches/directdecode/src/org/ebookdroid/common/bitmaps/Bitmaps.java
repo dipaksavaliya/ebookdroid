@@ -39,6 +39,10 @@ public class Bitmaps {
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     protected AbstractBitmapRef[] bitmaps;
 
+    protected Bitmaps() {
+        partSize = 0;
+        config = null;
+    }
     public Bitmaps(final String nodeId, final IBitmapRef orig, final Rect bitmapBounds, final boolean invert) {
         this.nodeId = nodeId;
         this.partSize = BitmapManager.partSize;

@@ -1,5 +1,6 @@
 package org.ebookdroid.core.crop;
 
+import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.common.bitmaps.RawBitmap;
 
@@ -51,6 +52,13 @@ public class PageCropper {
         return new RectF(left * pageSliceBounds.width() + pageSliceBounds.left, top * pageSliceBounds.height()
                 + pageSliceBounds.top, right * pageSliceBounds.width() + pageSliceBounds.left, bottom
                 * pageSliceBounds.height() + pageSliceBounds.top);
+    }
+
+    public static synchronized RectF getCropBounds(final ByteBufferBitmap bitmap, final Rect bitmapBounds,
+            final RectF pageSliceBounds) {
+
+        return new RectF(pageSliceBounds.left, pageSliceBounds.top, pageSliceBounds.width() + pageSliceBounds.left,
+                pageSliceBounds.height() + pageSliceBounds.top);
     }
 
     public static synchronized RectF getColumn(IBitmapRef bitmap, Rect bitmapBounds, float x, float y) {

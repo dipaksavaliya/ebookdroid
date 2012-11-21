@@ -1,6 +1,7 @@
 package org.ebookdroid.droids.fb2.codec;
 
 import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.codec.AbstractCodecPage;
@@ -111,7 +112,7 @@ public class FB2Page extends AbstractCodecPage {
     }
 
     @Override
-    public IBitmapRef renderBitmap(final ViewState viewState, final int width, final int height,
+    public ByteBufferBitmap renderBitmap(final ViewState viewState, final int width, final int height,
             final RectF pageSliceBounds) {
         final int nightmode = viewState != null && viewState.nightMode && viewState.positiveImagesInNightMode ? 1 : 0;
 
@@ -152,7 +153,7 @@ public class FB2Page extends AbstractCodecPage {
             y = bottom;
         }
 
-        return bmp;
+        return new ByteBufferBitmap(bmp);
     }
 
     public void appendLine(final Line line) {

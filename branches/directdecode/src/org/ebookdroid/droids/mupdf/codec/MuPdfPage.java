@@ -1,8 +1,6 @@
 package org.ebookdroid.droids.mupdf.codec;
 
-import org.ebookdroid.EBookDroidLibraryLoader;
-import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.IBitmapRef;
+import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.codec.AbstractCodecPage;
@@ -54,7 +52,7 @@ public class MuPdfPage extends AbstractCodecPage {
     }
 
     @Override
-    public IBitmapRef renderBitmap(ViewState viewState, final int width, final int height, final RectF pageSliceBounds) {
+    public ByteBufferBitmap renderBitmap(ViewState viewState, final int width, final int height, final RectF pageSliceBounds) {
         final float[] matrixArray = calculateFz(width, height, pageSliceBounds);
         return render(viewState, new Rect(0, 0, width, height), matrixArray);
     }
@@ -109,7 +107,7 @@ public class MuPdfPage extends AbstractCodecPage {
         return new RectF(box[0], box[1], box[2], box[3]);
     }
 
-    public IBitmapRef render(ViewState viewState, final Rect viewbox, final float[] ctm) {
+    public ByteBufferBitmap render(ViewState viewState, final Rect viewbox, final float[] ctm) {
         if (isRecycled()) {
             throw new RuntimeException("The page has been recycled before: " + this);
         }
@@ -124,31 +122,12 @@ public class MuPdfPage extends AbstractCodecPage {
         final int nightmode = viewState != null && viewState.nightMode && viewState.positiveImagesInNightMode ? 1 : 0;
         final int slowcmyk = AppSettings.current().slowCMYK ? 1 : 0;
 
-        if (USE_DIRECT) {
             final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * width * height).order(ByteOrder.nativeOrder());
             boolean res = renderPageDirect(docHandle, pageHandle, mRect, ctm, byteBuffer, nightmode, slowcmyk);
             if (res) {
-                final IBitmapRef b = BitmapManager.getBitmap("PDF page", width, height, Bitmap.Config.ARGB_8888);
-                b.setPixels(byteBuffer);
-                return b;
+                return new ByteBufferBitmap(width, height, byteBuffer);
             }
-        }
-
-        if (EBookDroidLibraryLoader.nativeGraphicsAvailable) {
-            final IBitmapRef bmp = BitmapManager.getBitmap("PDF page", width, height, MuPdfContext.NATIVE_BITMAP_CFG);
-            boolean res = renderPageBitmap(docHandle, pageHandle, mRect, ctm, bmp.getBitmap(), nightmode, slowcmyk);
-            if (res) {
-                return bmp;
-            }
-            BitmapManager.release(bmp);
-            return null;
-        }
-
-        final int[] bufferarray = new int[width * height];
-        renderPage(docHandle, pageHandle, mRect, ctm, bufferarray, nightmode, slowcmyk);
-        final IBitmapRef b = BitmapManager.getBitmap("PDF page", width, height, MuPdfContext.BITMAP_CFG);
-        b.setPixels(bufferarray, width, height);
-        return b;
+        return new ByteBufferBitmap(width, height);
     }
 
     @Override

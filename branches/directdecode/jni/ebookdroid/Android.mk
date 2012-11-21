@@ -16,6 +16,7 @@ LOCAL_SRC_FILES := \
 	DjvuDroidBridge.cpp \
 	fb2droid.cpp \
 	cbdroidbridge.c \
+	bytebufferbitmapbridge.c \
 	mupdfdroidbridge.c \
 	jni_concurrent.c \
 

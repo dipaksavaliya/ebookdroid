@@ -1,5 +1,6 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.core.codec.CodecFeatures;
 import org.ebookdroid.core.codec.CodecPage;
@@ -44,7 +45,7 @@ public interface DecodeService extends CodecFeatures {
 
     interface DecodeCallback {
 
-        void decodeComplete(CodecPage codecPage, IBitmapRef bitmap, Rect bitmapBounds, RectF croppedPageBounds);
+        void decodeComplete(CodecPage codecPage, ByteBufferBitmap bitmap, Rect bitmapBounds, RectF croppedPageBounds);
 
     }
 
