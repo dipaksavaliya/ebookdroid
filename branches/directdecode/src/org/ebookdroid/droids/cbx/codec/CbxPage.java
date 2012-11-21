@@ -146,23 +146,20 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
             if (CbxDocument.LCTX.isDebugEnabled()) {
                 CbxDocument.LCTX.d("Calling Native HQ4x");
             }
-            final ByteBufferBitmap src = new ByteBufferBitmap(storedBitmap, srcRect);
-            return src.scaleHq4x();
+            return ByteBufferBitmap.scaleHq4x(storedBitmap, srcRect);
         } else if (scaleFactor > 3.5) {
             if (CbxDocument.LCTX.isDebugEnabled()) {
                 CbxDocument.LCTX.d("Calling Native HQ3x");
             }
-            final ByteBufferBitmap src = new ByteBufferBitmap(storedBitmap, srcRect);
-            return src.scaleHq3x();
+            return ByteBufferBitmap.scaleHq3x(storedBitmap, srcRect);
         } else if (scaleFactor > 2.5) {
             if (CbxDocument.LCTX.isDebugEnabled()) {
                 CbxDocument.LCTX.d("Calling Native HQ2x");
             }
-            final ByteBufferBitmap src = new ByteBufferBitmap(storedBitmap, srcRect);
-            return src.scaleHq2x();
+            return ByteBufferBitmap.scaleHq2x(storedBitmap, srcRect);
         }
 
-        return new ByteBufferBitmap(storedBitmap, srcRect);
+        return ByteBufferBitmap.get(storedBitmap, srcRect);
     }
 
     private int getScale(final float requiredWidth, final float requiredHeight) {

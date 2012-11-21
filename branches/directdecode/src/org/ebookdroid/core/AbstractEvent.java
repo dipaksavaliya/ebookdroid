@@ -1,7 +1,7 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.BBBitmaps;
+import org.ebookdroid.common.bitmaps.BBManager;
 
 import android.graphics.RectF;
 
@@ -17,7 +17,7 @@ public abstract class AbstractEvent implements IEvent {
     public final LogContext LCTX = LogManager.root().lctx(getClass().getSimpleName(), false);
 
     protected final List<PageTreeNode> nodesToDecode = new ArrayList<PageTreeNode>();
-    protected final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
+    protected final List<BBBitmaps> bitmapsToRecycle = new ArrayList<BBBitmaps>();
 
     public AbstractViewController ctrl;
     protected ViewState viewState;
@@ -41,7 +41,7 @@ public abstract class AbstractEvent implements IEvent {
             process(page);
         }
 
-        BitmapManager.release(bitmapsToRecycle);
+        BBManager.release(bitmapsToRecycle);
 
         if (!nodesToDecode.isEmpty()) {
             ctrl.base.getDecodingProgressModel().increase(nodesToDecode.size());

@@ -1,5 +1,6 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.bitmaps.BBManager;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
@@ -239,7 +240,7 @@ public class DecodeServiceBase implements DecodeService {
                     LCTX.d(Thread.currentThread().getName() + ": Task " + task.id + ": Abort dead decode task for "
                             + task.node);
                 }
-//                BitmapManager.release(bitmap);
+                BBManager.release(bitmap);
                 return;
             }
 
@@ -316,7 +317,7 @@ public class DecodeServiceBase implements DecodeService {
                     + root.getCropping());
         }
 
-//        BitmapManager.release(rootBitmap);
+        BBManager.release(rootBitmap);
 
         final ViewState viewState = task.viewState;
         final PageIndex currentPage = viewState.book.getCurrentPage();
@@ -457,6 +458,7 @@ public class DecodeServiceBase implements DecodeService {
                     final Runnable r = nextTask();
                     if (r != null) {
                         BitmapManager.release();
+                        BBManager.release();
                         r.run();
                     }
                 }

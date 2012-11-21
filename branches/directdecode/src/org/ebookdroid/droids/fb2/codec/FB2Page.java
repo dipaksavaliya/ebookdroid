@@ -153,7 +153,7 @@ public class FB2Page extends AbstractCodecPage {
             y = bottom;
         }
 
-        return new ByteBufferBitmap(bmp);
+        return ByteBufferBitmap.get(bmp);
     }
 
     public void appendLine(final Line line) {

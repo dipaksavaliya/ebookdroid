@@ -6,12 +6,22 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.emdev.common.log.LogContext;
+import org.emdev.common.log.LogManager;
 import org.emdev.ui.gl.ByteBufferTexture;
 import org.emdev.ui.gl.GLCanvas;
 import org.emdev.utils.MathUtils;
 
+public class BBBitmaps {
 
-public class BBBitmaps extends Bitmaps {
+    protected static final LogContext LCTX = LogManager.root().lctx("Bitmaps", false);
+
+    protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    public Rect bounds;
+    public String nodeId;
 
     private ByteBufferBitmap bitmap;
 
@@ -26,7 +36,6 @@ public class BBBitmaps extends Bitmaps {
         }
     }
 
-    @Override
     public boolean drawGL(GLCanvas canvas, PagePaint paint, PointF vb, RectF tr, RectF cr) {
         lock.writeLock().lock();
         try {
@@ -46,14 +55,13 @@ public class BBBitmaps extends Bitmaps {
             canvas.setClipRect(actual);
 
             final RectF src = new RectF(0, 0, texture.getWidth(), texture.getHeight());
-            final RectF r = new RectF(tr.left - vb.x, tr.top - vb.y, (tr.left - vb.x) + tr.width(), (tr.top - vb.y) + tr.height());
-
-
+            final RectF r = new RectF(tr.left - vb.x, tr.top - vb.y, (tr.left - vb.x) + tr.width(), (tr.top - vb.y)
+                    + tr.height());
 
             final boolean res = canvas.drawTexture(texture, src, r);
 
             if (res && bitmap != null) {
-//                BitmapManager.release(bitmaps);
+                BBManager.release(bitmap);
                 bitmap = null;
             }
 
@@ -69,7 +77,22 @@ public class BBBitmaps extends Bitmaps {
         }
     }
 
-    @Override
+    ByteBufferBitmap clear() {
+        lock.writeLock().lock();
+        try {
+            if (texture != null) {
+                texture.recycle();
+                texture = null;
+            }
+
+            final ByteBufferBitmap ref = this.bitmap;
+            this.bitmap = null;
+            return ref;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
     public boolean hasBitmaps() {
         lock.readLock().lock();
         try {

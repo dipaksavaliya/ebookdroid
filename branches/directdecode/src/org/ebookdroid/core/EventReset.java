@@ -1,7 +1,7 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.BBBitmaps;
+import org.ebookdroid.common.bitmaps.BBManager;
 import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.RectF;
@@ -49,11 +49,11 @@ public class EventReset extends AbstractEvent {
     public ViewState process() {
         try {
             if (clearPages) {
-                final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
+                final List<BBBitmaps> bitmapsToRecycle = new ArrayList<BBBitmaps>();
                 for (final Page page : ctrl.model.getPages()) {
                     page.nodes.recycleAll(bitmapsToRecycle, true);
                 }
-                BitmapManager.release(bitmapsToRecycle);
+                BBManager.release(bitmapsToRecycle);
             }
             if (reason != null) {
                 ctrl.invalidatePageSizes(reason, null);

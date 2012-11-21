@@ -1,5 +1,6 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.bitmaps.BBBitmaps;
 import org.ebookdroid.common.bitmaps.Bitmaps;
 
 import android.graphics.RectF;
@@ -113,7 +114,7 @@ public class PageTree {
         return nodes[parentIndex];
     }
 
-    public boolean recycleAll(final List<Bitmaps> bitmapsToRecycle, final boolean includeRoot) {
+    public boolean recycleAll(final List<BBBitmaps> bitmapsToRecycle, final boolean includeRoot) {
         boolean res = false;
         if (includeRoot) {
             res |= root.recycle(bitmapsToRecycle);
@@ -131,7 +132,7 @@ public class PageTree {
         return res;
     }
 
-    public boolean recycleParents(final PageTreeNode child, final List<Bitmaps> bitmapsToRecycle) {
+    public boolean recycleParents(final PageTreeNode child, final List<BBBitmaps> bitmapsToRecycle) {
         if (child.id == 0) {
             return false;
         }
@@ -147,7 +148,7 @@ public class PageTree {
         return res;
     }
 
-    public boolean recycleChildren(final PageTreeNode node, final List<Bitmaps> bitmapsToRecycle) {
+    public boolean recycleChildren(final PageTreeNode node, final List<BBBitmaps> bitmapsToRecycle) {
         boolean res = false;
         int childId = getFirstChildId(node.id);
         if (childId >= maxNodeId) {
@@ -172,7 +173,7 @@ public class PageTree {
         return res;
     }
 
-    public void recycleNodes(final PageTreeLevel level, final List<Bitmaps> bitmapsToRecycle) {
+    public void recycleNodes(final PageTreeLevel level, final List<BBBitmaps> bitmapsToRecycle) {
         if (level.start >= maxNodeId) {
             return;
         }

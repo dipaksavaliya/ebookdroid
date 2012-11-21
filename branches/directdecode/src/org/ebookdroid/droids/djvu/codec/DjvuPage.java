@@ -1,5 +1,6 @@
 package org.ebookdroid.droids.djvu.codec;
 
+import org.ebookdroid.common.bitmaps.BBManager;
 import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.ViewState;
@@ -11,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,17 +48,20 @@ public class DjvuPage extends AbstractCodecPage {
     public ByteBufferBitmap renderBitmap(final ViewState viewState, final int width, final int height,
             final RectF pageSliceBounds) {
         final int renderMode = AppSettings.current().djvuRenderingMode;
+
+        ByteBufferBitmap buf = BBManager.getBitmap(width, height);
         if (width > 0 && height > 0) {
 
-            final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * width * height).order(ByteOrder.nativeOrder());
+            final ByteBuffer byteBuffer = buf.getPixels();
+
             if (renderPageDirect(pageHandle, contextHandle, width, height, pageSliceBounds.left, pageSliceBounds.top,
                     pageSliceBounds.width(), pageSliceBounds.height(), byteBuffer, renderMode)) {
-
-                return new ByteBufferBitmap(width, height, byteBuffer);
+                return buf;
             }
         }
 
-        return new ByteBufferBitmap(width, height); // TODO fill with grey!
+        // TODO fill with gray
+        return buf;
     }
 
     @Override

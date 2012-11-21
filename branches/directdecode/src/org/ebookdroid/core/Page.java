@@ -1,7 +1,7 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.bitmaps.BBBitmaps;
 import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.Bitmaps;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
@@ -57,7 +57,7 @@ public class Page {
         nodes = new PageTree(this);
     }
 
-    public void recycle(final List<Bitmaps> bitmapsToRecycle) {
+    public void recycle(final List<BBBitmaps> bitmapsToRecycle) {
         recycled = true;
         nodes.recycleAll(bitmapsToRecycle, true);
     }

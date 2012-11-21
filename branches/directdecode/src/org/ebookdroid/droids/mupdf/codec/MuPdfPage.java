@@ -1,5 +1,6 @@
 package org.ebookdroid.droids.mupdf.codec;
 
+import org.ebookdroid.common.bitmaps.BBManager;
 import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.ViewState;
@@ -13,7 +14,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -52,7 +52,8 @@ public class MuPdfPage extends AbstractCodecPage {
     }
 
     @Override
-    public ByteBufferBitmap renderBitmap(ViewState viewState, final int width, final int height, final RectF pageSliceBounds) {
+    public ByteBufferBitmap renderBitmap(final ViewState viewState, final int width, final int height,
+            final RectF pageSliceBounds) {
         final float[] matrixArray = calculateFz(width, height, pageSliceBounds);
         return render(viewState, new Rect(0, 0, width, height), matrixArray);
     }
@@ -107,7 +108,7 @@ public class MuPdfPage extends AbstractCodecPage {
         return new RectF(box[0], box[1], box[2], box[3]);
     }
 
-    public ByteBufferBitmap render(ViewState viewState, final Rect viewbox, final float[] ctm) {
+    public ByteBufferBitmap render(final ViewState viewState, final Rect viewbox, final float[] ctm) {
         if (isRecycled()) {
             throw new RuntimeException("The page has been recycled before: " + this);
         }
@@ -122,12 +123,15 @@ public class MuPdfPage extends AbstractCodecPage {
         final int nightmode = viewState != null && viewState.nightMode && viewState.positiveImagesInNightMode ? 1 : 0;
         final int slowcmyk = AppSettings.current().slowCMYK ? 1 : 0;
 
-            final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * width * height).order(ByteOrder.nativeOrder());
-            boolean res = renderPageDirect(docHandle, pageHandle, mRect, ctm, byteBuffer, nightmode, slowcmyk);
-            if (res) {
-                return new ByteBufferBitmap(width, height, byteBuffer);
-            }
-        return new ByteBufferBitmap(width, height);
+        final ByteBufferBitmap bmp = BBManager.getBitmap(width, height);
+        final ByteBuffer byteBuffer = bmp.getPixels();
+        final boolean res = renderPageDirect(docHandle, pageHandle, mRect, ctm, byteBuffer, nightmode, slowcmyk);
+        if (res) {
+            return bmp;
+        }
+
+        // TODO fill with gray
+        return bmp;
     }
 
     @Override

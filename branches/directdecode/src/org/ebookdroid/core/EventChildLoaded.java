@@ -1,7 +1,7 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.BBBitmaps;
+import org.ebookdroid.common.bitmaps.BBManager;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -83,9 +83,9 @@ public class EventChildLoaded extends AbstractEvent {
         // }
 
         if (!viewState.isNodeVisible(parent, bounds) || hiddenByChildren) {
-            final List<Bitmaps> bitmapsToRecycle = new ArrayList<Bitmaps>();
+            final List<BBBitmaps> bitmapsToRecycle = new ArrayList<BBBitmaps>();
             final boolean res = nodes.recycleParents(child, bitmapsToRecycle);
-            BitmapManager.release(bitmapsToRecycle);
+            BBManager.release(bitmapsToRecycle);
 
             if (res) {
                 if (LCTX.isDebugEnabled()) {
@@ -97,7 +97,7 @@ public class EventChildLoaded extends AbstractEvent {
 
     protected void recycleChildren() {
         final boolean res = nodes.recycleChildren(child, bitmapsToRecycle);
-        BitmapManager.release(bitmapsToRecycle);
+        BBManager.release(bitmapsToRecycle);
 
         if (res) {
             if (LCTX.isDebugEnabled()) {
