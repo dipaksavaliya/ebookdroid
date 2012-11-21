@@ -19,6 +19,13 @@
 #define INFO(args...) \
     __android_log_print(ANDROID_LOG_INFO, "EBookDroid.ByteBufferBitmap", args)
 
+JNIEXPORT jobject JNICALL
+Java_org_ebookdroid_common_bitmaps_ByteBufferBitmap_create(JNIEnv* env, jclass classObject, jint size)
+{
+    void* buf = malloc(size);
+    jobject obj = (*env)->NewDirectByteBuffer(env, buf, size);
+    return (*env)->NewGlobalRef(env, obj);
+}
 
 JNIEXPORT void JNICALL
 Java_org_ebookdroid_common_bitmaps_ByteBufferBitmap_nativeHq4x(JNIEnv* env, jclass classObject, jobject srcBuffer,
