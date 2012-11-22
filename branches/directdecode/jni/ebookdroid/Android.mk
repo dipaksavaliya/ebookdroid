@@ -19,6 +19,8 @@ LOCAL_SRC_FILES := \
 	bytebufferbitmapbridge.c \
 	mupdfdroidbridge.c \
 	jni_concurrent.c \
+	PageCropper.c \
+	javahelpers.c
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../mupdf/mupdf/fitz \

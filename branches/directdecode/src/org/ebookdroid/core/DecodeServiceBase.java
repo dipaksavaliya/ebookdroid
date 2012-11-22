@@ -208,7 +208,8 @@ public class DecodeServiceBase implements DecodeService {
 
             RectF cropping = task.node.page.getCropping(task.node);
             final RectF actualSliceBounds = cropping != null ? cropping : task.node.pageSliceBounds;
-            final ByteBufferBitmap bitmap = vuPage.renderBitmap(task.viewState, r.width(), r.height(), actualSliceBounds);
+            final ByteBufferBitmap bitmap = vuPage.renderBitmap(task.viewState, r.width(), r.height(),
+                    actualSliceBounds);
 
             if (executor.isTaskDead(task)) {
                 if (LCTX.isDebugEnabled()) {
@@ -285,8 +286,9 @@ public class DecodeServiceBase implements DecodeService {
         final Rect rootRect = new Rect(0, 0, PageCropper.BMP_SIZE, PageCropper.BMP_SIZE);
         final RectF rootBounds = root.pageSliceBounds;
 
-        final ByteBufferBitmap rootBitmap = vuPage.renderBitmap(task.viewState, rootRect.width(), rootRect.height(), rootBounds);
-        root.setAutoCropping(PageCropper.getCropBounds(rootBitmap, rootRect, root.pageSliceBounds), true);
+        final ByteBufferBitmap rootBitmap = vuPage.renderBitmap(task.viewState, rootRect.width(), rootRect.height(),
+                rootBounds);
+        root.setAutoCropping(PageCropper.getCropBounds(rootBitmap, root.pageSliceBounds), true);
 
         if (LCTX.isDebugEnabled()) {
             LCTX.d(Thread.currentThread().getName() + ": Task " + task.id + ": cropping root bounds: "
@@ -829,5 +831,14 @@ public class DecodeServiceBase implements DecodeService {
             final CodecPage page = getPage(pageNo);
             return page.renderBitmap(null, width, height, region).toBitmap();
         }
+    }
+
+    @Override
+    public ByteBufferBitmap createPageThumbnail(int width, int height, final int pageNo, final RectF region) {
+        if (document == null) {
+            return null;
+        }
+        final CodecPage page = getPage(pageNo);
+        return page.renderBitmap(null, width, height, region);
     }
 }

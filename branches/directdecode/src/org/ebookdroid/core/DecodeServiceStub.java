@@ -1,5 +1,6 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
@@ -119,6 +120,11 @@ public class DecodeServiceStub implements DecodeService {
 
     @Override
     public void stopSearch(final String pattern) {
+    }
+
+    @Override
+    public ByteBufferBitmap createPageThumbnail(int width, int height, int pageNo, RectF region) {
+        return null;
     }
 
 }
