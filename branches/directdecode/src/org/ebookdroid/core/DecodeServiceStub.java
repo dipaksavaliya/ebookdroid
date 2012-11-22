@@ -4,8 +4,6 @@ import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
 
-import android.graphics.Bitmap.Config;
-import android.graphics.PixelFormat;
 import android.graphics.RectF;
 
 import java.util.List;
@@ -113,26 +111,6 @@ public class DecodeServiceStub implements DecodeService {
     @Override
     public IBitmapRef createThumbnail(boolean useEmbeddedIfAvailable, final int width, final int height, final int pageNo, final RectF region) {
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.DecodeService#getPixelFormat()
-     */
-    @Override
-    public int getPixelFormat() {
-        return PixelFormat.RGBA_8888;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.DecodeService#getBitmapConfig()
-     */
-    @Override
-    public Config getBitmapConfig() {
-        return Config.ARGB_8888;
     }
 
     @Override

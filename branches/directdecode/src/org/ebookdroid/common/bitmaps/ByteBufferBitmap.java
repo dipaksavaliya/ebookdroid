@@ -88,7 +88,7 @@ public final class ByteBufferBitmap {
     }
 
     public IBitmapRef toBitmap() {
-        final IBitmapRef bitmap = BitmapManager.getBitmap("RawBitmap", width, height, Bitmap.Config.RGB_565);
+        final IBitmapRef bitmap = BitmapManager.getBitmap("RawBitmap", width, height, Bitmap.Config.ARGB_8888);
         bitmap.setPixels(pixels);
         return bitmap;
     }

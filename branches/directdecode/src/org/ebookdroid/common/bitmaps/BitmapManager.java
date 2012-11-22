@@ -4,7 +4,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
@@ -158,7 +157,7 @@ public class BitmapManager {
         final AbstractBitmapRef ref = (AbstractBitmapRef) r;
         if (ref == null || ref.isRecycled() || ref.width != width || ref.height != height) {
             BitmapManager.release(ref);
-            return BitmapManager.getBitmap("Page", (int) width, (int) height, Bitmap.Config.RGB_565);
+            return BitmapManager.getBitmap("Page", (int) width, (int) height, Bitmap.Config.ARGB_8888);
         }
         return r;
     }
@@ -385,14 +384,6 @@ public class BitmapManager {
 
     public static int getBitmapBufferSize(final int width, final int height, final Bitmap.Config config) {
         return getPixelSizeInBytes(config) * width * height;
-    }
-
-    public static int getBitmapBufferSize(final Bitmap parentBitmap, final Rect childSize) {
-        int bytes = 4;
-        if (parentBitmap != null) {
-            bytes = BitmapManager.getPixelSizeInBytes(parentBitmap.getConfig());
-        }
-        return bytes * childSize.width() * childSize.height();
     }
 
     public static int getPartSize() {

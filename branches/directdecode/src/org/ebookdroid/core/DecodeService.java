@@ -7,7 +7,6 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
 
-import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -38,10 +37,6 @@ public interface DecodeService extends CodecFeatures {
     void updateViewState(ViewState viewState);
 
     IBitmapRef createThumbnail(boolean useEmbeddedIfAvailable, int width, int height, int pageNo, RectF region);
-
-    int getPixelFormat();
-
-    Bitmap.Config getBitmapConfig();
 
     interface DecodeCallback {
 

@@ -97,7 +97,7 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
         final Canvas canvas = event.canvas;
 
         final IBitmapRef fgBitmap = BitmapManager.getBitmap("Foreground", canvas.getWidth(), canvas.getHeight(),
-                Bitmap.Config.RGB_565);
+                Bitmap.Config.ARGB_8888);
         try {
             fgBitmap.eraseColor(Color.BLACK);
             drawForeground(EventPool.newEventDraw(event, fgBitmap.getCanvas()));

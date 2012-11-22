@@ -1,8 +1,5 @@
 package org.ebookdroid.common.bitmaps;
 
-import android.graphics.Bitmap;
-import android.graphics.Rect;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -255,31 +252,6 @@ public class BBManager {
                         + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool=" + pool.size() + "/"
                         + (memoryPooled.get() / 1024) + "KB");
             }
-        }
-    }
-
-    public static int getBitmapBufferSize(final int width, final int height, final Bitmap.Config config) {
-        return getPixelSizeInBytes(config) * width * height;
-    }
-
-    public static int getBitmapBufferSize(final Bitmap parentBitmap, final Rect childSize) {
-        int bytes = 4;
-        if (parentBitmap != null) {
-            bytes = BBManager.getPixelSizeInBytes(parentBitmap.getConfig());
-        }
-        return bytes * childSize.width() * childSize.height();
-    }
-
-    public static int getPixelSizeInBytes(final Bitmap.Config config) {
-        switch (config) {
-            case ALPHA_8:
-                return 1;
-            case ARGB_4444:
-            case RGB_565:
-                return 2;
-            case ARGB_8888:
-            default:
-                return 4;
         }
     }
 }

@@ -121,7 +121,7 @@ public class FB2Page extends AbstractCodecPage {
         matrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height);
         matrix.postScale(1 / pageSliceBounds.width(), 1 / pageSliceBounds.height());
 
-        final IBitmapRef bmp = BitmapManager.getBitmap("FB2 page", width, height, Bitmap.Config.RGB_565);
+        final IBitmapRef bmp = BitmapManager.getBitmap("FB2 page", width, height, Bitmap.Config.ARGB_8888);
 
         final Canvas c = bmp.getCanvas();
         c.setMatrix(matrix);
@@ -153,7 +153,11 @@ public class FB2Page extends AbstractCodecPage {
             y = bottom;
         }
 
-        return ByteBufferBitmap.get(bmp);
+        final ByteBufferBitmap buffer = ByteBufferBitmap.get(bmp);
+
+        BitmapManager.release(bmp);
+
+        return buffer;
     }
 
     public void appendLine(final Line line) {

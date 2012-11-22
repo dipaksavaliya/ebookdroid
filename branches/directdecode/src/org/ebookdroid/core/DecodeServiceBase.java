@@ -16,8 +16,6 @@ import org.ebookdroid.core.crop.PageCropper;
 import org.ebookdroid.ui.viewer.IViewController.InvalidateSizeReason;
 
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -96,29 +94,6 @@ public class DecodeServiceBase implements DecodeService {
     @Override
     public boolean isFeatureSupported(final int feature) {
         return codecContext.isFeatureSupported(feature);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public int getPixelFormat() {
-        final Config cfg = getBitmapConfig();
-        switch (cfg) {
-            case ALPHA_8:
-                return PixelFormat.A_8;
-            case ARGB_4444:
-                return PixelFormat.RGBA_4444;
-            case RGB_565:
-                return PixelFormat.RGB_565;
-            case ARGB_8888:
-                return PixelFormat.RGBA_8888;
-            default:
-                return PixelFormat.RGB_565;
-        }
-    }
-
-    @Override
-    public Config getBitmapConfig() {
-        return this.codecContext.getBitmapConfig();
     }
 
     @Override

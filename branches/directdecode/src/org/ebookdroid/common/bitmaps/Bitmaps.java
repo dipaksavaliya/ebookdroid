@@ -23,7 +23,7 @@ public class Bitmaps {
 
     protected static final LogContext LCTX = LogManager.root().lctx("Bitmaps", false);
 
-    protected static final Config DEF_BITMAP_TYPE = Bitmap.Config.RGB_565;
+    protected static final Config DEF_BITMAP_TYPE = Bitmap.Config.ARGB_8888;
 
     protected static boolean useDefaultBitmapType = true;
 
