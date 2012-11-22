@@ -55,12 +55,10 @@ public class ByteBufferTexture extends BasicTexture {
 
     protected ByteBufferBitmap mBitmap;
 
-    public ByteBufferTexture(ByteBufferBitmap bitmap) {
+    public ByteBufferTexture(final ByteBufferBitmap bitmap) {
         super(null, 0, STATE_UNLOADED);
         this.mBitmap = bitmap;
-        final int w = mBitmap.getWidth();
-        final int h = mBitmap.getHeight();
-        setSize(w, h);
+        setSize(mBitmap.getWidth(), mBitmap.getHeight());
     }
 
     protected void setIsUploading(final boolean uploading) {
@@ -161,10 +159,13 @@ public class ByteBufferTexture extends BasicTexture {
                 gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
 
                 if (bWidth == texWidth && bHeight == texHeight) {
-                    gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, texWidth, texHeight, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, mBitmap.getPixels());
+                    gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, texWidth, texHeight, 0, GL10.GL_RGBA,
+                            GL10.GL_UNSIGNED_BYTE, mBitmap.getPixels());
                 } else {
-                    gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, texWidth, texHeight, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, null);
-                    gl.glTexSubImage2D(GL10.GL_TEXTURE_2D, 0, 0, 0, bWidth, bHeight, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, mBitmap.getPixels());
+                    gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, texWidth, texHeight, 0, GL10.GL_RGBA,
+                            GL10.GL_UNSIGNED_BYTE, null);
+                    gl.glTexSubImage2D(GL10.GL_TEXTURE_2D, 0, 0, 0, bWidth, bHeight, GL10.GL_RGBA,
+                            GL10.GL_UNSIGNED_BYTE, mBitmap.getPixels());
                 }
             } finally {
                 freeBitmap();

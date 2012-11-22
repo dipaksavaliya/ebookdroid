@@ -16,7 +16,7 @@ public final class ByteBufferBitmap {
     final AtomicBoolean used = new AtomicBoolean(true);
     long gen;
 
-    ByteBuffer pixels;
+    volatile ByteBuffer pixels;
     final int size;
     int width;
     int height;
@@ -26,6 +26,11 @@ public final class ByteBufferBitmap {
         this.height = height;
         this.size = 4 * width * height;
         this.pixels = create(size).order(ByteOrder.nativeOrder());
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        recycle();
     }
 
     public static ByteBufferBitmap get(final IBitmapRef bitmap) {
@@ -48,23 +53,26 @@ public final class ByteBufferBitmap {
     }
 
     public void recycle() {
+        ByteBuffer buf = pixels;
         pixels = null;
+        free(buf);
+        buf = null;
     }
 
-    public void retrieve(final Bitmap bitmap, final int left, final int top) {
-        final ByteBuffer src = ByteBuffer.allocateDirect(4 * bitmap.getWidth() * bitmap.getHeight()).order(
-                ByteOrder.nativeOrder());
-        bitmap.copyPixelsToBuffer(src);
-        nativeFillRect(src, pixels, bitmap.getWidth(), left, top, width, height);
-    }
-
-    public void retrieve(final Bitmap bitmap, final int left, final int top, final int width, final int height) {
-        this.width = width;
-        this.height = height;
-        final ByteBuffer src = ByteBuffer.allocateDirect(4 * bitmap.getWidth() * bitmap.getHeight()).order(
-                ByteOrder.nativeOrder());
-        bitmap.copyPixelsToBuffer(src);
-        nativeFillRect(src, pixels, bitmap.getWidth(), left, top, width, height);
+    public void copyPixelsFrom(final ByteBufferBitmap src, int left, int top, int width, int height) {
+        if (width > this.width) {
+            throw new IllegalArgumentException("width > this.width");
+        }
+        if (height > this.height) {
+            throw new IllegalArgumentException("height > this.height");
+        }
+        if (left + width > src.width) {
+            throw new IllegalArgumentException("left + width > src.width");
+        }
+        if (top + height > src.height) {
+            throw new IllegalArgumentException("top + height > src.height");
+        }
+        nativeFillRect2(src.pixels, src.width, this.pixels, this.width, left, top, width, height);
     }
 
     public ByteBuffer getPixels() {
@@ -170,5 +178,11 @@ public final class ByteBufferBitmap {
     private static native void nativeFillRect(ByteBuffer src, ByteBuffer dst, int srcWidth, int x, int y, int dstWidth,
             int dstHeight);
 
+    private static native void nativeFillRect2(ByteBuffer src, int srcWidth, ByteBuffer dst, int dstWidth, int x, int y,
+            int width, int height);
+
     private static native ByteBuffer create(int size);
+
+    private static native void free(ByteBuffer buf);
+
 }

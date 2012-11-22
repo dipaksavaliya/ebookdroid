@@ -5,6 +5,7 @@ import org.ebookdroid.core.PagePaint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.FloatMath;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -18,32 +19,64 @@ public class BBBitmaps {
 
     protected static final LogContext LCTX = LogManager.root().lctx("Bitmaps", false);
 
+    protected static final ThreadLocal<ByteBufferBitmap> threadSlices = new ThreadLocal<ByteBufferBitmap>();
+
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public Rect bounds;
-    public String nodeId;
+    public final Rect bounds;
+    public final String nodeId;
+    public final int partSize;
+    public final int columns;
+    public final int rows;
 
-    private ByteBufferBitmap bitmap;
+    private ByteBufferBitmap[] bitmaps;
 
-    private ByteBufferTexture texture;
+    private ByteBufferTexture[] textures;
 
-    public BBBitmaps(String nodeId, ByteBufferBitmap orig, Rect bitmapBounds, boolean invert) {
+    public BBBitmaps(final String nodeId, final ByteBufferBitmap orig, final Rect bitmapBounds, final boolean invert) {
         this.nodeId = nodeId;
-        this.bitmap = orig;
         this.bounds = bitmapBounds;
+        this.partSize = BitmapManager.partSize;
+        this.columns = (int) FloatMath.ceil(bounds.width() / (float) partSize);
+        this.rows = (int) FloatMath.ceil(bounds.height() / (float) partSize);
+        this.bitmaps = new ByteBufferBitmap[rows * columns];
+
         if (invert) {
-            this.bitmap.invert();
+            orig.invert();
+        }
+
+        int top = 0;
+        for (int row = 0; row < rows; row++, top += partSize) {
+            int left = 0;
+            for (int col = 0; col < columns; col++, left += partSize) {
+                final ByteBufferBitmap b = BBManager.getBitmap(partSize, partSize);
+
+                if (row == rows - 1 || col == columns - 1) {
+                    final int right = Math.min(left + partSize, bounds.width());
+                    final int bottom = Math.min(top + partSize, bounds.height());
+                    // b.eraseColor(invert ? PagePaint.NIGHT.fillPaint.getColor() : PagePaint.DAY.fillPaint.getColor());
+                    b.copyPixelsFrom(orig, left, top, right - left, bottom - top);
+                } else {
+                    b.copyPixelsFrom(orig, left, top, partSize, partSize);
+                }
+
+                final int index = row * columns + col;
+                bitmaps[index] = b;
+            }
         }
     }
 
-    public boolean drawGL(GLCanvas canvas, PagePaint paint, PointF vb, RectF tr, RectF cr) {
+    public boolean drawGL(final GLCanvas canvas, final PagePaint paint, final PointF vb, final RectF tr, final RectF cr) {
         lock.writeLock().lock();
         try {
-            if (texture == null) {
-                if (this.bitmap == null) {
+            if (textures == null) {
+                if (this.bitmaps == null) {
                     return false;
                 }
-                texture = new ByteBufferTexture(bitmap);
+                textures = new ByteBufferTexture[columns * rows];
+                for (int i = 0; i < textures.length; i++) {
+                    textures[i] = new ByteBufferTexture(bitmaps[i]);
+                }
             }
 
             if (LCTX.isDebugEnabled()) {
@@ -54,15 +87,11 @@ public class BBBitmaps {
             MathUtils.round(actual);
             canvas.setClipRect(actual);
 
-            final RectF src = new RectF(0, 0, texture.getWidth(), texture.getHeight());
-            final RectF r = new RectF(tr.left - vb.x, tr.top - vb.y, (tr.left - vb.x) + tr.width(), (tr.top - vb.y)
-                    + tr.height());
+            final boolean res = draw(canvas, vb, tr, actual);
 
-            final boolean res = canvas.drawTexture(texture, src, r);
-
-            if (res && bitmap != null) {
-                BBManager.release(bitmap);
-                bitmap = null;
+            if (res && bitmaps != null) {
+                BBManager.release(bitmaps);
+                bitmaps = null;
             }
 
             if (LCTX.isDebugEnabled()) {
@@ -77,16 +106,65 @@ public class BBBitmaps {
         }
     }
 
-    ByteBufferBitmap clear() {
+    protected boolean draw(final GLCanvas canvas, final PointF vb, final RectF tr, final RectF actual) {
+        final float offsetX = tr.left - vb.x;
+        final float offsetY = tr.top - vb.y;
+
+        final float scaleX = tr.width() / bounds.width();
+        final float scaleY = tr.height() / bounds.height();
+
+        final float sizeX = partSize * scaleX;
+        final float sizeY = partSize * scaleY;
+
+        final RectF src = new RectF();
+        final RectF rect = new RectF(offsetX, offsetY, offsetX + sizeX, offsetY + sizeY);
+        final RectF r = new RectF();
+
+        boolean res = true;
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
+                final int index = row * columns + col;
+                res &= draw(canvas, row, col, this.textures[index], actual, src, rect, r);
+                rect.left += sizeX;
+                rect.right += sizeX;
+            }
+            rect.left = offsetX;
+            rect.right = offsetX + sizeX;
+
+            rect.top += sizeY;
+            rect.bottom += sizeY;
+        }
+        return res;
+    }
+
+    protected boolean draw(final GLCanvas canvas, final int row, final int col, final ByteBufferTexture t,
+            final RectF actual, final RectF src, final RectF rect, final RectF r) {
+        boolean tres = false;
+        if (t != null) {
+            r.set(rect);
+            src.set(0, 0, t.getWidth(), t.getHeight());
+            if (!(r.right < actual.left || r.left > actual.right || r.bottom < actual.top || r.top > actual.bottom)) {
+                tres = canvas.drawTexture(t, src, r);
+                if (LCTX.isDebugEnabled()) {
+                    LCTX.d(nodeId + ": " + row + "." + col + " : " + t.getId() + " = " + tres);
+                }
+            }
+        }
+        return tres;
+    }
+
+    ByteBufferBitmap[] clear() {
         lock.writeLock().lock();
         try {
-            if (texture != null) {
-                texture.recycle();
-                texture = null;
+            if (textures != null) {
+                for (int i = 0; i < textures.length; i++) {
+                    textures[i].recycle();
+                }
+                textures = null;
             }
 
-            final ByteBufferBitmap ref = this.bitmap;
-            this.bitmap = null;
+            final ByteBufferBitmap[] ref = this.bitmaps;
+            this.bitmaps = null;
             return ref;
         } finally {
             lock.writeLock().unlock();
@@ -96,13 +174,7 @@ public class BBBitmaps {
     public boolean hasBitmaps() {
         lock.readLock().lock();
         try {
-            if (texture != null) {
-                return true;
-            }
-            if (bitmap == null) {
-                return false;
-            }
-            return true;
+            return textures != null || bitmaps != null;
         } finally {
             lock.readLock().unlock();
         }

@@ -195,8 +195,12 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         } catch (final OutOfMemoryError ex) {
             LCTX.e("No memory: ", ex);
             BitmapManager.clear("PageTreeNode OutOfMemoryError: ");
+            BBManager.clear("PageTreeNode OutOfMemoryError: ");
             stopDecodingThisNode(null);
+        } finally {
+            BBManager.release(bitmap);
         }
+
     }
 
     public RectF getTargetRect(final RectF pageBounds) {

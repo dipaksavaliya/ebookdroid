@@ -267,6 +267,7 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             BitmapManager.clear("DecodeService OutOfMemoryError: ");
+            BBManager.clear("DecodeService OutOfMemoryError: ");
 
             abortDecoding(task, null, null);
         } catch (final Throwable th) {

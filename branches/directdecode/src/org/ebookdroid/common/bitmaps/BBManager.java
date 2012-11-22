@@ -20,7 +20,7 @@ import org.emdev.utils.collections.TLIterator;
 
 public class BBManager {
 
-    static final LogContext LCTX = LogManager.root().lctx("BBManager", true);
+    static final LogContext LCTX = LogManager.root().lctx("BBManager", false);
 
     private final static long BITMAP_MEMORY_LIMIT = Runtime.getRuntime().maxMemory() / 2;
 
@@ -60,6 +60,7 @@ public class BBManager {
                         if (ref.used.compareAndSet(false, true)) {
                             it.remove();
 
+                            ref.pixels.rewind();
                             ref.gen = generation.get();
                             ref.width = width;
                             ref.height = height;
@@ -94,10 +95,9 @@ public class BBManager {
             memoryUsed.addAndGet(ref.size);
 
             if (LCTX.isDebugEnabled()) {
-                LCTX.d("Create bitmap: [" + ref.id + ", " + width + ", " + height + "], created="
-                        + created + ", reused=" + reused + ", memoryUsed=" + used.size() + "/"
-                        + (memoryUsed.get() / 1024) + "KB" + ", memoryInPool=" + pool.size() + "/"
-                        + (memoryPooled.get() / 1024) + "KB");
+                LCTX.d("Create bitmap: [" + ref.id + ", " + width + ", " + height + "], created=" + created
+                        + ", reused=" + reused + ", memoryUsed=" + used.size() + "/" + (memoryUsed.get() / 1024) + "KB"
+                        + ", memoryInPool=" + pool.size() + "/" + (memoryPooled.get() / 1024) + "KB");
             }
 
             shrinkPool(BITMAP_MEMORY_LIMIT);
@@ -137,10 +137,12 @@ public class BBManager {
                 } else if (ref instanceof List) {
                     final List<BBBitmaps> list = (List<BBBitmaps>) ref;
                     for (final BBBitmaps bmp : list) {
-                        final ByteBufferBitmap bitmap = bmp.clear();
-                        if (bitmap != null) {
-                            releaseImpl(bitmap);
-                            count++;
+                        final ByteBufferBitmap[] bitmaps = bmp.clear();
+                        if (bitmaps != null) {
+                            for (ByteBufferBitmap b : bitmaps) {
+                                releaseImpl(b);
+                                count++;
+                            }
                         }
                     }
                 } else if (ref instanceof ByteBufferBitmap[]) {
