@@ -47,8 +47,6 @@ public class BitmapManager {
 
     static int partSize = 1 << 7;
 
-    static boolean useEarlyRecycling = false;
-
     public static Bitmap getResource(final int resourceId) {
         synchronized (resources) {
             Bitmap bitmap = resources.get(resourceId);
@@ -289,14 +287,6 @@ public class BitmapManager {
 
     public static void setPartSize(final int partSize) {
         BitmapManager.partSize = partSize;
-    }
-
-    public static boolean isUseEarlyRecycling() {
-        return useEarlyRecycling;
-    }
-
-    public static void setUseEarlyRecycling(final boolean useEarlyRecycling) {
-        BitmapManager.useEarlyRecycling = useEarlyRecycling;
     }
 
     public static int getPixelSizeInBytes(final Bitmap.Config config) {

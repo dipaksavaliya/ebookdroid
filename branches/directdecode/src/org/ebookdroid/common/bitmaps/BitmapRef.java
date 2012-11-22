@@ -87,13 +87,7 @@ class BitmapRef extends AbstractBitmapRef {
 
     @Override
     void recycle() {
-        final Bitmap b = bitmap;
         bitmap = null;
-        if (b != null) {
-            if (BitmapManager.useEarlyRecycling) {
-                b.recycle();
-            }
-        }
     }
 
     @Override

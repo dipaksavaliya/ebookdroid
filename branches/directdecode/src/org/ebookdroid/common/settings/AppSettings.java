@@ -98,10 +98,6 @@ public class AppSettings implements AppPreferences, BookPreferences, IBackupAgen
 
     public final int bitmapSize;
 
-    public final boolean useEarlyRecycling;
-
-    public final boolean reloadDuringZoom;
-
     public final int heapPreallocate;
 
     public final int pdfStorageSize;
@@ -207,8 +203,6 @@ public class AppSettings implements AppPreferences, BookPreferences, IBackupAgen
         decodingThreadPriority = DECODE_THREAD_PRIORITY.getPreferenceValue(prefs);
         drawThreadPriority = DRAW_THREAD_PRIORITY.getPreferenceValue(prefs);
         bitmapSize = BITMAP_SIZE.getPreferenceValue(prefs);
-        useEarlyRecycling = EARLY_RECYCLING.getPreferenceValue(prefs);
-        reloadDuringZoom = RELOAD_DURING_ZOOM.getPreferenceValue(prefs);
         heapPreallocate = HEAP_PREALLOCATE.getPreferenceValue(prefs);
         pdfStorageSize = PDF_STORAGE_SIZE.getPreferenceValue(prefs);
         /* =============== Default rendering settings =============== */

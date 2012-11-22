@@ -48,18 +48,6 @@
                 android:summary="@string/pref_bitmapsize_summary"
                 android:title="@string/pref_bitmapsize_title" />
 
-            <CheckBoxPreference
-                android:defaultValue="@string/pref_earlyrecycling_defvalue"
-                android:key="@string/pref_earlyrecycling_id"
-                android:summary="@string/pref_earlyrecycling_summary"
-                android:title="@string/pref_earlyrecycling_title" />
-
-            <CheckBoxPreference
-                android:defaultValue="@string/pref_reloadduringzoom_defvalue"
-                android:key="@string/pref_reloadduringzoom_id"
-                android:summary="@string/pref_reloadduringzoom_summary"
-                android:title="@string/pref_reloadduringzoom_title" />
-
             <org.emdev.ui.preference.SeekBarPreference
                 android:defaultValue="@string/pref_heappreallocate_defvalue"
                 android:key="@string/pref_heappreallocate_id"
