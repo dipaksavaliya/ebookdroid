@@ -1,6 +1,6 @@
 package org.ebookdroid.droids.djvu.codec;
 
-import org.ebookdroid.common.bitmaps.BBManager;
+import org.ebookdroid.common.bitmaps.ByteBufferManager;
 import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.ViewState;
@@ -49,7 +49,7 @@ public class DjvuPage extends AbstractCodecPage {
             final RectF pageSliceBounds) {
         final int renderMode = AppSettings.current().djvuRenderingMode;
 
-        ByteBufferBitmap buf = BBManager.getBitmap(width, height);
+        ByteBufferBitmap buf = ByteBufferManager.getBitmap(width, height);
         if (width > 0 && height > 0) {
 
             final ByteBuffer byteBuffer = buf.getPixels();

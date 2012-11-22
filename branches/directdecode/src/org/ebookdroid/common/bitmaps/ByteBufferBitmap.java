@@ -26,6 +26,7 @@ public final class ByteBufferBitmap {
         this.height = height;
         this.size = 4 * width * height;
         this.pixels = create(size).order(ByteOrder.nativeOrder());
+        this.pixels.rewind();
     }
 
     @Override
@@ -33,21 +34,29 @@ public final class ByteBufferBitmap {
         recycle();
     }
 
-    public static ByteBufferBitmap get(final IBitmapRef bitmap) {
-        final Bitmap bmp = bitmap.getBitmap();
-        final ByteBufferBitmap b = BBManager.getBitmap(bmp.getWidth(), bmp.getHeight());
+    public static ByteBufferBitmap get(final Bitmap bmp) {
+        if (bmp.getConfig() != Bitmap.Config.ARGB_8888) {
+            throw new IllegalArgumentException("Wrong bitmap config: " + bmp.getConfig());
+        }
+        final ByteBufferBitmap b = ByteBufferManager.getBitmap(bmp.getWidth(), bmp.getHeight());
         bmp.copyPixelsToBuffer(b.pixels);
         return b;
     }
 
     public static ByteBufferBitmap get(final Bitmap bitmap, final Rect srcRect) {
-        final ByteBufferBitmap full = BBManager.getBitmap(bitmap.getWidth(), bitmap.getHeight());
-        bitmap.copyPixelsToBuffer(full.pixels);
+        final ByteBufferBitmap full = get(bitmap);
 
-        final ByteBufferBitmap part = BBManager.getBitmap(srcRect.width(), srcRect.height());
-        nativeFillRect(full.pixels, part.pixels, full.width, srcRect.left, srcRect.top, part.width, part.height);
+        final int srcWidth = srcRect.width();
+        final int srcHeight = srcRect.height();
 
-        BBManager.release(full);
+        if (full.width == srcWidth && full.height == srcHeight) {
+            return full;
+        }
+
+        final ByteBufferBitmap part = ByteBufferManager.getBitmap(srcWidth, srcHeight);
+        part.copyPixelsFrom(full, srcRect.left, srcRect.top, part.width, part.height);
+
+        ByteBufferManager.release(full);
 
         return part;
     }
@@ -59,7 +68,8 @@ public final class ByteBufferBitmap {
         buf = null;
     }
 
-    public void copyPixelsFrom(final ByteBufferBitmap src, int left, int top, int width, int height) {
+    public void copyPixelsFrom(final ByteBufferBitmap src, final int left, final int top, final int width,
+            final int height) {
         if (width > this.width) {
             throw new IllegalArgumentException("width > this.width");
         }
@@ -67,7 +77,7 @@ public final class ByteBufferBitmap {
             throw new IllegalArgumentException("height > this.height");
         }
         if (left + width > src.width) {
-            throw new IllegalArgumentException("left + width > src.width");
+            throw new IllegalArgumentException("left + width > src.width: " + left + ", " + width + ", " + src.width);
         }
         if (top + height > src.height) {
             throw new IllegalArgumentException("top + height > src.height");
@@ -121,11 +131,11 @@ public final class ByteBufferBitmap {
         final ByteBufferBitmap src = get(bitmap, srcRect);
         src.fillAlpha(0x00);
 
-        final ByteBufferBitmap dest = BBManager.getBitmap(src.width * 4, src.height * 4);
+        final ByteBufferBitmap dest = ByteBufferManager.getBitmap(src.width * 4, src.height * 4);
         nativeHq4x(src.pixels, dest.pixels, src.width, src.height);
         dest.fillAlpha(0xFF);
 
-        BBManager.release(src);
+        ByteBufferManager.release(src);
         return dest;
     }
 
@@ -133,11 +143,11 @@ public final class ByteBufferBitmap {
         final ByteBufferBitmap src = get(bitmap, srcRect);
         src.fillAlpha(0x00);
 
-        final ByteBufferBitmap dest = BBManager.getBitmap(src.width * 3, src.height * 3);
+        final ByteBufferBitmap dest = ByteBufferManager.getBitmap(src.width * 3, src.height * 3);
         nativeHq3x(src.pixels, dest.pixels, src.width, src.height);
         dest.fillAlpha(0xFF);
 
-        BBManager.release(src);
+        ByteBufferManager.release(src);
         return dest;
     }
 
@@ -145,11 +155,11 @@ public final class ByteBufferBitmap {
         final ByteBufferBitmap src = get(bitmap, srcRect);
         src.fillAlpha(0x00);
 
-        final ByteBufferBitmap dest = BBManager.getBitmap(src.width * 2, src.height * 2);
+        final ByteBufferBitmap dest = ByteBufferManager.getBitmap(src.width * 2, src.height * 2);
         nativeHq2x(src.pixels, dest.pixels, src.width, src.height);
         dest.fillAlpha(0xFF);
 
-        BBManager.release(src);
+        ByteBufferManager.release(src);
         return dest;
     }
 
@@ -178,8 +188,8 @@ public final class ByteBufferBitmap {
     private static native void nativeFillRect(ByteBuffer src, ByteBuffer dst, int srcWidth, int x, int y, int dstWidth,
             int dstHeight);
 
-    private static native void nativeFillRect2(ByteBuffer src, int srcWidth, ByteBuffer dst, int dstWidth, int x, int y,
-            int width, int height);
+    private static native void nativeFillRect2(ByteBuffer src, int srcWidth, ByteBuffer dst, int dstWidth, int x,
+            int y, int width, int height);
 
     private static native ByteBuffer create(int size);
 

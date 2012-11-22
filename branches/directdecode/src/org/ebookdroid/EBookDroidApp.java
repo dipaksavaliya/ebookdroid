@@ -1,6 +1,6 @@
 package org.ebookdroid;
 
-import org.ebookdroid.common.bitmaps.BBManager;
+import org.ebookdroid.common.bitmaps.ByteBufferManager;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.settings.AppSettings;
@@ -72,7 +72,7 @@ public class EBookDroidApp extends BaseDroidApp implements IAppSettingsChangeLis
     public void onLowMemory() {
         super.onLowMemory();
         BitmapManager.clear("on Low Memory: ");
-        BBManager.clear("on Low Memory: ");
+        ByteBufferManager.clear("on Low Memory: ");
     }
 
     @Override

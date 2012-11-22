@@ -4,8 +4,6 @@ import org.ebookdroid.EBookDroidLibraryLoader;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.codec.AbstractCodecContext;
 
-import android.graphics.Bitmap;
-
 import java.util.Arrays;
 
 import org.emdev.common.fonts.FontManager;

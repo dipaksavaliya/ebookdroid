@@ -153,7 +153,7 @@ public class FB2Page extends AbstractCodecPage {
             y = bottom;
         }
 
-        final ByteBufferBitmap buffer = ByteBufferBitmap.get(bmp);
+        final ByteBufferBitmap buffer = ByteBufferBitmap.get(bmp.getBitmap());
 
         BitmapManager.release(bmp);
 

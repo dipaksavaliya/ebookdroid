@@ -2,8 +2,8 @@ package org.ebookdroid.core.models;
 
 import org.ebookdroid.CodecType;
 import org.ebookdroid.R;
-import org.ebookdroid.common.bitmaps.BBBitmaps;
-import org.ebookdroid.common.bitmaps.BBManager;
+import org.ebookdroid.common.bitmaps.GLBitmaps;
+import org.ebookdroid.common.bitmaps.ByteBufferManager;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.common.cache.CacheManager;
@@ -113,12 +113,12 @@ public class DocumentModel extends ListenerProxy {
         if (LengthUtils.isNotEmpty(pages)) {
             saveDocumentInfo();
 
-            final List<BBBitmaps> bitmapsToRecycle = new ArrayList<BBBitmaps>();
+            final List<GLBitmaps> bitmapsToRecycle = new ArrayList<GLBitmaps>();
             for (final Page page : pages) {
                 page.recycle(bitmapsToRecycle);
             }
-            BBManager.release(bitmapsToRecycle);
-            BBManager.release();
+            ByteBufferManager.release(bitmapsToRecycle);
+            ByteBufferManager.release();
         }
         pages = EMPTY_PAGES;
     }

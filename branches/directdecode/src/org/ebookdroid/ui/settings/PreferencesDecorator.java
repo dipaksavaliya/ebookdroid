@@ -1,7 +1,5 @@
 package org.ebookdroid.ui.settings;
 
-import org.ebookdroid.EBookDroidApp;
-import org.ebookdroid.EBookDroidVersion;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.books.BookSettings;
@@ -11,7 +9,6 @@ import org.ebookdroid.common.settings.definitions.LibPreferences;
 import org.ebookdroid.common.settings.definitions.OpdsPreferences;
 import org.ebookdroid.common.settings.types.CacheLocation;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
-import org.ebookdroid.common.settings.types.DocumentViewType;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.curl.PageAnimationType;
 
@@ -21,15 +18,12 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceGroup;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.ui.preference.SeekBarPreference;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.enums.EnumUtils;
@@ -98,16 +92,6 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
     }
 
     public void decoratePerformanceSettings() {
-        if (EBookDroidApp.version == EBookDroidVersion.DEV) {
-            final Preference p = findPreference(VIEW_TYPE.key);
-            if (p instanceof ListPreference) {
-                final ListPreference lp = (ListPreference) p;
-                final String value = DocumentViewType.GL.getResValue();
-                lp.setValue(value);
-                setListPreferenceSummary(lp, value);
-                lp.setEnabled(false);
-            }
-        }
     }
 
     public void decorateRenderSettings() {
@@ -139,27 +123,6 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
             final Preference pref = findPreference(relatedKey);
             if (pref != null) {
                 pref.setEnabled(type == DocumentViewMode.SINGLE_PAGE);
-            }
-        }
-    }
-
-    public void setHWA(final DocumentViewType type, final String hwaPrefKey) {
-        final Preference hwaPref = findPreference(hwaPrefKey);
-        if (hwaPref != null) {
-            final Class<? extends Preference> clazz = hwaPref.getClass();
-            try {
-                final Method setCheckedMethod = clazz.getMethod("setChecked", boolean.class);
-                final Method setEnabledMethod = clazz.getMethod("setEnabled", boolean.class);
-                if ((type != DocumentViewType.BASE) || AndroidVersion.lessThan3x) {
-                    setCheckedMethod.invoke(hwaPref, false);
-                    setEnabledMethod.invoke(hwaPref, false);
-                } else {
-                    setEnabledMethod.invoke(hwaPref, true);
-                }
-            } catch (final NoSuchMethodException e) {
-            } catch (final IllegalArgumentException e) {
-            } catch (final IllegalAccessException e) {
-            } catch (final InvocationTargetException e) {
             }
         }
     }

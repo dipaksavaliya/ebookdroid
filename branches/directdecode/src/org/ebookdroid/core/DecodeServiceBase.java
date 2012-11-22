@@ -1,6 +1,6 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.common.bitmaps.BBManager;
+import org.ebookdroid.common.bitmaps.ByteBufferManager;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
@@ -215,7 +215,7 @@ public class DecodeServiceBase implements DecodeService {
                     LCTX.d(Thread.currentThread().getName() + ": Task " + task.id + ": Abort dead decode task for "
                             + task.node);
                 }
-                BBManager.release(bitmap);
+                ByteBufferManager.release(bitmap);
                 return;
             }
 
@@ -242,7 +242,7 @@ public class DecodeServiceBase implements DecodeService {
             }
 
             BitmapManager.clear("DecodeService OutOfMemoryError: ");
-            BBManager.clear("DecodeService OutOfMemoryError: ");
+            ByteBufferManager.clear("DecodeService OutOfMemoryError: ");
 
             abortDecoding(task, null, null);
         } catch (final Throwable th) {
@@ -293,7 +293,7 @@ public class DecodeServiceBase implements DecodeService {
                     + root.getCropping());
         }
 
-        BBManager.release(rootBitmap);
+        ByteBufferManager.release(rootBitmap);
 
         final ViewState viewState = task.viewState;
         final PageIndex currentPage = viewState.book.getCurrentPage();
@@ -373,7 +373,7 @@ public class DecodeServiceBase implements DecodeService {
 
     void updateImage(final DecodeTask currentDecodeTask, final CodecPage page, final ByteBufferBitmap bitmap,
             final Rect bitmapBounds, final RectF croppedPageBounds) {
-        currentDecodeTask.node.decodeComplete(page, bitmap, bitmapBounds, croppedPageBounds);
+        currentDecodeTask.node.decodeComplete(page, bitmap, croppedPageBounds);
     }
 
     @Override
@@ -434,7 +434,7 @@ public class DecodeServiceBase implements DecodeService {
                     final Runnable r = nextTask();
                     if (r != null) {
                         BitmapManager.release();
-                        BBManager.release();
+                        ByteBufferManager.release();
                         r.run();
                     }
                 }

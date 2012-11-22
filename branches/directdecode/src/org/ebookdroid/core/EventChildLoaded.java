@@ -1,9 +1,8 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.common.bitmaps.BBBitmaps;
-import org.ebookdroid.common.bitmaps.BBManager;
+import org.ebookdroid.common.bitmaps.ByteBufferManager;
+import org.ebookdroid.common.bitmaps.GLBitmaps;
 
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.util.ArrayList;
@@ -18,19 +17,16 @@ public class EventChildLoaded extends AbstractEvent {
     public PageTree nodes;
     public PageTreeNode child;
 
-    public Rect bitmapBounds;
-
     public EventChildLoaded(final Queue<EventChildLoaded> eventQueue) {
         this.eventQueue = eventQueue;
     }
 
-    final void init(final AbstractViewController ctrl, final PageTreeNode child, final Rect bitmapBounds) {
+    final void init(final AbstractViewController ctrl, final PageTreeNode child) {
         this.viewState = ViewState.get(ctrl);
         this.ctrl = ctrl;
         this.page = child.page;
         this.nodes = page.nodes;
         this.child = child;
-        this.bitmapBounds = bitmapBounds;
     }
 
     final void release() {
@@ -83,9 +79,9 @@ public class EventChildLoaded extends AbstractEvent {
         // }
 
         if (!viewState.isNodeVisible(parent, bounds) || hiddenByChildren) {
-            final List<BBBitmaps> bitmapsToRecycle = new ArrayList<BBBitmaps>();
+            final List<GLBitmaps> bitmapsToRecycle = new ArrayList<GLBitmaps>();
             final boolean res = nodes.recycleParents(child, bitmapsToRecycle);
-            BBManager.release(bitmapsToRecycle);
+            ByteBufferManager.release(bitmapsToRecycle);
 
             if (res) {
                 if (LCTX.isDebugEnabled()) {
@@ -97,7 +93,7 @@ public class EventChildLoaded extends AbstractEvent {
 
     protected void recycleChildren() {
         final boolean res = nodes.recycleChildren(child, bitmapsToRecycle);
-        BBManager.release(bitmapsToRecycle);
+        ByteBufferManager.release(bitmapsToRecycle);
 
         if (res) {
             if (LCTX.isDebugEnabled()) {

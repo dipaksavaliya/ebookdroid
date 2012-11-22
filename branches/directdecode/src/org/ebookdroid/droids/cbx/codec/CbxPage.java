@@ -45,6 +45,7 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
             try {
                 final Options opts = new Options();
                 opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                opts.inMutable=false;
                 opts.inJustDecodeBounds = onlyBounds;
                 opts.inSampleSize = scale;
 
@@ -56,6 +57,9 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
                 } else {
                     pageInfo.height = (bitmap.getHeight() * scale);
                     pageInfo.width = (bitmap.getWidth() * scale);
+                }
+                if (CbxDocument.LCTX.isDebugEnabled()) {
+                    CbxDocument.LCTX.d("Bitmap decoded: " + pageInfo.width + ", " + pageInfo.height + ", " + scale);
                 }
                 return bitmap;
             } finally {
@@ -132,6 +136,9 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
                         * storedBitmap.getWidth()), (int) FloatMath.ceil(pageSliceBounds.bottom
                         * storedBitmap.getHeight()));
 
+        if (CbxDocument.LCTX.isDebugEnabled()) {
+            CbxDocument.LCTX.d("bitmap="+storedBitmap.getWidth()+", "+storedBitmap.getHeight()+", src rect=" + (srcRect));
+        }
         if (CbxDocument.LCTX.isDebugEnabled()) {
             CbxDocument.LCTX.d("source ratio=" + (srcRect.width() / (float) srcRect.height()) + ", target ratio="
                     + (width / (float) height));

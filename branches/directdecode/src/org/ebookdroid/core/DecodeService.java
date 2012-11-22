@@ -7,7 +7,6 @@ import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
 
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.util.List;
@@ -40,7 +39,7 @@ public interface DecodeService extends CodecFeatures {
 
     interface DecodeCallback {
 
-        void decodeComplete(CodecPage codecPage, ByteBufferBitmap bitmap, Rect bitmapBounds, RectF croppedPageBounds);
+        void decodeComplete(CodecPage codecPage, ByteBufferBitmap bitmap, RectF croppedPageBounds);
 
     }
 

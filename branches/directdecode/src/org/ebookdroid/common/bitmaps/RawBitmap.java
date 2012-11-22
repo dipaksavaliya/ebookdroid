@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+@Deprecated
 public final class RawBitmap {
 
     final int[] pixels;

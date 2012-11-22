@@ -15,9 +15,9 @@ import org.emdev.utils.collections.ArrayDeque;
 import org.emdev.utils.collections.SparseArrayEx;
 import org.emdev.utils.collections.TLIterator;
 
-public class BBManager {
+public class ByteBufferManager {
 
-    static final LogContext LCTX = LogManager.root().lctx("BBManager", false);
+    static final LogContext LCTX = LogManager.root().lctx("ByteBufferManager", false);
 
     private final static long BITMAP_MEMORY_LIMIT = Runtime.getRuntime().maxMemory() / 2;
 
@@ -132,8 +132,8 @@ public class BBManager {
                     releaseImpl((ByteBufferBitmap) ref);
                     count++;
                 } else if (ref instanceof List) {
-                    final List<BBBitmaps> list = (List<BBBitmaps>) ref;
-                    for (final BBBitmaps bmp : list) {
+                    final List<GLBitmaps> list = (List<GLBitmaps>) ref;
+                    for (final GLBitmaps bmp : list) {
                         final ByteBufferBitmap[] bitmaps = bmp.clear();
                         if (bitmaps != null) {
                             for (ByteBufferBitmap b : bitmaps) {
@@ -185,12 +185,12 @@ public class BBManager {
         }
     }
 
-    public static void release(final List<BBBitmaps> bitmapsToRecycle) {
+    public static void release(final List<GLBitmaps> bitmapsToRecycle) {
         if (LengthUtils.isNotEmpty(bitmapsToRecycle)) {
             if (LCTX.isDebugEnabled()) {
                 LCTX.d("Adding  list of " + bitmapsToRecycle.size() + " bitmaps to release queue");
             }
-            releasing.add(new ArrayList<BBBitmaps>(bitmapsToRecycle));
+            releasing.add(new ArrayList<GLBitmaps>(bitmapsToRecycle));
         }
     }
 
