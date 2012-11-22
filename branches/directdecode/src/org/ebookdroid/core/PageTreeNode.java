@@ -7,7 +7,6 @@ import org.ebookdroid.common.bitmaps.GLBitmaps;
 import org.ebookdroid.common.cache.DocumentCacheFile.PageInfo;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.books.BookSettings;
-import org.ebookdroid.common.settings.definitions.AppPreferences;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.ui.viewer.IViewController;
@@ -16,7 +15,6 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -162,20 +160,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
             final BookSettings bs = page.base.getBookSettings();
             if (bs != null) {
-                final boolean correctContrast = bs.contrast != AppPreferences.CONTRAST.defValue;
-                final boolean correctExposure = bs.exposure != AppPreferences.EXPOSURE.defValue;
-
-                if (correctContrast || correctExposure || bs.autoLevels) {
-                    if (correctContrast) {
-                        bitmap.contrast(bs.contrast);
-                    }
-                    if (correctExposure) {
-                        bitmap.exposure(bs.exposure - AppPreferences.EXPOSURE.defValue);
-                    }
-                    if (bs.autoLevels) {
-                        bitmap.autoLevels();
-                    }
-                }
+                bitmap.applyEffects(bs);
             }
 
             final GLBitmaps bitmaps = holder.swap(fullId, bitmap);

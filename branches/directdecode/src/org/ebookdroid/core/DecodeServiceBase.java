@@ -1,10 +1,11 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.common.bitmaps.ByteBufferManager;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
+import org.ebookdroid.common.bitmaps.ByteBufferManager;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.common.settings.AppSettings;
+import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.core.codec.CodecContext;
 import org.ebookdroid.core.codec.CodecDocument;
 import org.ebookdroid.core.codec.CodecFeatures;
@@ -283,11 +284,14 @@ public class DecodeServiceBase implements DecodeService {
     }
 
     protected RectF calculateRootCropping(final DecodeTask task, final PageTreeNode root, final CodecPage vuPage) {
-        final Rect rootRect = new Rect(0, 0, PageCropper.BMP_SIZE, PageCropper.BMP_SIZE);
         final RectF rootBounds = root.pageSliceBounds;
+        final ByteBufferBitmap rootBitmap = vuPage.renderBitmap(task.viewState, PageCropper.BMP_SIZE, PageCropper.BMP_SIZE, rootBounds);
 
-        final ByteBufferBitmap rootBitmap = vuPage.renderBitmap(task.viewState, rootRect.width(), rootRect.height(),
-                rootBounds);
+        final BookSettings bs = task.viewState.book;
+        if (bs != null) {
+            rootBitmap.applyEffects(bs);
+        }
+
         root.setAutoCropping(PageCropper.getCropBounds(rootBitmap, root.pageSliceBounds), true);
 
         if (LCTX.isDebugEnabled()) {

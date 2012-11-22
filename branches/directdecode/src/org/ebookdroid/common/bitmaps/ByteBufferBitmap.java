@@ -1,5 +1,8 @@
 package org.ebookdroid.common.bitmaps;
 
+import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.definitions.AppPreferences;
+
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
@@ -66,6 +69,23 @@ public final class ByteBufferBitmap {
         pixels = null;
         free(buf);
         buf = null;
+    }
+
+    public void applyEffects(final BookSettings bs) {
+        final boolean correctContrast = bs.contrast != AppPreferences.CONTRAST.defValue;
+        final boolean correctExposure = bs.exposure != AppPreferences.EXPOSURE.defValue;
+
+        if (correctContrast || correctExposure || bs.autoLevels) {
+            if (correctContrast) {
+                contrast(bs.contrast);
+            }
+            if (correctExposure) {
+                exposure(bs.exposure - AppPreferences.EXPOSURE.defValue);
+            }
+            if (bs.autoLevels) {
+                autoLevels();
+            }
+        }
     }
 
     public void copyPixelsFrom(final ByteBufferBitmap src, final int left, final int top, final int width,
