@@ -49,11 +49,6 @@ class BitmapRef extends AbstractBitmapRef {
     }
 
     @Override
-    public void setPixels(final RawBitmap raw) {
-        bitmap.setPixels(raw.pixels, 0, raw.width, 0, 0, raw.width, raw.height);
-    }
-
-    @Override
     public void eraseColor(final int color) {
         bitmap.eraseColor(color);
     }

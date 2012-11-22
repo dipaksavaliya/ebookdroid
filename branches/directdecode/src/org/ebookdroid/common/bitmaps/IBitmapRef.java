@@ -18,8 +18,6 @@ public interface IBitmapRef {
 
     void setPixels(Buffer pixels);
 
-    void setPixels(final RawBitmap raw);
-
     void getPixels(int[] pixels, int width, int height);
 
     void eraseColor(final int color);
