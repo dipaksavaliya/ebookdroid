@@ -309,7 +309,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
                 if (bitmapsToRecycle != null) {
                     bitmapsToRecycle.add(bitmaps);
                 } else {
-                    ByteBufferManager.release(Arrays.asList(bitmaps));
+                    ByteBufferManager.release(bitmaps);
                 }
                 return true;
             }
@@ -322,7 +322,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
             }
             final GLBitmaps oldBitmaps = ref.getAndSet(bitmaps);
             if (oldBitmaps != null && oldBitmaps != bitmaps) {
-                ByteBufferManager.release(Arrays.asList(oldBitmaps));
+                ByteBufferManager.release(oldBitmaps);
             }
         }
     }

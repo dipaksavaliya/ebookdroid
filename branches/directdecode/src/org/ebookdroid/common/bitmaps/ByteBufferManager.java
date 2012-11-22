@@ -131,6 +131,15 @@ public class ByteBufferManager {
                 if (ref instanceof ByteBufferBitmap) {
                     releaseImpl((ByteBufferBitmap) ref);
                     count++;
+                } else if (ref instanceof GLBitmaps) {
+                    final GLBitmaps bmp = (GLBitmaps) ref;
+                    final ByteBufferBitmap[] bitmaps = bmp.clear();
+                    if (bitmaps != null) {
+                        for (ByteBufferBitmap b : bitmaps) {
+                            releaseImpl(b);
+                            count++;
+                        }
+                    }
                 } else if (ref instanceof List) {
                     final List<GLBitmaps> list = (List<GLBitmaps>) ref;
                     for (final GLBitmaps bmp : list) {
@@ -182,6 +191,15 @@ public class ByteBufferManager {
                 LCTX.d("Adding " + refs.length + " refs to release queue");
             }
             releasing.add(refs);
+        }
+    }
+
+    public static void release(final GLBitmaps ref) {
+        if (ref != null) {
+            if (LCTX.isDebugEnabled()) {
+                LCTX.d("Adding 1 bitmaps to release queue");
+            }
+            releasing.add(ref);
         }
     }
 
