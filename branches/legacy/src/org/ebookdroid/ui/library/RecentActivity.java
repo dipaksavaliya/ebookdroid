@@ -106,9 +106,6 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
         if (AndroidVersion.VERSION == 3) {
             setActionForView(R.id.recent_showlibrary);
             setActionForView(R.id.recent_showbrowser);
-            setActionForView(R.id.ShelfLeftButton);
-            setActionForView(R.id.ShelfCaption);
-            setActionForView(R.id.ShelfRightButton);
         }
     }
 
@@ -204,11 +201,6 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
         menu.setHeaderTitle(node.path);
         menu.findItem(R.id.bookmenu_recentgroup).setVisible(bs != null);
 
-        final BookShelfAdapter bookShelf = getController().getBookShelf(node);
-        final BookShelfAdapter current = null;
-        menu.findItem(R.id.bookmenu_openbookshelf).setVisible(
-                bookShelf != null && current != null && bookShelf != current);
-
         final MenuItem om = menu.findItem(R.id.bookmenu_open);
         final SubMenu osm = om != null ? om.getSubMenu() : null;
         if (osm == null) {
@@ -273,7 +265,7 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
         return vf != null ? vf.getDisplayedChild() : VIEW_RECENT;
     }
 
-    void showLibrary(final LibraryAdapter libraryAdapter, final RecentAdapter recentAdapter) {
+    void showLibrary(final LibraryAdapter libraryAdapter, final RecentAdapter recentAdapter, final int view) {
         if (recentBooksView == null) {
             recentBooksView = new RecentBooksView(getController(), recentAdapter);
             registerForContextMenu(recentBooksView);
@@ -288,9 +280,7 @@ public class RecentActivity extends AbstractActionActivity<RecentActivity, Recen
         vf.addView(recentBooksView, VIEW_RECENT);
         vf.addView(libraryView, VIEW_LIBRARY);
 
-        if (libraryButton != null) {
-            libraryButton.setImageResource(R.drawable.recent_actionbar_library);
-        }
+        changeLibraryView(view);
     }
 
     ViewFlipper getViewflipper() {
