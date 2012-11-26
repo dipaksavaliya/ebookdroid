@@ -200,7 +200,6 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
         inflater.inflate(R.menu.book_menu, menu);
         menu.setHeaderTitle(path);
         menu.findItem(R.id.bookmenu_recentgroup).setVisible(bs != null);
-        menu.findItem(R.id.bookmenu_openbookshelf).setVisible(false);
         menu.findItem(R.id.bookmenu_openbookfolder).setVisible(false);
 
         final MenuItem om = menu.findItem(R.id.bookmenu_open);

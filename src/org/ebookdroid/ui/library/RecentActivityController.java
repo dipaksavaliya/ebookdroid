@@ -40,7 +40,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.io.File;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -84,12 +83,7 @@ actions = {
         @ActionMethodDef(id = R.id.actions_doDeleteBook, method = "doDeleteBook"),
         @ActionMethodDef(id = R.id.actions_goToBookmark, method = "openBook"),
         @ActionMethodDef(id = R.id.bookmenu_settings, method = "openBookSettings"),
-        @ActionMethodDef(id = R.id.bookmenu_openbookshelf, method = "openBookShelf"),
         @ActionMethodDef(id = R.id.bookmenu_openbookfolder, method = "openBookFolder"),
-        @ActionMethodDef(id = R.id.ShelfCaption, method = "showSelectShelfDlg"),
-        @ActionMethodDef(id = R.id.actions_selectShelf, method = "selectShelf"),
-        @ActionMethodDef(id = R.id.ShelfLeftButton, method = "selectPrevShelf"),
-        @ActionMethodDef(id = R.id.ShelfRightButton, method = "selectNextShelf"),
         @ActionMethodDef(id = R.id.recent_showbrowser, method = "goFileBrowser"),
         @ActionMethodDef(id = R.id.recent_showlibrary, method = "goLibrary"),
         @ActionMethodDef(id = R.id.recentmenu_backupsettings, method = "backupSettings"),
@@ -143,7 +137,8 @@ public class RecentActivityController extends ActionController<RecentActivity> i
             return;
         }
 
-        changeLibraryView(recent != null ? RecentActivity.VIEW_RECENT : RecentActivity.VIEW_LIBRARY);
+        int initialView = recent != null ? RecentActivity.VIEW_RECENT : RecentActivity.VIEW_LIBRARY;
+        getManagedComponent().showLibrary(libraryAdapter, recentAdapter, initialView);
 
         EBookDroidApp.checkInstalledFonts(getManagedComponent());
     }
@@ -157,7 +152,8 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         LibSettings.applySettingsChanges(null, LibSettings.current());
 
         final BookSettings recent = SettingsManager.getRecentBook();
-        changeLibraryView(recent != null ? RecentActivity.VIEW_RECENT : RecentActivity.VIEW_LIBRARY);
+        int initialView = recent != null ? RecentActivity.VIEW_RECENT : RecentActivity.VIEW_LIBRARY;
+        getManagedComponent().showLibrary(libraryAdapter, recentAdapter, initialView);
     }
 
     protected boolean checkAutoLoad(final LibSettings libSettings, final BookSettings recent) {
@@ -171,7 +167,7 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         }
 
         if (shouldLoad && found) {
-            changeLibraryView(RecentActivity.VIEW_RECENT);
+            getManagedComponent().showLibrary(libraryAdapter, recentAdapter, RecentActivity.VIEW_RECENT);
             showDocument(Uri.fromFile(file), null);
             return true;
         }
@@ -454,18 +450,6 @@ public class RecentActivityController extends ActionController<RecentActivity> i
         getManagedComponent().startActivity(intent);
     }
 
-    @ActionMethod(ids = R.id.ShelfCaption)
-    public void showSelectShelfDlg(final ActionEx action) {
-        final List<String> names = bookshelfAdapter.getListNames();
-
-        if (LengthUtils.isNotEmpty(names)) {
-            final ActionDialogBuilder builder = new ActionDialogBuilder(getContext(), this);
-            builder.setTitle(R.string.bookcase_shelves);
-            builder.setItems(names.toArray(new String[names.size()]), this.getOrCreateAction(R.id.actions_selectShelf));
-            builder.show();
-        }
-    }
-
     @ActionMethod(ids = { R.id.recent_showlibrary })
     public void goLibrary(final ActionEx action) {
         final int viewMode = getManagedComponent().getViewMode();
@@ -558,12 +542,11 @@ public class RecentActivityController extends ActionController<RecentActivity> i
             final LibSettings.Diff diff) {
         final FileExtensionFilter filter = newSettings.allowedFileTypes;
 
-        if (diff.isAutoScanDirsChanged()) {
-            libraryAdapter.startScan();
-            return;
-        }
         if (diff.isAllowedFileTypesChanged()) {
             recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), filter);
+        }
+
+        if (diff.isAutoScanDirsChanged() || diff.isAllowedFileTypesChanged()) {
             libraryAdapter.startScan();
         }
 
@@ -583,15 +566,12 @@ public class RecentActivityController extends ActionController<RecentActivity> i
     }
 
     public void changeLibraryView(final int view) {
-        LibSettings r = LibSettings.current();
-        if (!false) {
-            getManagedComponent().changeLibraryView(view);
-            if (view == RecentActivity.VIEW_LIBRARY) {
-                libraryAdapter.startScan();
-            } else {
-                final FileExtensionFilter filter = LibSettings.current().allowedFileTypes;
-                recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), filter);
-            }
+        getManagedComponent().changeLibraryView(view);
+        if (view == RecentActivity.VIEW_LIBRARY) {
+            libraryAdapter.startScan();
+        } else {
+            final FileExtensionFilter filter = LibSettings.current().allowedFileTypes;
+            recentAdapter.setBooks(SettingsManager.getRecentBooks().values(), filter);
         }
     }
 
