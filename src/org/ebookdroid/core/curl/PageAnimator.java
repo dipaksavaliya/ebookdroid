@@ -2,7 +2,6 @@ package org.ebookdroid.core.curl;
 
 import org.ebookdroid.common.touch.IGestureDetector;
 import org.ebookdroid.core.EventDraw;
-import org.ebookdroid.core.EventGLDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
 
@@ -15,8 +14,6 @@ public interface PageAnimator extends IGestureDetector {
     void resetPageIndexes(final int currentIndex);
 
     void draw(EventDraw event);
-
-    void draw(EventGLDraw event);
 
     void setViewDrawn(boolean b);
 

@@ -1,7 +1,6 @@
 package org.ebookdroid.core.curl;
 
 import org.ebookdroid.core.EventDraw;
-import org.ebookdroid.core.EventGLDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
@@ -10,8 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-
-import org.emdev.ui.gl.GLCanvas;
 
 public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
 
@@ -110,26 +107,6 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#onFirstDrawEvent(org.emdev.ui.gl.GLCanvas,
-     *      org.ebookdroid.core.ViewState)
-     */
-    @Override
-    protected void onFirstDrawEvent(final GLCanvas canvas, final ViewState viewState) {
-        mFlipRadius = viewState.viewRect.width();
-
-        resetClipEdge();
-
-        lock.writeLock().lock();
-        try {
-            updateValues();
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawForeground(org.ebookdroid.core.EventDraw)
      */
     @Override
@@ -176,65 +153,6 @@ public abstract class AbstractSinglePageCurler extends AbstractPageAnimator {
     protected void drawExtraObjects(final EventDraw event) {
         final Path path = createCurlEdgePath();
         event.canvas.drawPath(path, mCurlEdgePaint);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawForeground(org.ebookdroid.core.EventDraw)
-     */
-    @Override
-    protected void drawForeground(final EventGLDraw event) {
-        Page page = event.viewState.model.getPageObject(foreIndex);
-        if (page == null) {
-            page = event.viewState.model.getCurrentPageObject();
-        }
-        if (page != null) {
-            event.process(page);
-        }
-    }
-
-    @Override
-    protected void drawBackground(final EventGLDraw event) {
-        if (foreIndex != backIndex) {
-            final Page page = event.viewState.model.getPageObject(backIndex);
-            if (page != null) {
-                event.canvas.setClipPath(backClip);
-                event.process(page);
-                event.canvas.clearClipRect();
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawExtraObjects(org.ebookdroid.core.EventGLDraw)
-     */
-    @Override
-    protected void drawExtraObjects(final EventGLDraw event) {
-        final GLCanvas canvas = event.canvas;
-
-        shadow(canvas);
-
-        canvas.fillPoly(mCurlEdgePaint.getColor(), foreBack);
-        canvas.drawPoly(Color.BLACK, foreBack);
-    }
-
-    void shadow(final GLCanvas canvas) {
-        canvas.save();
-        float width = 40;
-        int count = 20;
-        for (int i = count; i > 0; i--) {
-            float move = i * width / count;
-            float alpha = 0.5f * (1 - i /(float)count);
-
-            canvas.setAlpha(alpha * alpha * alpha);
-            canvas.translate(move, move);
-            canvas.fillPoly(Color.BLACK, foreBack);
-            canvas.translate(-move, -move);
-        }
-        canvas.restore();
     }
 
     /**

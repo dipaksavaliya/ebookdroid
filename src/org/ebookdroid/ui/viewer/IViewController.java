@@ -2,7 +2,6 @@ package org.ebookdroid.ui.viewer;
 
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.EventDraw;
-import org.ebookdroid.core.EventGLDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.events.ZoomListener;
@@ -74,8 +73,6 @@ public interface IViewController extends ZoomListener {
     void toggleRenderingEffects();
 
     void drawView(EventDraw eventDraw);
-
-    void drawView(EventGLDraw eventGLDraw);
 
     void pageUpdated(ViewState viewState, Page page);
 

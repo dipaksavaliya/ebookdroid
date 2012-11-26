@@ -23,7 +23,6 @@ import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.EventDraw;
-import org.ebookdroid.core.EventGLDraw;
 import org.ebookdroid.core.EventPool;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
@@ -38,7 +37,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.FloatMath;
 
-import org.emdev.ui.gl.GLCanvas;
 import org.emdev.utils.FastMath;
 import org.emdev.utils.MatrixUtils;
 
@@ -255,26 +253,6 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawBackground(org.ebookdroid.core.EventGLDraw)
-     */
-    @Override
-    protected void drawBackground(final EventGLDraw event) {
-        final GLCanvas canvas = event.canvas;
-
-        Page page = event.viewState.model.getPageObject(backIndex);
-        if (page == null) {
-            page = event.viewState.model.getCurrentPageObject();
-        }
-        if (page != null) {
-            canvas.save();
-            event.process(page);
-            canvas.restore();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawForeground(org.ebookdroid.core.EventDraw)
      */
     @Override
@@ -297,43 +275,10 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawForeground(org.ebookdroid.core.EventGLDraw)
-     */
-    @Override
-    protected void drawForeground(final EventGLDraw event) {
-        final GLCanvas canvas = event.canvas;
-
-        Page page = event.viewState.model.getPageObject(foreIndex);
-        if (page == null) {
-            page = event.viewState.model.getCurrentPageObject();
-        }
-        if (page != null) {
-            canvas.save();
-            event.process(page);
-            canvas.restore();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawExtraObjects(org.ebookdroid.core.EventDraw)
      */
     @Override
     protected void drawExtraObjects(final EventDraw event) {
-
-        if (AppSettings.current().showAnimIcon) {
-            DragMark.CURLER.draw(event.canvas, event.viewState);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawExtraObjects(org.ebookdroid.core.EventDraw)
-     */
-    @Override
-    protected void drawExtraObjects(final EventGLDraw event) {
 
         if (AppSettings.current().showAnimIcon) {
             DragMark.CURLER.draw(event.canvas, event.viewState);
@@ -348,24 +293,6 @@ public class SinglePageNaturalCurler extends AbstractPageAnimator {
      */
     @Override
     protected void onFirstDrawEvent(final Canvas canvas, final ViewState viewState) {
-        resetClipEdge();
-
-        lock.writeLock().lock();
-        try {
-            updateValues();
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#onFirstDrawEvent(org.emdev.ui.gl.GLCanvas,
-     *      org.ebookdroid.core.ViewState)
-     */
-    @Override
-    protected void onFirstDrawEvent(final GLCanvas canvas, final ViewState viewState) {
         resetClipEdge();
 
         lock.writeLock().lock();

@@ -2,7 +2,6 @@ package org.ebookdroid.core.curl;
 
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.EventDraw;
-import org.ebookdroid.core.EventGLDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
@@ -93,22 +92,6 @@ public class SinglePageView implements PageAnimator {
      */
     @Override
     public void draw(final EventDraw event) {
-        final Page page = event.viewState.model.getCurrentPageObject();
-        if (page != null) {
-            event.process(page);
-            if (AppSettings.current().showAnimIcon) {
-                DragMark.DRAG.draw(event.canvas, event.viewState);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.curl.PageAnimator#draw(org.ebookdroid.core.EventGLDraw)
-     */
-    @Override
-    public void draw(final EventGLDraw event) {
         final Page page = event.viewState.model.getCurrentPageObject();
         if (page != null) {
             event.process(page);

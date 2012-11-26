@@ -3,7 +3,6 @@ package org.ebookdroid.core.curl;
 import org.ebookdroid.common.bitmaps.BitmapManager;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.core.EventDraw;
-import org.ebookdroid.core.EventGLDraw;
 import org.ebookdroid.core.EventPool;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
@@ -11,8 +10,6 @@ import org.ebookdroid.core.ViewState;
 import org.ebookdroid.ui.viewer.views.DragMark;
 
 import android.graphics.Canvas;
-
-import org.emdev.ui.gl.GLCanvas;
 
 public abstract class AbstractPageSlider extends AbstractPageAnimator {
 
@@ -39,22 +36,6 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
      */
     @Override
     protected void onFirstDrawEvent(final Canvas canvas, final ViewState viewState) {
-        lock.writeLock().lock();
-        try {
-            updateValues();
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#onFirstDrawEvent(org.emdev.ui.gl.GLCanvas,
-     *      org.ebookdroid.core.ViewState)
-     */
-    @Override
-    protected void onFirstDrawEvent(final GLCanvas canvas, final ViewState viewState) {
         lock.writeLock().lock();
         try {
             updateValues();
@@ -108,18 +89,6 @@ public abstract class AbstractPageSlider extends AbstractPageAnimator {
      */
     @Override
     protected final void drawExtraObjects(final EventDraw event) {
-        if (event.viewState.app.showAnimIcon) {
-            DragMark.CURLER.draw(event.canvas, event.viewState);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.ebookdroid.core.curl.AbstractPageAnimator#drawExtraObjects(org.ebookdroid.core.EventDraw)
-     */
-    @Override
-    protected final void drawExtraObjects(final EventGLDraw event) {
         if (event.viewState.app.showAnimIcon) {
             DragMark.CURLER.draw(event.canvas, event.viewState);
         }
