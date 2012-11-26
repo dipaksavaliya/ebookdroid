@@ -16,7 +16,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
-import org.emdev.ui.gl.GLCanvas;
 import org.emdev.utils.LengthUtils;
 
 public class Bitmaps {
@@ -260,9 +259,4 @@ public class Bitmaps {
             lock.readLock().unlock();
         }
     }
-
-    public boolean drawGL(final GLCanvas canvas, final PagePaint paint, final PointF vb, final RectF tr, final RectF cr) {
-        return false;
-    }
-
 }

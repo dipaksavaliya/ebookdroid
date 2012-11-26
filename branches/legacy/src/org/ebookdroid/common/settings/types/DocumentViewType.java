@@ -5,7 +5,6 @@ import org.ebookdroid.R;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IView;
 import org.ebookdroid.ui.viewer.viewers.BaseView;
-import org.ebookdroid.ui.viewer.viewers.GLView;
 import org.ebookdroid.ui.viewer.viewers.SurfaceView;
 
 import java.lang.reflect.Constructor;
@@ -16,9 +15,7 @@ public enum DocumentViewType implements ResourceConstant {
 
     BASE(R.string.pref_docviewtype_base, BaseView.class),
 
-    SURFACE(R.string.pref_docviewtype_surface, SurfaceView.class),
-
-    GL(R.string.pref_docviewtype_glsurface, GLView.class);
+    SURFACE(R.string.pref_docviewtype_surface, SurfaceView.class);
 
     private final String resValue;
 
