@@ -80,7 +80,7 @@
 
     <target name="-svn-checkout-changelog">
         <svn javahl="false">
-            <export srcurl="http://ebookdroid.googlecode.com/svn/wiki/ChangeLog.wiki" destpath="assets/about_changelog.wiki" />
+            <export srcurl="http://ebookdroid.googlecode.com/svn/wiki/ChangeLog_legacy.wiki" destpath="assets/about_changelog.wiki" />
         </svn>
     </target>
 
