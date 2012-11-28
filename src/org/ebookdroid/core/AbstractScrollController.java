@@ -1,18 +1,27 @@
 package org.ebookdroid.core;
 
+import org.ebookdroid.R;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.core.models.DocumentModel.PageIterator;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.views.DragMark;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
 public abstract class AbstractScrollController extends AbstractViewController {
 
+    protected static volatile Bitmap dragBitmap;
+
     protected AbstractScrollController(final IActivityController base, final DocumentViewMode mode) {
         super(base, mode);
+        if (dragBitmap == null) {
+            dragBitmap = BitmapFactory.decodeResource(base.getContext().getResources(),
+                    R.drawable.components_curler_drag);
+        }
     }
 
     /**
@@ -35,8 +44,13 @@ public abstract class AbstractScrollController extends AbstractViewController {
         new EventGotoPage(this, toPage, offsetX, offsetY).process().release();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.ui.viewer.IViewController#drawView(org.ebookdroid.core.EventDraw)
+     */
     @Override
-    public final void drawView(final EventGLDraw eventDraw) {
+    public final void drawView(final EventDraw eventDraw) {
         final ViewState viewState = eventDraw.viewState;
         if (viewState.model == null) {
             return;

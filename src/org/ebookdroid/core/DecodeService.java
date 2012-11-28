@@ -1,12 +1,13 @@
 package org.ebookdroid.core;
 
-import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
 import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.core.codec.CodecFeatures;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
 import org.ebookdroid.core.codec.OutlineLink;
 
+import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.util.List;
@@ -37,11 +38,13 @@ public interface DecodeService extends CodecFeatures {
 
     IBitmapRef createThumbnail(boolean useEmbeddedIfAvailable, int width, int height, int pageNo, RectF region);
 
-    ByteBufferBitmap createPageThumbnail(int width, int height, int pageNo, RectF region);
+    int getPixelFormat();
+
+    Bitmap.Config getBitmapConfig();
 
     interface DecodeCallback {
 
-        void decodeComplete(CodecPage codecPage, ByteBufferBitmap bitmap, RectF croppedPageBounds);
+        void decodeComplete(CodecPage codecPage, IBitmapRef bitmap, Rect bitmapBounds, RectF croppedPageBounds);
 
     }
 

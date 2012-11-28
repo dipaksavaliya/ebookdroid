@@ -12,7 +12,6 @@ import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.core.curl.PageAnimationType;
 
-import android.app.Activity;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -25,9 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.ui.preference.SeekBarPreference;
-import org.emdev.ui.uimanager.IUIManager;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.enums.EnumUtils;
 
@@ -58,23 +55,17 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
         return parent.getRoot();
     }
 
-    @Override
-    public Activity getActivity() {
-        return parent.getActivity();
-    }
-
     public void decorateSettings() {
         decoratePreference(getRoot());
         decorateBrowserSettings();
-        decorateOpdsSettings();
-        decoratePerformanceSettings();
+        decorateMemorySettings();
         decorateRenderSettings();
         decorateTypeSpecificSettings();
         decorateScrollSettings();
         decorateUISettings();
     }
 
-    public void decorateBooksSettings(final BookSettings bs) {
+    public void decorateBooksSettings(BookSettings bs) {
         addViewModeListener(BOOK_VIEW_MODE.key, BOOK_PAGE_ALIGN.key, BOOK_ANIMATION_TYPE.key);
         addAnimationTypeListener(BOOK_ANIMATION_TYPE.key, BOOK_PAGE_ALIGN.key);
 
@@ -82,15 +73,11 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
     }
 
     public void decorateBrowserSettings() {
-        final boolean isTablet = IUIManager.instance.isTabletUi(parent.getActivity()) && !AndroidVersion.lessThan3x;
-        enableSettings(isTablet, SHOW_REMOVABLE_MEDIA.key, SHOW_SCANNING_MEDIA.key);
-
         addListener(CACHE_LOCATION.key, new OnPreferenceChangeListener() {
 
             @Override
-            public boolean onPreferenceChange(final Preference preference, final Object newValue) {
-                final CacheLocation newLocation = EnumUtils.getByResValue(CacheLocation.class,
-                        LengthUtils.toString(newValue), null);
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                CacheLocation newLocation = EnumUtils.getByResValue(CacheLocation.class, LengthUtils.toString(newValue), null);
                 if (newLocation != null) {
                     CacheManager.moveCacheLocation(preference.getContext(), newLocation);
                 }
@@ -99,10 +86,7 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
         });
     }
 
-    public void decorateOpdsSettings() {
-    }
-
-    public void decoratePerformanceSettings() {
+    public void decorateMemorySettings() {
     }
 
     public void decorateRenderSettings() {
@@ -130,14 +114,10 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
     }
 
     public void enableSinglePageModeSetting(final DocumentViewMode type, final String... relatedKeys) {
-        enableSettings(type == DocumentViewMode.SINGLE_PAGE, relatedKeys);
-    }
-
-    public void enableSettings(final boolean enabled, final String... relatedKeys) {
         for (final String relatedKey : relatedKeys) {
             final Preference pref = findPreference(relatedKey);
             if (pref != null) {
-                pref.setEnabled(enabled);
+                pref.setEnabled(type == DocumentViewMode.SINGLE_PAGE);
             }
         }
     }
@@ -156,7 +136,7 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
         } else if (pref instanceof SeekBarPreference) {
             decorateSeekPreference((SeekBarPreference) pref);
         } else if (pref instanceof PreferenceGroup) {
-            final PreferenceGroup group = (PreferenceGroup) pref;
+            PreferenceGroup group = (PreferenceGroup) pref;
             for (int i = 0, n = group.getPreferenceCount(); i < n; i++) {
                 decoratePreference(group.getPreference(i));
             }
@@ -303,5 +283,4 @@ public class PreferencesDecorator implements IPreferenceContainer, AppPreference
             return true;
         }
     }
-
 }

@@ -87,7 +87,7 @@ public class FB2Document extends AbstractCodecDocument {
 
         final ArrayList<MarkupElement> mainStream = content.getMarkupStream(null);
         final LineStream documentLines = content.createLines(mainStream, PAGE_WIDTH - 2 * MARGIN_X,
-                JustificationMode.Justify, AppSettings.current().fb2HyphenEnabled);
+                JustificationMode.Justify);
         createPages(documentLines);
 
         final long t4 = System.currentTimeMillis();

@@ -1,11 +1,14 @@
 package org.ebookdroid.ui.viewer;
 
+import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.core.ViewState;
 
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
+import android.widget.Scroller;
 
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
@@ -17,6 +20,8 @@ public interface IView {
     View getView();
 
     IActivityController getBase();
+
+    Scroller getScroller();
 
     void invalidateScroll();
 
@@ -66,7 +71,7 @@ public interface IView {
 
     PointF getBase(RectF viewRect);
 
-    void checkFullScreenMode();
-
     boolean post(Runnable r);
+
+    Bitmaps createBitmaps(final String nodeId, final IBitmapRef orig, final Rect bitmapBounds, final boolean invert);
 }

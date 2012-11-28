@@ -15,9 +15,8 @@ public class LineStream implements Collection<Line> {
 
     private final ArrayList<Line> lines = new ArrayList<Line>();
 
-    public LineStream(final ParsedContent content, final int maxLineWidth, final JustificationMode jm,
-            final boolean hyphenEnabled) {
-        this.params = new LineCreationParams(content, maxLineWidth, jm, hyphenEnabled);
+    public LineStream(final ParsedContent content, final int maxLineWidth, final JustificationMode jm) {
+        this.params = new LineCreationParams(content, maxLineWidth, jm);
     }
 
     public LineStream(final LineCreationParams params) {

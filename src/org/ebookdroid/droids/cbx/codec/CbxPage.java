@@ -1,6 +1,8 @@
 package org.ebookdroid.droids.cbx.codec;
 
-import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
+import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.common.bitmaps.IBitmapRef;
+import org.ebookdroid.common.bitmaps.RawBitmap;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.codec.AbstractCodecPage;
 import org.ebookdroid.core.codec.CodecPageInfo;
@@ -8,6 +10,8 @@ import org.ebookdroid.core.codec.CodecPageInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.FloatMath;
@@ -19,6 +23,8 @@ import java.io.InputStream;
 import org.emdev.common.archives.ArchiveEntry;
 
 public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCodecPage {
+
+    private static final Paint PAINT = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 
     private final ArchiveEntryType entry;
 
@@ -45,7 +51,6 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
             try {
                 final Options opts = new Options();
                 opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                opts.inMutable=false;
                 opts.inJustDecodeBounds = onlyBounds;
                 opts.inSampleSize = scale;
 
@@ -57,9 +62,6 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
                 } else {
                     pageInfo.height = (bitmap.getHeight() * scale);
                     pageInfo.width = (bitmap.getWidth() * scale);
-                }
-                if (CbxDocument.LCTX.isDebugEnabled()) {
-                    CbxDocument.LCTX.d("Bitmap decoded: " + pageInfo.width + ", " + pageInfo.height + ", " + scale);
                 }
                 return bitmap;
             } finally {
@@ -104,7 +106,7 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
     }
 
     @Override
-    public ByteBufferBitmap renderBitmap(final ViewState viewState, final int width, final int height,
+    public IBitmapRef renderBitmap(final ViewState viewState, final int width, final int height,
             final RectF pageSliceBounds) {
         if (getPageInfo() == null) {
             return null;
@@ -131,14 +133,15 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
             return null;
         }
 
+        final IBitmapRef bmp = BitmapManager.getBitmap("CBX page", width, height, Bitmap.Config.RGB_565);
+
+        final Canvas c = bmp.getCanvas();
+
         final Rect srcRect = new Rect((int) (pageSliceBounds.left * storedBitmap.getWidth()),
                 (int) (pageSliceBounds.top * storedBitmap.getHeight()), (int) FloatMath.ceil(pageSliceBounds.right
                         * storedBitmap.getWidth()), (int) FloatMath.ceil(pageSliceBounds.bottom
                         * storedBitmap.getHeight()));
 
-        if (CbxDocument.LCTX.isDebugEnabled()) {
-            CbxDocument.LCTX.d("bitmap="+storedBitmap.getWidth()+", "+storedBitmap.getHeight()+", src rect=" + (srcRect));
-        }
         if (CbxDocument.LCTX.isDebugEnabled()) {
             CbxDocument.LCTX.d("source ratio=" + (srcRect.width() / (float) srcRect.height()) + ", target ratio="
                     + (width / (float) height));
@@ -153,20 +156,30 @@ public class CbxPage<ArchiveEntryType extends ArchiveEntry> extends AbstractCode
             if (CbxDocument.LCTX.isDebugEnabled()) {
                 CbxDocument.LCTX.d("Calling Native HQ4x");
             }
-            return ByteBufferBitmap.scaleHq4x(storedBitmap, srcRect);
+            final RawBitmap src = new RawBitmap(storedBitmap, srcRect);
+            final IBitmapRef scaled = src.scaleHq4x();
+            scaled.draw(c, null, new Rect(0, 0, width, height), PAINT);
+            BitmapManager.release(scaled);
         } else if (scaleFactor > 3.5) {
             if (CbxDocument.LCTX.isDebugEnabled()) {
                 CbxDocument.LCTX.d("Calling Native HQ3x");
             }
-            return ByteBufferBitmap.scaleHq3x(storedBitmap, srcRect);
+            final RawBitmap src = new RawBitmap(storedBitmap, srcRect);
+            final IBitmapRef scaled = src.scaleHq3x();
+            scaled.draw(c, null, new Rect(0, 0, width, height), PAINT);
+            BitmapManager.release(scaled);
         } else if (scaleFactor > 2.5) {
             if (CbxDocument.LCTX.isDebugEnabled()) {
                 CbxDocument.LCTX.d("Calling Native HQ2x");
             }
-            return ByteBufferBitmap.scaleHq2x(storedBitmap, srcRect);
+            final RawBitmap src = new RawBitmap(storedBitmap, srcRect);
+            final IBitmapRef scaled = src.scaleHq2x();
+            scaled.draw(c, null, new Rect(0, 0, width, height), PAINT);
+            BitmapManager.release(scaled);
+        } else {
+            c.drawBitmap(storedBitmap, srcRect, new Rect(0, 0, width, height), PAINT);
         }
-
-        return ByteBufferBitmap.get(storedBitmap, srcRect);
+        return bmp;
     }
 
     private int getScale(final float requiredWidth, final float requiredHeight) {

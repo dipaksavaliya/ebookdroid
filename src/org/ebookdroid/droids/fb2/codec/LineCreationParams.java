@@ -10,15 +10,12 @@ public class LineCreationParams {
     public boolean insertSpace = true;
     public int extraSpace = 0;
     public boolean noLineBreak = false;
-    public boolean hyphenEnabled;
 
-    public LineCreationParams(final ParsedContent content, final int maxLineWidth, final JustificationMode jm,
-            final boolean hyphenEnabled) {
+    public LineCreationParams(final ParsedContent content, final int maxLineWidth, final JustificationMode jm) {
         super();
         this.content = content;
         this.maxLineWidth = maxLineWidth;
         this.jm = jm;
-        this.hyphenEnabled = hyphenEnabled;
     }
 
 }

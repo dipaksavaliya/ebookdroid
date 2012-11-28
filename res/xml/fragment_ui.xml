@@ -25,7 +25,9 @@
             android:summary="@string/pref_confirmclose_summary"
             android:title="@string/pref_confirmclose_title" />
 
-    <org.emdev.ui.preference.SeekBarPreference
+        <EditTextPreference
+            android:maxLength="3"
+            android:numeric="integer"
             android:defaultValue="@string/pref_brightness_defvalue"
             android:key="@string/pref_brightness_id"
             ebookdroid:minValue="@string/pref_brightness_minvalue"

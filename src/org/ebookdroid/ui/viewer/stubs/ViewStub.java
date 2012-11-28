@@ -1,5 +1,7 @@
 package org.ebookdroid.ui.viewer.stubs;
 
+import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IView;
@@ -8,6 +10,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
+import android.widget.Scroller;
 
 public class ViewStub implements IView {
 
@@ -21,6 +24,11 @@ public class ViewStub implements IView {
     @Override
     public IActivityController getBase() {
         return ActivityControllerStub.STUB;
+    }
+
+    @Override
+    public Scroller getScroller() {
+        return null;
     }
 
     @Override
@@ -128,11 +136,14 @@ public class ViewStub implements IView {
     }
 
     @Override
-    public void checkFullScreenMode() {
-    }
-
-    @Override
     public boolean post(final Runnable r) {
         return false;
     }
+
+    @Override
+    public Bitmaps createBitmaps(final String nodeId, final IBitmapRef orig, final Rect bitmapBounds,
+            final boolean invert) {
+        return new Bitmaps(nodeId, orig, bitmapBounds, invert);
+    }
+
 }

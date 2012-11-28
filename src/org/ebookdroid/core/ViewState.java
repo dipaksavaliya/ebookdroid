@@ -121,7 +121,7 @@ public class ViewState {
         this.positiveImagesInNightMode = book != null ? book.positiveImagesInNightMode : app.positiveImagesInNightMode;
         this.pageAlign = DocumentViewMode.getPageAlign(book);
         this.paint = this.nightMode ? PagePaint.NIGHT : PagePaint.DAY;
-        this.paint.bitmapPaint.setFilterBitmap(false);
+        this.paint.bitmapPaint.setFilterBitmap(app.bitmapFileringEnabled);
 
         this.zoom = zoom;
 

@@ -24,8 +24,6 @@ public class LibSettings implements LibPreferences, IBackupAgent {
 
     /* =============== Browser settings =============== */
 
-    public final boolean useBookcase;
-
     public final Set<String> autoScanDirs;
 
     public final String searchBookQuery;
@@ -34,28 +32,19 @@ public class LibSettings implements LibPreferences, IBackupAgent {
 
     public final CacheLocation cacheLocation;
 
-    public final boolean autoScanRemovableMedia;
-
-    public final boolean showScanningInMenu;
-
-    public final boolean showRemovableMediaInMenu;
-
-    public final boolean showNotifications;
-
     private LibSettings() {
         BackupManager.addAgent(this);
         final SharedPreferences prefs = SettingsManager.prefs;
         /* =============== Browser settings =============== */
-        useBookcase = USE_BOOK_CASE.getPreferenceValue(prefs);
         autoScanDirs = AUTO_SCAN_DIRS.getPreferenceValue(prefs);
         searchBookQuery = SEARCH_BOOK_QUERY.getPreferenceValue(prefs);
         allowedFileTypes = FILE_TYPE_FILTER.getFilter(prefs);
         cacheLocation  = CACHE_LOCATION.getPreferenceValue(prefs);
-        autoScanRemovableMedia = AUTO_SCAN_REMOVABLE_MEDIA.getPreferenceValue(prefs);
-        showRemovableMediaInMenu = SHOW_REMOVABLE_MEDIA.getPreferenceValue(prefs);
-        showScanningInMenu = SHOW_SCANNING_MEDIA.getPreferenceValue(prefs);
-        showNotifications = SHOW_NOTIFICATIONS.getPreferenceValue(prefs);
     }
+
+    /* =============== Browser settings =============== */
+
+
 
     /* =============== */
 
@@ -134,11 +123,9 @@ public class LibSettings implements LibPreferences, IBackupAgent {
 
     public static class Diff {
 
-        private static final int D_UseBookcase = 0x0001 << 0;
         private static final int D_AutoScanDirs = 0x0001 << 1;
         private static final int D_AllowedFileTypes = 0x0001 << 2;
         private static final int D_CacheLocation = 0x0001 << 3;
-        private static final int D_AutoScanMedia = 0x0001 << 4;
 
         private int mask;
         private final boolean firstTime;
@@ -148,9 +135,6 @@ public class LibSettings implements LibPreferences, IBackupAgent {
             if (firstTime) {
                 mask = 0xFFFFFFFF;
             } else if (news != null) {
-                if (olds.useBookcase != news.useBookcase) {
-                    mask |= D_UseBookcase;
-                }
                 if (!olds.autoScanDirs.equals(news.autoScanDirs)) {
                     mask |= D_AutoScanDirs;
                 }
@@ -160,18 +144,11 @@ public class LibSettings implements LibPreferences, IBackupAgent {
                 if (olds.cacheLocation != news.cacheLocation) {
                     mask |= D_CacheLocation;
                 }
-                if (olds.autoScanRemovableMedia != news.autoScanRemovableMedia) {
-                    mask |= D_AutoScanMedia;
-                }
             }
         }
 
         public boolean isFirstTime() {
             return firstTime;
-        }
-
-        public boolean isUseBookcaseChanged() {
-            return 0 != (mask & D_UseBookcase);
         }
 
         public boolean isAutoScanDirsChanged() {
@@ -186,8 +163,5 @@ public class LibSettings implements LibPreferences, IBackupAgent {
             return 0 != (mask & D_CacheLocation);
         }
 
-        public boolean isAutoScanRemovableMediaChanged() {
-            return 0 != (mask & D_AutoScanMedia);
-        }
     }
 }

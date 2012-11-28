@@ -1,26 +1,29 @@
 package org.ebookdroid.core;
 
 import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
-import org.ebookdroid.common.bitmaps.ByteBufferManager;
-import org.ebookdroid.common.bitmaps.GLBitmaps;
+import org.ebookdroid.common.bitmaps.Bitmaps;
+import org.ebookdroid.common.bitmaps.IBitmapRef;
+import org.ebookdroid.common.bitmaps.RawBitmap;
 import org.ebookdroid.common.cache.DocumentCacheFile.PageInfo;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.books.BookSettings;
+import org.ebookdroid.common.settings.definitions.AppPreferences;
 import org.ebookdroid.core.codec.CodecPage;
 import org.ebookdroid.core.models.DecodingProgressModel;
 import org.ebookdroid.ui.viewer.IViewController;
 
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.emdev.common.log.LogContext;
-import org.emdev.ui.gl.GLCanvas;
 import org.emdev.utils.MatrixUtils;
 
 public class PageTreeNode implements DecodeService.DecodeCallback {
@@ -125,7 +128,7 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
         holder.recycle(null);
     }
 
-    public boolean recycle(final List<GLBitmaps> bitmapsToRecycle) {
+    public boolean recycle(final List<Bitmaps> bitmapsToRecycle) {
         stopDecodingThisNode("node recycling");
         return holder.recycle(bitmapsToRecycle);
     }
@@ -153,39 +156,53 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
     }
 
     @Override
-    public void decodeComplete(final CodecPage codecPage, final ByteBufferBitmap bitmap, final RectF croppedPageBounds) {
+    public void decodeComplete(final CodecPage codecPage, final IBitmapRef bitmap, final Rect bitmapBounds,
+            final RectF croppedPageBounds) {
 
         try {
-            if (bitmap == null) {
+            if (bitmap == null || bitmapBounds == null) {
                 stopDecodingThisNode(null);
                 return;
             }
 
             final BookSettings bs = page.base.getBookSettings();
             if (bs != null) {
-                bitmap.applyEffects(bs);
+                final boolean correctContrast = bs.contrast != AppPreferences.CONTRAST.defValue;
+                final boolean correctExposure = bs.exposure != AppPreferences.EXPOSURE.defValue;
+
+                if (correctContrast || correctExposure || bs.autoLevels) {
+                    final RawBitmap raw = new RawBitmap(bitmap, bitmapBounds);
+                    if (correctContrast) {
+                        raw.contrast(bs.contrast);
+                    }
+                    if (correctExposure) {
+                        raw.exposure(bs.exposure - AppPreferences.EXPOSURE.defValue);
+                    }
+                    if (bs.autoLevels) {
+                        raw.autoLevels();
+                    }
+                    bitmap.setPixels(raw);
+                }
             }
 
-            final GLBitmaps bitmaps = holder.swap(fullId, bitmap);
+            final Bitmaps bitmaps = holder.reuse(fullId, bitmap, bitmapBounds);
 
             holder.setBitmap(bitmaps);
             stopDecodingThisNode(null);
 
             final IViewController dc = page.base.getDocumentController();
             if (dc instanceof AbstractViewController) {
-                EventPool.newEventChildLoaded((AbstractViewController) dc, PageTreeNode.this).process()
+                EventPool.newEventChildLoaded((AbstractViewController) dc, PageTreeNode.this, bitmapBounds).process()
                         .release();
             }
 
         } catch (final OutOfMemoryError ex) {
             LCTX.e("No memory: ", ex);
             BitmapManager.clear("PageTreeNode OutOfMemoryError: ");
-            ByteBufferManager.clear("PageTreeNode OutOfMemoryError: ");
             stopDecodingThisNode(null);
         } finally {
-            ByteBufferManager.release(bitmap);
+            BitmapManager.release(bitmap);
         }
-
     }
 
     public RectF getTargetRect(final RectF pageBounds) {
@@ -269,47 +286,54 @@ public class PageTreeNode implements DecodeService.DecodeCallback {
 
     class BitmapHolder {
 
-        final AtomicReference<GLBitmaps> ref = new AtomicReference<GLBitmaps>();
+        final AtomicReference<Bitmaps> ref = new AtomicReference<Bitmaps>();
 
-        public boolean drawBitmap(final GLCanvas canvas, final PagePaint paint, final PointF viewBase,
+        public boolean drawBitmap(final Canvas canvas, final PagePaint paint, final PointF viewBase,
                 final RectF targetRect, final RectF clipRect) {
-            final GLBitmaps bitmaps = ref.get();
-            return bitmaps != null ? bitmaps.drawGL(canvas, paint, viewBase, targetRect, clipRect) : false;
+            final Bitmaps bitmaps = ref.get();
+            return bitmaps != null ? bitmaps.draw(canvas, paint, viewBase, targetRect, clipRect) : false;
         }
 
-        public GLBitmaps swap(final String nodeId, final ByteBufferBitmap bitmap) {
+        public Bitmaps reuse(final String nodeId, final IBitmapRef bitmap, final Rect bitmapBounds) {
             final BookSettings bs = page.base.getBookSettings();
             final AppSettings app = AppSettings.current();
             final boolean invert = bs != null ? bs.nightMode : app.nightMode;
-
-            return new GLBitmaps(nodeId, bitmap, invert);
+            if (app.textureReuseEnabled) {
+                final Bitmaps bitmaps = ref.get();
+                if (bitmaps != null) {
+                    if (bitmaps.reuse(nodeId, bitmap, bitmapBounds, invert)) {
+                        return bitmaps;
+                    }
+                }
+            }
+            return page.base.getView().createBitmaps(nodeId, bitmap, bitmapBounds, invert);
         }
 
         public boolean hasBitmaps() {
-            final GLBitmaps bitmaps = ref.get();
+            final Bitmaps bitmaps = ref.get();
             return bitmaps != null ? bitmaps.hasBitmaps() : false;
         }
 
-        public boolean recycle(final List<GLBitmaps> bitmapsToRecycle) {
-            final GLBitmaps bitmaps = ref.getAndSet(null);
+        public boolean recycle(final List<Bitmaps> bitmapsToRecycle) {
+            final Bitmaps bitmaps = ref.getAndSet(null);
             if (bitmaps != null) {
                 if (bitmapsToRecycle != null) {
                     bitmapsToRecycle.add(bitmaps);
                 } else {
-                    ByteBufferManager.release(bitmaps);
+                    BitmapManager.release(Arrays.asList(bitmaps));
                 }
                 return true;
             }
             return false;
         }
 
-        public void setBitmap(final GLBitmaps bitmaps) {
+        public void setBitmap(final Bitmaps bitmaps) {
             if (bitmaps == null) {
                 return;
             }
-            final GLBitmaps oldBitmaps = ref.getAndSet(bitmaps);
+            final Bitmaps oldBitmaps = ref.getAndSet(bitmaps);
             if (oldBitmaps != null && oldBitmaps != bitmaps) {
-                ByteBufferManager.release(oldBitmaps);
+                BitmapManager.release(Arrays.asList(oldBitmaps));
             }
         }
     }

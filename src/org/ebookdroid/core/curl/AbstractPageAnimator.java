@@ -1,18 +1,19 @@
 package org.ebookdroid.core.curl;
 
-import org.ebookdroid.core.EventGLDraw;
+import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.common.bitmaps.IBitmapRef;
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.MotionEvent;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.emdev.ui.gl.GLCanvas;
 
 public abstract class AbstractPageAnimator extends SinglePageView implements PageAnimator {
 
@@ -41,6 +42,12 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
     protected Vector2D mOldMovement;
     /** TRUE if the user moves the pages */
     protected boolean bUserMoves;
+
+    protected IBitmapRef foreBitmap;
+    protected int foreBitmapIndex = -1;
+
+    protected IBitmapRef backBitmap;
+    protected int backBitmapIndex = -1;
 
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -203,11 +210,11 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
 
     protected abstract Vector2D fixMovement(Vector2D point, final boolean bMaintainMoveDir);
 
-    protected abstract void drawBackground(EventGLDraw event);
+    protected abstract void drawBackground(EventDraw event);
 
-    protected abstract void drawForeground(EventGLDraw event);
+    protected abstract void drawForeground(EventDraw event);
 
-    protected abstract void drawExtraObjects(EventGLDraw event);
+    protected abstract void drawExtraObjects(EventDraw event);
 
     /**
      * Update points values values.
@@ -217,14 +224,20 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.curl.SinglePageView#draw(org.ebookdroid.core.EventGLDraw)
+     * @see org.ebookdroid.core.curl.SinglePageView#draw(org.ebookdroid.core.EventDraw)
      */
     @Override
-    public final synchronized void draw(final EventGLDraw event) {
-        final GLCanvas canvas = event.canvas;
+    public final synchronized void draw(final EventDraw event) {
+        final Canvas canvas = event.canvas;
         final ViewState viewState = event.viewState;
 
         if (!enabled()) {
+            BitmapManager.release(foreBitmap);
+            BitmapManager.release(backBitmap);
+
+            foreBitmap = null;
+            backBitmap = null;
+
             super.draw(event);
             return;
         }
@@ -235,7 +248,7 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
             onFirstDrawEvent(canvas, viewState);
         }
 
-        canvas.clearBuffer(Color.BLACK);
+        canvas.drawColor(Color.BLACK);
 
         // Draw our elements
         lock.readLock().lock();
@@ -253,14 +266,14 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
         }
     }
 
-    protected void drawInternal(final EventGLDraw event) {
+    protected void drawInternal(final EventDraw event) {
         drawForeground(event);
         if (foreIndex != backIndex) {
             drawBackground(event);
         }
     }
 
-    protected abstract void onFirstDrawEvent(GLCanvas canvas, final ViewState viewState);
+    protected abstract void onFirstDrawEvent(Canvas canvas, final ViewState viewState);
 
     /**
      * {@inheritDoc}
@@ -379,6 +392,21 @@ public abstract class AbstractPageAnimator extends SinglePageView implements Pag
 
     protected int getInitialXForBackFlip(final int width) {
         return width;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.ebookdroid.core.curl.SinglePageView#pageUpdated(int)
+     */
+    @Override
+    public void pageUpdated(final ViewState viewState, final Page page) {
+        if (foreBitmapIndex == page.index.viewIndex) {
+            foreBitmapIndex = -1;
+        }
+        if (backBitmapIndex == page.index.viewIndex) {
+            backBitmapIndex = -1;
+        }
     }
 
     /**

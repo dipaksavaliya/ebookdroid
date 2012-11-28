@@ -10,7 +10,7 @@ import org.ebookdroid.common.settings.types.PageAlign;
 import org.ebookdroid.common.touch.DefaultGestureDetector;
 import org.ebookdroid.common.touch.IGestureDetector;
 import org.ebookdroid.common.touch.IMultiTouchListener;
-import org.ebookdroid.common.touch.MultiTouchGestureDetector;
+import org.ebookdroid.common.touch.MultiTouchGestureDetectorFactory;
 import org.ebookdroid.common.touch.TouchManager;
 import org.ebookdroid.common.touch.TouchManager.Touch;
 import org.ebookdroid.core.codec.PageLink;
@@ -37,10 +37,26 @@ import org.emdev.common.log.LogManager;
 import org.emdev.ui.actions.AbstractComponentController;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
+import org.emdev.ui.actions.ActionMethodDef;
+import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.progress.IProgressIndicator;
 import org.emdev.utils.LengthUtils;
 
+@ActionTarget(
+// action list
+actions = {
+        // actions
+        @ActionMethodDef(id = R.id.actions_verticalConfigScrollUp, method = "verticalConfigScroll"),
+        @ActionMethodDef(id = R.id.actions_verticalConfigScrollDown, method = "verticalConfigScroll"),
+        @ActionMethodDef(id = R.id.actions_leftTopCorner, method = "scrollToCorner"),
+        @ActionMethodDef(id = R.id.actions_leftBottomCorner, method = "scrollToCorner"),
+        @ActionMethodDef(id = R.id.actions_rightTopCorner, method = "scrollToCorner"),
+        @ActionMethodDef(id = R.id.actions_rightBottomCorner, method = "scrollToCorner"),
+        @ActionMethodDef(id = R.id.actions_quickZoom, method = "quickZoom"),
+        @ActionMethodDef(id = R.id.actions_zoomToColumn, method = "zoomToColumn")
+// no more
+})
 public abstract class AbstractViewController extends AbstractComponentController<IView> implements IViewController {
 
     protected static final LogContext LCTX = LogManager.root().lctx("View", false);
@@ -104,7 +120,7 @@ public abstract class AbstractViewController extends AbstractComponentController
 
     protected List<IGestureDetector> initGestureDetectors(final List<IGestureDetector> list) {
         final GestureListener listener = new GestureListener();
-        list.add(new MultiTouchGestureDetector(listener));
+        list.add(MultiTouchGestureDetectorFactory.create(listener));
         list.add(new DefaultGestureDetector(base.getContext(), listener));
         return list;
     }
@@ -389,6 +405,15 @@ public abstract class AbstractViewController extends AbstractComponentController
      */
     @Override
     public final boolean onTouchEvent(final MotionEvent ev) {
+        final int delay = AppSettings.current().touchProcessingDelay;
+        if (delay > 0) {
+            try {
+                Thread.sleep(Math.min(250, delay));
+            } catch (final InterruptedException e) {
+                Thread.interrupted();
+            }
+        }
+
         for (final IGestureDetector d : getGestureDetectors()) {
             if (d.enabled() && d.onTouchEvent(ev)) {
                 return true;

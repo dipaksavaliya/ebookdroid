@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical" >
 
     <TextView
         android:id="@+id/textAlias"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
         android:text="@string/opds_addfeed_alias" />
 
     <EditText
         android:id="@+id/editAlias"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="text" >
@@ -23,21 +23,21 @@
 
     <TextView
         android:id="@+id/textURL"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
         android:text="@string/opds_addfeed_url" />
 
     <EditText
         android:id="@+id/editURL"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textUri" />
 
     <CheckBox
         android:id="@+id/checkAuth"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
         android:checked="true"
@@ -46,14 +46,14 @@
 
     <TextView
         android:id="@+id/textUsername"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
         android:text="@string/opds_authfeed_username" />
 
     <EditText
         android:id="@+id/editUsername"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="text" >
@@ -61,14 +61,14 @@
 
     <TextView
         android:id="@+id/textPassword"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
         android:text="@string/opds_authfeed_password" />
 
     <EditText
         android:id="@+id/editPassword"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPassword" />

@@ -16,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ExpandableListAdapter;
@@ -36,10 +35,19 @@ import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
 import org.emdev.ui.AbstractActionActivity;
+import org.emdev.ui.actions.ActionMethodDef;
+import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.uimanager.IUIManager;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
+@ActionTarget(
+// action list
+actions = {
+// start
+@ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout")
+// finish
+})
 public class BrowserActivity extends AbstractActionActivity<BrowserActivity, BrowserActivityController> {
 
     private static final String CURRENT_DIRECTORY = "currentDirectory";
@@ -75,12 +83,18 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
             c.onCreate();
         }
 
-        IUIManager.instance.setTitleVisible(this, !AndroidVersion.lessThan3x, true);
+        IUIManager.instance.setTitleVisible(this, false, true);
         setContentView(R.layout.browser);
 
         header = (TextView) findViewById(R.id.browsertext);
         viewflipper = (ViewFlipper) findViewById(R.id.browserflip);
         viewflipper.addView(LayoutUtils.fillInParent(viewflipper, new FileBrowserView(c, c.adapter)));
+
+        if (AndroidVersion.VERSION == 3) {
+            setActionForView(R.id.browserhome);
+            setActionForView(R.id.browserupfolder);
+            setActionForView(R.id.browserrecent);
+        }
     }
 
     @Override
@@ -113,17 +127,12 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
     void setTitle(final File dir) {
 
         String path = dir.getAbsolutePath();
-        if (AndroidVersion.lessThan3x) {
-            header.setText(path);
-            final ImageView view = (ImageView) findViewById(R.id.browserupfolder);
-            if (view != null) {
-                final boolean hasParent = dir.getParentFile() != null;
-                view.setImageResource(hasParent ? R.drawable.browser_actionbar_nav_up_enabled
-                        : R.drawable.browser_actionbar_nav_up_disabled);
-            }
-        } else {
-            setTitle(path);
-            IUIManager.instance.invalidateOptionsMenu(this);
+        header.setText(path);
+        final ImageView view = (ImageView) findViewById(R.id.browserupfolder);
+        if (view != null) {
+            final boolean hasParent = dir.getParentFile() != null;
+            view.setImageResource(hasParent ? R.drawable.browser_actionbar_nav_up_enabled
+                    : R.drawable.browser_actionbar_nav_up_disabled);
         }
     }
 
@@ -142,19 +151,6 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
     }
 
     public void showProgress(final boolean show) {
-        if (!AndroidVersion.lessThan3x) {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        setProgressBarIndeterminateVisibility(show);
-                        getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
-                    } catch (final Throwable e) {
-                    }
-                }
-            });
-        }
     }
 
     @Override
@@ -204,7 +200,6 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
         inflater.inflate(R.menu.book_menu, menu);
         menu.setHeaderTitle(path);
         menu.findItem(R.id.bookmenu_recentgroup).setVisible(bs != null);
-        menu.findItem(R.id.bookmenu_openbookshelf).setVisible(false);
         menu.findItem(R.id.bookmenu_openbookfolder).setVisible(false);
 
         final MenuItem om = menu.findItem(R.id.bookmenu_open);

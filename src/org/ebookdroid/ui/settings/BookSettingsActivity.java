@@ -16,7 +16,6 @@ public class BookSettingsActivity extends BaseSettingsActivity {
 
     private BookSettings current;
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

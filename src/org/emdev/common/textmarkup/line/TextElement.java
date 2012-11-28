@@ -1,5 +1,7 @@
 package org.emdev.common.textmarkup.line;
 
+import org.ebookdroid.common.settings.AppSettings;
+
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
@@ -67,8 +69,8 @@ public class TextElement extends AbstractLineElement {
     }
 
     @Override
-    public AbstractLineElement[] split(final float remaining, boolean hyphenEnabled) {
-        if (!hyphenEnabled) {
+    public AbstractLineElement[] split(final float remaining) {
+        if (!AppSettings.current().fb2HyphenEnabled) {
             return null;
         }
         final int count = HyphenationUtils.hyphenateWord(chars, start, length, starts, lengths);

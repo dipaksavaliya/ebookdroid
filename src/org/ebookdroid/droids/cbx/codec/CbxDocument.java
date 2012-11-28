@@ -19,7 +19,7 @@ import org.emdev.utils.StringUtils;
 
 public class CbxDocument<ArchiveEntryType extends ArchiveEntry> extends AbstractCodecDocument {
 
-    public static final LogContext LCTX = LogManager.root().lctx("Cbx", false);
+    public static final LogContext LCTX = LogManager.root().lctx("Cbx");
 
     private static final ArchiveEntryExtensionFilter imageFilter = new ArchiveEntryExtensionFilter("jpg", "jpeg", "png", "gif");
 

@@ -1,7 +1,7 @@
 package org.ebookdroid.droids.mupdf.codec;
 
-import org.ebookdroid.common.bitmaps.ByteBufferManager;
-import org.ebookdroid.common.bitmaps.ByteBufferBitmap;
+import org.ebookdroid.common.bitmaps.BitmapManager;
+import org.ebookdroid.common.bitmaps.IBitmapRef;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.core.ViewState;
 import org.ebookdroid.core.codec.AbstractCodecPage;
@@ -9,12 +9,10 @@ import org.ebookdroid.core.codec.PageLink;
 import org.ebookdroid.core.codec.PageTextBox;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,8 +29,6 @@ public class MuPdfPage extends AbstractCodecPage {
     final RectF pageBounds;
     final int actualWidth;
     final int actualHeight;
-
-    private final static boolean USE_DIRECT = true;
 
     private MuPdfPage(final long pageHandle, final long docHandle) {
         this.pageHandle = pageHandle;
@@ -53,8 +49,7 @@ public class MuPdfPage extends AbstractCodecPage {
     }
 
     @Override
-    public ByteBufferBitmap renderBitmap(final ViewState viewState, final int width, final int height,
-            final RectF pageSliceBounds) {
+    public IBitmapRef renderBitmap(ViewState viewState, final int width, final int height, final RectF pageSliceBounds) {
         final float[] matrixArray = calculateFz(width, height, pageSliceBounds);
         return render(viewState, new Rect(0, 0, width, height), matrixArray);
     }
@@ -109,7 +104,7 @@ public class MuPdfPage extends AbstractCodecPage {
         return new RectF(box[0], box[1], box[2], box[3]);
     }
 
-    public ByteBufferBitmap render(final ViewState viewState, final Rect viewbox, final float[] ctm) {
+    public IBitmapRef render(ViewState viewState, final Rect viewbox, final float[] ctm) {
         if (isRecycled()) {
             throw new RuntimeException("The page has been recycled before: " + this);
         }
@@ -124,15 +119,11 @@ public class MuPdfPage extends AbstractCodecPage {
         final int nightmode = viewState != null && viewState.nightMode && viewState.positiveImagesInNightMode ? 1 : 0;
         final int slowcmyk = AppSettings.current().slowCMYK ? 1 : 0;
 
-        final ByteBufferBitmap bmp = ByteBufferManager.getBitmap(width, height);
-        final ByteBuffer byteBuffer = bmp.getPixels();
-        final boolean res = renderPageDirect(docHandle, pageHandle, mRect, ctm, byteBuffer, nightmode, slowcmyk);
-        if (res) {
-            return bmp;
-        }
-
-        bmp.eraseColor(Color.GRAY);
-        return bmp;
+        final int[] bufferarray = new int[width * height];
+        renderPage(docHandle, pageHandle, mRect, ctm, bufferarray, nightmode, slowcmyk);
+        final IBitmapRef b = BitmapManager.getBitmap("PDF page", width, height, MuPdfContext.BITMAP_CFG);
+        b.setPixels(bufferarray, width, height);
+        return b;
     }
 
     @Override
@@ -151,9 +142,6 @@ public class MuPdfPage extends AbstractCodecPage {
 
     private static native boolean renderPageBitmap(long dochandle, long pagehandle, int[] viewboxarray,
             float[] matrixarray, Bitmap bitmap, int noghtmode, int slowcmyk);
-
-    private static native boolean renderPageDirect(long dochandle, long pagehandle, int[] viewboxarray,
-            float[] matrixarray, ByteBuffer buffer, int noghtmode, int slowcmyk);
 
     private native static List<PageTextBox> search(long docHandle, long pageHandle, String pattern);
 

@@ -5,10 +5,8 @@ import org.ebookdroid.R;
 import org.ebookdroid.common.settings.AppSettings;
 import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
-import org.ebookdroid.common.settings.types.BookRotationType;
 import org.ebookdroid.common.settings.types.ToastPosition;
 import org.ebookdroid.common.touch.TouchManagerView;
-import org.ebookdroid.ui.viewer.viewers.GLView;
 import org.ebookdroid.ui.viewer.views.ManualCropView;
 import org.ebookdroid.ui.viewer.views.PageViewZoomControls;
 import org.ebookdroid.ui.viewer.views.SearchControls;
@@ -30,14 +28,22 @@ import android.widget.Toast;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
 import org.emdev.ui.AbstractActionActivity;
+import org.emdev.ui.actions.ActionMethodDef;
+import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.uimanager.IUIManager;
 import org.emdev.utils.LayoutUtils;
 import org.emdev.utils.LengthUtils;
 
+@ActionTarget(
+// action list
+actions = {
+// start
+@ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout")
+// finish
+})
 public class ViewerActivity extends AbstractActionActivity<ViewerActivity, ViewerActivityController> {
 
     public static final DisplayMetrics DM = new DisplayMetrics();
@@ -109,7 +115,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
 
         frameLayout = new FrameLayout(this);
 
-        view = new GLView(getController());
+        view = AppSettings.current().viewType.create(getController());
         this.registerForContextMenu(view.getView());
 
         LayoutUtils.fillInParent(frameLayout, view.getView());
@@ -172,6 +178,10 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
         getController().afterDestroy(finishing);
 
         EBookDroidApp.onActivityClose(finishing);
+    }
+
+    protected IView createView() {
+        return AppSettings.current().viewType.create(getController());
     }
 
     public TouchManagerView getTouchView() {
@@ -288,7 +298,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
     }
 
     protected boolean hasNormalMenu() {
-        return AndroidVersion.lessThan4x || IUIManager.instance.isTabletUi(this) || AppSettings.current().showTitle;
+        return true;
     }
 
     /**
@@ -308,13 +318,7 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
         final AppSettings as = AppSettings.current();
 
         setMenuItemChecked(menu, as.fullScreen, R.id.mainmenu_fullscreen);
-
-        if (!AndroidVersion.lessThan3x) {
-            setMenuItemChecked(menu, as.showTitle, R.id.mainmenu_showtitle);
-        } else {
-            setMenuItemVisible(menu, false, R.id.mainmenu_showtitle);
-        }
-
+        setMenuItemVisible(menu, false, R.id.mainmenu_showtitle);
         setMenuItemChecked(menu, getZoomControls().getVisibility() == View.VISIBLE, R.id.mainmenu_zoom);
 
         final BookSettings bs = getController().getBookSettings();
@@ -322,8 +326,6 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
             return;
         }
 
-        setMenuItemChecked(menu, bs.rotation == BookRotationType.PORTRAIT, R.id.mainmenu_force_portrait);
-        setMenuItemChecked(menu, bs.rotation == BookRotationType.LANDSCAPE, R.id.mainmenu_force_landscape);
         setMenuItemChecked(menu, bs.nightMode, R.id.mainmenu_nightmode);
         setMenuItemChecked(menu, bs.cropPages, R.id.mainmenu_croppages);
         setMenuItemChecked(menu, bs.splitPages, R.id.mainmenu_splitpages, R.drawable.viewer_menu_split_pages,
@@ -376,7 +378,6 @@ public class ViewerActivity extends AbstractActionActivity<ViewerActivity, Viewe
 
     @Override
     public final boolean dispatchKeyEvent(final KeyEvent event) {
-        view.checkFullScreenMode();
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
             if (!hasNormalMenu()) {
                 getController().getOrCreateAction(R.id.actions_openOptionsMenu).run();

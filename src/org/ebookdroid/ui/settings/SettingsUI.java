@@ -6,8 +6,6 @@ import android.net.Uri;
 
 import java.io.File;
 
-import org.emdev.common.android.AndroidVersion;
-
 public class SettingsUI {
 
     public static void showBookSettings(final Context context, final String fileName) {
@@ -17,8 +15,7 @@ public class SettingsUI {
     }
 
     public static void showAppSettings(final Context context, final String fileName) {
-        final Class<?> activityClass = AndroidVersion.lessThan3x ? SettingsActivity.class
-                : FragmentedSettingsActivity.class;
+        final Class<?> activityClass = SettingsActivity.class;
         final Intent intent = new Intent(context, activityClass);
         if (fileName != null) {
             intent.setData(Uri.fromFile(new File(fileName)));

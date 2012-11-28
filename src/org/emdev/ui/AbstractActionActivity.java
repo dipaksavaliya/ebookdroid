@@ -35,7 +35,7 @@ public abstract class AbstractActionActivity<A extends Activity, C extends Actio
         return getController();
     }
 
-    @SuppressWarnings({ "unchecked", "deprecation" })
+    @SuppressWarnings({ "unchecked" })
     public final C restoreController() {
         final Object last = this.getLastNonConfigurationInstance();
         if (last instanceof ActionController) {
@@ -122,19 +122,6 @@ public abstract class AbstractActionActivity<A extends Activity, C extends Actio
     }
 
     protected void setMenuItemExtra(final MenuItem item, final String name, final Object data) {
-        Intent intent = item.getIntent();
-        if (intent == null) {
-            intent = new Intent();
-            item.setIntent(intent);
-        }
-        intent.putExtra(name, new ExtraWrapper(data));
-    }
-
-    protected void setMenuItemExtra(final Menu menu, final int itemId, final String name, final Object data) {
-        MenuItem item = menu.findItem(itemId);
-        if (item == null) {
-            return;
-        }
         Intent intent = item.getIntent();
         if (intent == null) {
             intent = new Intent();

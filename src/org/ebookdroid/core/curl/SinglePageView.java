@@ -1,7 +1,7 @@
 package org.ebookdroid.core.curl;
 
 import org.ebookdroid.common.settings.AppSettings;
-import org.ebookdroid.core.EventGLDraw;
+import org.ebookdroid.core.EventDraw;
 import org.ebookdroid.core.Page;
 import org.ebookdroid.core.SinglePageController;
 import org.ebookdroid.core.ViewState;
@@ -88,10 +88,10 @@ public class SinglePageView implements PageAnimator {
     /**
      * {@inheritDoc}
      *
-     * @see org.ebookdroid.core.curl.PageAnimator#draw(org.ebookdroid.core.EventGLDraw)
+     * @see org.ebookdroid.core.curl.PageAnimator#draw(org.ebookdroid.core.EventDraw)
      */
     @Override
-    public void draw(final EventGLDraw event) {
+    public void draw(final EventDraw event) {
         final Page page = event.viewState.model.getCurrentPageObject();
         if (page != null) {
             event.process(page);

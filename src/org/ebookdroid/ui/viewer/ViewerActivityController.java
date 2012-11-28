@@ -4,7 +4,6 @@ import org.ebookdroid.CodecType;
 import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
 import org.ebookdroid.common.bitmaps.BitmapManager;
-import org.ebookdroid.common.bitmaps.ByteBufferManager;
 import org.ebookdroid.common.cache.CacheManager;
 import org.ebookdroid.common.keysbinding.KeyBindingsDialog;
 import org.ebookdroid.common.keysbinding.KeyBindingsManager;
@@ -15,7 +14,6 @@ import org.ebookdroid.common.settings.books.BookSettings;
 import org.ebookdroid.common.settings.books.Bookmark;
 import org.ebookdroid.common.settings.listeners.IAppSettingsChangeListener;
 import org.ebookdroid.common.settings.listeners.IBookSettingsChangeListener;
-import org.ebookdroid.common.settings.types.BookRotationType;
 import org.ebookdroid.common.settings.types.DocumentViewMode;
 import org.ebookdroid.common.touch.TouchManager;
 import org.ebookdroid.core.DecodeService;
@@ -67,7 +65,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.backup.BackupManager;
 import org.emdev.common.content.ContentScheme;
 import org.emdev.common.filesystem.PathFromUri;
@@ -77,6 +74,8 @@ import org.emdev.ui.actions.ActionController;
 import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
+import org.emdev.ui.actions.ActionMethodDef;
+import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.actions.params.EditableValue;
@@ -88,6 +87,36 @@ import org.emdev.ui.uimanager.IUIManager;
 import org.emdev.utils.LengthUtils;
 import org.emdev.utils.StringUtils;
 
+@ActionTarget(
+// action list
+actions = {
+        // start
+        @ActionMethodDef(id = R.id.actions_redecodingWithPassword, method = "redecodingWithPassword"),
+        @ActionMethodDef(id = R.id.actions_openOptionsMenu, method = "openOptionsMenu"),
+        @ActionMethodDef(id = R.id.actions_gotoOutlineItem, method = "gotoOutlineItem"),
+        @ActionMethodDef(id = R.id.mainmenu_outline, method = "showOutline"),
+        @ActionMethodDef(id = R.id.actions_doSearch, method = "doSearch"),
+        @ActionMethodDef(id = R.id.actions_doSearchBack, method = "doSearch"),
+        @ActionMethodDef(id = R.id.mainmenu_goto_page, method = "showGotoDialog"),
+        @ActionMethodDef(id = R.id.mainmenu_booksettings, method = "showBookSettings"),
+        @ActionMethodDef(id = R.id.mainmenu_settings, method = "showAppSettings"),
+        @ActionMethodDef(id = R.id.mainmenu_fullscreen, method = "toggleFullScreen"),
+        @ActionMethodDef(id = R.id.mainmenu_showtitle, method = "toggleTitleVisibility"),
+        @ActionMethodDef(id = R.id.mainmenu_nightmode, method = "toggleNightMode"),
+        @ActionMethodDef(id = R.id.mainmenu_splitpages, method = "toggleSplitPages"),
+        @ActionMethodDef(id = R.id.mainmenu_croppages, method = "toggleCropPages"),
+        @ActionMethodDef(id = R.id.mainmenu_thumbnail, method = "setCurrentPageAsThumbnail"),
+        @ActionMethodDef(id = R.id.mainmenu_bookmark, method = "showBookmarkDialog"),
+        @ActionMethodDef(id = R.id.actions_addBookmark, method = "addBookmark"),
+        @ActionMethodDef(id = R.id.actions_goToBookmark, method = "goToBookmark"),
+        @ActionMethodDef(id = R.id.actions_keyBindings, method = "showKeyBindingsDialog"),
+        @ActionMethodDef(id = R.id.mainmenu_zoom, method = "toggleControls"),
+        @ActionMethodDef(id = R.id.mainmenu_crop, method = "toggleControls"),
+        @ActionMethodDef(id = R.id.actions_toggleTouchManagerView, method = "toggleControls"),
+        @ActionMethodDef(id = R.id.mainmenu_search, method = "toggleControls"),
+        @ActionMethodDef(id = R.id.mainmenu_close, method = "closeActivity")
+// finish
+})
 public class ViewerActivityController extends ActionController<ViewerActivity> implements IActivityController,
         DecodingProgressListener, CurrentPageListener, IAppSettingsChangeListener, IBookSettingsChangeListener {
 
@@ -170,8 +199,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         createAction(R.id.mainmenu_zoom).putValue("view", activity.getZoomControls());
         createAction(R.id.mainmenu_search).putValue("view", activity.getSearchControls());
         createAction(R.id.actions_toggleTouchManagerView).putValue("view", activity.getTouchView());
-        createAction(R.id.mainmenu_force_portrait).putValue("mode", BookRotationType.PORTRAIT);
-        createAction(R.id.mainmenu_force_landscape).putValue("mode", BookRotationType.LANDSCAPE);
 
         if (++loadingCount == 1) {
             documentModel = ActivityControllerStub.DM_STUB;
@@ -293,7 +320,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             }
             SettingsManager.removeListener(this);
             BitmapManager.clear("on finish");
-            ByteBufferManager.clear("on finish");
         }
     }
 
@@ -507,19 +533,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.mainmenu_showtitle)
     public void toggleTitleVisibility(final ActionEx action) {
-        if (!AndroidVersion.lessThan3x) {
-            AppSettings.toggleTitleVisibility();
-        }
-    }
-
-    @ActionMethod(ids = { R.id.mainmenu_force_portrait, R.id.mainmenu_force_landscape })
-    public void forceOrientation(final ActionEx action) {
-        final BookRotationType mode = action.getParameter("mode");
-        if (bookSettings.rotation == mode) {
-            SettingsManager.setBookRotation(bookSettings, BookRotationType.UNSPECIFIED);
-        } else {
-            SettingsManager.setBookRotation(bookSettings, mode);
-        }
     }
 
     @ActionMethod(ids = R.id.mainmenu_nightmode)

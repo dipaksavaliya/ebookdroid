@@ -2,15 +2,9 @@ package org.ebookdroid.common.notifications;
 
 import android.content.Intent;
 
-import org.emdev.common.android.AndroidVersion;
-
 public interface INotificationManager {
 
-    INotificationManager instance =
-    /* CompatibilityNotificationManager for Android 1.6 - 2.x */
-    AndroidVersion.lessThan3x ? new CompatibilityNotificationManager() :
-    /* ModernNotificationManager for Android 3.0+ */
-    new ModernNotificationManager();
+    INotificationManager instance =new OldestNotificationManager();
 
     int notify(final CharSequence title, final CharSequence message, final Intent intent);
 
