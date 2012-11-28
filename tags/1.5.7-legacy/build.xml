@@ -1,0 +1,53 @@
+<project name="EBookDroid" basedir="." default="EBookDroid-dev">
+
+    <tstamp>
+        <format property="debug.version" pattern="yyyyMMdd.HHmmss" />
+    </tstamp>
+
+    <property name="out.dir" value="target" />
+    <property name="out.absolute.dir" location="${out.dir}" />
+
+    <property name="out.debug.file" location="${out.absolute.dir}/${ant.project.name}-${debug.version}.apk" />
+    <property name="out.release.file" location="${out.absolute.dir}/${ant.project.name}-release.apk" />
+
+    <path id="project.libraries.jars" />
+    <path id="project.libraries.libs" />
+
+    <import file="${basedir}/build.core.xml" />
+
+    <property name="arm.mk" location="jni/Application.mk" />
+
+    <property name="arm.apk" location="apk/${package.name}-${package.version.name}.apk" />
+
+    <mkdir dir="apk" />
+
+    <target name="EBookDroid-release" depends="-prepare-release">
+        <var name="target.version.code" value="${package.version.code}" />
+        <var name="target.version.name" value="${package.version.name}" />
+
+        <antcall target="-make-release" inheritall="true">
+            <param name="mk" value="${arm.mk}" />
+            <param name="apk" value="${arm.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
+            <param name="unrar.arch" value="arm5" />
+            <param name="version.code" value="${target.version.code}" />
+            <param name="version.name" value="${target.version.name}" />
+        </antcall>
+
+    </target>
+
+    <target name="EBookDroid-dev" depends="-prepare-dev">
+        <property name="target.apk" location="apk/${package.name}-${package.version.name}-r${svn.info.rev}.apk" />
+        <echo>Target: ${target.apk}</echo>
+
+        <antcall target="-make-release">
+            <param name="mk" value="${arm.mk}" />
+            <param name="apk" value="${target.apk}" />
+            <param name="ndk.dir" value="${arm.ndk.dir}" />
+            <param name="unrar.arch" value="arm5" />
+            <param name="version.code" value="${package.version.code}" />
+            <param name="version.name" value="${package.version.name}" />
+        </antcall>
+    </target>
+
+</project>
