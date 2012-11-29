@@ -1,5 +1,12 @@
 #labels Featured
 
+= EBookDroid v1.6.1 changelog =
+
+== Bug fixes ==
+
+ * Fix selecting GLES configuration on old devices
+ * Fix other reported issues
+ 
 = EBookDroid v1.6.0 changelog =
 
 == New features ==
