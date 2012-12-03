@@ -91,7 +91,7 @@ public abstract class AbstractViewController extends AbstractComponentController
     private List<IGestureDetector> detectors;
 
     public AbstractViewController(final IActivityController base, final DocumentViewMode mode) {
-        super(base, base.getView());
+        super(base.getActionController(), base.getView());
 
         this.base = base;
         this.mode = mode;
@@ -223,7 +223,7 @@ public abstract class AbstractViewController extends AbstractComponentController
         EventPool.newEventZoom(this, oldZoom, newZoom, committed).process();
 
         if (committed) {
-            base.getManagedComponent().zoomChanged(newZoom);
+            base.zoomChanged(newZoom);
         } else {
             inQuickZoom.set(false);
             inZoomToColumn.set(false);

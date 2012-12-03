@@ -22,6 +22,7 @@ import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
 import org.emdev.ui.AbstractActionActivity;
+import org.emdev.ui.actions.ActionMenuHelper;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.uimanager.IUIManager;
 
@@ -43,44 +44,13 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
     }
 
     @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onCreate()");
-        }
-        super.onCreate(savedInstanceState);
-
+    public void onCreateImpl(final Bundle savedInstanceState) {
         setContentView(R.layout.opds);
         setActionForView(R.id.opdsaddfeed);
-
         list = (ExpandableListView) findViewById(R.id.opdslist);
         list.setGroupIndicator(null);
         list.setChildIndicator(null);
         this.registerForContextMenu(list);
-
-        final OPDSActivityController c = restoreController();
-        if (c != null) {
-            c.onRestore(this);
-        } else {
-            getController().onCreate();
-        }
-    }
-
-    @Override
-    protected void onPostCreate(final Bundle savedInstanceState) {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onPostCreate()");
-        }
-        super.onPostCreate(savedInstanceState);
-        getController().onPostCreate();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onDestroy()");
-        }
-        super.onDestroy();
-        getController().onDestroy(isFinishing());
     }
 
     @Override
@@ -160,7 +130,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
         menu.setHeaderTitle(getFeedTitle(feed));
         updateMenuItems(menu, feed.parent);
 
-        setMenuParameters(menu, new Constant("feed", feed));
+        ActionMenuHelper.setMenuParameters(getController(), menu, new Constant("feed", feed));
     }
 
     protected void onCreateFacetContextMenu(final ContextMenu menu, final Feed feed, final Feed facet) {
@@ -170,7 +140,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
         menu.setHeaderTitle(getFeedTitle(facet));
         updateMenuItems(menu, feed.parent);
 
-        setMenuParameters(menu, new Constant("feed", facet));
+        ActionMenuHelper.setMenuParameters(getController(), menu, new Constant("feed", facet));
     }
 
     protected void onCreateBookContextMenu(final ContextMenu menu, final Book book) {
@@ -178,7 +148,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
         inflater.inflate(R.menu.opds_bookmenu, menu);
 
         menu.setHeaderTitle(book.title);
-        setMenuParameters(menu, new Constant("book", book));
+        ActionMenuHelper.setMenuParameters(getController(), menu, new Constant("book", book));
     }
 
     protected void onCreateLinkContextMenu(final ContextMenu menu, final Book book, final Link link) {
@@ -186,7 +156,7 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
         inflater.inflate(R.menu.opds_bookmenu, menu);
 
         menu.setHeaderTitle(book.title);
-        setMenuParameters(menu, new Constant("book", book), new Constant("link", link));
+        ActionMenuHelper.setMenuParameters(getController(), menu, new Constant("book", book), new Constant("link", link));
     }
 
     protected void updateMenuItems(final Menu menu) {
@@ -200,18 +170,18 @@ public class OPDSActivity extends AbstractActionActivity<OPDSActivity, OPDSActiv
 
         if (menu != null) {
             if (AndroidVersion.lessThan3x) {
-                setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_menu_nav_up_enabled,
+                ActionMenuHelper.setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_menu_nav_up_enabled,
                         R.drawable.opds_menu_nav_up_disabled);
-                setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_menu_nav_next_enabled,
+                ActionMenuHelper.setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_menu_nav_next_enabled,
                         R.drawable.opds_menu_nav_next_disabled);
-                setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_menu_nav_prev_enabled,
+                ActionMenuHelper.setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_menu_nav_prev_enabled,
                         R.drawable.opds_menu_nav_prev_disabled);
             } else {
-                setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_actionbar_nav_up_enabled,
+                ActionMenuHelper.setMenuItemEnabled(menu, canUp, R.id.opdsupfolder, R.drawable.opds_actionbar_nav_up_enabled,
                         R.drawable.opds_actionbar_nav_up_disabled);
-                setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_actionbar_nav_next_enabled,
+                ActionMenuHelper.setMenuItemEnabled(menu, canNext, R.id.opdsnextfolder, R.drawable.opds_actionbar_nav_next_enabled,
                         R.drawable.opds_actionbar_nav_next_disabled);
-                setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_actionbar_nav_prev_enabled,
+                ActionMenuHelper.setMenuItemEnabled(menu, canPrev, R.id.opdsprevfolder, R.drawable.opds_actionbar_nav_prev_enabled,
                         R.drawable.opds_actionbar_nav_prev_disabled);
             }
         }

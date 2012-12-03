@@ -4,7 +4,6 @@ import org.ebookdroid.EBookDroidApp;
 import org.ebookdroid.R;
 import org.ebookdroid.ui.library.adapters.BrowserAdapter;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -53,9 +52,9 @@ public class FolderDlg implements AdapterView.OnItemClickListener {
     private ImageView upButton;
     private ImageView homeButton;
 
-    public FolderDlg(final IActionController<? extends Activity> controller) {
+    public FolderDlg(final IActionController<?> controller) {
         this.filter = DirectoryFilter.NOT_HIDDEN;
-        this.context = controller.getManagedComponent();
+        this.context = EBookDroidApp.context;
         this.controller = new ActionController<FolderDlg>(controller, this);
     }
 

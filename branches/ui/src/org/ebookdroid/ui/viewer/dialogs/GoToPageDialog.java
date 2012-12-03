@@ -125,7 +125,7 @@ public class GoToPageDialog extends Dialog {
         final ListView bookmarks = (ListView) findViewById(R.id.bookmarks);
         bookmarks.setAdapter(null);
         adapter = null;
-        IUIManager.instance.invalidateOptionsMenu(base.getManagedComponent());
+        IUIManager.instance.invalidateOptionsMenu(base.getActivity());
     }
 
     @ActionMethod(ids = R.id.goToButton)

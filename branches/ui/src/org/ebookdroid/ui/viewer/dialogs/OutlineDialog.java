@@ -28,7 +28,7 @@ public class OutlineDialog extends Dialog implements OnItemClickListener {
         super(base.getContext());
         this.base = base;
         this.outline = outline;
-        this.actions = new ActionController<OutlineDialog>(base, this);
+        this.actions = new ActionController<OutlineDialog>(base.getActionController(), this);
     }
 
     @Override

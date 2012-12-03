@@ -10,7 +10,6 @@ import org.ebookdroid.core.models.ZoomModel;
 import org.ebookdroid.ui.viewer.IActivityController;
 import org.ebookdroid.ui.viewer.IView;
 import org.ebookdroid.ui.viewer.IViewController;
-import org.ebookdroid.ui.viewer.ViewerActivity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,7 +17,7 @@ import android.content.Context;
 import org.emdev.ui.actions.ActionController;
 import org.emdev.ui.actions.IActionController;
 
-public class ActivityControllerStub extends ActionController<ViewerActivity> implements IActivityController {
+public class ActivityControllerStub extends ActionController<Activity> implements IActivityController {
 
     public static final ActivityControllerStub STUB = new ActivityControllerStub();
 
@@ -93,5 +92,9 @@ public class ActivityControllerStub extends ActionController<ViewerActivity> imp
 
     @Override
     public void runOnUiThread(final Runnable r) {
+    }
+
+    @Override
+    public void zoomChanged(float newZoom) {
     }
 }

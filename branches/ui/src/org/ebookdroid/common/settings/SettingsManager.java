@@ -14,8 +14,8 @@ import org.ebookdroid.core.PageIndex;
 import org.ebookdroid.core.curl.PageAnimationType;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import java.io.File;
@@ -71,7 +71,7 @@ public class SettingsManager {
     }
 
     public static BookSettings create(final long ownerId, final String fileName, final boolean temporaryBook,
-            final Intent intent) {
+            final Bundle args) {
         lock.writeLock().lock();
         try {
             boolean created = false;
@@ -86,31 +86,30 @@ public class SettingsManager {
             }
             bookSettings.put(current.fileName, current);
 
-            if (intent != null) {
-                current.persistent = Boolean.parseBoolean(LengthUtils.safeString(intent.getStringExtra("persistent"),
-                        "true"));
+            if (args != null) {
+                current.persistent = Boolean.parseBoolean(LengthUtils.safeString(args.getString("persistent"), "true"));
 
-                current.viewMode = DocumentViewMode.valueOf((LengthUtils.safeString(intent.getStringExtra("viewMode"),
+                current.viewMode = DocumentViewMode.valueOf((LengthUtils.safeString(args.getString("viewMode"),
                         current.viewMode.toString())));
                 current.animationType = PageAnimationType.valueOf(LengthUtils.safeString(
-                        intent.getStringExtra("animationType"), current.animationType.toString()));
-                current.pageAlign = PageAlign.valueOf(LengthUtils.safeString(intent.getStringExtra("pageAlign"),
+                        args.getString("animationType"), current.animationType.toString()));
+                current.pageAlign = PageAlign.valueOf(LengthUtils.safeString(args.getString("pageAlign"),
                         current.pageAlign.toString()));
-                current.splitPages = Boolean.parseBoolean(LengthUtils.safeString(intent.getStringExtra("splitPages"),
+                current.splitPages = Boolean.parseBoolean(LengthUtils.safeString(args.getString("splitPages"),
                         Boolean.toString(current.splitPages)));
-                current.cropPages = Boolean.parseBoolean(LengthUtils.safeString(intent.getStringExtra("cropPages"),
+                current.cropPages = Boolean.parseBoolean(LengthUtils.safeString(args.getString("cropPages"),
                         Boolean.toString(current.cropPages)));
-                current.nightMode = Boolean.parseBoolean(LengthUtils.safeString(intent.getStringExtra("nightMode"),
+                current.nightMode = Boolean.parseBoolean(LengthUtils.safeString(args.getString("nightMode"),
                         Boolean.toString(current.nightMode)));
 
-                if (intent.hasExtra("pageIndex")) {
-                    final int pageIndex = Integer.parseInt(LengthUtils.safeString(intent.getStringExtra("pageIndex"),
+                if (args.containsKey("pageIndex")) {
+                    final int pageIndex = Integer.parseInt(LengthUtils.safeString(args.getString("pageIndex"),
                             Integer.toString(current.currentPage.viewIndex)));
                     current.currentPage = new PageIndex(current.splitPages ? current.currentPage.docIndex : pageIndex,
                             pageIndex);
 
-                    current.offsetX = Float.parseFloat(LengthUtils.safeString(intent.getStringExtra("offsetX"), "0"));
-                    current.offsetY = Float.parseFloat(LengthUtils.safeString(intent.getStringExtra("offsetY"), "0"));
+                    current.offsetX = Float.parseFloat(LengthUtils.safeString(args.getString("offsetX"), "0"));
+                    current.offsetY = Float.parseFloat(LengthUtils.safeString(args.getString("offsetY"), "0"));
                 }
             }
 

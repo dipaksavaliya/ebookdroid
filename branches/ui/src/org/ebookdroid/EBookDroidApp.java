@@ -10,7 +10,6 @@ import org.ebookdroid.common.settings.SettingsManager;
 import org.ebookdroid.common.settings.listeners.IAppSettingsChangeListener;
 import org.ebookdroid.common.settings.listeners.IBackupSettingsChangeListener;
 import org.ebookdroid.common.settings.listeners.ILibSettingsChangeListener;
-import org.ebookdroid.ui.library.RecentActivityController;
 
 import android.content.Context;
 import android.util.Log;
@@ -105,13 +104,6 @@ public class EBookDroidApp extends BaseDroidApp implements IAppSettingsChangeLis
                 b.setPositiveButton(android.R.string.ok, R.id.actions_no_action);
                 b.show();
             }
-        }
-    }
-
-    public static void onActivityClose(final boolean finishing) {
-        if (finishing && !SettingsManager.hasOpenedBooks() && !RecentActivityController.working.get()) {
-            Log.i(APP_NAME, "Application finished");
-            System.exit(0);
         }
     }
 }

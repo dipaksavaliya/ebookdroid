@@ -10,19 +10,19 @@ import org.ebookdroid.ui.library.views.FileBrowserView;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
@@ -30,12 +30,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
-import org.emdev.common.android.AndroidVersion;
-import org.emdev.common.log.LogContext;
-import org.emdev.common.log.LogManager;
-import org.emdev.ui.AbstractActionActivity;
+import org.emdev.ui.AbstractActionFragment;
+import org.emdev.ui.actions.ActionMenuHelper;
 import org.emdev.ui.actions.ActionMethodDef;
 import org.emdev.ui.actions.ActionTarget;
 import org.emdev.ui.uimanager.IUIManager;
@@ -49,127 +46,60 @@ actions = {
 @ActionMethodDef(id = R.id.mainmenu_about, method = "showAbout")
 // finish
 })
-public class BrowserActivity extends AbstractActionActivity<BrowserActivity, BrowserActivityController> {
+public class FileBrowserFragment extends AbstractActionFragment<FileBrowserFragment, FileBrowserFragmentController> {
 
     private static final String CURRENT_DIRECTORY = "currentDirectory";
-
-    private static final AtomicLong SEQ = new AtomicLong();
-
-    public final LogContext LCTX;
 
     ViewFlipper viewflipper;
     TextView header;
 
-    public BrowserActivity() {
+    public FileBrowserFragment() {
         super();
-        LCTX = LogManager.root().lctx(this.getClass().getSimpleName(), true).lctx("" + SEQ.getAndIncrement(), true);
+        setHasOptionsMenu(true);
+    }
+
+    public FileBrowserFragment(FileBrowserFragmentController fileBrowserFragmentController) {
+        super(fileBrowserFragmentController);
+        setHasOptionsMenu(true);
     }
 
     @Override
-    protected BrowserActivityController createController() {
-        return new BrowserActivityController(this);
+    protected FileBrowserFragmentController createController() {
+        return new FileBrowserFragmentController(this);
     }
 
     @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onCreate()");
-        }
-
-        super.onCreate(savedInstanceState);
-
-        BrowserActivityController c = restoreController();
-        if (c == null) {
-            c = getController();
-            c.onCreate();
-        }
-
-        IUIManager.instance.setTitleVisible(this, !AndroidVersion.lessThan3x, true);
-        setContentView(R.layout.browser);
-
-        header = (TextView) findViewById(R.id.browsertext);
-        viewflipper = (ViewFlipper) findViewById(R.id.browserflip);
-        viewflipper.addView(LayoutUtils.fillInParent(viewflipper, new FileBrowserView(c, c.adapter)));
-
-        if (AndroidVersion.VERSION == 3) {
-            setActionForView(R.id.browserhome);
-            setActionForView(R.id.browserupfolder);
-            setActionForView(R.id.browserrecent);
-        }
+    protected View onCreateViewImpl(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.browser, container, false);
+        header = (TextView) root.findViewById(R.id.browsertext);
+        viewflipper = (ViewFlipper) root.findViewById(R.id.browserflip);
+        viewflipper.addView(LayoutUtils.fillInParent(viewflipper, new FileBrowserView(controller, controller.adapter)));
+        return root;
     }
 
     @Override
-    protected void onPostCreate(final Bundle savedInstanceState) {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onPostCreate()");
-        }
-        super.onPostCreate(savedInstanceState);
-
-        getController().onPostCreate(savedInstanceState);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        final MenuInflater inflater = getMenuInflater();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.browsermenu, menu);
-        return true;
-    }
-
-    @Override
-    protected void updateMenuItems(final Menu optionsMenu) {
-
-        final File dir = getController().adapter.getCurrentDirectory();
-        final boolean hasParent = dir != null ? dir.getParentFile() != null : false;
-
-        setMenuItemEnabled(optionsMenu, hasParent, R.id.browserupfolder, R.drawable.browser_actionbar_nav_up_enabled,
-                R.drawable.browser_actionbar_nav_up_disabled);
     }
 
     void setTitle(final File dir) {
-
         String path = dir.getAbsolutePath();
-        if (AndroidVersion.lessThan3x) {
-            header.setText(path);
-            final ImageView view = (ImageView) findViewById(R.id.browserupfolder);
-            if (view != null) {
-                final boolean hasParent = dir.getParentFile() != null;
-                view.setImageResource(hasParent ? R.drawable.browser_actionbar_nav_up_enabled
-                        : R.drawable.browser_actionbar_nav_up_disabled);
-            }
-        } else {
-            setTitle(path);
-            IUIManager.instance.invalidateOptionsMenu(this);
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(CURRENT_DIRECTORY, getController().adapter.getCurrentDirectory().getAbsolutePath());
-    }
-
-    @Override
-    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
-        if (getController().onKeyDown(keyCode, event)) {
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
+        getActivity().setTitle(path);
+        IUIManager.instance.invalidateOptionsMenu(getActivity());
     }
 
     public void showProgress(final boolean show) {
-        if (!AndroidVersion.lessThan3x) {
-            runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
 
-                @Override
-                public void run() {
-                    try {
-                        setProgressBarIndeterminateVisibility(show);
-                        getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
-                    } catch (final Throwable e) {
-                    }
+            @Override
+            public void run() {
+                try {
+                    getActivity().setProgressBarIndeterminateVisibility(show);
+                    getActivity().getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, !show ? 10000 : 1);
+                } catch (final Throwable e) {
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override
@@ -187,7 +117,7 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
             }
         }
 
-        setMenuSource(menu, source);
+        ActionMenuHelper.setMenuSource(getController(), menu, source);
     }
 
     protected Object getContextMenuSource(final View v, final ContextMenuInfo menuInfo) {
@@ -215,7 +145,7 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
 
     protected void createFileMenu(final ContextMenu menu, final String path) {
         final BookSettings bs = SettingsManager.getBookSettings(path);
-        final MenuInflater inflater = getMenuInflater();
+        final MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.book_menu, menu);
         menu.setHeaderTitle(path);
         menu.findItem(R.id.bookmenu_recentgroup).setVisible(bs != null);
@@ -248,11 +178,11 @@ public class BrowserActivity extends AbstractActionActivity<BrowserActivity, Bro
     protected void addBookmarkMenuItem(final Menu menu, final Bookmark b) {
         final MenuItem bmi = menu.add(R.id.actions_goToBookmarkGroup, R.id.actions_goToBookmark, Menu.NONE, b.name);
         bmi.setIcon(R.drawable.viewer_menu_bookmark);
-        setMenuItemExtra(bmi, "bookmark", b);
+        ActionMenuHelper.setMenuItemExtra(bmi, "bookmark", b);
     }
 
     protected void createFolderMenu(final ContextMenu menu, final String path) {
-        final MenuInflater inflater = getMenuInflater();
+        final MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.library_menu, menu);
         menu.setHeaderTitle(path);
     }

@@ -1,7 +1,7 @@
 package org.ebookdroid.core.codec;
 
 import org.ebookdroid.common.settings.AppSettings;
-import org.ebookdroid.ui.viewer.ViewerActivity;
+import org.ebookdroid.ui.EBookDroidActivity;
 
 import android.graphics.Bitmap;
 
@@ -97,11 +97,11 @@ public abstract class AbstractCodecContext implements CodecContext {
     }
 
     public static int getWidthInPixels(final float pdfWidth) {
-        return getSizeInPixels(pdfWidth, AppSettings.current().getXDpi(ViewerActivity.DM.xdpi));
+        return getSizeInPixels(pdfWidth, AppSettings.current().getXDpi(EBookDroidActivity.DM.xdpi));
     }
 
     public static int getHeightInPixels(final float pdfHeight) {
-        return getSizeInPixels(pdfHeight, AppSettings.current().getYDpi(ViewerActivity.DM.ydpi));
+        return getSizeInPixels(pdfHeight, AppSettings.current().getYDpi(EBookDroidActivity.DM.ydpi));
     }
 
     public static int getSizeInPixels(final float pdfHeight, float dpi) {
@@ -118,8 +118,8 @@ public abstract class AbstractCodecContext implements CodecContext {
     private static int getDensityDPI() {
         if (densityDPI == null) {
             try {
-                final Field f = ViewerActivity.DM.getClass().getDeclaredField("densityDpi");
-                densityDPI = ((Integer) f.get(ViewerActivity.DM));
+                final Field f = EBookDroidActivity.DM.getClass().getDeclaredField("densityDpi");
+                densityDPI = ((Integer) f.get(EBookDroidActivity.DM));
             } catch (final Throwable ex) {
                 densityDPI = Integer.valueOf(120);
             }

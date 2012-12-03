@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
-import org.emdev.ui.actions.ActionController;
+import org.emdev.ui.AbstractActivityController;
 import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
 import org.emdev.ui.actions.ActionMethod;
@@ -36,7 +36,7 @@ import org.emdev.ui.actions.params.EditableValue.PasswordEditable;
 import org.emdev.utils.LengthUtils;
 
 @TargetApi(8)
-public class OPDSActivityController extends ActionController<OPDSActivity> implements
+public class OPDSActivityController extends AbstractActivityController<OPDSActivity> implements
         ExpandableListView.OnGroupClickListener, ExpandableListView.OnChildClickListener, FeedListener {
 
     public final LogContext LCTX;
@@ -52,10 +52,9 @@ public class OPDSActivityController extends ActionController<OPDSActivity> imple
         LCTX = LogManager.root().lctx(this.getClass().getSimpleName(), true).lctx("" + SEQ.getAndIncrement());
     }
 
-    public void onCreate() {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onCreate(): " + getManagedComponent());
-        }
+    @Override
+    public void afterCreate() {
+        super.afterCreate();
         final OPDSActivity activity = getManagedComponent();
 
         adapter = new OPDSAdapter(activity, this);
@@ -68,23 +67,17 @@ public class OPDSActivityController extends ActionController<OPDSActivity> imple
         goHome(null);
     }
 
-    public void onRestore(final OPDSActivity activity) {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onRestore(): " + getManagedComponent());
-        }
-        setManagedComponent(activity);
+    @Override
+    public void onRecreate(final OPDSActivity activity) {
+        super.onRecreate(activity);
+
         activity.list.setOnGroupClickListener(this);
         activity.list.setOnChildClickListener(this);
         activity.list.setAdapter(adapter);
         activity.onCurrrentFeedChanged(adapter.getCurrentFeed());
     }
 
-    public void onPostCreate() {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("onPostCreate()");
-        }
-    }
-
+    @Override
     public void onDestroy(final boolean finishing) {
         if (LCTX.isDebugEnabled()) {
             LCTX.d("onDestroy(): " + finishing);
@@ -204,7 +197,7 @@ public class OPDSActivityController extends ActionController<OPDSActivity> imple
         authCheck.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
                 loginText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
                 loginEdit.setVisibility(isChecked ? View.VISIBLE : View.GONE);
                 passwordText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
@@ -261,7 +254,7 @@ public class OPDSActivityController extends ActionController<OPDSActivity> imple
         authCheck.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
                 loginText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
                 loginEdit.setVisibility(isChecked ? View.VISIBLE : View.GONE);
                 passwordText.setVisibility(isChecked ? View.VISIBLE : View.GONE);

@@ -48,11 +48,15 @@ import android.database.Cursor;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -64,17 +68,16 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.backup.BackupManager;
 import org.emdev.common.filesystem.PathFromUri;
-import org.emdev.common.log.LogContext;
 import org.emdev.common.log.LogManager;
-import org.emdev.ui.actions.ActionController;
+import org.emdev.ui.AbstractFragmentController;
 import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
+import org.emdev.ui.actions.ActionMenuHelper;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.ActionMethodDef;
 import org.emdev.ui.actions.ActionTarget;
@@ -119,16 +122,17 @@ actions = {
         @ActionMethodDef(id = R.id.mainmenu_close, method = "closeActivity")
 // finish
 })
-public class ViewerActivityController extends ActionController<ViewerActivity> implements IActivityController,
-        DecodingProgressListener, CurrentPageListener, IAppSettingsChangeListener, IBookSettingsChangeListener {
+public class ViewerFragmentController extends AbstractFragmentController<ViewerFragment> implements
+        IActivityController, DecodingProgressListener, CurrentPageListener, IAppSettingsChangeListener,
+        IBookSettingsChangeListener {
+
+    public static final String BUNDLE_URI = "uri";
+
+    public static final String BUNDLE_SCHEME = "scheme";
+
+    public static final String BUNDLE_TYPE = "type";
 
     private static final String E_MAIL_ATTACHMENT = "[E-mail Attachment]";
-
-    private static final AtomicLong SEQ = new AtomicLong();
-
-    private final LogContext LCTX;
-
-    private final long id;
 
     private final AtomicReference<IViewController> ctrl = new AtomicReference<IViewController>(ViewContollerStub.STUB);
 
@@ -146,8 +150,6 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     private CodecType codecType;
 
-    private final Intent intent;
-
     private int loadingCount = 0;
 
     private String m_fileName;
@@ -161,23 +163,15 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     /**
      * Instantiates a new base viewer activity.
      */
-    public ViewerActivityController(final ViewerActivity activity) {
-        super(activity);
-        id = SEQ.getAndIncrement();
-        LCTX = LogManager.root().lctx("Controller", true).lctx("" + id, true);
-        this.intent = activity.getIntent();
+    public ViewerFragmentController(final ViewerFragment fragment) {
+        super(fragment);
         SettingsManager.addListener(this);
-
         history = new NavigationHistory(this);
     }
 
-    public void beforeCreate(final ViewerActivity activity) {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("beforeCreate(): " + activity.LCTX);
-        }
-        if (getManagedComponent() != activity) {
-            setManagedComponent(activity);
-        }
+    @Override
+    public void afterAttach(final Activity activity) {
+        super.afterAttach(activity);
 
         final AppSettings newSettings = AppSettings.current();
 
@@ -188,43 +182,44 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         KeyBindingsManager.loadFromSettings(newSettings);
     }
 
-    public void afterCreate() {
+    @Override
+    public void afterCreateView() {
         if (LCTX.isDebugEnabled()) {
             LCTX.d("afterCreate()");
         }
 
-        final ViewerActivity activity = getManagedComponent();
+        final ViewerFragment fragment = getFragment();
         final AppSettings appSettings = AppSettings.current();
 
-        IUIManager.instance.setFullScreenMode(activity, getManagedComponent().view.getView(), appSettings.fullScreen);
+        IUIManager.instance.setFullScreenMode(getActivity(), getManagedComponent().view.getView(),
+                appSettings.fullScreen);
 
-        createAction(R.id.mainmenu_crop).putValue("view", activity.getManualCropControls()).putValue("mode",
+        createAction(R.id.mainmenu_crop).putValue("view", fragment.getManualCropControls()).putValue("mode",
                 DocumentViewMode.SINGLE_PAGE);
-        createAction(R.id.mainmenu_zoom).putValue("view", activity.getZoomControls());
-        createAction(R.id.mainmenu_search).putValue("view", activity.getSearchControls());
-        createAction(R.id.actions_toggleTouchManagerView).putValue("view", activity.getTouchView());
+        createAction(R.id.mainmenu_zoom).putValue("view", fragment.getZoomControls());
+        createAction(R.id.mainmenu_search).putValue("view", fragment.getSearchControls());
+        createAction(R.id.actions_toggleTouchManagerView).putValue("view", fragment.getTouchView());
 
         if (++loadingCount == 1) {
             documentModel = ActivityControllerStub.DM_STUB;
             searchModel = new SearchModel(this);
 
-            if (intent == null) {
-                showErrorDlg(R.string.msg_bad_intent, intent);
-                return;
-            }
-            final String scheme = intent.getScheme();
-            if (LengthUtils.isEmpty(scheme)) {
-                showErrorDlg(R.string.msg_bad_intent, intent);
-                return;
-            }
-            final Uri data = intent.getData();
+            final Bundle args = getFragment().getArguments();
+            final Uri data = args.getParcelable(BUNDLE_URI);
+            final String scheme = args.getString(BUNDLE_SCHEME);
+
             if (data == null) {
-                showErrorDlg(R.string.msg_no_intent_data, intent);
+                showErrorDlg(R.string.msg_no_intent_data, "");
                 return;
             }
+            if (LengthUtils.isEmpty(scheme)) {
+                showErrorDlg(R.string.msg_bad_intent, "");
+                return;
+            }
+
             if (scheme.equals("content")) {
                 try {
-                    final Cursor c = activity.getContentResolver().query(data, null, null, null, null);
+                    final Cursor c = fragment.getActivity().getContentResolver().query(data, null, null, null, null);
                     c.moveToFirst();
                     final int fileNameColumnId = c.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME);
                     if (fileNameColumnId >= 0) {
@@ -244,7 +239,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 bookTitle = LengthUtils.safeString(data.getLastPathSegment(), E_MAIL_ATTACHMENT);
                 codecType = CodecType.getByUri(data.toString());
                 if (codecType == null) {
-                    final String type = intent.getType();
+                    final String type = args.getString(BUNDLE_TYPE);
                     LCTX.i("Book mime type: " + type);
                     if (LengthUtils.isNotEmpty(type)) {
                         codecType = CodecType.getByMimeType(type);
@@ -260,9 +255,9 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             }
 
             documentModel = new DocumentModel(codecType);
-            documentModel.addListener(ViewerActivityController.this);
+            documentModel.addListener(ViewerFragmentController.this);
             progressModel = new DecodingProgressModel();
-            progressModel.addListener(ViewerActivityController.this);
+            progressModel.addListener(ViewerFragmentController.this);
 
             final Uri uri = data;
             m_fileName = "";
@@ -272,24 +267,17 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 m_fileName = E_MAIL_ATTACHMENT;
                 CacheManager.clear(m_fileName);
             } else {
-                m_fileName = PathFromUri.retrieve(activity.getContentResolver(), uri);
+                m_fileName = PathFromUri.retrieve(fragment.getActivity().getContentResolver(), uri);
             }
 
-            bookSettings = SettingsManager.create(id, m_fileName, temporaryBook, intent);
+            bookSettings = SettingsManager.create(0, m_fileName, temporaryBook, args);
             SettingsManager.applyBookSettingsChanges(null, bookSettings);
         }
     }
 
-    public void beforePostCreate() {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("beforePostCreate()");
-        }
-    }
-
-    public void afterPostCreate() {
-        if (LCTX.isDebugEnabled()) {
-            LCTX.d("afterPostCreate()");
-        }
+    @Override
+    public void onStart() {
+        super.onStart();
         setWindowTitle();
         if (loadingCount == 1 && documentModel != ActivityControllerStub.DM_STUB) {
             startDecoding(m_fileName, "");
@@ -300,24 +288,28 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         getManagedComponent().view.post(new BookLoadTask(fileName, password));
     }
 
+    @Override
     public void beforeResume() {
         if (LCTX.isDebugEnabled()) {
             LCTX.d("beforeResume()");
         }
     }
 
+    @Override
     public void afterResume() {
         if (LCTX.isDebugEnabled()) {
             LCTX.d("afterResume()");
         }
     }
 
+    @Override
     public void beforePause() {
         if (LCTX.isDebugEnabled()) {
             LCTX.d("beforePause()");
         }
     }
 
+    @Override
     public void afterPause() {
         if (LCTX.isDebugEnabled()) {
             LCTX.d("afterPause()");
@@ -354,11 +346,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     }
 
     public void askPassword(final String fileName, final int promtId) {
-        final EditText input = new EditText(getManagedComponent());
+        final EditText input = new EditText(getActivity());
         input.setSingleLine(true);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getActivity(), this);
         builder.setTitle(fileName).setMessage(promtId).setView(input);
         builder.setPositiveButton(R.id.actions_redecodingWithPassword, new EditableValue("input", input), new Constant(
                 "fileName", fileName));
@@ -366,7 +358,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     }
 
     public void showErrorDlg(final int msgId, final Object... args) {
-        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getActivity(), this);
 
         builder.setTitle(R.string.error_dlg_title);
         builder.setMessage(msgId, args);
@@ -401,13 +393,18 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     }
 
     @Override
+    public void zoomChanged(final float newZoom) {
+        getFragment().zoomChanged(newZoom);
+    }
+
+    @Override
     public void decodingProgressChanged(final int currentlyDecoding) {
         final Runnable r = new Runnable() {
 
             @Override
             public void run() {
                 try {
-                    final ViewerActivity activity = getManagedComponent();
+                    final Activity activity = getActivity();
                     activity.setProgressBarIndeterminateVisibility(currentlyDecoding > 0);
                     activity.getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS,
                             currentlyDecoding == 0 ? 10000 : currentlyDecoding);
@@ -461,12 +458,12 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     public void setWindowTitle() {
         bookTitle = StringUtils.cleanupTitle(bookTitle);
-        getManagedComponent().getWindow().setTitle(bookTitle);
+        getActivity().getWindow().setTitle(bookTitle);
     }
 
     @ActionMethod(ids = R.id.actions_openOptionsMenu)
     public void openOptionsMenu(final ActionEx action) {
-        IUIManager.instance.openOptionsMenu(getManagedComponent(), getManagedComponent().view.getView());
+        IUIManager.instance.openOptionsMenu(getActivity(), getManagedComponent().view.getView());
     }
 
     @ActionMethod(ids = R.id.actions_gotoOutlineItem)
@@ -536,12 +533,12 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @ActionMethod(ids = R.id.mainmenu_booksettings)
     public void showBookSettings(final ActionEx action) {
-        SettingsUI.showBookSettings(getManagedComponent(), bookSettings.fileName);
+        SettingsUI.showBookSettings(getActivity(), bookSettings.fileName);
     }
 
     @ActionMethod(ids = R.id.mainmenu_settings)
     public void showAppSettings(final ActionEx action) {
-        SettingsUI.showAppSettings(getManagedComponent(), bookSettings.fileName);
+        SettingsUI.showAppSettings(getActivity(), bookSettings.fileName);
     }
 
     @ActionMethod(ids = R.id.mainmenu_fullscreen)
@@ -588,12 +585,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         final BookSettings bs = getBookSettings();
         final int offset = bs != null ? bs.firstPageOffset : 1;
 
-        final EditText input = (EditText) LayoutInflater.from(getManagedComponent()).inflate(R.layout.bookmark_edit,
-                null);
+        final EditText input = (EditText) LayoutInflater.from(getActivity()).inflate(R.layout.bookmark_edit, null);
         input.setText(getManagedComponent().getString(R.string.text_page) + " " + (page + offset));
         input.selectAll();
 
-        final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+        final ActionDialogBuilder builder = new ActionDialogBuilder(getActivity(), this);
         builder.setTitle(R.string.menu_add_bookmark).setMessage(message).setView(input);
         builder.setPositiveButton(R.id.actions_addBookmark, new EditableValue("input", input));
         builder.setNegativeButton().show();
@@ -610,7 +606,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             bookSettings.bookmarks.add(new Bookmark(name, documentModel.getCurrentIndex(), pos.x, pos.y));
             Collections.sort(bookSettings.bookmarks);
             SettingsManager.storeBookSettings(bookSettings);
-            IUIManager.instance.invalidateOptionsMenu(getManagedComponent());
+            IUIManager.instance.invalidateOptionsMenu(getActivity());
         }
     }
 
@@ -677,17 +673,12 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
     @Override
     public final Context getContext() {
-        return getManagedComponent();
+        return getActivity();
     }
 
     @Override
     public final IView getView() {
         return getManagedComponent().view;
-    }
-
-    @Override
-    public final Activity getActivity() {
-        return getManagedComponent();
     }
 
     @Override
@@ -721,7 +712,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 mcv.initControls();
             }
         }
-        IUIManager.instance.invalidateOptionsMenu(getManagedComponent());
+        IUIManager.instance.invalidateOptionsMenu(getActivity());
     }
 
     public final boolean dispatchKeyEvent(final KeyEvent event) {
@@ -744,7 +735,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                             }
 
                             if (AppSettings.current().confirmClose) {
-                                final ActionDialogBuilder builder = new ActionDialogBuilder(getManagedComponent(), this);
+                                final ActionDialogBuilder builder = new ActionDialogBuilder(getActivity(), this);
                                 builder.setTitle(R.string.confirmclose_title);
                                 builder.setMessage(R.string.confirmclose_msg);
                                 builder.setPositiveButton(R.id.mainmenu_close);
@@ -770,8 +761,8 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         if (temporaryBook) {
             CacheManager.clear(E_MAIL_ATTACHMENT);
         }
-        SettingsManager.releaseBookSettings(id, bookSettings);
-        getManagedComponent().finish();
+        SettingsManager.releaseBookSettings(0, bookSettings);
+        getActivity().finish();
     }
 
     /**
@@ -783,7 +774,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
     @Override
     public void onAppSettingsChanged(final AppSettings oldSettings, final AppSettings newSettings,
             final AppSettings.Diff diff) {
-        final ViewerActivity activity = getManagedComponent();
+        final Activity activity = getActivity();
         if (diff.isRotationChanged()) {
             if (bookSettings != null) {
                 activity.setRequestedOrientation(bookSettings.getOrientation(newSettings));
@@ -793,7 +784,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         if (diff.isFullScreenChanged()) {
-            IUIManager.instance.setFullScreenMode(activity, activity.view.getView(), newSettings.fullScreen);
+            IUIManager.instance.setFullScreenMode(activity, getView().getView(), newSettings.fullScreen);
         }
 
         if (!diff.isFirstTime() && diff.isShowTitleChanged()) {
@@ -801,7 +792,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         if (diff.isKeepScreenOnChanged()) {
-            activity.view.getView().setKeepScreenOn(newSettings.keepScreenOn);
+            getView().getView().setKeepScreenOn(newSettings.keepScreenOn);
         }
 
         if (diff.isTapConfigChanged()) {
@@ -816,7 +807,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             getDocumentController().updateMemorySettings();
         }
 
-        IUIManager.instance.invalidateOptionsMenu(getManagedComponent());
+        IUIManager.instance.invalidateOptionsMenu(getActivity());
     }
 
     /**
@@ -844,7 +835,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         }
 
         if (diff.isRotationChanged()) {
-            getManagedComponent().setRequestedOrientation(newSettings.getOrientation(AppSettings.current()));
+            getActivity().setRequestedOrientation(newSettings.getOrientation(AppSettings.current()));
         }
 
         if (diff.isFirstTime()) {
@@ -868,7 +859,51 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
 
         currentPageChanged(PageIndex.NULL, documentModel.getCurrentIndex());
 
-        IUIManager.instance.invalidateOptionsMenu(getManagedComponent());
+        IUIManager.instance.invalidateOptionsMenu(getActivity());
+    }
+
+    @Override
+    public void updateMenuItems(final Menu menu) {
+        final AppSettings as = AppSettings.current();
+
+        ActionMenuHelper.setMenuItemChecked(menu, as.fullScreen, R.id.mainmenu_fullscreen);
+
+        if (!AndroidVersion.lessThan3x) {
+            ActionMenuHelper.setMenuItemChecked(menu, as.showTitle, R.id.mainmenu_showtitle);
+        } else {
+            ActionMenuHelper.setMenuItemVisible(menu, false, R.id.mainmenu_showtitle);
+        }
+
+        ActionMenuHelper.setMenuItemChecked(menu, getFragment().getZoomControls().getVisibility() == View.VISIBLE,
+                R.id.mainmenu_zoom);
+
+        final BookSettings bs = getBookSettings();
+        if (bs == null) {
+            return;
+        }
+
+        ActionMenuHelper.setMenuItemChecked(menu, bs.nightMode, R.id.mainmenu_nightmode);
+        ActionMenuHelper.setMenuItemChecked(menu, bs.cropPages, R.id.mainmenu_croppages);
+        ActionMenuHelper.setMenuItemChecked(menu, bs.splitPages, R.id.mainmenu_splitpages,
+                R.drawable.viewer_menu_split_pages, R.drawable.viewer_menu_split_pages_off);
+
+        final MenuItem navMenu = menu.findItem(R.id.mainmenu_nav_menu);
+        if (navMenu != null) {
+            final SubMenu subMenu = navMenu.getSubMenu();
+            subMenu.removeGroup(R.id.actions_goToBookmarkGroup);
+            if (AppSettings.current().showBookmarksInMenu && LengthUtils.isNotEmpty(bs.bookmarks)) {
+                for (final Bookmark b : bs.bookmarks) {
+                    addBookmarkMenuItem(subMenu, b);
+                }
+            }
+        }
+
+    }
+
+    protected void addBookmarkMenuItem(final Menu menu, final Bookmark b) {
+        final MenuItem bmi = menu.add(R.id.actions_goToBookmarkGroup, R.id.actions_goToBookmark, Menu.NONE, b.name);
+        bmi.setIcon(R.drawable.viewer_menu_bookmark);
+        ActionMenuHelper.setMenuItemExtra(bmi, "bookmark", b);
     }
 
     final class BookLoadTask extends BaseAsyncTask<String, Throwable> implements IProgressIndicator, Runnable {
@@ -877,7 +912,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         private final String m_password;
 
         public BookLoadTask(final String fileName, final String password) {
-            super(getManagedComponent(), R.string.msg_loading, false);
+            super(getActivity(), R.string.msg_loading, false);
             m_fileName = fileName;
             m_password = password;
         }
@@ -891,8 +926,11 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
         protected Throwable doInBackground(final String... params) {
             LCTX.d("BookLoadTask.doInBackground(): start");
             try {
-                if (intent.getScheme().equals("content")) {
-                    final File tempFile = org.emdev.common.cache.CacheManager.createTempFile(intent.getData());
+                final Bundle intent = getFragment().getArguments();
+                final String scheme = intent.getString(BUNDLE_SCHEME);
+                if ("content".equals(scheme)) {
+                    final Uri data = intent.getParcelable(BUNDLE_URI);
+                    final File tempFile = org.emdev.common.cache.CacheManager.createTempFile(data);
                     m_fileName = tempFile.getAbsolutePath();
                 }
                 getView().waitForInitialization();
@@ -944,7 +982,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                     showErrorDlg(R.string.msg_unexpected_error, msg);
                 } else {
                     if (codecType != null && codecType.useCustomFonts) {
-                        EBookDroidApp.checkInstalledFonts(getManagedComponent());
+                        EBookDroidApp.checkInstalledFonts(getActivity());
                     }
                 }
             } catch (final Throwable th) {
@@ -1026,7 +1064,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 getDocumentController().goToLink(targetPage.index.docIndex, newRect,
                         AppSettings.current().storeSearchGotoHistory);
             } else {
-                Toast.makeText(getManagedComponent(), R.string.msg_no_text_found, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.msg_no_text_found, Toast.LENGTH_LONG).show();
             }
             getDocumentController().redrawView();
         }
@@ -1039,7 +1077,7 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
             }
             final String last = values[length - 1];
             if (progressDialog == null || !progressDialog.isShowing()) {
-                progressDialog = ProgressDialog.show(getManagedComponent(), "", last, true);
+                progressDialog = ProgressDialog.show(getActivity(), "", last, true);
                 progressDialog.setCancelable(true);
                 progressDialog.setCanceledOnTouchOutside(true);
                 progressDialog.setOnCancelListener(this);
@@ -1047,5 +1085,10 @@ public class ViewerActivityController extends ActionController<ViewerActivity> i
                 progressDialog.setMessage(last);
             }
         }
+    }
+
+    @Override
+    public ViewerFragment createFragment() {
+        return new ViewerFragment(this);
     }
 }

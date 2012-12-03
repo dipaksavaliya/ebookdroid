@@ -13,9 +13,7 @@ import org.ebookdroid.ui.library.dialogs.FolderDlg;
 import org.ebookdroid.ui.library.tasks.CopyBookTask;
 import org.ebookdroid.ui.library.tasks.MoveBookTask;
 import org.ebookdroid.ui.library.tasks.RenameBookTask;
-import org.ebookdroid.ui.opds.OPDSActivity;
 import org.ebookdroid.ui.settings.SettingsUI;
-import org.ebookdroid.ui.viewer.ViewerActivity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -37,10 +36,10 @@ import org.emdev.common.android.AndroidVersion;
 import org.emdev.common.filesystem.CompositeFilter;
 import org.emdev.common.filesystem.DirectoryFilter;
 import org.emdev.common.filesystem.PathFromUri;
-import org.emdev.ui.AbstractActionActivity;
-import org.emdev.ui.actions.ActionController;
+import org.emdev.ui.AbstractFragmentController;
 import org.emdev.ui.actions.ActionDialogBuilder;
 import org.emdev.ui.actions.ActionEx;
+import org.emdev.ui.actions.ActionMenuHelper;
 import org.emdev.ui.actions.ActionMethod;
 import org.emdev.ui.actions.ActionMethodDef;
 import org.emdev.ui.actions.ActionTarget;
@@ -73,29 +72,32 @@ actions = {
         @ActionMethodDef(id = R.id.actions_doDeleteBook, method = "doDeleteBook")
 // finish
 })
-public class BrowserActivityController extends ActionController<BrowserActivity> implements IBrowserActivity {
+public class FileBrowserFragmentController extends AbstractFragmentController<FileBrowserFragment> implements IBrowserActivity {
 
     private static final String CURRENT_DIRECTORY = "currentDirectory";
 
     FileFilter filter;
     BrowserAdapter adapter;
 
-    public BrowserActivityController(final BrowserActivity activity) {
-        super(activity);
+    public FileBrowserFragmentController(final FileBrowserFragment fragment) {
+        super(fragment);
         this.filter = new CompositeFilter(false, DirectoryFilter.NOT_HIDDEN, LibSettings.current().allowedFileTypes);
     }
 
-    public void onCreate() {
+    public void beforeCreateView() {
+        super.beforeCreateView();
         adapter = new BrowserAdapter(filter);
     }
 
-    public void onPostCreate(final Bundle savedInstanceState) {
+    public void afterCreateView(final Bundle savedInstanceState) {
+        super.afterCreateView();
+
         goHome(null);
 
-        final BrowserActivity activity = getManagedComponent();
-        final Uri data = activity.getIntent().getData();
+        final FileBrowserFragment fragment = getManagedComponent();
+        final Uri data = fragment.getArguments().getParcelable("uri");
         if (data != null) {
-            setCurrentDir(new File(PathFromUri.retrieve(activity.getContentResolver(), data)));
+            setCurrentDir(new File(PathFromUri.retrieve(getContext().getContentResolver(), data)));
         } else if (savedInstanceState != null) {
             final String absolutePath = savedInstanceState.getString(CURRENT_DIRECTORY);
             if (absolutePath != null) {
@@ -113,12 +115,7 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
 
     @Override
     public Context getContext() {
-        return getManagedComponent();
-    }
-
-    @Override
-    public Activity getActivity() {
-        return getManagedComponent();
+        return getActivity();
     }
 
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
@@ -127,8 +124,6 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
             final File parent = dir != null ? dir.getParentFile() : null;
             if (parent != null) {
                 setCurrentDir(parent);
-            } else {
-                getManagedComponent().finish();
             }
             return true;
         }
@@ -155,35 +150,31 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
 
     @ActionMethod(ids = R.id.mainmenu_settings)
     public void showSettings(final ActionEx action) {
-        SettingsUI.showAppSettings(getManagedComponent(), null);
+        SettingsUI.showAppSettings(getActivity(), null);
     }
 
     @ActionMethod(ids = R.id.browserrecent)
     public void goRecent(final ActionEx action) {
-        final BrowserActivity activity = getManagedComponent();
-        final Intent myIntent = new Intent(activity, RecentActivity.class);
-        activity.startActivity(myIntent);
-        activity.finish();
+        getActivity().getFragmentManager().popBackStack();
     }
 
     @ActionMethod(ids = R.id.mainmenu_opds)
     public void goOPDSBrowser(final ActionEx action) {
-        final BrowserActivity activity = getManagedComponent();
-        final Intent myIntent = new Intent(activity, OPDSActivity.class);
-        activity.startActivity(myIntent);
+//        final BrowserActivity activity = getManagedComponent();
+//        final Intent myIntent = new Intent(activity, OPDSActivity.class);
+//        activity.startActivity(myIntent);
     }
 
     @Override
     public void showDocument(final Uri uri, final Bookmark b) {
-        final BrowserActivity activity = getManagedComponent();
         final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.setClass(activity, ViewerActivity.class);
+        intent.setClass(getActivity(), getActivity().getClass());
         if (b != null) {
             intent.putExtra("pageIndex", "" + b.page.viewIndex);
             intent.putExtra("offsetX", "" + b.offsetX);
             intent.putExtra("offsetY", "" + b.offsetY);
         }
-        activity.startActivity(intent);
+        getActivity().startActivity(intent);
     }
 
     @Override
@@ -194,7 +185,7 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
 
     @Override
     public void showProgress(final boolean show) {
-        final BrowserActivity activity = getManagedComponent();
+        final Activity activity = getActivity();
 
         if (!AndroidVersion.lessThan3x) {
             activity.runOnUiThread(new Runnable() {
@@ -218,7 +209,7 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
 
     @ActionMethod(ids = R.id.actions_goToBookmark)
     public void openBook(final ActionEx action) {
-        final File file = action.getParameter(AbstractActionActivity.MENU_ITEM_SOURCE);
+        final File file = action.getParameter(ActionMenuHelper.MENU_ITEM_SOURCE);
         if (!file.isDirectory()) {
             final Bookmark b = action.getParameter("bookmark");
             showDocument(Uri.fromFile(file), b);
@@ -227,7 +218,7 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
 
     @ActionMethod(ids = R.id.bookmenu_removefromrecent)
     public void removeBookFromRecents(final ActionEx action) {
-        final File file = action.getParameter(AbstractActionActivity.MENU_ITEM_SOURCE);
+        final File file = action.getParameter(ActionMenuHelper.MENU_ITEM_SOURCE);
         if (file != null) {
             SettingsManager.removeBookFromRecents(file.getAbsolutePath());
             adapter.notifyDataSetInvalidated();
@@ -236,7 +227,7 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
 
     @ActionMethod(ids = R.id.bookmenu_cleardata)
     public void removeCachedBookFiles(final ActionEx action) {
-        final File file = action.getParameter(AbstractActionActivity.MENU_ITEM_SOURCE);
+        final File file = action.getParameter(ActionMenuHelper.MENU_ITEM_SOURCE);
         if (file != null) {
             CacheManager.clear(file.getAbsolutePath());
             adapter.notifyDataSetInvalidated();
@@ -245,7 +236,7 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
 
     @ActionMethod(ids = R.id.bookmenu_deletesettings)
     public void removeBookSettings(final ActionEx action) {
-        final File file = action.getParameter(AbstractActionActivity.MENU_ITEM_SOURCE);
+        final File file = action.getParameter(ActionMenuHelper.MENU_ITEM_SOURCE);
         if (file != null) {
             final BookSettings bs = SettingsManager.getBookSettings(file.getAbsolutePath());
             if (bs != null) {
@@ -277,7 +268,7 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
         final File book = action.getParameter("source");
         final BookNode node = new BookNode(book, SettingsManager.getBookSettings(book.getAbsolutePath()));
 
-        new CopyBookTask(this.getManagedComponent(), null, targetFolder).execute(node);
+        new CopyBookTask(this.getActivity(), null, targetFolder).execute(node);
     }
 
     @ActionMethod(ids = R.id.actions_doMoveBook)
@@ -304,12 +295,12 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
         }
 
         final FileUtils.FilePath path = FileUtils.parseFilePath(file.getAbsolutePath(), CodecType.getAllExtensions());
-        final EditText input = new EditText(getManagedComponent());
+        final EditText input = new EditText(getActivity());
         input.setSingleLine();
         input.setText(path.name);
         input.selectAll();
 
-        final ActionDialogBuilder builder = new ActionDialogBuilder(this.getManagedComponent(), this);
+        final ActionDialogBuilder builder = new ActionDialogBuilder(this.getActivity(), this);
         builder.setTitle(R.string.book_rename_title);
         builder.setMessage(R.string.book_rename_msg);
         builder.setView(input);
@@ -364,4 +355,21 @@ public class BrowserActivityController extends ActionController<BrowserActivity>
             adapter.remove(file);
         }
     }
+
+    @Override
+    public FileBrowserFragment createFragment() {
+        return new FileBrowserFragment(this);
+    }
+
+    @Override
+    public void updateMenuItems(final Menu optionsMenu) {
+
+        final File dir = adapter.getCurrentDirectory();
+        final boolean hasParent = dir != null ? dir.getParentFile() != null : false;
+
+        ActionMenuHelper.setMenuItemEnabled(optionsMenu, hasParent, R.id.browserupfolder, R.drawable.browser_actionbar_nav_up_enabled,
+                R.drawable.browser_actionbar_nav_up_disabled);
+    }
+
+
 }

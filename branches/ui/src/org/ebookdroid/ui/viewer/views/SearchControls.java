@@ -1,8 +1,8 @@
 package org.ebookdroid.ui.viewer.views;
 
 import org.ebookdroid.R;
-import org.ebookdroid.ui.viewer.ViewerActivity;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import org.emdev.ui.actions.ActionEx;
+import org.emdev.ui.actions.IActionController;
 import org.emdev.ui.actions.params.Constant;
 import org.emdev.ui.actions.params.EditableValue;
 
@@ -20,18 +21,18 @@ public class SearchControls extends LinearLayout {
     private ImageButton m_prevButton;
     private ImageButton m_nextButton;
 
-    public SearchControls(final ViewerActivity parent) {
-        super(parent);
+    public SearchControls(final Context context, IActionController<?> parent) {
+        super(context);
         setVisibility(View.GONE);
         setOrientation(LinearLayout.VERTICAL);
 
-        LayoutInflater.from(parent).inflate(R.layout.seach_controls, this, true);
+        LayoutInflater.from(context).inflate(R.layout.seach_controls, this, true);
         m_prevButton = (ImageButton) findViewById(R.id.search_controls_prev);
         m_nextButton = (ImageButton) findViewById(R.id.search_controls_next);
         m_edit = (EditText) findViewById(R.id.search_controls_edit);
 
-        ActionEx forwardSearch = parent.getController().getOrCreateAction(R.id.actions_doSearch);
-        ActionEx backwardSearch = parent.getController().getOrCreateAction(R.id.actions_doSearchBack);
+        ActionEx forwardSearch = parent.getOrCreateAction(R.id.actions_doSearch);
+        ActionEx backwardSearch = parent.getOrCreateAction(R.id.actions_doSearchBack);
 
         forwardSearch.addParameter(new EditableValue("input", m_edit)).addParameter(new Constant("forward", "true"));
         backwardSearch.addParameter(new EditableValue("input", m_edit)).addParameter(new Constant("forward", "false"));

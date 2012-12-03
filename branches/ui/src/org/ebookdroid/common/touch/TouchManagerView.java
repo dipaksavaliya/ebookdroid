@@ -45,7 +45,7 @@ public class TouchManagerView extends View {
     public TouchManagerView(final IActivityController base) {
         super(base.getContext());
         this.base = base;
-        this.actions = new ActionController<TouchManagerView>(base, this);
+        this.actions = new ActionController<TouchManagerView>(base.getActionController(), this);
         this.detector = new DefaultGestureDetector(getContext(), new GestureListener());
 
         super.setVisibility(View.GONE);
