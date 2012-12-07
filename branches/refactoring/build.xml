@@ -1,4 +1,4 @@
-<project name="EBookDroid" basedir="." default="EBookDroid-dev">
+<project name="EBookDroid-ref" basedir="." default="EBookDroid-dev">
 
     <tstamp>
         <format property="debug.version" pattern="yyyyMMdd.HHmmss" />
