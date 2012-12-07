@@ -71,7 +71,6 @@ public class SettingsActivity extends BaseSettingsActivity {
         loadPreferences(root, R.xml.fragment_render);
         loadPreferences(root, R.xml.fragment_typespec);
         loadPreferences(root, R.xml.fragment_browser);
-        loadPreferences(root, R.xml.fragment_opds);
 
         loadPreferences(root, R.xml.fragment_backup);
 

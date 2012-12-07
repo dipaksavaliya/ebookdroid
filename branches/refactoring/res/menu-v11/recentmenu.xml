@@ -26,12 +26,6 @@
         android:showAsAction="ifRoom"
         android:title="Show files"/>
     <item
-        android:id="@+id/mainmenu_opds"
-        android:alphabeticShortcut="o"
-        android:icon="@drawable/recent_actionbar_opdsbrowser"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_opds"/>
-    <item
         android:id="@+id/recentmenu_cleanrecent"
         android:alphabeticShortcut="n"
         android:icon="@drawable/recent_actionbar_clear"

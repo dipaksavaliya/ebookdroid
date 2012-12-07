@@ -22,11 +22,6 @@
         android:icon="@drawable/recent_menu_backup"
         android:title="@string/menu_backupsettings"/>
     <item
-        android:id="@+id/mainmenu_opds"
-        android:alphabeticShortcut="o"
-        android:icon="@drawable/recent_menu_opdsbrowser"
-        android:title="@string/menu_opds"/>
-    <item
         android:id="@+id/mainmenu_about"
         android:icon="@drawable/common_menu_about"
         android:title="@string/menu_about"/>
