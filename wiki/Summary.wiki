@@ -1,13 +1,23 @@
-#summary EBookDroid is an open source (GPL'ed) document viewer for Android.
+#summary EBookDroid - _The_ Customizable ebook Reader
 
-EBookDroid is an open source (GPL'ed) document viewer for Android based on the [http://code.google.com/p/vudroid VuDroid] code base.
+EBookDroid is a highly customizable open source document viewer for Android. It is licensed under the GNU General Public License (GPL) and it stems from the [http://code.google.com/p/vudroid VuDroid] code base.
+EBookDroid supports the following ebook and document formats: PDF, Djvu, FictionBook (fb2 and fb2.zip), comics book formats (cbr and cbz) and XPS (OpenXPS). epub is not supported at the moment [_a_]. 
 
-Supported file formats:
- * PDF
- * DjVu
- * XPS (OpenXPS)
- * comics books (cbz,cbr)
- * FictionBook (fb2, fb2.zip)
+Collaboration with electronic publication sites and access to online ebook catalogs is allowed by the supported OPDS ( [http://en.wikipedia.org/wiki/OPDS Open Publication Distribution System) protocol.
+
+EBookDroid allows you to customize the way you read on a _per book_ basis: each document's layout can be tailored to give you the best reading experience and all the parameters will be remembered the next time you will access it.
+Whatever your document, be it a two-faced xerox, a book with wide asymmetric margins or a multi-column article, EBookDroid provides you with features to split pages, automatically or manually crop margins and instantly zoom to a column's content. Please refer to the *Wiki* section of the developer's website for further instructions (don't forget to read the *FAQ*).
+
+Should you experience any problems, please report them in the *Issues* section on the developer's website, at the following address: http://code.google.com/p/ebookdroid/.
+
+If the issues are related to a particular document, don't forget to attach it to your question to the developers.
+
+_Please note:_
+
+EbookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly from the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further instructions on how to do that. All MIME types supported by EBookDroid can be found in the *Wiki* section of the developer's website. 
+
+[_a_] There are plenty of free epub ebook reader around, but you can still use an external converter to turn your epubs into fb2 and enjoy them in EBookDroid.
+----
 
 This software contains:
  * [http://www.mupdf.com/ MuPDF]
@@ -15,7 +25,15 @@ This software contains:
  * [http://vtd-xml.sourceforge.net/ VTD-XML]
  * [http://www.rarlab.com/ unrar]
 
-On Google Play Market:
+Supported file formats:
+ * PDF
+ * DjVu
+ * XPS (OpenXPS)
+ * comics books (cbz,cbr)
+ * FictionBook (fb2, fb2.zip)
+----
+
+EBookDroid on Google Play Market:
  * [https://play.google.com/store/apps/details?id=org.ebookdroid EBookDroid]
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.legacy Legacy font pack]
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.nimbusl NimbusL font pack]
@@ -23,6 +41,6 @@ On Google Play Market:
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.scada Scada font pack]
  * [https://play.google.com/store/apps/details?id=org.ebookdroid.fontpack.urwsymbol URW Symbol font pack]
 
-On Google Code:
+EBookDroid on Google Code:
  * [http://code.google.com/p/ebookdroid/downloads/list EBookDroid]
  * [http://code.google.com/p/ebookdroid-fontpacks/downloads/list EBookDroid font packs]
