@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_full"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <FrameLayout
+        android:id="@+id/main_left"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:background="@color/main_left"
+        android:gravity="center" />
+
+    <FrameLayout
+        android:id="@+id/main_right"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:background="@color/main_right"
+        android:gravity="center" />
+
+    <FrameLayout
+        android:id="@+id/main_top"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/main_right"
+        android:layout_toRightOf="@+id/main_left"
+        android:background="@color/main_top" />
+
+    <FrameLayout
+        android:id="@+id/main_bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/main_central"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/main_right"
+        android:background="@color/main_bottom" >
+
+        <TextView
+            android:id="@+id/startup_msg"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|bottom"
+            android:gravity="center_horizontal"
+            android:singleLine="true"
+            android:text="Startup"
+            android:textSize="18dip" />
+    </FrameLayout>
+
+    <ViewFlipper
+        android:id="@+id/main_central"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/main_bottom"
+        android:layout_below="@+id/main_top"
+        android:layout_toLeftOf="@id/main_right"
+        android:layout_toRightOf="@id/main_left"
+        android:background="@color/main_center"
+        android:gravity="center" />
+
+</RelativeLayout>

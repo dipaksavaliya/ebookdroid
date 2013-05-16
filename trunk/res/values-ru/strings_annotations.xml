@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="ann_use_pressure">"Учитывать нажим"</string>
+    <string name="ann_change_color">"Сменить цвет"</string>
+    <string name="ann_thin_line">"Тонкая линия"</string>
+    <string name="ann_thick_line">"Линия"</string>
+    <string name="ann_thickest_line">"Толстая линия"</string>
+    <string name="ann_undo">"Назад"</string>
+    <string name="ann_clear">"Стереть все"</string>
+
+</resources>

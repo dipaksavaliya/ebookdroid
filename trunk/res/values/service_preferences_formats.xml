@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="pref_brfiletypes" translatable="false">brfiletypes</string>
+    <string name="pref_ft_djvu" translatable="false">djvu</string>
+
+    <string-array name="pref_ft_djvu_ext" translatable="false">
+        <item>djvu</item>
+        <item>djv</item>
+    </string-array>
+    <string-array name="pref_ft_djvu_mime" translatable="false">
+        <item>application/djvu</item>
+        <item>image/djvu</item>
+        <item>image/vnd.djvu</item>
+        <item>image/x-djvu</item>
+    </string-array>
+
+    <string name="pref_ft_pdf" translatable="false">pdf</string>
+
+    <string-array name="pref_ft_pdf_ext" translatable="false">
+        <item>pdf</item>
+    </string-array>
+    <string-array name="pref_ft_pdf_mime" translatable="false">
+        <item>application/pdf</item>
+    </string-array>
+
+    <string name="pref_ft_xps" translatable="false">xps</string>
+
+    <string-array name="pref_ft_xps_ext" translatable="false">
+        <item>xps</item>
+        <item>oxps</item>
+    </string-array>
+    <string-array name="pref_ft_xps_mime" translatable="false">
+        <item>application/vnd.ms-xpsdocument</item>
+        <item>application/oxps</item>
+    </string-array>
+
+    <string name="pref_ft_cbx" translatable="false">cbx</string>
+
+    <string-array name="pref_ft_cbx_ext" translatable="false">
+        <item>cbz</item>
+        <item>cbr</item>
+    </string-array>
+    <string-array name="pref_ft_cbx_mime" translatable="false">
+        <item>application/x-cbz</item>
+        <item>application/x-cbr</item>
+    </string-array>
+
+    <string name="pref_ft_fb2" translatable="false">fb2</string>
+
+    <string-array name="pref_ft_fb2_ext" translatable="false">
+        <item>fb2</item>
+        <item>fbz</item>
+        <item>fb2.zip</item>
+    </string-array>
+    <string-array name="pref_ft_fb2_mime" translatable="false">
+        <item>application/fb2</item>
+        <item>application/x-fb2</item>
+        <item>text/fb2+xml</item>
+    </string-array>
+
+    <string name="pref_ft_epub" translatable="false">epub</string>
+
+    <string-array name="pref_ft_epub_ext" translatable="false">
+        <item>epub</item>
+    </string-array>
+    <string-array name="pref_ft_epub_mime" translatable="false">
+        <item>application/epub+zip</item>
+    </string-array>
+
+    <string name="pref_ft_rtf" translatable="false">rtf</string>
+
+    <string-array name="pref_ft_rtf_ext" translatable="false">
+        <item>rtf</item>
+    </string-array>
+    <string-array name="pref_ft_rtf_mime" translatable="false">
+        <item>application/rtf</item>
+        <item>application/x-rtf</item>
+        <item>text/richtext</item>
+        <item>text/rtf</item>
+    </string-array>
+
+</resources>

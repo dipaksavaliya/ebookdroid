@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="text_copy">"Копировать"</string>
+    <string name="text_translate">"Перевести"</string>
+    <string name="text_highlight">"Выделить"</string>
+    <string name="text_clear">"Очистить выделение"</string>
+    <string name="text_selection_no_text">"Текст недоступен"</string>
+    <string name="text_selection_text_copied">"Текст скопирован в бувер обмена"</string>
+
+</resources>

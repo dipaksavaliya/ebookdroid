@@ -1,0 +1,64 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:ebookdroid="http://ebookdroid.org"
+        android:key="browserscreen"
+        android:summary="@string/pref_browser_category_summary"
+        android:title="@string/pref_browser_category" >
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_usebookcase_defvalue"
+            android:key="@string/pref_usebookcase_id"
+            android:summary="@string/pref_usebookcase_summary"
+            android:title="@string/pref_usebookcase_title" />
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_brautoscandir_defvalue"
+            android:key="@string/pref_brautoscandir_id"
+            android:summary="@string/pref_brautoscandir_summary"
+            android:title="@string/pref_brautoscandir_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_savescanresults_defvalue"
+            android:key="@string/pref_savescanresults_id"
+            android:summary="@string/pref_savescanresults_summary"
+            android:title="@string/pref_savescanresults_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_autoscanremovable_defvalue"
+            android:key="@string/pref_autoscanremovable_id"
+            android:summary="@string/pref_autoscanremovable_summary"
+            android:title="@string/pref_autoscanremovable_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_showremovable_defvalue"
+            android:key="@string/pref_showremovable_id"
+            android:summary="@string/pref_showremovable_summary"
+            android:title="@string/pref_showremovable_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_showscanning_defvalue"
+            android:key="@string/pref_showscanning_id"
+            android:summary="@string/pref_showscanning_summary"
+            android:title="@string/pref_showscanning_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_shownotifications_defvalue"
+            android:key="@string/pref_shownotifications_id"
+            android:summary="@string/pref_shownotifications_summary"
+            android:title="@string/pref_shownotifications_title" />
+
+        <ListPreference
+            android:defaultValue="@string/pref_cachelocation_defvalue"
+            android:entries="@array/pref_cachelocation_entries"
+            android:entryValues="@array/pref_cachelocation_values"
+            android:key="@string/pref_cachelocation_id"
+            android:summary="@string/pref_cachelocation_summary"
+            android:title="@string/pref_cachelocation_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_handle_http_defvalue"
+            android:key="@string/pref_handle_http_id"
+            android:summary="@string/pref_handle_http_summary"
+            android:title="@string/pref_handle_http_title" />
+
+    </PreferenceScreen>

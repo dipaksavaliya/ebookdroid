@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/filebrowser_paste"
+        android:icon="@drawable/browser_actionbar_paste"
+        android:showAsAction="always"/>
+    <item
+        android:id="@+id/browser_createfolder"
+        android:alphabeticShortcut="c"
+        android:icon="@drawable/browser_actionbar_add"
+        android:showAsAction="ifRoom"
+        android:title="@string/browser_createfolder"/>
+    <item
+        android:id="@+id/browserhome"
+        android:alphabeticShortcut="h"
+        android:icon="@drawable/browser_actionbar_nav_home"
+        android:showAsAction="always"
+        android:title="@string/browser_home"/>
+    <item
+        android:id="@+id/browserupfolder"
+        android:alphabeticShortcut="u"
+        android:icon="@drawable/browser_actionbar_nav_up_enabled"
+        android:showAsAction="always"
+        android:title="@string/browser_up"/>
+    <item
+        android:id="@+id/mainmenu_close"
+        android:icon="@drawable/common_actionbar_close"
+        android:showAsAction="always"
+        android:title="@string/menu_close"/>
+
+</menu>
