@@ -3,10 +3,22 @@
 = Supported Mime Types =
 
 
-|| Extensions || Mime types ||
-|| .pdf || application/pdf ||
-|| .djv, .djvu || image/djvu, image/vnd.djvu, image/x-djvu ||
-|| .xps, .oxps || application/vnd.ms-xpsdocument, application/oxps||
-|| .cbz || application/x-cbz ||
-|| .cbr || application/x-cbr ||
-|| .fb2 || application/x-fb2 ||
+||File type|| Extensions || Mime types ||
+|| PDF  || .pdf      || application/pdf ||
+|| DjVU || .djv      || application/djvu||
+||      || .djvu     || image/djvu ||
+||      ||           || image/vnd.djvu ||
+||      ||           || image/x-djvu ||
+|| XPS  || .xps      || application/vnd.ms-xpsdocument||
+|| XPS  || .oxps     || application/oxps||
+|| CBZ  || .cbz      || application/x-cbz ||
+|| CBR  || .cbr      || application/x-cbr ||
+|| FB2  || .fb2      || application/fb2 ||
+|| FB2  || .fb2.zip  || application/x-fb2 ||
+|| FB2  ||           || text/fb2+xml ||
+|| EPUB || .epub     || application/epub+zip ||
+|| EPUB || .epub.zip ||  ||
+|| RTF  || .rtf      || application/rtf ||
+|| RTF  ||           || application/x-rtf ||
+|| RTF  ||           || text/richtext ||
+|| RTF  ||           || text/rtf ||
