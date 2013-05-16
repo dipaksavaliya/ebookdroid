@@ -10,15 +10,15 @@
 ||      ||           || image/vnd.djvu ||
 ||      ||           || image/x-djvu ||
 || XPS  || .xps      || application/vnd.ms-xpsdocument||
-|| XPS  || .oxps     || application/oxps||
+||      || .oxps     || application/oxps||
 || CBZ  || .cbz      || application/x-cbz ||
 || CBR  || .cbr      || application/x-cbr ||
 || FB2  || .fb2      || application/fb2 ||
-|| FB2  || .fb2.zip  || application/x-fb2 ||
-|| FB2  ||           || text/fb2+xml ||
+||      || .fb2.zip  || application/x-fb2 ||
+||      ||           || text/fb2+xml ||
 || EPUB || .epub     || application/epub+zip ||
-|| EPUB || .epub.zip ||  ||
+||      || .epub.zip ||  ||
 || RTF  || .rtf      || application/rtf ||
-|| RTF  ||           || application/x-rtf ||
-|| RTF  ||           || text/richtext ||
-|| RTF  ||           || text/rtf ||
+||      ||           || application/x-rtf ||
+||      ||           || text/richtext ||
+||      ||           || text/rtf ||
