@@ -2,12 +2,11 @@
 
 = EBookDroid v2.0.0 changelog =
 
-==Since version 2,==
-
-===The EBookDroid become a closed source application,===
-===All 3d-party GPL code are deleted or moved to separate programs,===
-===Only Android 3.1+ devices supported.===
-===Legacy fonts are added back in package and selected by default.===
+==Since version 2==
+ * The EBookDroid become a closed source application.
+ * All 3d-party GPL code are deleted or moved to separate programs.
+ * Only Android 3.1+ devices supported
+ * Legacy fonts are added back in package and selected by default.
 
 ==New features==
  * Multi-document support including instant switching between opened documents and service views.
