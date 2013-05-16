@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/annotation_change_color"
+        android:icon="@drawable/viewer_actionmode_draw_color"
+        android:showAsAction="always"
+        android:title="@string/ann_change_color"/>
+    <item
+        android:id="@+id/annotation_freehand"
+        android:icon="@drawable/viewer_actionmode_draw_thin"
+        android:showAsAction="always"
+        android:title="">
+        <menu>
+            <item
+                android:id="@+id/annotation_line_thin"
+                android:icon="@drawable/viewer_actionmode_draw_thin"
+                android:title="@string/ann_thin_line"/>
+            <item
+                android:id="@+id/annotation_line_thick"
+                android:icon="@drawable/viewer_actionmode_draw_thick"
+                android:title="@string/ann_thick_line"/>
+            <item
+                android:id="@+id/annotation_line_thickest"
+                android:icon="@drawable/viewer_actionmode_draw_thickest"
+                android:title="@string/ann_thickest_line"/>
+            <item
+                android:id="@+id/annotation_use_pressure"
+                android:checkable="true"
+                android:title="@string/ann_use_pressure"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/annotation_rectangle"
+        android:icon="@drawable/viewer_actionmode_draw_rect"
+        android:showAsAction="always"
+        />
+    <item
+        android:id="@+id/annotation_eraser"
+        android:icon="@drawable/viewer_actionmode_draw_eraser"
+        android:showAsAction="always"
+        android:title="@string/ann_eraser"/>
+    <item
+        android:id="@+id/annotation_undo"
+        android:icon="@drawable/viewer_actionmode_draw_undo"
+        android:showAsAction="always"
+        android:title="@string/ann_undo"/>
+    <item
+        android:id="@+id/annotation_clear"
+        android:icon="@drawable/viewer_actionmode_draw_delete"
+        android:showAsAction="always"
+        android:title="@string/ann_clear"/>
+
+</menu>

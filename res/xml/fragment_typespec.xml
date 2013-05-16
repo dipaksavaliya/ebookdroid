@@ -1,0 +1,162 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ebookdroid="http://ebookdroid.org"
+    android:summary="@string/pref_brfiletypespecific_summary"
+    android:title="@string/pref_brfiletypespecific_title" >
+
+    <PreferenceCategory
+        android:key="brfiletypespecificdjvu"
+        android:summary="@string/pref_brfiletypespecificdjvu_summary"
+        android:title="@string/pref_brfiletypespecificdjvu_title" >
+
+        <ListPreference
+            android:defaultValue="@string/pref_djvu_rendering_mode_0"
+            android:entries="@array/pref_djvu_rendering_mode_entries"
+            android:entryValues="@array/pref_djvu_rendering_mode_values"
+            android:key="@string/pref_djvu_rendering_mode_id"
+            android:summary="@string/pref_djvu_rendering_mode_summary"
+            android:title="@string/pref_djvu_rendering_mode_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="brfiletypespecificpdf"
+        android:summary="@string/pref_brfiletypespecificpdf_summary"
+        android:title="@string/pref_brfiletypespecificpdf_title" >
+
+        <org.emdev.ui.preference.FontPickerPreference
+            android:defaultValue="@string/pref_monofontpack_defvalue"
+            android:key="@string/pref_monofontpack_id"
+            android:summary="@string/pref_monofontpack_summary"
+            android:title="@string/pref_monofontpack_title"
+            ebookdroid:fontFamily="mono" />
+
+        <org.emdev.ui.preference.FontPickerPreference
+            android:defaultValue="@string/pref_sansfontpack_defvalue"
+            android:key="@string/pref_sansfontpack_id"
+            android:summary="@string/pref_sansfontpack_summary"
+            android:title="@string/pref_sansfontpack_title"
+            ebookdroid:fontFamily="sans" />
+
+        <org.emdev.ui.preference.FontPickerPreference
+            android:defaultValue="@string/pref_seriffontpack_defvalue"
+            android:key="@string/pref_seriffontpack_id"
+            android:summary="@string/pref_seriffontpack_summary"
+            android:title="@string/pref_seriffontpack_title"
+            ebookdroid:fontFamily="serif" />
+
+        <org.emdev.ui.preference.FontPickerPreference
+            android:defaultValue="@string/pref_symbolfontpack_defvalue"
+            android:key="@string/pref_symbolfontpack_id"
+            android:summary="@string/pref_symbolfontpack_summary"
+            android:title="@string/pref_symbolfontpack_title"
+            ebookdroid:fontFamily="symbol" />
+
+        <org.emdev.ui.preference.FontPickerPreference
+            android:defaultValue="@string/pref_dingbatfontpack_defvalue"
+            android:key="@string/pref_dingbatfontpack_id"
+            android:summary="@string/pref_dingbatfontpack_summary"
+            android:title="@string/pref_dingbatfontpack_title"
+            ebookdroid:fontFamily="dingbat" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_slowcmyk_defvalue"
+            android:key="@string/pref_slowcmyk_id"
+            android:summary="@string/pref_slowcmyk_summary"
+            android:title="@string/pref_slowcmyk_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="brfiletypespecificfb2"
+        android:summary="@string/pref_brfiletypespecificfb2_summary"
+        android:title="@string/pref_brfiletypespecificfb2_title" >
+
+        <org.emdev.ui.preference.FontPickerPreference
+            android:defaultValue="@string/pref_fb2fontpack_defvalue"
+            android:key="@string/pref_fb2fontpack_id"
+            android:summary="@string/pref_fb2fontpack_summary"
+            android:title="@string/pref_fb2fontpack_title" />
+
+        <ListPreference
+            android:defaultValue="@string/pref_fontsize_normal"
+            android:entries="@array/pref_fontsize_entries"
+            android:entryValues="@array/pref_fontsize_values"
+            android:key="@string/pref_fontsize_id"
+            android:summary="@string/pref_fontsize_summary"
+            android:title="@string/pref_fontsize_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_fb2hyphen_defvalue"
+            android:key="@string/pref_fb2hyphen_id"
+            android:summary="@string/pref_fb2hyphen_summary"
+            android:title="@string/pref_fb2hyphen_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_fb2cacheimages_defvalue"
+            android:key="@string/pref_fb2cacheimages_id"
+            android:summary="@string/pref_fb2cacheimages_summary"
+            android:title="@string/pref_fb2cacheimages_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="brfiletypespecificepub"
+        android:summary="@string/pref_brfiletypespecificepub_summary"
+        android:title="@string/pref_brfiletypespecificepub_title" >
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_epuboverridefonts_defvalue"
+            android:key="@string/pref_epuboverridefonts_id"
+            android:summary="@string/pref_epuboverridefonts_summary"
+            android:title="@string/pref_epuboverridefonts_title" />
+
+        <org.emdev.ui.preference.FontPickerPreference
+            android:defaultValue="@string/pref_epubfontpack_defvalue"
+            android:key="@string/pref_epubfontpack_id"
+            android:summary="@string/pref_epubfontpack_summary"
+            android:title="@string/pref_epubfontpack_title" />
+
+        <ListPreference
+            android:defaultValue="@string/pref_fontsize_normal"
+            android:entries="@array/pref_fontsize_entries"
+            android:entryValues="@array/pref_fontsize_values"
+            android:key="@string/pref_epubfontsize_id"
+            android:summary="@string/pref_epubfontsize_summary"
+            android:title="@string/pref_epubfontsize_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_epubhyphen_defvalue"
+            android:key="@string/pref_epubhyphen_id"
+            android:summary="@string/pref_epubhyphen_summary"
+            android:title="@string/pref_epubhyphen_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="brfiletypespecificrtf"
+        android:summary="@string/pref_brfiletypespecificrtf_summary"
+        android:title="@string/pref_brfiletypespecificrtf_title" >
+
+        <org.emdev.ui.preference.FontPickerPreference
+            android:defaultValue="@string/pref_rtffontpack_defvalue"
+            android:key="@string/pref_rtffontpack_id"
+            android:summary="@string/pref_rtffontpack_summary"
+            android:title="@string/pref_rtffontpack_title" />
+
+        <ListPreference
+            android:defaultValue="@string/pref_fontsize_normal"
+            android:entries="@array/pref_fontsize_entries"
+            android:entryValues="@array/pref_fontsize_values"
+            android:key="@string/pref_rtffontsize_id"
+            android:summary="@string/pref_rtffontsize_summary"
+            android:title="@string/pref_rtffontsize_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/pref_rtfhyphen_defvalue"
+            android:key="@string/pref_rtfhyphen_id"
+            android:summary="@string/pref_rtfhyphen_summary"
+            android:title="@string/pref_rtfhyphen_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

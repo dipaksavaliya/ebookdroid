@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <color name="actionbar_white">#FFFFFFFF</color>
+    <color name="actionbar_black">#FF000000</color>
+    <color name="outline_background">#BB000000</color>
+    <color name="list_item_color_android2">#FF000000</color>
+
+    <color name="main_center">#FF000000</color>
+    <color name="main_left">#FFFF0000</color>
+    <color name="main_right">#FF00FF00</color>
+    <color name="main_top">#FFFFFF00</color>
+    <color name="main_bottom">#FF000000</color>
+
+</resources>

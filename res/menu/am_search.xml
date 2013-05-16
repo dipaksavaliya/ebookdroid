@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/actions_doSearchBack"
+        android:title="@string/search_backward"
+        android:showAsAction="always" />
+    <item
+        android:id="@+id/actions_doSearch"
+        android:title="@string/search_forward"
+        android:showAsAction="always" />
+
+</menu>

@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/am_picturesettins_reset"
+        android:showAsAction="always"
+        android:title="Reset"/>
+    <item
+        android:id="@+id/am_picturesettins_default"
+        android:showAsAction="always"
+        android:title="Default"/>
+
+</menu>
