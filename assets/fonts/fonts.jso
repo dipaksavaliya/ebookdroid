@@ -1,0 +1,59 @@
+[
+{
+    name : "NimbusL free fonts",
+    mono :
+    {
+         "regular"     : "NimbusL/NimbusMonL-Regu.20130422.cff" ,
+         "italic"      : "NimbusL/NimbusMonL-ReguObli.20130422.cff" ,
+         "bold"        : "NimbusL/NimbusMonL-Bold.20130422.cff" ,
+         "bold italic" : "NimbusL/NimbusMonL-BoldObli.20130422.cff"
+    },
+    sans :
+    {
+         "regular"     : "NimbusL/NimbusSanL-Regu.20130422.cff" ,
+         "italic"      : "NimbusL/NimbusSanL-ReguItal.20130422.cff" ,
+         "bold"        : "NimbusL/NimbusSanL-Bold.20130422.cff" ,
+         "bold italic" : "NimbusL/NimbusSanL-BoldItal.20130422.cff"
+    },
+    serif :
+    {
+         "regular"     : "NimbusL/NimbusRomNo9L-Regu.20130422.cff" ,
+         "italic"      : "NimbusL/NimbusRomNo9L-ReguItal.20130422.cff" ,
+         "bold"        : "NimbusL/NimbusRomNo9L-Medi.20130422.cff" ,
+         "bold italic" : "NimbusL/NimbusRomNo9L-MediItal.20130422.cff"
+    }
+}
+,
+{
+    name   : "Free URW symbol fonts",
+    symbol :
+    {
+         "regular"     : "URW/StandardSymL.20130422.cff"
+    },
+    dingbat :
+    {
+         "regular"     : "URW/Dingbats.20130422.cff"
+    }
+}
+,
+{
+    name   : "AcademyOld fonts",
+    serif :
+    {
+         "regular"     : "Academy/academy.20130422.ttf",
+         "italic"      : "Academy/academyi.20130422.ttf"
+    }
+}
+,
+{
+    name   : "Scada fonts",
+    sans :
+    {
+         "regular"     : "Scada/Scada-Regular.20130422.ttf",
+         "italic"      : "Scada/Scada-Italic.20130422.ttf",
+         "bold"        : "Scada/Scada-Bold.20130422.ttf",
+         "bold italic" : "Scada/Scada-BoldItalic.20130422.ttf"
+    }
+}
+
+]
