@@ -11,6 +11,12 @@
             android:summary="@string/pref_usebookcase_summary"
             android:title="@string/pref_usebookcase_title" />
 
+        <org.emdev.ui.preference.SwitchPreferenceEx
+            android:defaultValue="@string/pref_showrecentsonstartup_defvalue"
+            android:key="@string/pref_showrecentsonstartup_id"
+            android:summary="@string/pref_showrecentsonstartup_summary"
+            android:title="@string/pref_showrecentsonstartup_title" />
+
         <EditTextPreference
             android:defaultValue="@string/pref_brautoscandir_defvalue"
             android:key="@string/pref_brautoscandir_id"
@@ -54,11 +60,5 @@
             android:key="@string/pref_cachelocation_id"
             android:summary="@string/pref_cachelocation_summary"
             android:title="@string/pref_cachelocation_title" />
-
-        <org.emdev.ui.preference.SwitchPreferenceEx
-            android:defaultValue="@string/pref_handle_http_defvalue"
-            android:key="@string/pref_handle_http_id"
-            android:summary="@string/pref_handle_http_summary"
-            android:title="@string/pref_handle_http_title" />
 
     </PreferenceScreen>

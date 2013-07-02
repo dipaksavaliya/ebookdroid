@@ -3,10 +3,10 @@
     <item
         android:id="@+id/am_picturesettins_reset"
         android:showAsAction="always"
-        android:title="Reset"/>
+        android:title="@string/ps_default"/>
     <item
         android:id="@+id/am_picturesettins_default"
         android:showAsAction="always"
-        android:title="Default"/>
+        android:title="@string/ps_reset"/>
 
 </menu>

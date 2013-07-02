@@ -7,6 +7,9 @@
     <string name="pref_usebookcase_title">Use bookcase view</string>
     <string name="pref_usebookcase_summary">Use bookcase view instead of lists</string>
 
+    <string name="pref_showrecentsonstartup_title">Show recents list on startup</string>
+    <string name="pref_showrecentsonstartup_summary">Show recents list on startup if bookcase is switched off</string>
+
     <string name="pref_brautoscandir_title">Auto Scan directories</string>
     <string name="pref_brautoscandir_summary">Directories for automatic files search</string>
 

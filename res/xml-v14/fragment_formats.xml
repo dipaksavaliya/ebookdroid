@@ -53,4 +53,10 @@
         android:title="@string/pref_ft_rtf_title"
         ebookdroid:jsonProperty="@string/pref_ft_rtf" />
 
+    <org.emdev.ui.preference.SwitchPreferenceEx
+        android:defaultValue="@string/pref_handle_http_defvalue"
+        android:key="@string/pref_handle_http_id"
+        android:summary="@string/pref_handle_http_summary"
+        android:title="@string/pref_handle_http_title" />
+
 </PreferenceScreen>

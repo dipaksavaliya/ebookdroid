@@ -12,6 +12,7 @@
     <item android:id="@+id/actions_toggleTouchManagerView"/>
     <item android:id="@+id/actions_toggleTextSelectionView"/>
     <item android:id="@+id/actions_openOptionsMenu"/>
+    <item android:id="@+id/actions_installDecoder"/>
 
     <item android:id="@+id/actions_verticalConfigScrollUp"/>
     <item android:id="@+id/actions_verticalConfigScrollDown"/>
@@ -59,5 +60,10 @@
     <item android:id="@+id/actions_tapsUpdate"/>
 
     <item android:id="@+id/actions_colorChanged"/>
+
+
+    <item android:id="@+id/actions_doAddNote"/>
+    <item android:id="@+id/actions_doUpdateNote"/>
+    <item android:id="@+id/actions_doDeleteNote"/>
 
 </resources>

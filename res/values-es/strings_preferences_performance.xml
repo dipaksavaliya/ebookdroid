@@ -22,11 +22,6 @@
 <!--<string name="pref_decodingonscroll_summary">"Allow to decode pages during scrolling or fling"</string>-->
     <string name="pref_bitmapsize_title">"Tamaño de la texturas"</string>
     <string name="pref_bitmapsize_summary">"Define el tamaño de las texturas"</string>
-<!--<string name="list_bitmapsize_64">"64 * 64"</string>-->
-<!--<string name="list_bitmapsize_128">"128 * 128"</string>-->
-<!--<string name="list_bitmapsize_256">"256 * 256"</string>-->
-<!--<string name="list_bitmapsize_512">"512 * 512"</string>-->
-<!--<string name="list_bitmapsize_1024">"1024 * 1024"</string>-->
     <string name="pref_heappreallocate_title">"Reserva de Heap"</string>
     <string name="pref_heappreallocate_summary">"Tamaño en MB de la reserva de Heap durante el inicio de la aplicación"</string>
     <string name="pref_pdfstoragesize_title">"Tamaño de almacenamiento interno de MuPDF"</string>

@@ -17,7 +17,7 @@
         android:textSize="20sp"
 />
 
-    <LinearLayout
+    <View
         android:id="@+id/seek_bar_minus"
         android:layout_width="48.0px"
         android:layout_height="48.0px"
@@ -27,7 +27,7 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/components_seekbar_minus" />
 
-    <LinearLayout
+    <View
         android:id="@+id/seek_bar_plus"
         android:layout_width="48.0px"
         android:layout_height="48.0px"

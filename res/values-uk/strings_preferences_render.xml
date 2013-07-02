@@ -55,6 +55,8 @@
     <string name="pref_nightmode_summary">"Білі літери на чорному фоні"</string>
 <!--<string name="pref_posimages_in_nightmode_title">"Positive images in night mode"</string>-->
 <!--<string name="pref_posimages_in_nightmode_summary">"Show gray-scaled images in night mode (do not invert image colors)"</string>-->
+<!--<string name="pref_bg_color_title">"Background color"</string>-->
+<!--<string name="pref_bg_color_summary">"Use specified color as page background"</string>-->
 <!--<string name="pref_contrast_title">"Contrast"</string>-->
 <!--<string name="pref_contrast_summary">"Contrast correction level"</string>-->
 <!--<string name="pref_gamma_title">"Gamma"</string>-->

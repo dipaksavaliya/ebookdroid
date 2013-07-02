@@ -3,19 +3,12 @@
 
     <string name="pref_brbrfiletypesscreen_title">"Formato dei file da visualizzare"</string>
     <string name="pref_brbrfiletypesscreen_summary">"Associazione dei tipi di file"</string>
-<!--<string name="pref_ft_djvu_title">"DjVU"</string>-->
     <string name="pref_ft_djvu_summary">"Visualizza i file DjVU"</string>
-<!--<string name="pref_ft_pdf_title">"PDF"</string>-->
     <string name="pref_ft_pdf_summary">"Visualizza i file PDF"</string>
-<!--<string name="pref_ft_xps_title">"XPS"</string>-->
     <string name="pref_ft_xps_summary">"Visualizza i file XPS"</string>
-<!--<string name="pref_ft_cbx_title">"CBZ and CBR"</string>-->
 <!--<string name="pref_ft_cbx_summary">"Show CBZ and CBR comics books"</string>-->
-<!--<string name="pref_ft_fb2_title">"FB2"</string>-->
     <string name="pref_ft_fb2_summary">"Visualizza i file FB2"</string>
-<!--<string name="pref_ft_epub_title">"EPUB"</string>-->
 <!--<string name="pref_ft_epub_summary">"Show EPUB books"</string>-->
-<!--<string name="pref_ft_rtf_title">"RTF"</string>-->
 <!--<string name="pref_ft_rtf_summary">"Show RTF books"</string>-->
 
 </resources>

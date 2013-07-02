@@ -55,6 +55,8 @@
     <string name="pref_nightmode_summary">"Letras blancas sobre fondo negro"</string>
     <string name="pref_posimages_in_nightmode_title">"Imágenes positivas en modo nocturno"</string>
     <string name="pref_posimages_in_nightmode_summary">"Mostrar las imágenes en escala de grises en modo nocturno (no invertir los colores de la imagen)"</string>
+<!--<string name="pref_bg_color_title">"Background color"</string>-->
+<!--<string name="pref_bg_color_summary">"Use specified color as page background"</string>-->
     <string name="pref_contrast_title">"Contraste"</string>
     <string name="pref_contrast_summary">"Nivel de corrección de contraste (0 – 1000, 100 por defecto)"</string>
 <!--<string name="pref_gamma_title">"Gamma"</string>-->

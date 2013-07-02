@@ -39,5 +39,7 @@
     <string name="opds_downloading_dlg_title">"Downloading book as&#8230;"</string>
     <string name="opds_downloading_dlg_raw_type">"Raw type"</string>
 
+    <string name="opds_seach_dlg_msg">"Enter search query:"</string>
+
 </resources>
 

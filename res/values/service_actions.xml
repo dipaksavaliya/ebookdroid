@@ -6,13 +6,22 @@
 
         <item>actions_openOptionsMenu</item>
 
+        <item>mainmenu_showrecent</item>
+        <item>recent_showbrowser</item>
+        <item>mainmenu_smb</item>
+        <item>mainmenu_opds</item>
+        <item>mainmenu_settings</item>
+        <item>mainmenu_about</item>
+        <item>mainmenu_exit</item>
+
         <item>mainmenu_outline</item>
         <item>mainmenu_search</item>
         <item>mainmenu_bookmark</item>
         <item>mainmenu_goto_page</item>
         <item>mainmenu_drawbookmark</item>
 
-        <item>mainmenu_fullscreen</item>
+        <item>mainmenu_hide_sbar</item>
+        <item>mainmenu_hide_sysui</item>
         <item>mainmenu_showtitle</item>
         <item>mainmenu_force_vscroll</item>
         <item>mainmenu_force_hscroll</item>
@@ -53,13 +62,22 @@
 
         <item>@string/menu_show_options_menu</item>
 
+        <item>@string/menu_recents</item>
+        <item>@string/menu_files</item>
+        <item>@string/menu_smb</item>
+        <item>@string/menu_opds</item>
+        <item>@string/menu_settings</item>
+        <item>@string/menu_about</item>
+        <item>@string/menu_exit</item>
+
         <item>@string/menu_outline</item>
         <item>@string/menu_searchtext</item>
         <item>@string/menu_add_bookmark</item>
         <item>@string/menu_goto_page</item>
         <item>@string/menu_drawbookmark</item>
 
-        <item>@string/pref_fullscreen_title</item>
+        <item>@string/pref_hide_sbar_title</item>
+        <item>@string/pref_hide_sysui_title</item>
         <item>@string/pref_title_title</item>
         <item>@string/list_viewmode_vertical_scroll</item>
         <item>@string/list_viewmode_horizontal_scroll</item>

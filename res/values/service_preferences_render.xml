@@ -175,8 +175,8 @@
     <string translatable="false" name="pref_use_pixel_ar_defvalue">false</string>
 
     <string translatable="false" name="pref_pixel_ar_id">pixel_ar</string>
-    <string translatable="false" name="pref_pixel_ar_defvalue">1</string>
-    <string translatable="false" name="pref_pixel_ar_minvalue">0.5</string>
-    <string translatable="false" name="pref_pixel_ar_maxvalue">1.5</string>
+    <string translatable="false" name="pref_pixel_ar_defvalue">100</string>
+    <string translatable="false" name="pref_pixel_ar_minvalue">50</string>
+    <string translatable="false" name="pref_pixel_ar_maxvalue">150</string>
 
 </resources>

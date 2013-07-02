@@ -34,5 +34,6 @@
     <string name="opds_downloading_type_dlg_title">"Выберите тип книги для скачивания"</string>
     <string name="opds_downloading_dlg_title">"Загрузка книги…"</string>
     <string name="opds_downloading_dlg_raw_type">"Неизвестный тип"</string>
+    <string name="opds_seach_dlg_msg">"Веедите строку поиска:"</string>
 
 </resources>

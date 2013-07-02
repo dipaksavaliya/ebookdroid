@@ -1,117 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:orientation="vertical" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
-    <TableLayout
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/tapZonesRegionBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="*" >
+        android:layout_alignParentTop="true" >
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/tap_zones_regions" />
 
-            <Spinner
-                android:id="@+id/tapZonesConfigRegions"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:layout_weight="3" />
-        </TableRow>
+        <Spinner
+            android:id="@+id/tapZonesConfigRegions"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="0dip"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="@string/tap_zones_single_tap" />
+    <LinearLayout
+        android:id="@+id/tapZonesButtonBar"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
 
-            <Spinner
-                android:id="@+id/tapZonesConfigSingleAction"
-                android:layout_width="0dip"
-                android:layout_weight="2" />
-        </TableRow>
+        <Button
+            android:id="@+id/tapZonesConfigReset"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/tap_zones_reset" />
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+        <Button
+            android:id="@+id/tapZonesConfigDelete"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/tap_zones_delete" />
 
-            <TextView
-                android:layout_width="0dip"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="@string/tap_zones_double_tap" />
+        <Button
+            android:id="@+id/tapZonesConfigClear"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/tap_zones_clear" />
+    </LinearLayout>
 
-            <Spinner
-                android:id="@+id/tapZonesConfigDoubleAction"
-                android:layout_width="0dip"
-                android:layout_weight="2" />
-        </TableRow>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/tapZonesButtonBar"
+        android:layout_below="@id/tapZonesRegionBar"
+        android:layout_gravity="center"
+        android:orientation="vertical" >
 
-        <TableRow
+        <TableLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone" >
+            android:stretchColumns="*" >
 
-            <TextView
-                android:layout_width="0dip"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="@string/tap_zones_long_tap" />
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
 
-            <Spinner
-                android:id="@+id/tapZonesConfigLongAction"
-                android:layout_width="0dip"
-                android:layout_weight="2" />
-        </TableRow>
+                <TextView
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/tap_zones_single_tap" />
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+                <Spinner
+                    android:id="@+id/tapZonesConfigSingleAction"
+                    android:layout_width="0dip"
+                    android:layout_weight="2" />
+            </TableRow>
 
-            <TextView
-                android:layout_width="0dip"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="@string/tap_zones_two_finger_tap" />
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
 
-            <Spinner
-                android:id="@+id/tapZonesConfigTwoFingerAction"
-                android:layout_width="0dip"
-                android:layout_weight="2" />
-        </TableRow>
+                <TextView
+                    android:layout_width="0dip"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/tap_zones_double_tap" />
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+                <Spinner
+                    android:id="@+id/tapZonesConfigDoubleAction"
+                    android:layout_width="0dip"
+                    android:layout_weight="2" />
+            </TableRow>
 
-            <Button
-                android:id="@+id/tapZonesConfigReset"
-                android:layout_width="0dip"
-                android:layout_weight="1"
-                android:text="@string/tap_zones_reset" />
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" >
 
-            <Button
-                android:id="@+id/tapZonesConfigDelete"
-                android:layout_width="0dip"
-                android:layout_weight="1"
-                android:text="@string/tap_zones_delete" />
+                <TextView
+                    android:layout_width="0dip"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/tap_zones_long_tap" />
 
-            <Button
-                android:id="@+id/tapZonesConfigClear"
-                android:layout_width="0dip"
-                android:layout_weight="1"
-                android:text="@string/tap_zones_clear" />
-        </TableRow>
-    </TableLayout>
+                <Spinner
+                    android:id="@+id/tapZonesConfigLongAction"
+                    android:layout_width="0dip"
+                    android:layout_weight="2" />
+            </TableRow>
 
-</ScrollView>
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:layout_width="0dip"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/tap_zones_two_finger_tap" />
+
+                <Spinner
+                    android:id="@+id/tapZonesConfigTwoFingerAction"
+                    android:layout_width="0dip"
+                    android:layout_weight="2" />
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+</RelativeLayout>

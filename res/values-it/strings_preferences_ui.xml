@@ -36,8 +36,10 @@
     <string name="pref_brightnessnightmodeonly_summary">"Applica le impostazioni di luminosità solo alla modalità notte"</string>
     <string name="pref_keepscreenon_title">"Non spegnere lo schermo"</string>
     <string name="pref_keepscreenon_summary">"Non passare al regime di ibernazione"</string>
-    <string name="pref_fullscreen_title">"Schermo intero"</string>
-    <string name="pref_fullscreen_summary">"Nascondi la barra di stato"</string>
+<!--<string name="pref_hide_sbar_title">"Hide Status bar"</string>-->
+<!--<string name="pref_hide_sbar_summary">"Hide Status bar"</string>-->
+<!--<string name="pref_hide_sysui_title">"Hide System UI"</string>-->
+<!--<string name="pref_hide_sysui_summary">"Hide System UI bar"</string>-->
     <string name="pref_title_title">"Titolo"</string>
     <string name="pref_title_summary">"Mostra il titolo. È necessario ricaricare il documento"</string>
     <string name="pref_pageintitle_title">"Numero di pagina"</string>
@@ -56,8 +58,5 @@
     <string name="pref_showanimicon_summary">"Se l'animazione o il trascinamento sono possibili, visualizza un simbolo del tipo di animazione selezionata"</string>
 <!--<string name="pref_dictionarytype_title">"Dictionary"</string>-->
 <!--<string name="pref_dictionarytype_summary">"Third party application to lookup words translation"</string>-->
-<!--<string name="list_dictionarytype_fora">"Fora Dictionary"</string>-->
-<!--<string name="list_dictionarytype_color">"ColorDict"</string>-->
-<!--<string name="list_dictionarytype_golden">"GoldenDict"</string>-->
 
 </resources>

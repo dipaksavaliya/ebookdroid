@@ -3,7 +3,6 @@
 
     <string name="pref_brfiletypespecific_title">"Ajustes específicos"</string>
     <string name="pref_brfiletypespecific_summary">"Ajustes específicos para cada formato"</string>
-<!--<string name="pref_brfiletypespecificdjvu_title">"DJVU"</string>-->
     <string name="pref_brfiletypespecificdjvu_summary">"Ajustes para DJVU"</string>
     <string name="pref_djvu_rendering_mode_title">"Modo de representación"</string>
     <string name="pref_djvu_rendering_mode_summary">"Modo de representación de la página"</string>
@@ -13,7 +12,6 @@
     <string name="list_djvu_rendering_mode_3">"Sólo la máscara"</string>
     <string name="list_djvu_rendering_mode_4">"Sólo la capa de fondo"</string>
     <string name="list_djvu_rendering_mode_5">"Sólo la capa principal"</string>
-<!--<string name="pref_brfiletypespecificpdf_title">"PDF"</string>-->
     <string name="pref_brfiletypespecificpdf_summary">"Opciones específicas para PDF"</string>
     <string name="pref_monofontpack_title">"Fuentes Monospace"</string>
     <string name="pref_monofontpack_summary">"Define el paquete de fuentes monospace a utilizar"</string>
@@ -28,7 +26,6 @@
     <string name="pref_systemfontpack">"Fuentes Android por defecto"</string>
     <string name="pref_slowcmyk_title">"CMYK lento"</string>
     <string name="pref_slowcmyk_summary">"Emplear el algoritmo de conversión lento pero preciso CMYK a RGB"</string>
-<!--<string name="pref_brfiletypespecificfb2_title">"FB2"</string>-->
     <string name="pref_brfiletypespecificfb2_summary">"Opciones específicas para FB2"</string>
     <string name="pref_fontsize_title">"Tamaño de la fuente"</string>
     <string name="pref_fontsize_summary">"Tamaño base de la fuente"</string>
@@ -43,7 +40,6 @@
     <string name="pref_fb2hyphen_summary">"Activar el soporte experimental para la separación silábica"</string>
     <string name="pref_fb2cacheimages_title">"Caché de imágenes"</string>
     <string name="pref_fb2cacheimages_summary">"Almacenar temporalmente las images de los documentos en disco para reducir el consumo de memoria"</string>
-<!--<string name="pref_brfiletypespecificepub_title">"EPUB"</string>-->
 <!--<string name="pref_brfiletypespecificepub_summary">"EPUB format specific settings"</string>-->
 <!--<string name="pref_epuboverridefonts_title">"Override document fonts"</string>-->
 <!--<string name="pref_epuboverridefonts_summary">"Override document fonts"</string>-->
@@ -53,7 +49,6 @@
 <!--<string name="pref_epubfontsize_summary">"Base font size"</string>-->
 <!--<string name="pref_epubhyphen_title">"Enable Hyphenation"</string>-->
 <!--<string name="pref_epubhyphen_summary">"Experimental Hyphenation implementation"</string>-->
-<!--<string name="pref_brfiletypespecificrtf_title">"RTF"</string>-->
 <!--<string name="pref_brfiletypespecificrtf_summary">"RTF format specific settings"</string>-->
 <!--<string name="pref_rtffontpack_title">"RTF font family"</string>-->
 <!--<string name="pref_rtffontpack_summary">"Specify what font pack to use in RTF rendering"</string>-->

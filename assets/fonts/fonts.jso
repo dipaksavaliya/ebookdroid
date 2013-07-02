@@ -40,8 +40,8 @@
     name   : "AcademyOld fonts",
     serif :
     {
-         "regular"     : "Academy/academy.20130422.ttf",
-         "italic"      : "Academy/academyi.20130422.ttf"
+         "regular"     : "Academy/academy.20130617.ttf",
+         "italic"      : "Academy/academyi.20130617.ttf"
     }
 }
 ,

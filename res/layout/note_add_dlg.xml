@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/note_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:hint="@string/note_dlg_title_hint"
+        android:singleLine="true"
+        android:textSize="18dip" />
+
+    <org.emdev.ui.widget.RichEditText
+        android:id="@+id/note_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        android:gravity="top|left"
+        android:hint="@string/note_dlg_text_hint"
+        android:lines="5"
+        android:maxLines="100"
+        android:minHeight="80dp"
+        android:textSize="18dip" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:gravity="center" >
+
+        <ToggleButton
+            android:id="@+id/note_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:textOff="B"
+            android:textOn="B" />
+
+        <ToggleButton
+            android:id="@+id/note_italic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:textOff="I"
+            android:textOn="I" />
+
+        <ToggleButton
+            android:id="@+id/note_underline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:textOff="U"
+            android:textOn="U" />
+    </LinearLayout>
+
+</LinearLayout>
