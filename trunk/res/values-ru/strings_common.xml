@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-<!--<string name="app_name">"EBookDroid"</string>-->
     <string name="startup_init_app">"Инициализация…"</string>
     <string name="startup_check_gl">"Проверка GL конфигурации…"</string>
     <string name="startup_init_native">"Загрузка нативной библиотеки…"</string>
@@ -16,7 +15,7 @@
     <string name="confirmsave_msg">"Хотите сохранить книгу?"</string>
     <string name="confirmsave_yes_btn">"Сохранить"</string>
     <string name="confirmsave_no_btn">"Закрыть"</string>
-<!--<string name="error_dlg_title">"Application error"</string>-->
+    <string name="error_dlg_title">"Ошибка приложения"</string>
 <!--<string name="error_native_failed">"Fatal error: application is inconsistent."</string>-->
 <!--<string name="msg_bad_intent">"Bad intent or scheme:\n%s"</string>-->
 <!--<string name="msg_no_intent_data">"No intent data:\n%s"</string>-->
@@ -86,8 +85,10 @@
     <string name="outline_missed">"Оглавление отсутствует"</string>
     <string name="error_page_out_of_rande">"Неправильный номер страницы. Допустимый диапазон: 1-%1$d"</string>
     <string name="msg_loading">"Идет загрузка %1$s … подождите немного"</string>
+    <string name="msg_loading_part">"Идет загрузка %1$s (%2$d/%3$d)… подождите немного"</string>
     <string name="msg_caching">"Caching %1$s (%2$d/%3$d)… подождите немного"</string>
     <string name="msg_getting_page_size">"Получение размера страниц %1$d/%2$d"</string>
+    <string name="tap_zones_regions">"Регион"</string>
     <string name="tap_zones_single_tap">"Одиночный тап"</string>
     <string name="tap_zones_double_tap">"Двойной тап"</string>
     <string name="tap_zones_long_tap">"Долгий тап"</string>
@@ -108,5 +109,10 @@
     <string name="cache_moving_text">"Перенос кэшированных файлов…"</string>
     <string name="cache_moving_progress">"Перенос кэшированных файлов %1$d/%2$d"</string>
     <string name="error_invalid_view_mode">"Это действие доступно только в режиме просмотра %1$s"</string>
+    <string name="install_decoder_title">"Установка плагина"</string>
+    <string name="install_decoder_msg">"Для открытия этого документа требуется отдельный плагин. Подтвердите установку и использование данного плагина:"</string>
+    <string name="tools_export_progress">"Экспорт заметок, дневника и аннотаций…"</string>
+    <string name="tools_export_success">"Данные сохранены в %1$s"</string>
+    <string name="tools_export_error">"Ошибка сохранения данных:\n%1$s"</string>
 
 </resources>

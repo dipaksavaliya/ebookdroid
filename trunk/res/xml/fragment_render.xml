@@ -10,13 +10,14 @@
         android:summary="@string/pref_use_pixel_ar_summary"
         android:title="@string/pref_use_pixel_ar_title" />
 
-    <EditTextPreference
+    <org.emdev.ui.preference.AspectRatioPreference
         android:defaultValue="@string/pref_pixel_ar_defvalue"
         android:dependency="@string/pref_use_pixel_ar_id"
-        android:inputType="numberDecimal"
         android:key="@string/pref_pixel_ar_id"
         android:summary="@string/pref_pixel_ar_summary"
-        android:title="@string/pref_pixel_ar_title" />
+        android:title="@string/pref_pixel_ar_title"
+        ebookdroid:maxValue="@string/pref_pixel_ar_maxvalue"
+        ebookdroid:minValue="@string/pref_pixel_ar_minvalue" />
 
     <ListPreference
             android:defaultValue="@string/pref_rotation_auto"
@@ -90,6 +91,13 @@
             android:key="@string/pref_posimages_in_nightmode_id"
             android:summary="@string/pref_posimages_in_nightmode_summary"
             android:title="@string/pref_posimages_in_nightmode_title" />
+
+        <org.emdev.ui.preference.ColorPickerPreference
+            android:defaultValue="@string/pref_bg_color_defvalue"
+            android:key="@string/pref_bg_color_id"
+            android:summary="@string/pref_bg_color_summary"
+            android:title="@string/pref_bg_color_title" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/am_toos_up"
+        android:showAsAction="always"
+        android:title="@string/am_tools_up"/>
+    <item
+        android:id="@+id/annotation_change_color"
+        android:icon="@drawable/viewer_actionmode_draw_color"
+        android:showAsAction="always"
+        android:title="@string/am_tools_ann_change_color"/>
+    <item
+        android:id="@+id/annotation_freehand"
+        android:icon="@drawable/viewer_actionmode_draw_thin"
+        android:showAsAction="always"
+        android:title="">
+        <menu>
+            <item
+                android:id="@+id/annotation_line_thin"
+                android:icon="@drawable/viewer_actionmode_draw_thin"
+                android:title="@string/am_tools_ann_thin_line"/>
+            <item
+                android:id="@+id/annotation_line_thick"
+                android:icon="@drawable/viewer_actionmode_draw_thick"
+                android:title="@string/am_tools_ann_thick_line"/>
+            <item
+                android:id="@+id/annotation_line_thickest"
+                android:icon="@drawable/viewer_actionmode_draw_thickest"
+                android:title="@string/am_tools_ann_thickest_line"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/annotation_rectangle"
+        android:icon="@drawable/viewer_actionmode_draw_rect"
+        android:showAsAction="always"
+        />
+    <item
+        android:id="@+id/textselect_highlight"
+        android:icon="@drawable/viewer_actionmode_textselect_highlight"
+        android:showAsAction="always"
+        android:title="@string/am_tools_text_highlight"/>
+    <item
+        android:id="@+id/textselect_clear"
+        android:icon="@drawable/viewer_actionmode_draw_delete"
+        android:showAsAction="always"
+        android:title="@string/am_tools_text_clear"/>
+
+</menu>

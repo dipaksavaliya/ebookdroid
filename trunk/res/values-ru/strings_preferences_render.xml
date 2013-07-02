@@ -55,6 +55,8 @@
     <string name="pref_nightmode_summary">"Белые буквы на черном фоне"</string>
     <string name="pref_posimages_in_nightmode_title">"Позитивные картинки в ночном режиме"</string>
     <string name="pref_posimages_in_nightmode_summary">"В ночном режиме показывать картинки оттенками серого без инвертации"</string>
+    <string name="pref_bg_color_title">"Цвет фона"</string>
+    <string name="pref_bg_color_summary">"Использовать выбранный цвет как цвет фона страницы"</string>
     <string name="pref_contrast_title">"Контраст"</string>
     <string name="pref_contrast_summary">"Коррекция контраста (0 – 1000, 100 по умолчанию)"</string>
     <string name="pref_gamma_title">"Гамма"</string>

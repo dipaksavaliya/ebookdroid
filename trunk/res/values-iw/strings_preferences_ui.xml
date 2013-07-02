@@ -36,8 +36,10 @@
     <string name="pref_brightnessnightmodeonly_summary">"החל בהירות רק במצב הלילה"</string>
     <string name="pref_keepscreenon_title">"אל תכבה את המסך"</string>
     <string name="pref_keepscreenon_summary">"אל להיכנס לתרדמה "</string>
-    <string name="pref_fullscreen_title">"מסך מלא"</string>
-    <string name="pref_fullscreen_summary">"הסתר שורת המצב."</string>
+<!--<string name="pref_hide_sbar_title">"Hide Status bar"</string>-->
+<!--<string name="pref_hide_sbar_summary">"Hide Status bar"</string>-->
+<!--<string name="pref_hide_sysui_title">"Hide System UI"</string>-->
+<!--<string name="pref_hide_sysui_summary">"Hide System UI bar"</string>-->
     <string name="pref_title_title">"כותרת"</string>
     <string name="pref_title_summary">"הצג הכותרת. נדרש לפתוח מחדש את המסמך"</string>
     <string name="pref_pageintitle_title">"כותרת הדף"</string>
@@ -56,8 +58,5 @@
     <string name="pref_showanimicon_summary">"לציין את סוג האנימציה אם אפשריים אנימציה או גרירה"</string>
 <!--<string name="pref_dictionarytype_title">"Dictionary"</string>-->
 <!--<string name="pref_dictionarytype_summary">"Third party application to lookup words translation"</string>-->
-<!--<string name="list_dictionarytype_fora">"Fora Dictionary"</string>-->
-<!--<string name="list_dictionarytype_color">"ColorDict"</string>-->
-<!--<string name="list_dictionarytype_golden">"GoldenDict"</string>-->
 
 </resources>

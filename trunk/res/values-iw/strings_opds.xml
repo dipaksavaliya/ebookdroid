@@ -34,5 +34,6 @@
     <string name="opds_downloading_type_dlg_title">"בחר את הסוג של ספרים להורדה"</string>
     <string name="opds_downloading_dlg_title">"טוען ספר …"</string>
     <string name="opds_downloading_dlg_raw_type">"סוג לא ידוע"</string>
+<!--<string name="opds_seach_dlg_msg">"Enter search query:"</string>-->
 
 </resources>

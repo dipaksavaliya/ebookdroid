@@ -34,5 +34,6 @@
     <string name="opds_downloading_type_dlg_title">"选择下载的书籍类型"</string>
     <string name="opds_downloading_dlg_title">"下载…"</string>
     <string name="opds_downloading_dlg_raw_type">"原始类型"</string>
+<!--<string name="opds_seach_dlg_msg">"Enter search query:"</string>-->
 
 </resources>

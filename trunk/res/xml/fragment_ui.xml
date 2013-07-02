@@ -62,10 +62,16 @@
             android:title="@string/pref_keepscreenon_title" />
 
     <CheckBoxPreference
-            android:defaultValue="@string/pref_fullscreen_defvalue"
-            android:key="@string/pref_fullscreen_id"
-            android:summary="@string/pref_fullscreen_summary"
-            android:title="@string/pref_fullscreen_title" />
+            android:defaultValue="@string/pref_hide_sbar_defvalue"
+            android:key="@string/pref_hide_sbar_id"
+            android:summary="@string/pref_hide_sbar_summary"
+            android:title="@string/pref_hide_sbar_title" />
+
+    <CheckBoxPreference
+            android:defaultValue="@string/pref_hide_sysui_defvalue"
+            android:key="@string/pref_hide_sysui_id"
+            android:summary="@string/pref_hide_sysui_summary"
+            android:title="@string/pref_hide_sysui_title" />
 
     <CheckBoxPreference
             android:defaultValue="@string/pref_title_defvalue"

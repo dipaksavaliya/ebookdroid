@@ -3,19 +3,12 @@
 
     <string name="pref_brbrfiletypesscreen_title">"סוגי קבצים"</string>
     <string name="pref_brbrfiletypesscreen_summary">"סוגים של קבצים לתצוגה"</string>
-<!--<string name="pref_ft_djvu_title">"DjVU"</string>-->
     <string name="pref_ft_djvu_summary">"הצג קבצי DjVu"</string>
-<!--<string name="pref_ft_pdf_title">"PDF"</string>-->
     <string name="pref_ft_pdf_summary">"הצג קבצי PDF"</string>
-<!--<string name="pref_ft_xps_title">"XPS"</string>-->
     <string name="pref_ft_xps_summary">"הצג קבצי XPS"</string>
-<!--<string name="pref_ft_cbx_title">"CBZ and CBR"</string>-->
 <!--<string name="pref_ft_cbx_summary">"Show CBZ and CBR comics books"</string>-->
-<!--<string name="pref_ft_fb2_title">"FB2"</string>-->
     <string name="pref_ft_fb2_summary">"הצג fb2 קבצים"</string>
-<!--<string name="pref_ft_epub_title">"EPUB"</string>-->
 <!--<string name="pref_ft_epub_summary">"Show EPUB books"</string>-->
-<!--<string name="pref_ft_rtf_title">"RTF"</string>-->
 <!--<string name="pref_ft_rtf_summary">"Show RTF books"</string>-->
 
 </resources>

@@ -73,10 +73,15 @@
                 </menu>
             </item>
             <item
-                android:id="@+id/mainmenu_fullscreen"
+                android:id="@+id/mainmenu_hide_sbar"
                 android:checkable="true"
                 android:icon="@drawable/viewer_menu_fullscreen"
-                android:title="@string/pref_fullscreen_title"/>
+                android:title="@string/pref_hide_sbar_title"/>
+            <item
+                android:id="@+id/mainmenu_hide_sysui"
+                android:checkable="true"
+                android:icon="@drawable/viewer_menu_fullscreen"
+                android:title="@string/pref_hide_sysui_title"/>
             <item
                 android:id="@+id/mainmenu_showtitle"
                 android:checkable="true"

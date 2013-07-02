@@ -4,7 +4,7 @@
     <string name="pref_brfiletypespecific_title">Format specific</string>
     <string name="pref_brfiletypespecific_summary">Settings unique to each individual file format</string>
 
-    <string name="pref_brfiletypespecificdjvu_title">DJVU</string>
+    <string translatable="false" name="pref_brfiletypespecificdjvu_title">DJVU</string>
     <string name="pref_brfiletypespecificdjvu_summary">DJVU format specific settings</string>
 
     <string name="pref_djvu_rendering_mode_title">Rendering mode</string>
@@ -17,7 +17,7 @@
     <string name="list_djvu_rendering_mode_4">Background only</string>
     <string name="list_djvu_rendering_mode_5">Foreground only</string>
 
-    <string name="pref_brfiletypespecificpdf_title">PDF</string>
+    <string translatable="false" name="pref_brfiletypespecificpdf_title">PDF</string>
     <string name="pref_brfiletypespecificpdf_summary">PDF format specific settings</string>
 
     <string name="pref_monofontpack_title">Monospace font family</string>
@@ -40,7 +40,7 @@
     <string name="pref_slowcmyk_title">Slow CMYK</string>
     <string name="pref_slowcmyk_summary">Use slow but accurate CMYK to RGB algorithm</string>
 
-    <string name="pref_brfiletypespecificfb2_title">FB2</string>
+    <string translatable="false" name="pref_brfiletypespecificfb2_title">FB2</string>
     <string name="pref_brfiletypespecificfb2_summary">FB2 format specific settings</string>
 
     <string name="pref_fontsize_title">Font size</string>
@@ -61,7 +61,7 @@
     <string name="pref_fb2cacheimages_title">Cache images on disk</string>
     <string name="pref_fb2cacheimages_summary">Temporary store document images on disk to reduce memory usage</string>
 
-    <string name="pref_brfiletypespecificepub_title">EPUB</string>
+    <string translatable="false" name="pref_brfiletypespecificepub_title">EPUB</string>
     <string name="pref_brfiletypespecificepub_summary">EPUB format specific settings</string>
 
     <string name="pref_epuboverridefonts_title">Override document fonts</string>
@@ -76,7 +76,7 @@
     <string name="pref_epubhyphen_title">Enable Hyphenation</string>
     <string name="pref_epubhyphen_summary">Experimental Hyphenation implementation</string>
 
-    <string name="pref_brfiletypespecificrtf_title">RTF</string>
+    <string translatable="false" name="pref_brfiletypespecificrtf_title">RTF</string>
     <string name="pref_brfiletypespecificrtf_summary">RTF format specific settings</string>
 
     <string name="pref_rtffontpack_title">RTF font family</string>

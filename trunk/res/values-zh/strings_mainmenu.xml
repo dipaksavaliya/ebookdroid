@@ -24,7 +24,8 @@
 <!--<string name="menu_crop">"Manual crop"</string>-->
 <!--<string name="menu_drawbookmark">"Add annnotation"</string>-->
 <!--<string name="menu_other">"Other…"</string>-->
-<!--<string name="menu_switch_menu">"Switch to…"</string>-->
+<!--<string name="menu_switch_to_book_menu">"Switch to opened book…"</string>-->
+<!--<string name="menu_switch_to_service_menu">"Switch to service view…"</string>-->
     <string name="menu_navigation_menu">"导航"</string>
     <string name="menu_fastsettings_menu">"查看"</string>
     <string name="menu_allsettings_menu">"设置"</string>

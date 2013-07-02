@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/am_toos_up"
+        android:showAsAction="always"
+        android:title="@string/am_tools_up"/>
+    <item
+        android:id="@+id/am_tools_text_copy"
+        android:icon="@drawable/viewer_actionmode_textselect_copy"
+        android:showAsAction="always"
+        android:title="@string/am_tools_text_copy"/>
+    <item
+        android:id="@+id/am_tools_text_translate"
+        android:icon="@drawable/viewer_actionmode_textselect_translate"
+        android:showAsAction="always"
+        android:title="@string/am_tools_text_translate"/>
+    <item
+        android:id="@+id/am_tools_text_google"
+        android:icon="@drawable/viewer_actionmode_tools_google"
+        android:showAsAction="always"
+        android:title="@string/am_tools_text_google"/>
+
+</menu>

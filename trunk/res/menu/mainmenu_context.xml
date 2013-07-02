@@ -2,11 +2,48 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/mainmenu_switch_menu"
+        android:id="@+id/mainmenu_switch_to_book_menu"
         android:icon="@drawable/application_icon"
-        android:title="@string/menu_switch_menu">
+        android:title="@string/menu_switch_to_book_menu">
         <menu>
             <item android:id="@+id/mainmenu_switchTo"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/mainmenu_switch_to_service_menu"
+        android:icon="@drawable/application_icon"
+        android:title="@string/menu_switch_to_service_menu">
+        <menu>
+            <item
+                android:id="@+id/mainmenu_showrecent"
+                android:alphabeticShortcut="1"
+                android:icon="@drawable/recent_actionbar_recent"
+                android:title="@string/menu_recents"/>
+            <item
+                android:id="@+id/recent_showbrowser"
+                android:alphabeticShortcut="2"
+                android:icon="@drawable/recent_actionbar_filebrowser"
+                android:title="@string/menu_files"/>
+            <item
+                android:id="@+id/mainmenu_smb"
+                android:alphabeticShortcut="3"
+                android:icon="@drawable/recent_actionbar_smbbrowser"
+                android:title="@string/menu_smb"/>
+            <item
+                android:id="@+id/mainmenu_opds"
+                android:alphabeticShortcut="4"
+                android:icon="@drawable/recent_actionbar_opdsbrowser"
+                android:title="@string/menu_opds"/>
+            <item
+                android:id="@+id/mainmenu_settings"
+                android:alphabeticShortcut="5"
+                android:icon="@drawable/common_actionbar_allsettings"
+                android:title="@string/menu_settings"/>
+            <item
+                android:id="@+id/mainmenu_about"
+                android:alphabeticShortcut="6"
+                android:icon="@drawable/common_actionbar_about"
+                android:title="@string/menu_about"/>
         </menu>
     </item>
     <item
@@ -23,13 +60,17 @@
                 android:icon="@drawable/viewer_menu_searchtext"
                 android:title="@string/menu_searchtext"/>
             <item
+                android:id="@+id/mainmenu_goto_page"
+                android:icon="@drawable/viewer_menu_goto"
+                android:title="@string/menu_goto_page"/>
+            <item
                 android:id="@+id/mainmenu_bookmark"
                 android:icon="@drawable/viewer_menu_bookmark_add"
                 android:title="@string/menu_add_bookmark"/>
             <item
-                android:id="@+id/mainmenu_goto_page"
-                android:icon="@drawable/viewer_menu_goto"
-                android:title="@string/menu_goto_page"/>
+                android:id="@+id/mainmenu_drawbookmark"
+                android:icon="@drawable/viewer_menu_annotation"
+                android:title="@string/menu_drawbookmark"/>
         </menu>
     </item>
     <item
@@ -38,10 +79,15 @@
         android:title="@string/menu_fastsettings_menu">
         <menu>
             <item
-                android:id="@+id/mainmenu_fullscreen"
+                android:id="@+id/mainmenu_hide_sbar"
                 android:checkable="true"
                 android:icon="@drawable/viewer_menu_fullscreen"
-                android:title="@string/pref_fullscreen_title"/>
+                android:title="@string/pref_hide_sbar_title"/>
+            <item
+                android:id="@+id/mainmenu_hide_sysui"
+                android:checkable="true"
+                android:icon="@drawable/viewer_menu_fullscreen"
+                android:title="@string/pref_hide_sysui_title"/>
             <item
                 android:id="@+id/mainmenu_showtitle"
                 android:checkable="true"
@@ -95,9 +141,6 @@
                 android:id="@+id/mainmenu_thumbnail"
                 android:icon="@drawable/viewer_menu_thumbnail"
                 android:title="@string/menu_thumbnail"/>
-            <item
-                android:id="@+id/mainmenu_drawbookmark"
-                android:title="@string/menu_drawbookmark"/>
         </menu>
     </item>
     <item
@@ -114,10 +157,6 @@
                 android:icon="@drawable/viewer_menu_booksettings"
                 android:title="@string/menu_picturesettings"/>
             <item
-                android:id="@+id/mainmenu_settings"
-                android:icon="@drawable/common_menu_allsettings"
-                android:title="@string/menu_settings"/>
-            <item
                 android:id="@+id/actions_toggleTouchManagerView"
                 android:icon="@drawable/viewer_menu_tapconfig"
                 android:title="@string/menu_tap_configuration"/>
@@ -128,10 +167,6 @@
         </menu>
     </item>
     <item
-        android:id="@+id/mainmenu_about"
-        android:icon="@drawable/common_actionbar_about"
-        android:title="@string/menu_about"/>
-    <item
         android:id="@+id/mainmenu_close"
         android:icon="@drawable/common_actionbar_close"
         android:title="@string/menu_close"/>
@@ -140,4 +175,5 @@
         android:alphabeticShortcut="e"
         android:icon="@drawable/common_actionbar_close"
         android:title="@string/menu_exit"/>
+
 </menu>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-<!--<string name="app_name">"EBookDroid"</string>-->
 <!--<string name="startup_init_app">"Init application…"</string>-->
 <!--<string name="startup_check_gl">"Check GL configuration…"</string>-->
 <!--<string name="startup_init_native">"Load native library…"</string>-->
@@ -86,8 +85,10 @@
     <string name="outline_missed">"No existe índice"</string>
     <string name="error_page_out_of_rande">"Número de página inválido. Rango: 1-%1$d"</string>
     <string name="msg_loading">"Cargando %1$s … Espere por favor"</string>
+<!--<string name="msg_loading_part">"Loading %1$s (%2$d/%3$d)… Please wait"</string>-->
 <!--<string name="msg_caching">"Caching %1$s (%2$d/%3$d)… Please wait"</string>-->
     <string name="msg_getting_page_size">"Obteniendo tamaño de página %1$d/%2$d"</string>
+<!--<string name="tap_zones_regions">"Region"</string>-->
     <string name="tap_zones_single_tap">"Toque simple"</string>
     <string name="tap_zones_double_tap">"Toque doble"</string>
     <string name="tap_zones_long_tap">"Toque largo"</string>
@@ -104,9 +105,14 @@
     <string name="notification_file_delete">"Archivo eliminado de la biblioteca"</string>
     <string name="font_reminder_title">"Atención"</string>
     <string name="font_reminder">"A partir de la versión 1.5, las fuentes de PDF y FB2 ya no están incluidas en la aplicación. Se usarán las fuentes estándar del sistema. Si quieres restablecer las fuentes antiguas o instalar otras, utiliza por favor los paquetes de instalación de fuentes de la Play Store: &lt;ul&gt;&lt;li&gt;&lt;a href=&quot;market://details?id=org.ebookdroid.fontpack.legacy&quot;&gt;Fuentes antiguas&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;"</string>
-<!--<string name="msg_fonts_installing_pack">"Installing embedded fonts: %1$s..."</string>-->
+<!--<string name="msg_fonts_installing_pack">"Installing embedded fonts: %1$s…"</string>-->
     <string name="cache_moving_text">"Moviendo los archivos en memoria…"</string>
     <string name="cache_moving_progress">"Moviendo los archivos en memoria %1$d/%2$d"</string>
 <!--<string name="error_invalid_view_mode">"This action is only available in view mode %1$s"</string>-->
+<!--<string name="install_decoder_title">"Decoder plugin installation"</string>-->
+<!--<string name="install_decoder_msg">"Opening this document requires installation of the separate decoder plugin. Our application can provide the following one. Please confirm installation and usage:"</string>-->
+<!--<string name="tools_export_progress">"Export book notes, diary and annotations…"</string>-->
+<!--<string name="tools_export_success">"Book work exported to %1$s"</string>-->
+<!--<string name="tools_export_error">"Export failed:\n%1$s"</string>-->
 
 </resources>
