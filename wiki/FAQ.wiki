@@ -24,7 +24,7 @@ EbookDroid offers several features to make the most out of the - usually scarce 
 These methods are not necessarily mutually exclusive as it is for example possible to split a landscape page into two portrait pages, each one with its own margins automatically cropped and it will still be possible to zoom in and out of single columns of text with a simple gesture. Please note that all these features can be applied on a per book basis, as EBookDroid will remember each book's specific settings.
 
 === Split pages ===
-Some documents show two pages side by side in a single landscape view. EBookDroid can show half landscape page at the time in portrait mode, effectively splitting a single large landscape page into two subsequent portrait pages. This functionality is easily accessed by checking "Split page" in the More... View... menu. It can also be set as a default behavior for all books, although you'll rarely need to do so.
+Some documents show two pages side by side in a single landscape view. EBookDroid can show half landscape page at the time in portrait mode, effectively splitting a single large landscape page into two subsequent portrait pages. This functionality is easily accessed by checking "Split page" in the More... View... menu (the actual sequence of commands could vary from version to version). It can also be set as a default behavior for all books, although you'll rarely need to do so.
 
 === Crop margins (automatic) ===
 Most documents (books, whitepapers, tutorials)share a page layout characterized by wide empty margins around the page's content. While this is usually desirable in a printed document, it represents a waste of screen real estate on handheld devices such as smartphones and tablets. By checking the option "*Crop margins*" in the View... menu, you can have EBookDroid automatically strip those margins away for you. 
@@ -38,7 +38,7 @@ Sometimes it is useful to be able to manually select a specific portion of page 
 
 For example, some whitepapers carry disclaimers or website addresses on the side of the page: showing a full page with intact margins or a page automatically cropped to include the side text would result in unnecessary waste of screen area. EBookDroid allows you to select only what you want to read, and it does so with unique flexibility.
 
-The Manual Crop menu works in every visualization mode but _it can only be set in *single page* mode_. It can be accessed via the View... menu by selecting "*Manual Crop*". If you are in Single Page mode, you will be presentend with a customizable rectangular selection on top of the current (single) page.  By dragging handles at the opposite corners of the rectangular selection, you will be able to define the portion of the page that will be shown on the screen (viewable area). Once you are satisfied with your selection, _double tap_ inside the area. This will bring up a context menu with the following relevant options:
+The Manual Crop menu works in every visualization mode but _it can only be set in *single page* mode_. It can be accessed via the View... menu by selecting "*Manual Crop*". If you are in Single Page mode, you will be presented with a customizable rectangular selection on top of the current (single) page.  By dragging handles at the opposite corners of the rectangular selection, you will be able to define the portion of the page that will be shown on the screen (viewable area). Once you are satisfied with your selection, _double tap_ inside the area. This will bring up a context menu with the following relevant options:
 
  * Crop current page only
  * Crop all pages
@@ -51,7 +51,7 @@ EBookDroid can crop all pages with the same area pattern, but it can also crop e
 For example, some textbooks have the main body of text always on the right of each page and a wide margin that can carry pictures or comments always on the left (or the other way around). Being the relevant content area the same for every page, these book are best viewed by selecting "*Crop all pages*" after having highlighted the area of interest.
 
 
-Other textbooks have a symmetric layout, with the main body of text placed on the left for even pages and on the right for odd pages (or the other way around). These books are best served by selecting the area of interest on one page (it does not matter if it's even or odd) and then choosing "*Crop all even (odd) pages symmetrically*". The area for the specular pages will be automatically set by EBookDroid.
+Other textbooks have a symmetric layout, with the main body of text placed on the left for even pages and on the right for odd pages (or the other way around). These books are best served by selecting the area of interest on one page (it does not matter if it's even or odd) and then choosing "*Crop all even (odd) pages symmetrically*". The area for the specular pages will be automatically set by EBookDroid. You can use this feature to remove the holes from the sheets of a ringbinder, for example. 
 
 
 Other documents present a certain type of content on one page and a different kind of content on the next one (for example, a picture on the left page and text/comment on the right page). 
@@ -84,6 +84,32 @@ Although the viewable area selection affects all viewing modes, setting the area
 == A: ==
 By default EBookDroid has two tapping areas at the top and bottom of the screen that allow you to turn pages up and down. This is the most natural way to navigate a document in small devices like mobile phones and smartphones. 
 You can add your own tapping areas by means of the "Configure Taps" menu. You can have both vertical and horizontal tapping areas.
+
+
+== Q: What is the Diary function and how do I use it? ==
+== A: ==
+Starting with version 2.0, EBookDroid provides the user with many ways to annotate your documents. The Diary function associate text with every page of the book. This allows the user to write extensive comments, considerations, ideas, or simply summarizing what he or she has understood so far. All diary pages can be exported to an epub document that can be read by any application and moved to other platforms for further elaboration.
+
+To add a Diary page:
+Long tap on the page, choose "Notes" from the tools bar, then "Diary".
+You can now write down your thoughts and associate the text to the page you are reading.
+These notes will be saved internally by EBookDroid and will be accessible for reading and editing by using the Diary feature on that same page.
+You can add a diary page for every page of your book.
+
+To export the diary:
+If you want to access all the notes at once, you have to export them using the Export function (available on the Text toolbar). EBookDroid will generate an epub file containing all your diary pages neatly ordered by page number.The epub file will be placed in the same folder as the original file with the name "<book title>_notes.epub". You can then use it at your leisure, for example by moving it on your computer, renaming it as a zip file and extract the notes on selected pages.
+If you add more entries to your diary, you must remember to export it again in order for them to show up in the epub container.
+
+== Q: Why should I need a Diary feature? ==
+== A: ==
+The Diary feature provides you with much more flexibility with respect to in-text annotations. Here are a few examples of how you could use it.
+
+You are an IT professional and you are reading a programming textbook while commuting on the subway. While you read, you write code that exemplifies what you believe you have just learned. At the end of the day you end up with several programs, most likely one per page. Transfer the booktitle_notes.epub file to your computer, rename it as a zip file and extract the pages where your code snippets are located.
+
+You are a student and have to write an essay. It would be easier to do it if you could write the essential points as long as you read. Do that at every page you want. When you finish reading, take the booktitle_notes.epub file, import it into your word processor, massage it a bit, print it and hand it in. 
+This could work for lengthy textbooks too: while you read, you make notes of the most interesting parts. At the end of the book, you will have a nice version of it in your own words, chapter after chapter, page after page.
+
+You are a journalist and you have to review a book. While you are reading it, you can add your considerations on every page you find something worth noting. At the end of the book, you export your diary as booktitle_notes.epub and move it to your computer. Here you can open it and transfer it into your word processor to create a review with all your annotations ordered by chapter.
 
 == Q: Why does EBookDroid need to access the Internet? Do you collect data when I am not looking? ==
 == A: ==
