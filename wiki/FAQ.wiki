@@ -88,15 +88,15 @@ You can add your own tapping areas by means of the "Configure Taps" menu. You ca
 
 == Q: What is the Diary function and how do I use it? ==
 == A: ==
-Starting with version 2.0, EBookDroid provides the user with many ways to annotate your documents. The Diary function associate text with every page of the book. This allows the user to write extensive comments, considerations, ideas, or simply summarizing what he or she has understood so far. All diary pages can be exported to an epub document that can be read by any application and moved to other platforms for further elaboration.
+Starting with version 2.0, EBookDroid provides users with many ways to annotate their documents. The Diary function associate text with every page of the book. This allows the user to write extensive comments, considerations, ideas, or simply summarizing what he or she has understood so far. All diary pages can be exported as an epub document that can be read by any application and moved to other platforms for further elaboration.
 
-To add a Diary page:
+=== To add a Diary page: ===
 Long tap on the page, choose "Notes" from the tools bar, then "Diary".
 You can now write down your thoughts and associate the text to the page you are reading.
 These notes will be saved internally by EBookDroid and will be accessible for reading and editing by using the Diary feature on that same page.
 You can add a diary page for every page of your book.
 
-To export the diary:
+=== To export the Diary: ===
 If you want to access all the notes at once, you have to export them using the Export function (available on the Text toolbar). EBookDroid will generate an epub file containing all your diary pages neatly ordered by page number.The epub file will be placed in the same folder as the original file with the name "<book title>_notes.epub". You can then use it at your leisure, for example by moving it on your computer, renaming it as a zip file and extract the notes on selected pages.
 If you add more entries to your diary, you must remember to export it again in order for them to show up in the epub container.
 
