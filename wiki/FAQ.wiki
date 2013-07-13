@@ -10,14 +10,14 @@ For example:
 
 == Q: How can I  have EBookDroid automatically open a certain type of file using an external file manager? ==
 == A: ==
-EbookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly from the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further istructions on how to do that. All MIME types supported by EBookDroid are listed [MimeTypes here].
+EBookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly from the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further instructions on how to do that. All MIME types supported by EBookDroid are listed [MimeTypes here].
 
 == Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
 == A: ==
 EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
 
 == Q: What? No reflow??? ==
-== A:
+== A: ==
 Yes, no reflow.
 For several technical reasons, EBookDroid is a 'page-oriented' document viewer. Many of its unique features require the document's content to be cast in a set of immutable pages. Not only that, but EBookDroid developers believe a document should be rendered as faithfully as possible to the way the original creator designed it.
 All that said, EBookDroid provide several features to make the best of the scarce screen size of portable devices.
@@ -34,7 +34,7 @@ EbookDroid offers several features to make the most out of the - usually scarce 
 These methods are not necessarily mutually exclusive as it is for example possible to split a landscape page into two portrait pages, each one with its own margins automatically cropped and it will still be possible to zoom in and out of single columns of text with a simple gesture. Please note that all these features can be applied on a per book basis, as EBookDroid will remember each book's specific settings.
 
 === Split pages ===
-Some documents show two pages side by side in a single landscape view. EBookDroid can show half landscape page at the time in portrait mode, effectively splitting a single large landscape page into two subsequent portrait pages. This functionality is easily accessed by checking "Split page" in the More... View... menu (the actual sequence of commands could vary from version to version). It can also be set as a default behavior for all books, although you'll rarely need to do so.
+Some documents show two pages side by side in a single landscape view. EBookDroid can show half landscape page at the time in portrait mode, effectively splitting a single large landscape page into two subsequent portrait pages. This functionality is easily accessed by checking "*Split pages*" in the More... View... menu (the actual sequence of commands could vary from version to version). It can also be set as a default behavior for all books, although you'll rarely need to do so.
 
 === Crop margins (automatic) ===
 Most documents (books, whitepapers, tutorials)share a page layout characterized by wide empty margins around the page's content. While this is usually desirable in a printed document, it represents a waste of screen real estate on handheld devices such as smartphones and tablets. By checking the option "*Crop margins*" in the View... menu, you can have EBookDroid automatically strip those margins away for you. 
@@ -63,10 +63,8 @@ For example, some textbooks have the main body of text always on the right of ea
 
 Other textbooks have a symmetric layout, with the main body of text placed on the left for even pages and on the right for odd pages (or the other way around). These books are best served by selecting the area of interest on one page (it does not matter if it's even or odd) and then choosing "*Crop all even (odd) pages symmetrically*". The area for the specular pages will be automatically set by EBookDroid. You can use this feature to remove the holes from the sheets of a ringbinder, for example. 
 
-
 Other documents present a certain type of content on one page and a different kind of content on the next one (for example, a picture on the left page and text/comment on the right page). 
 EBookDroid's flexible Manual Crop feature allow you to select two distinct viewable areas for even and odd pages. Just repeat the Manual Crop procedure twice for two subsequent pages: each time, select the desired viewable area, double tap inside it and choose "*Crop all even (odd) pages*". Again, you do not need to worry which pages are odd and which are even; you just need to repeat the procedure for two (adjacent) pages. 
-
 
 Once you have set the desired viewable area with Manual Crop, you can scroll, change page, zoom in and out and be sure to be able to return to the same view by pinching out. The area selected represents now the new page size for your document (to be specific: for one, all, all even or odd pages according to your choice).
 
@@ -84,7 +82,7 @@ The last option in Manual Crop settings,
 simply takes you back to the area selection screen. You can exit the Manual Crop submenu by using the back button on your device.
 
 === Zoom to column ===
-Zoom to Column is a feature that allows you to fit the width of a selected column to the screen. This is useful for reading multiple column documents, like newspapers, magazines, scientific papers, some textbooks and whitepapers. There is no menu to directly access this feature, whose action can be associated to a particular gesture (a tap, a long tap or a double tap, whatever suits you) in the "Tap Configuration" menu.  Repeating the gesture on the magnified column will take you back at the previous level of magnification (be it full page, a custom level or one imposed via automatic or manual crop settings).
+Zoom to Column is a feature that allows you to fit the width of a selected column to the screen. This is useful for reading multiple column documents, like newspapers, magazines, scientific papers, some textbooks and whitepapers. There is no menu to directly access this feature, whose action can be associated to a particular gesture (a tap, a long tap or a double tap, whatever suits you) in the "*Tap Configuration*" menu.  Repeating the gesture on the magnified column will take you back at the previous level of magnification (be it full page, a custom level or one imposed via automatic or manual crop settings).
 
 == Q: When I try to select the area for Manual Crop nothing happens. Why? ==
 == A: ==
@@ -125,7 +123,7 @@ You are a journalist and you have to review a book. While you are reading it, yo
 EBookDroid requires Internet access in order to provide OPDS functionality.
 Unlike many other e-book readers on the market, EBookDroid is open source, which means that everyone can read the source code and see what the program does and does not. You do not have to trust the developers: if you are not into software developing, you can ask a programmer you personally trust to look at the source code to see if something muddy is going on.
 
-== Q: On my device, EBookdroid is too slow for my tastes: can I speed it up a bit? ==
+== Q: On my device, EBookDroid is too slow for my tastes: can I speed it up a bit? ==
 == A: ==
 The first thing to do is getting a version of EBookDroid optimized for your device's particular architecture. Please refer to the download page on this website for versions optimized for different architectures (like for Arm A8 or A9 with Neon support).
 
