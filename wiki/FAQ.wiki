@@ -12,6 +12,16 @@ For example:
 == A: ==
 EbookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly from the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further istructions on how to do that. All MIME types supported by EBookDroid are listed [MimeTypes here].
 
+== Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
+== A: ==
+EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
+
+== Q: What? No reflow??? ==
+== A:
+Yes, no reflow.
+For several technical reasons, EBookDroid is a 'page-oriented' document viewer. Many of its unique features require the document's content to be cast in a set of immutable pages. Not only that, but EBookDroid developers believe a document should be rendered as faithfully as possible to the way the original creator designed it.
+All that said, EBookDroid provide several features to make the best of the scarce screen size of portable devices.
+
 == Q: How can I maximize viewable area in Ebookdroid? ==
 == A: ==
 EbookDroid offers several features to make the most out of the - usually scarce - screen real estate of tablets and smartphones. Apart from the ordinary zoom level (manually selectable either by pinching in and out or by means of a slider at the bottom of the screen), the following methods can be used to magnify relevant parts of a document:
@@ -55,7 +65,7 @@ Other textbooks have a symmetric layout, with the main body of text placed on th
 
 
 Other documents present a certain type of content on one page and a different kind of content on the next one (for example, a picture on the left page and text/comment on the right page). 
-EBookDroid's flexible Manual Crop feature allow you to select two distinct viewable areas for even and odd pages. Just repeat the Manual Crop procedure twice for two subsequent pages: each time, select the desired viewable area, double tap inside it and choose "*Crop all even (odd) pages*". Again, you do not need to worry which pages are are the odd or even; you just need to repeat the procedure for two (adjacent) pages. 
+EBookDroid's flexible Manual Crop feature allow you to select two distinct viewable areas for even and odd pages. Just repeat the Manual Crop procedure twice for two subsequent pages: each time, select the desired viewable area, double tap inside it and choose "*Crop all even (odd) pages*". Again, you do not need to worry which pages are odd and which are even; you just need to repeat the procedure for two (adjacent) pages. 
 
 
 Once you have set the desired viewable area with Manual Crop, you can scroll, change page, zoom in and out and be sure to be able to return to the same view by pinching out. The area selected represents now the new page size for your document (to be specific: for one, all, all even or odd pages according to your choice).
@@ -85,24 +95,23 @@ Although the viewable area selection affects all viewing modes, setting the area
 By default EBookDroid has two tapping areas at the top and bottom of the screen that allow you to turn pages up and down. This is the most natural way to navigate a document in small devices like mobile phones and smartphones. 
 You can add your own tapping areas by means of the "Configure Taps" menu. You can have both vertical and horizontal tapping areas.
 
-
 == Q: What is the Diary function and how do I use it? ==
 == A: ==
-Starting with version 2.0, EBookDroid provides users with many ways to annotate their documents. The Diary function associate text with every page of the book. This allows the user to write extensive comments, considerations, ideas, or simply summarizing what he or she has understood so far. All diary pages can be exported as an epub document that can be read by any application and moved to other platforms for further elaboration.
+Starting with version 2.0, EBookDroid provides users with many ways to annotate their documents. The Diary function can associate text with every page of the book. This allows the user to write extensive comments, considerations, ideas, or simply to summarize what he or she has read so far. All diary pages can be exported as an epub document that can be read by any application and moved to other platforms for further processing.
 
 === To add a Diary page: ===
 Long tap on the page, choose "Notes" from the tools bar, then "Diary".
-You can now write down your thoughts and associate the text to the page you are reading.
+You can now write down your thoughts and associate the text to the page you are reading. A note can have a title and a content; the content can have some basic formatting (bold, italics, underline).
 These notes will be saved internally by EBookDroid and will be accessible for reading and editing by using the Diary feature on that same page.
 You can add a diary page for every page of your book.
 
 === To export the Diary: ===
-If you want to access all the notes at once, you have to export them using the Export function (available on the Text toolbar). EBookDroid will generate an epub file containing all your diary pages neatly ordered by page number.The epub file will be placed in the same folder as the original file with the name "<book title>_notes.epub". You can then use it at your leisure, for example by moving it on your computer, renaming it as a zip file and extract the notes on selected pages.
+Diary pages are stored internally by EBookDroid for maximum efficiency. If you want to access all the notes at once, you have to export them using the Export function (available on the Text toolbar). EBookDroid will generate an epub file containing all your diary pages neatly ordered by page number.The epub file will be placed in the same folder as the original file with the name booktitle_notes.epub (where booktitle is the actual name of the file of your document). You can then use it at your leisure, for example by moving it on your computer, renaming it as a zip file and extract the notes on selected pages.
 If you add more entries to your diary, you must remember to export it again in order for them to show up in the epub container.
 
 == Q: Why should I need a Diary feature? ==
 == A: ==
-The Diary feature provides you with much more flexibility with respect to in-text annotations. Here are a few examples of how you could use it.
+The Diary feature (actually a personal log associated with the document) provides the user with much more flexibility with respect to in-text annotations (also available in EBookDroid 2.0+). Here are a few examples of how you could use it.
 
 You are an IT professional and you are reading a programming textbook while commuting on the subway. While you read, you write code that exemplifies what you believe you have just learned. At the end of the day you end up with several programs, most likely one per page. Transfer the booktitle_notes.epub file to your computer, rename it as a zip file and extract the pages where your code snippets are located.
 
@@ -120,10 +129,8 @@ Unlike many other e-book readers on the market, EBookDroid is open source, which
 == A: ==
 The first thing to do is getting a version of EBookDroid optimized for your device's particular architecture. Please refer to the download page on this website for versions optimized for different architectures (like for Arm A8 or A9 with Neon support).
 
-
 If you are using an optimized version of EBookDroid and your browsing still feel sluggish, you can try fiddling with Advanced Settings. These are settings that affect performance but need to be balanced on a per device basis to avoid having the opposite effect to that intended. 
 For example: you can make EBookDroid load a certain number of pages (default is zero) into memory. The more pages you load into memory, the faster it will be moving from one to the next. But too many pages will drain your memory (sometimes unnecessarily, for example if you do not need to fast-browse and you take some time to read each page). Some users believe that setting to 3 the "Number of pages to load into memory" is a good compromise. Your mileage may vary.
-
 
 Not all devices tolerate all these advanced settings, therefore some experimenting is needed to strike the correct balance of performance and stability. 
 For example, you can dedicate more than one thread to page rendering, but on certain devices this could have a detrimental effect on some services or other applications making the system overall slower. 
