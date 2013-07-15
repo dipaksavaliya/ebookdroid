@@ -5,7 +5,7 @@
     <string name="bookmenu_settings">"Mostra impostazioni libro"</string>
     <string name="bookmenu_openbookshelf">"Visualizza libreria"</string>
     <string name="bookmenu_openbookfolder">"Visualizza cartelle"</string>
-<!--<string name="bookmenu_createbookshortcut">"Create shortcut on desktop"</string>-->
+    <string name="bookmenu_createbookshortcut">"Crea scorciatoia sul desktop"</string>
     <string name="bookmenu_recentgroup">"Gestisci recenti…"</string>
     <string name="bookmenu_removefromrecent">"Escludi dai recenti"</string>
     <string name="bookmenu_cleardata">"Cancella cache dati"</string>

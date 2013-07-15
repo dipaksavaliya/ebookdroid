@@ -21,8 +21,7 @@
 <!--<string name="pref_navigation_mode_title">"Navigation for service views"</string>-->
 <!--<string name="pref_navigation_mode_summary">"How to navigate between service views&quot;"</string>-->
 <!--<string name="list_navigation_type_list">"Drop down list in action bar"</string>-->
-<!--<string name="list_navigation_type_tabs">"Tabs in action bar"</string>-->
-<!--<string name="list_navigation_type_ctabs">"Custom tabs in action bar"</string>-->
+<!--<string name="list_navigation_type_ctabs">"Tabs in action bar"</string>-->
 <!--<string name="list_navigation_mode_all">"Always show all service views"</string>-->
 <!--<string name="list_navigation_mode_top_always">"Alway show top service view"</string>-->
 <!--<string name="list_navigation_mode_top_hidden">"Hide top service view if book opened"</string>-->
@@ -36,10 +35,10 @@
     <string name="pref_brightnessnightmodeonly_summary">"Applica le impostazioni di luminosità solo alla modalità notte"</string>
     <string name="pref_keepscreenon_title">"Non spegnere lo schermo"</string>
     <string name="pref_keepscreenon_summary">"Non passare al regime di ibernazione"</string>
-<!--<string name="pref_hide_sbar_title">"Hide Status bar"</string>-->
-<!--<string name="pref_hide_sbar_summary">"Hide Status bar"</string>-->
-<!--<string name="pref_hide_sysui_title">"Hide System UI"</string>-->
-<!--<string name="pref_hide_sysui_summary">"Hide System UI bar"</string>-->
+    <string name="pref_hide_sbar_title">"Nascondi la barra di stato"</string>
+    <string name="pref_hide_sbar_summary">"Nascondi la barra di stato (Status Bar)"</string>
+    <string name="pref_hide_sysui_title">"Nascondi la barra di sistema"</string>
+    <string name="pref_hide_sysui_summary">"Nascondi la barra di sistema (System UI Bar)"</string>
     <string name="pref_title_title">"Titolo"</string>
     <string name="pref_title_summary">"Mostra il titolo. È necessario ricaricare il documento"</string>
     <string name="pref_pageintitle_title">"Numero di pagina"</string>
@@ -56,7 +55,7 @@
     <string name="list_toastposition_righbottom">"In basso a destra"</string>
     <string name="pref_showanimicon_title">"Visualizza simbolo animazione"</string>
     <string name="pref_showanimicon_summary">"Se l'animazione o il trascinamento sono possibili, visualizza un simbolo del tipo di animazione selezionata"</string>
-<!--<string name="pref_dictionarytype_title">"Dictionary"</string>-->
-<!--<string name="pref_dictionarytype_summary">"Third party application to lookup words translation"</string>-->
+    <string name="pref_dictionarytype_title">"Dizionario"</string>
+    <string name="pref_dictionarytype_summary">"Applicazione 'dizionario' di terze parti per la ricerca delle traduzioni"</string>
 
 </resources>

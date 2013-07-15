@@ -7,10 +7,10 @@
     <string name="pref_pagesinmemory_summary">"מספר העמודים המאוחסנים בזיכרון"</string>
     <string name="pref_lowlevel_category">"אפליקצית Tweaks (חובה לפתוח מחדש את המסמך)"</string>
     <string name="pref_lowlevel_category_summary">"הגדרות מתקדמות (חובה לפתוח מחדש את המסמך)"</string>
-    <string name="pref_decoding_threads_title">"מספר זרם הפענוח"</string>
-    <string name="pref_decoding_threads_summary">"מספר זרם הפענוח"</string>
     <string name="pref_decodethread_priority_title">"עדיפות זרם פענוח"</string>
     <string name="pref_decodethread_priority_summary">"עדיפות זרם פענוח"</string>
+<!--<string name="pref_decodethread_timeout_title">"Decode thread timeout"</string>-->
+<!--<string name="pref_decodethread_timeout_summary">"Defines decode thread timeout in seconds"</string>-->
     <string name="pref_drawthread_priority_title">"עדיפות זרם הציור"</string>
     <string name="pref_drawthread_priority_summary">"עדיפות זרם הציור"</string>
     <string name="list_thread_priority_lowest">"הנמוך ביותר"</string>

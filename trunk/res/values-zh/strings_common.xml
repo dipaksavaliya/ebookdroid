@@ -17,9 +17,6 @@
 <!--<string name="confirmsave_no_btn">"Close"</string>-->
     <string name="error_dlg_title">"应用程序错误"</string>
 <!--<string name="error_native_failed">"Fatal error: application is inconsistent."</string>-->
-    <string name="msg_bad_intent">"错误:\n%s"</string>
-    <string name="msg_no_intent_data">"数据丢失:\n%s"</string>
-    <string name="msg_unknown_intent_data_type">"未知的数据类型:\n%s"</string>
     <string name="msg_loading_book">"加载书籍： %1$s…"</string>
     <string name="msg_wrong_password">"密码错误&quot;…"</string>
     <string name="msg_password_required">"请输入密码…"</string>
@@ -41,6 +38,11 @@
     <string name="bookmark_current">"当前书签位置"</string>
     <string name="bookmark_end">"结束"</string>
     <string name="bookmark_invalid_page">"无效的页码. 有效的页码范围是: %1$d-%2$d"</string>
+<!--<string name="notes_title">"Notes"</string>-->
+<!--<string name="clear_notes_title">"Clear notes"</string>-->
+<!--<string name="clear_notes_text">"This action will remove all notes from the selected book. Continue?"</string>-->
+<!--<string name="del_note_title">"Remove note"</string>-->
+<!--<string name="del_note_text">"Remove this note?"</string>-->
     <string name="bookmarks_title">"书签"</string>
     <string name="clear_bookmarks_title">"删除书签"</string>
     <string name="clear_bookmarks_text">"确定删除所有书签?"</string>

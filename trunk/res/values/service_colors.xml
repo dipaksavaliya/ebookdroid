@@ -2,14 +2,21 @@
 <resources>
 
     <color name="actionbar_white">#FFFFFFFF</color>
-    <color name="actionbar_black">#FF000000</color>
-    <color name="outline_background">#BB000000</color>
-    <color name="list_item_color_android2">#FF000000</color>
 
     <color name="main_center">#FF000000</color>
     <color name="main_left">#FF000000</color>
     <color name="main_right">#FF000000</color>
     <color name="main_top">#FF000000</color>
     <color name="main_bottom">#FF000000</color>
+
+    <color name="goto_panel_background">#002e3e</color>
+
+    <color name="outline_background">#002e3e</color>
+    <color name="outline_background_selected">#FF4A7921</color>
+
+    <color name="bookmark_background">#FF5A5A5A</color>
+    <color name="bookmark_progress">#FF4A7921</color>
+
+    <color name="note_background">#FF4A7921</color>
 
 </resources>

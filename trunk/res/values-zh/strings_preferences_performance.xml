@@ -7,10 +7,10 @@
     <string name="pref_pagesinmemory_summary">"存储在内存中的页数"</string>
     <string name="pref_lowlevel_category">"低级别的应用程序首选项（需重新加载文件）"</string>
     <string name="pref_lowlevel_category_summary">"低级别的应用程序首选项（需重新加载文件）"</string>
-    <string name="pref_decoding_threads_title">"解码线程数量"</string>
-    <string name="pref_decoding_threads_summary">"运行解码线程的数量"</string>
     <string name="pref_decodethread_priority_title">"解码线程优先级"</string>
     <string name="pref_decodethread_priority_summary">"设置解码线程优先级"</string>
+<!--<string name="pref_decodethread_timeout_title">"Decode thread timeout"</string>-->
+<!--<string name="pref_decodethread_timeout_summary">"Defines decode thread timeout in seconds"</string>-->
     <string name="pref_drawthread_priority_title">"表面绘图线程优先级"</string>
     <string name="pref_drawthread_priority_summary">"设置表面绘图线程优先级"</string>
     <string name="list_thread_priority_lowest">"最低"</string>

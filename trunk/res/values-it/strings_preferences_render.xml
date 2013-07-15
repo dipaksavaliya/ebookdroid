@@ -55,19 +55,19 @@
     <string name="pref_nightmode_summary">"Testo chiaro su sfondo scuro (negativo)"</string>
     <string name="pref_posimages_in_nightmode_title">"Non invertire i colori delle immagini"</string>
     <string name="pref_posimages_in_nightmode_summary">"In modalità notturna mostra una versione in scala di grigio delle immagini, senza invertirne i colori"</string>
-<!--<string name="pref_bg_color_title">"Background color"</string>-->
-<!--<string name="pref_bg_color_summary">"Use specified color as page background"</string>-->
+    <string name="pref_bg_color_title">"Colore pagina"</string>
+    <string name="pref_bg_color_summary">"Specifica il colore da usare come sfondo della pagina"</string>
     <string name="pref_contrast_title">"Contrasto"</string>
     <string name="pref_contrast_summary">"Correzione del livello di contrasto (0 – 1000, default = 100 )"</string>
 <!--<string name="pref_gamma_title">"Gamma"</string>-->
-<!--<string name="pref_gamma_summary">"Gamma correction level"</string>-->
+    <string name="pref_gamma_summary">"Correzione del livello gamma"</string>
     <string name="pref_exposure_title">"Esposizione"</string>
     <string name="pref_exposure_summary">"Correzione del livello di esposizione (0 – 200, default = 100)"</string>
     <string name="pref_autolevels_title">"Livelli automatici"</string>
     <string name="pref_autolevels_summary">"Correzione automatica dei livelli"</string>
-<!--<string name="pref_use_pixel_ar_title">"Fix custom pixel aspect ratio"</string>-->
-<!--<string name="pref_use_pixel_ar_summary">"Fix custom pixel aspect ratio"</string>-->
-<!--<string name="pref_pixel_ar_title">"Custom pixel aspect ratio"</string>-->
-<!--<string name="pref_pixel_ar_summary">"Custom pixel spect ratio"</string>-->
+    <string name="pref_use_pixel_ar_title">"Imposta proporzioni fisse"</string>
+    <string name="pref_use_pixel_ar_summary">"Imposta un rapporto fisso nelle proporzioni della pagina"</string>
+    <string name="pref_pixel_ar_title">"Rapporto di proporzioni personalizzato"</string>
+    <string name="pref_pixel_ar_summary">"Valore del rapporto di proporzioni personalizzato"</string>
 
 </resources>

@@ -7,10 +7,10 @@
     <string name="pref_pagesinmemory_summary">"Número de páginas a almacenar en memoria"</string>
     <string name="pref_lowlevel_category">"Preferencias de bajo nivel"</string>
     <string name="pref_lowlevel_category_summary">"Preferencias de bajo nivel para la aplicación (se aplican tras recargar el documento)"</string>
-    <string name="pref_decoding_threads_title">"Hilos para la decodificación"</string>
-    <string name="pref_decoding_threads_summary">"Número de hilos usados en el proceso de decodificación"</string>
     <string name="pref_decodethread_priority_title">"Prioridad del hilo de decodificación"</string>
     <string name="pref_decodethread_priority_summary">"Define la prioridad del hilo encargado de la decodificación"</string>
+<!--<string name="pref_decodethread_timeout_title">"Decode thread timeout"</string>-->
+<!--<string name="pref_decodethread_timeout_summary">"Defines decode thread timeout in seconds"</string>-->
     <string name="pref_drawthread_priority_title">"Prioridad del hilo de dibujo"</string>
     <string name="pref_drawthread_priority_summary">"Define la prioridad del hilo encargado del dibujo en pantalla"</string>
     <string name="list_thread_priority_lowest">"Baja"</string>

@@ -21,8 +21,7 @@
     <string name="pref_navigation_mode_title">"Переключение между вкладками"</string>
     <string name="pref_navigation_mode_summary">"Способ переключения между вкладками"</string>
     <string name="list_navigation_type_list">"Выпадающий список"</string>
-    <string name="list_navigation_type_tabs">"Стандартные закладки"</string>
-    <string name="list_navigation_type_ctabs">"Нестандартные закладки"</string>
+    <string name="list_navigation_type_ctabs">"Закладки"</string>
     <string name="list_navigation_mode_all">"Всегда показывать все служебные вкладки"</string>
     <string name="list_navigation_mode_top_always">"Всегда показывать последнюю служебную вкладку"</string>
     <string name="list_navigation_mode_top_hidden">"Прятать служебную вкладку при открытой книге"</string>

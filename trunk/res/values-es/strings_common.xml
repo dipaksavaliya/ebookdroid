@@ -17,9 +17,6 @@
 <!--<string name="confirmsave_no_btn">"Close"</string>-->
     <string name="error_dlg_title">"Error en la aplicación"</string>
 <!--<string name="error_native_failed">"Fatal error: application is inconsistent."</string>-->
-    <string name="msg_bad_intent">"Intent o esquema erróneos:\n%s"</string>
-    <string name="msg_no_intent_data">"No hay datos en el Intent:\n%s"</string>
-    <string name="msg_unknown_intent_data_type">"Tipo de datos del Intent desconocidos:\n%s"</string>
     <string name="msg_loading_book">"Cargando libro: %1$s…"</string>
     <string name="msg_wrong_password">"Contraseña incorrecta…"</string>
     <string name="msg_password_required">"Introduzca la contraseña…"</string>
@@ -41,6 +38,11 @@
 <!--<string name="bookmark_current">"Current position"</string>-->
     <string name="bookmark_end">"Fin"</string>
     <string name="bookmark_invalid_page">"Número de página inválido. Rango: %1$d-%2$d"</string>
+<!--<string name="notes_title">"Notes"</string>-->
+<!--<string name="clear_notes_title">"Clear notes"</string>-->
+<!--<string name="clear_notes_text">"This action will remove all notes from the selected book. Continue?"</string>-->
+<!--<string name="del_note_title">"Remove note"</string>-->
+<!--<string name="del_note_text">"Remove this note?"</string>-->
     <string name="bookmarks_title">"Marcadores"</string>
     <string name="clear_bookmarks_title">"Eliminar los marcadores"</string>
     <string name="clear_bookmarks_text">"¿Está seguro de querer eliminar todos los marcadores?"</string>

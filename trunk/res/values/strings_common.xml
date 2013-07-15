@@ -22,9 +22,9 @@
 
     <string name="error_dlg_title">Application error</string>
     <string name="error_native_failed">Fatal error: application is inconsistent.</string>
-    <string name="msg_bad_intent">"Bad intent or scheme:\n%s"</string>
-    <string name="msg_no_intent_data">"No intent data:\n%s"</string>
-    <string name="msg_unknown_intent_data_type">"Unknown intent data type:\n%s"</string>
+    <string name="msg_bad_intent" translatable="false">"Bad intent or scheme:\n%s"</string>
+    <string name="msg_no_intent_data" translatable="false">"No intent data:\n%s"</string>
+    <string name="msg_unknown_intent_data_type" translatable="false">"Unknown intent data type:\n%s"</string>
 
     <string name="msg_loading_book">"Loading book: %1$s&#8230;"</string>
 
@@ -53,6 +53,12 @@
     <string name="bookmark_end">End</string>
     <string name="bookmark_invalid_page">Page number out of range. Valid range: %1$d-%2$d</string>
 
+    <string name="notes_title">Notes</string>
+    <string name="clear_notes_title">Clear notes</string>
+    <string name="clear_notes_text">This action will remove all notes from the selected book. Continue?</string>
+    <string name="del_note_title">Remove note</string>
+    <string name="del_note_text">Remove this note?</string>
+
     <string name="bookmarks_title">Bookmarks</string>
     <string name="clear_bookmarks_title">Clear bookmarks</string>
     <string name="clear_bookmarks_text">This action will remove all bookmarks from the selected book. Continue?</string>
@@ -78,6 +84,7 @@
     <string name="about_license_title">License</string>
     <string name="about_3dparty_title">Third party software</string>
     <string name="about_changelog_title">Change Log</string>
+    <string name="about_faq_title" translatable="false">FAQ</string>
     <string name="about_thanks_title">Acknowledgments</string>
     <string name="about_donations">Donations</string>
 

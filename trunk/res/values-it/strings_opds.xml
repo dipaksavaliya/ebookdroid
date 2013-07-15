@@ -29,11 +29,11 @@
     <string name="opds_error_title">"Errore OPDS"</string>
     <string name="opds_error_msg" translatable="true">"%s"</string>
     <string name="opds_retry_download">"Nuovo tentativo"</string>
-<!--<string name="opds_prev">"Prev section"</string>-->
-<!--<string name="opds_next">"Next section"</string>-->
+    <string name="opds_prev">"Sezione precedente"</string>
+    <string name="opds_next">"Sezione successiva"</string>
     <string name="opds_downloading_type_dlg_title">"Specifica il formato dei libri da scaricare"</string>
     <string name="opds_downloading_dlg_title">"Libro scaricato come…"</string>
 <!--<string name="opds_downloading_dlg_raw_type">"Raw type"</string>-->
-<!--<string name="opds_seach_dlg_msg">"Enter search query:"</string>-->
+    <string name="opds_seach_dlg_msg">"Immetti la richiesta di ricerca:"</string>
 
 </resources>
