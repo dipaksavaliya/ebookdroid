@@ -3,6 +3,10 @@
 
     <string name="pref_navigation_category">"Навигация и история"</string>
     <string name="pref_navigation_category_summary">"Настройки навигации и истории"</string>
+    <string name="pref_usegotobar_title">"Новая навигация"</string>
+    <string name="pref_usegotobar_summary">"Использовать новую навигацию вместо диалога перехода"</string>
+    <string name="pref_showaddbutton_title">"Показывать кнопку"</string>
+    <string name="pref_showaddbutton_summary">"Показывать кнопку для добавления закладки"</string>
     <string name="pref_showbookmarksmenu_summary">"Показываеть закладки"</string>
     <string name="pref_showbookmarksmenu_title">"Показывать закладки в меню навигации"</string>
     <string name="pref_link_highlight_summary">"Выберите цвет подсветки ссылок"</string>

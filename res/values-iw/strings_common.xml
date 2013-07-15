@@ -17,9 +17,6 @@
 <!--<string name="confirmsave_no_btn">"Close"</string>-->
 <!--<string name="error_dlg_title">"Application error"</string>-->
 <!--<string name="error_native_failed">"Fatal error: application is inconsistent."</string>-->
-<!--<string name="msg_bad_intent">"Bad intent or scheme:\n%s"</string>-->
-<!--<string name="msg_no_intent_data">"No intent data:\n%s"</string>-->
-<!--<string name="msg_unknown_intent_data_type">"Unknown intent data type:\n%s"</string>-->
 <!--<string name="msg_loading_book">"Loading book: %1$s…"</string>-->
     <string name="msg_wrong_password">"סיסמא שגויה …"</string>
     <string name="msg_password_required">"הזן את הסיסמה …"</string>
@@ -41,6 +38,11 @@
 <!--<string name="bookmark_current">"Current position"</string>-->
     <string name="bookmark_end">"הסוף"</string>
 <!--<string name="bookmark_invalid_page">"Page number out of range. Valid range: %1$d-%2$d"</string>-->
+<!--<string name="notes_title">"Notes"</string>-->
+<!--<string name="clear_notes_title">"Clear notes"</string>-->
+<!--<string name="clear_notes_text">"This action will remove all notes from the selected book. Continue?"</string>-->
+<!--<string name="del_note_title">"Remove note"</string>-->
+<!--<string name="del_note_text">"Remove this note?"</string>-->
     <string name="bookmarks_title">"סימניות"</string>
     <string name="clear_bookmarks_title">"מחק את הסימנייה"</string>
     <string name="clear_bookmarks_text">"האם אתה באמת רוצה למחוק את כל הסימניות?"</string>

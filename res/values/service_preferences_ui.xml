@@ -5,74 +5,56 @@
     <string name="pref_lang_defvalue" translatable="false">""</string>
     <string name="pref_lang_default" translatable="false">""</string>
     <string name="pref_lang_en" translatable="false">"en"</string>
-    <string name="pref_lang_de" translatable="false">"de"</string>
+<!--<string name="pref_lang_de" translatable="false">"de"</string> -->
     <string name="pref_lang_es" translatable="false">"es"</string>
-    <string name="pref_lang_fr" translatable="false">"fr"</string>
+<!--<string name="pref_lang_fr" translatable="false">"fr"</string> -->
     <string name="pref_lang_it" translatable="false">"it"</string>
-    <string name="pref_lang_nl" translatable="false">"nl"</string>
+<!--<string name="pref_lang_nl" translatable="false">"nl"</string> -->
     <string name="pref_lang_ru" translatable="false">"ru"</string>
-    <string name="pref_lang_uk" translatable="false">"uk"</string>
+<!--<string name="pref_lang_uk" translatable="false">"uk"</string> -->
     <string name="pref_lang_zh" translatable="false">"zh"</string>
     <string name="pref_lang_iw" translatable="false">"iw"</string>
-
-<!--
-Order according to application statistics from Market:
-
-Russian (Russia)			159,948	61.66 %
-English (United States)		33,542	12.93 %
-English (United Kingdom)	11,447	4.41 %
-German (Germany)			5,256	2.03 %
-Spanish (Spain)				4,500	1.73 %
-French (France)				3,101	1.20 %
-Russian (Ukraine)			2,807	1.08 %
-Portuguese (Brazil)			2,642	1.02 %
-Japanese (Japan)			2,434	0.94 %
-Others						33,711	13.00 %
- -->
 
     <string-array name="pref_lang_entries" translatable="false">
         <item>@string/list_lang_default</item>
         <item>@string/list_lang_ru</item>
         <item>@string/list_lang_en</item>
-        <item>@string/list_lang_de</item>
-        <item>@string/list_lang_es</item>
-        <item>@string/list_lang_fr</item>
-        <item>@string/list_lang_uk</item>
         <item>@string/list_lang_it</item>
-        <item>@string/list_lang_nl</item>
+        <item>@string/list_lang_es</item>
         <item>@string/list_lang_zh</item>
         <item>@string/list_lang_iw</item>
-    </string-array>
+<!--    <item>@string/list_lang_de</item> -->
+<!--    <item>@string/list_lang_fr</item> -->
+<!--    <item>@string/list_lang_uk</item> -->
+<!--    <item>@string/list_lang_nl</item> -->
+        </string-array>
 
     <string-array name="pref_lang_values" translatable="false">
         <item>@string/pref_lang_default</item>
         <item>@string/pref_lang_ru</item>
         <item>@string/pref_lang_en</item>
-        <item>@string/pref_lang_de</item>
-        <item>@string/pref_lang_es</item>
-        <item>@string/pref_lang_fr</item>
-        <item>@string/pref_lang_uk</item>
         <item>@string/pref_lang_it</item>
-        <item>@string/pref_lang_nl</item>
+        <item>@string/pref_lang_es</item>
         <item>@string/pref_lang_zh</item>
         <item>@string/pref_lang_iw</item>
-    </string-array>
+<!--    <item>@string/pref_lang_de</item> -->
+<!--    <item>@string/pref_lang_fr</item> -->
+<!--    <item>@string/pref_lang_uk</item> -->
+<!--    <item>@string/pref_lang_nl</item> -->
+        </string-array>
 
     <string name="pref_navigation_type_id" translatable="false">navigation_type</string>
     <string name="pref_navigation_type_defvalue" translatable="false">"list"</string>
     <string name="pref_navigation_type_list" translatable="false">"list"</string>
-    <string name="pref_navigation_type_tabs" translatable="false">"tabs"</string>
     <string name="pref_navigation_type_ctabs" translatable="false">"ctabs"</string>
 
     <string-array name="pref_navigation_type_entries" translatable="false">
         <item>@string/list_navigation_type_list</item>
-        <item>@string/list_navigation_type_tabs</item>
         <item>@string/list_navigation_type_ctabs</item>
         </string-array>
 
     <string-array name="pref_navigation_type_values" translatable="false">
         <item>@string/pref_navigation_type_list</item>
-        <item>@string/pref_navigation_type_tabs</item>
         <item>@string/pref_navigation_type_ctabs</item>
         </string-array>
 

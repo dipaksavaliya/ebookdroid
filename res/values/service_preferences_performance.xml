@@ -31,10 +31,10 @@
         <item>@string/pref_thread_priority_highest</item>
     </string-array>
 
-    <string translatable="false" name="pref_decoding_threads_id">decoding_threads</string>
-    <string translatable="false" name="pref_decoding_threads_defvalue">1</string>
-    <string translatable="false" name="pref_decoding_threads_minvalue">1</string>
-    <string translatable="false" name="pref_decoding_threads_maxvalue">16</string>
+    <string translatable="false" name="pref_decodethread_timeout_id">decodethread_timeout</string>
+    <string translatable="false" name="pref_decodethread_timeout_defvalue">15</string>
+    <string translatable="false" name="pref_decodethread_timeout_minvalue">5</string>
+    <string translatable="false" name="pref_decodethread_timeout_maxvalue">60</string>
 
     <string translatable="false" name="pref_decodingonscroll_id">decodingonscroll</string>
     <string translatable="false" name="pref_decodingonscroll_defvalue">true</string>

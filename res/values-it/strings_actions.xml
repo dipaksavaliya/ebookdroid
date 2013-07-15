@@ -3,9 +3,9 @@
 
     <string name="actions_verticalConfigScrollUp">"Scorri indietro"</string>
     <string name="actions_verticalConfigScrollDown">"Scorri avanti"</string>
-<!--<string name="actions_1xZoom">"1x zoom"</string>-->
-<!--<string name="actions_2xZoom">"2x zoom"</string>-->
-<!--<string name="actions_4xZoom">"4x zoom"</string>-->
+    <string name="actions_1xZoom">"Zoom 1x"</string>
+    <string name="actions_2xZoom">"Zoom 2x"</string>
+    <string name="actions_4xZoom">"Zoom 4x"</string>
     <string name="actions_quickZoom">"Zoom rapido"</string>
     <string name="actions_zoomToColumn">"Adatta a larghezza colonna"</string>
     <string name="actions_leftTopCorner">"Scorri all'angolo superiore sinistro"</string>

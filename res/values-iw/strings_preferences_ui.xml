@@ -21,8 +21,7 @@
 <!--<string name="pref_navigation_mode_title">"Navigation for service views"</string>-->
 <!--<string name="pref_navigation_mode_summary">"How to navigate between service views&quot;"</string>-->
 <!--<string name="list_navigation_type_list">"Drop down list in action bar"</string>-->
-<!--<string name="list_navigation_type_tabs">"Tabs in action bar"</string>-->
-<!--<string name="list_navigation_type_ctabs">"Custom tabs in action bar"</string>-->
+<!--<string name="list_navigation_type_ctabs">"Tabs in action bar"</string>-->
 <!--<string name="list_navigation_mode_all">"Always show all service views"</string>-->
 <!--<string name="list_navigation_mode_top_always">"Alway show top service view"</string>-->
 <!--<string name="list_navigation_mode_top_hidden">"Hide top service view if book opened"</string>-->
