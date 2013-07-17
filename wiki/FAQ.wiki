@@ -93,30 +93,30 @@ Although the viewable area selection affects all viewing modes, setting the area
 By default EBookDroid has two tapping areas at the top and bottom of the screen that allow you to turn pages up and down. This is the most natural way to navigate a document in small devices like mobile phones and smartphones. 
 You can add your own tapping areas by means of the "Configure Taps" menu. You can have both vertical and horizontal tapping areas.
 
-== Q: What is the Diary function and how do I use it? ==
+== Q: What is the Notebook function and how do I use it? ==
 == A: ==
-Starting with version 2.0, EBookDroid provides users with many ways to annotate their documents. The Diary function can associate text with every page of the book. This allows the user to write extensive comments, considerations, ideas, or simply to summarize what he or she has read so far. All diary pages can be exported as an epub document that can be read by any application and moved to other platforms for further processing.
+Starting with version 2.0, EBookDroid provides users with many ways to annotate their documents. The Notebook function can associate text with every page of the book. This allows the user to write extensive comments, considerations, ideas, or simply to summarize what he or she has read so far. All notebook pages can be exported as an epub document that can be read by any application and moved to other platforms for further processing.
 
-=== To add a Diary page: ===
-Long tap on the page, choose "Notes" from the tools bar, then "Diary".
-You can now write down your thoughts and associate the text to the page you are reading. A note can have a title and a content; the content can have some basic formatting (bold, italics, underline).
-These notes will be saved internally by EBookDroid and will be accessible for reading and editing by using the Diary feature on that same page.
-You can add a diary page for every page of your book.
+=== To add a Notebook page: ===
+Long tap on the page, choose "Notes" from the tools bar, then "Notebook".
+You can now write down your thoughts and associate the text to the page you are reading. A notebook entry can have a title and a content; the content can have some basic formatting (bold, italics, underline).
+These notes will be saved internally by EBookDroid and will be accessible for reading and editing by using the Notebook feature on that same page.
+You can add a notebook page for every page of your book.
 
-=== To export the Diary: ===
-Diary pages are stored internally by EBookDroid for maximum efficiency. If you want to access all the notes at once, you have to export them using the Export function (available on the Text toolbar). EBookDroid will generate an epub file containing all your diary pages neatly ordered by page number.The epub file will be placed in the same folder as the original file with the name booktitle_notes.epub (where booktitle is the actual name of the file of your document). You can then use it at your leisure, for example by moving it on your computer, renaming it as a zip file and extract the notes on selected pages.
-If you add more entries to your diary, you must remember to export it again in order for them to show up in the epub container.
+=== To export the Notebook: ===
+Notebook pages are stored internally by EBookDroid for maximum efficiency. If you want to access all notes at once, you have to export them using the Export function (available on the Text toolbar). EBookDroid will generate an epub file containing all your diary pages neatly ordered by page number.The epub file will be placed in the same folder as the original file with the name booktitle_notes.epub (where booktitle is the actual name of the file of your document). You can then use it at your leisure, for example by moving it on your computer, renaming it as a zip file and extract the notes on selected pages.
+If you add more entries to your notebook, you must remember to export it again in order for them to show up in the epub container.
 
-== Q: Why should I need a Diary feature? ==
+== Q: Why should I need a Notebook feature? ==
 == A: ==
-The Diary feature (actually a personal log associated with the document) provides the user with much more flexibility with respect to in-text annotations (also available in EBookDroid 2.0+). Here are a few examples of how you could use it.
+The Notebook feature (actually a personal log associated with the document) provides the user with much more flexibility with respect to in-text annotations (also available in EBookDroid 2.0+). Here are a few examples of how you could use it.
 
 You are an IT professional and you are reading a programming textbook while commuting on the subway. While you read, you write code that exemplifies what you believe you have just learned. At the end of the day you end up with several programs, most likely one per page. Transfer the booktitle_notes.epub file to your computer, rename it as a zip file and extract the pages where your code snippets are located.
 
-You are a student and have to write an essay. It would be easier to do it if you could write the essential points as long as you read. Do that at every page you want. When you finish reading, take the booktitle_notes.epub file, import it into your word processor, massage it a bit, print it and hand it in. 
-This could work for lengthy textbooks too: while you read, you make notes of the most interesting parts. At the end of the book, you will have a nice version of it in your own words, chapter after chapter, page after page.
+You are a student and have to write an essay. It would be easier to do it if you could write the essential points as long as you read. Do that at every page you want. When you finish reading, take the booktitle_notes.epub file, import it into your word processor, massage it a bit, print it out and hand it in. 
+You could use notebooks to summarize lengthy textbooks while you read. Take notes about the most interesting parts on every page you feel inclined to add something. When you finish reading the book, you will have a nice version of it in your own words, chapter after chapter, page after page.
 
-You are a journalist and you have to review a book. While you are reading it, you can add your considerations on every page you find something worth noting. At the end of the book, you export your diary as booktitle_notes.epub and move it to your computer. Here you can open it and transfer it into your word processor to create a review with all your annotations ordered by chapter.
+You are a journalist and you have to review a book. While you are reading it, you can add your considerations on every page you find something worth noting. At the end of the book, you export your diary as booktitle_notes.epub and move it to your computer. Here you can open it and transfer it into your word processor to create a review with all your annotations ordered by page.
 
 == Q: Why does EBookDroid need to access the Internet? Do you collect data when I am not looking? ==
 == A: ==
