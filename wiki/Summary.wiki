@@ -3,6 +3,12 @@
 EBookDroid is a highly customizable document viewer for Android.
 EBookDroid supports the following ebook and document formats: DjVU, PDF, XPS (OpenXPS), FictionBook (fb2 and fb2.zip), Comics Book formats (cbr and cbz), plus - starting with version 2.0 - EPUB and RTF.
 
+EBookDroid 2.0 provides the following extra tools:
+ * Text selection and external dictionary support.
+ * Text highlighting
+ * Free-hand annotations.
+ * Text notes and page notebooks.
+
 Collaboration with electronic publication sites and access to online ebook catalogs is allowed by the supported OPDS ( [http://en.wikipedia.org/wiki/OPDS Open Publication Distribution System) protocol. This is the reason the app is requiring permissions for network access.
 
 EBookDroid allows you to customize the way you read on a _per book_ basis: each document's layout can be tailored to give you the best reading experience and all settings will be remembered the next time you will open it.
