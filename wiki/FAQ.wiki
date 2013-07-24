@@ -12,6 +12,14 @@ For example:
 == A: ==
 EBookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly from the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further instructions on how to do that. All MIME types supported by EBookDroid are listed [MimeTypes here].
 
+== Q: I don't see any of my EPUB and RTF files. Why? ==
+== A: ==
+You have to enable file type associations in General settings..., File Association.... Just tap in the missing checkboxes, restart EBookDroid and you will see your EPUB and RTF files.
+
+== Q: Do I need to download some plug-in to view my PDF documents? ==
+== A: ==
+No, all plug-ins are already integrated into EBookDroid. All you have to do is to acknowledge installation and the fact that you want to use the plug-in to read your documents. The reason for this is simply that starting with version 2.0 some of the code is now used as separate modules in form of a plug-in.
+
 == Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
 == A: ==
 EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
@@ -63,10 +71,12 @@ For example, some textbooks have the main body of text always on the right of ea
 
 Other textbooks have a symmetric layout, with the main body of text placed on the left for even pages and on the right for odd pages (or the other way around). These books are best served by selecting the area of interest on one page (it does not matter if it's even or odd) and then choosing "*Crop all even (odd) pages symmetrically*". The area for the specular pages will be automatically set by EBookDroid. You can use this feature to remove the holes from the sheets of a ringbinder, for example. 
 
+
 Other documents present a certain type of content on one page and a different kind of content on the next one (for example, a picture on the left page and text/comment on the right page). 
 EBookDroid's flexible Manual Crop feature allow you to select two distinct viewable areas for even and odd pages. Just repeat the Manual Crop procedure twice for two subsequent pages: each time, select the desired viewable area, double tap inside it and choose "*Crop all even (odd) pages*". Again, you do not need to worry which pages are odd and which are even; you just need to repeat the procedure for two (adjacent) pages. 
 
 Once you have set the desired viewable area with Manual Crop, you can scroll, change page, zoom in and out and be sure to be able to return to the same view by pinching out. The area selected represents now the new page size for your document (to be specific: for one, all, all even or odd pages according to your choice).
+
 
 You can remove manual crop settings via the same menu you use to set them: View... , "Manual crop", double click on the selected area and then choose one of the options:
 
@@ -74,6 +84,7 @@ You can remove manual crop settings via the same menu you use to set them: View.
  * Remove all crop setting
 
 The first option will remove any (manual) crop settings associated with the current page or set of pages. This means that it can be used to remove crop settings from a single page, from all pages, from all even (or odd, but not both) pages, according to what had previously been chosen. To remove all (manual) crop settings from the selected document just choose "Remove all crop settings". This won't affect the automatic crop setting the document might have.
+
 
 The last option in Manual Crop settings, 
 
