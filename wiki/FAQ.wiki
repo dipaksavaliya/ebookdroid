@@ -104,6 +104,11 @@ Although the viewable area selection affects all viewing modes, setting the area
 By default EBookDroid has two tapping areas at the top and bottom of the screen that allow you to turn pages up and down. This is the most natural way to navigate a document in small devices like mobile phones and smartphones. 
 You can add your own tapping areas by means of the "Configure Taps" menu. You can have both vertical and horizontal tapping areas.
 
+== Q: Where are the Edit Tools? ==
+== A: ==
+The new Edit Tools introduced with EBookDroid 2.0 are experimental features under development. For this reason they are disabled by default. In order to use them, you need to enable each one of them in the menu Edit Tools under General Settings...
+Once one or more Edit Tools have been enable, a long tap on the page will make the Edit toolbar appear at the top of the screen. Choose a tool and then an action to perform with that tool. When you are done, tap on the check sign on the letf of the toolbar to apply your action.
+
 == Q: What is the Notebook function and how do I use it? ==
 == A: ==
 Starting with version 2.0, EBookDroid provides users with many ways to annotate their documents. The Notebook function can associate text with every page of the book. This allows the user to write extensive comments, considerations, ideas, or simply to summarize what he or she has read so far. All notebook pages can be exported as an epub document that can be read by any application and moved to other platforms for further processing.
