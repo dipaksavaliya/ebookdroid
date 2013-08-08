@@ -22,20 +22,20 @@
             android:summary="@string/pref_rotation_summary"
             android:title="@string/pref_rotation_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_splitpages_defvalue"
             android:key="@string/pref_book_splitpages_id"
             android:summary="@string/pref_splitpages_summary"
             android:title="@string/pref_splitpages_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_splitpages_rtl_defvalue"
             android:dependency="@string/pref_book_splitpages_id"
             android:key="@string/pref_book_splitpages_rtl_id"
             android:summary="@string/pref_splitpages_rtl_summary"
             android:title="@string/pref_splitpages_rtl_title" />
 
-	<CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_croppages_defvalue"
             android:key="@string/pref_book_croppages_id"
             android:summary="@string/pref_croppages_summary"
@@ -74,13 +74,13 @@
         android:summary="@string/pref_postprocessing_summary"
         android:title="@string/pref_postprocessing_category" >
 
-        <CheckBoxPreference
+        <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_nightmode_defvalue"
             android:key="@string/pref_book_nightmode_id"
             android:summary="@string/pref_nightmode_summary"
             android:title="@string/pref_nightmode_title" />
 
-        <CheckBoxPreference
+        <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_posimages_in_nightmode_defvalue"
             android:key="@string/pref_book_posimages_in_nightmode_id"
             android:summary="@string/pref_posimages_in_nightmode_summary"

@@ -15,4 +15,9 @@
     <string translatable="false" name="pref_animate_scrolling_id">animate_scrolling</string>
     <string translatable="false" name="pref_animate_scrolling_defvalue">true</string>
 
+    <string translatable="false" name="pref_quickzoomfactor_id">quickzoomfactor</string>
+    <string translatable="false" name="pref_quickzoomfactor_defvalue">200</string>
+    <string translatable="false" name="pref_quickzoomfactor_minvalue">110</string>
+    <string translatable="false" name="pref_quickzoomfactor_maxvalue">400</string>
+
 </resources>

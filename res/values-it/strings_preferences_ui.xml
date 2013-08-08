@@ -16,17 +16,19 @@
     <string name="list_lang_uk">"Ucraino (Український)"</string>
     <string name="list_lang_zh">"Cinese (中文简体)"</string>
     <string name="list_lang_iw">"Ebraico (עברית)"</string>
-<!--<string name="pref_navigation_type_title">"Navigation"</string>-->
-<!--<string name="pref_navigation_type_summary">"Navigation between documents and service views&quot;"</string>-->
-<!--<string name="pref_navigation_mode_title">"Navigation for service views"</string>-->
-<!--<string name="pref_navigation_mode_summary">"How to navigate between service views&quot;"</string>-->
-<!--<string name="list_navigation_type_list">"Drop down list in action bar"</string>-->
-<!--<string name="list_navigation_type_ctabs">"Tabs in action bar"</string>-->
-<!--<string name="list_navigation_mode_all">"Always show all service views"</string>-->
-<!--<string name="list_navigation_mode_top_always">"Alway show top service view"</string>-->
-<!--<string name="list_navigation_mode_top_hidden">"Hide top service view if book opened"</string>-->
+    <string name="pref_navigation_type_title">"Interfaccia servizi"</string>
+    <string name="pref_navigation_type_summary">"Specifica come navigare tra i documenti e i diverse modalità di catalogo (servizi)&quot;"</string>
+    <string name="pref_navigation_mode_title">"Navigazione tra servizi"</string>
+    <string name="pref_navigation_mode_summary">"Come spostarsi da un servizio all'altro&quot;"</string>
+    <string name="list_navigation_type_list">"Menu a discesa nella barra delle attività"</string>
+    <string name="list_navigation_type_ctabs">"Linguette nella barra delle attività"</string>
+    <string name="list_navigation_mode_all">"Mostra sempre tutti i servizi"</string>
+    <string name="list_navigation_mode_top_always">"Mostra sempre il servizio principale"</string>
+    <string name="list_navigation_mode_top_hidden">"Nascondi il servizio principale quando il libro è aperto"</string>
     <string name="pref_loadrecent_title">"Apri titolo recente"</string>
     <string name="pref_loadrecent_summary">"All'avvio apri l’ultimo libro letto"</string>
+<!--<string name="pref_confirmexit_title">"Confirm application exit"</string>-->
+<!--<string name="pref_confirmexit_summary">"Ask application exit confirmation on Back pressed"</string>-->
     <string name="pref_confirmclose_title">"Conferma chiusura"</string>
     <string name="pref_confirmclose_summary">"Chiedi conferma della chiusura del documento alla pressione del pulsante Indietro"</string>
     <string name="pref_brightness_title">"Luminosità"</string>
@@ -55,7 +57,5 @@
     <string name="list_toastposition_righbottom">"In basso a destra"</string>
     <string name="pref_showanimicon_title">"Visualizza simbolo animazione"</string>
     <string name="pref_showanimicon_summary">"Se l'animazione o il trascinamento sono possibili, visualizza un simbolo del tipo di animazione selezionata"</string>
-    <string name="pref_dictionarytype_title">"Dizionario"</string>
-    <string name="pref_dictionarytype_summary">"Applicazione 'dizionario' di terze parti per la ricerca delle traduzioni"</string>
 
 </resources>

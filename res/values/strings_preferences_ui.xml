@@ -35,8 +35,11 @@
     <string name="pref_loadrecent_title">Load recent</string>
     <string name="pref_loadrecent_summary">On app start, load last opened book</string>
 
-    <string name="pref_confirmclose_title">Confirm closing</string>
-    <string name="pref_confirmclose_summary">Ask close confirmation on Back pressed</string>
+    <string name="pref_confirmexit_title">Confirm application exit</string>
+    <string name="pref_confirmexit_summary">Ask application exit confirmation on Back pressed</string>
+
+    <string name="pref_confirmclose_title">Confirm book closing</string>
+    <string name="pref_confirmclose_summary">Ask book close confirmation on Back pressed</string>
 
     <string name="pref_brightness_title">Brightness</string>
     <string name="pref_brightness_summary">Set the overall image brightness (0&#8211;100)</string>
@@ -75,10 +78,5 @@
     <string name="pref_showanimicon_title">Show animation icon</string>
     <string name="pref_showanimicon_summary">Show animation or dragging icon when animations or dragging are enabled</string>
 
-    <string name="pref_dictionarytype_title">Dictionary</string>
-    <string name="pref_dictionarytype_summary">Third party application to lookup words translation</string>
 
-    <string translatable="false" name="list_dictionarytype_fora">Fora Dictionary</string>
-    <string translatable="false" name="list_dictionarytype_color">ColorDict</string>
-    <string translatable="false" name="list_dictionarytype_golden">GoldenDict</string>
 </resources>

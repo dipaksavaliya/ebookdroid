@@ -14,7 +14,7 @@
         <item>mainmenu_about</item>
         <item>mainmenu_close</item>
         <item>mainmenu_exit</item>
-        
+
         <item>mainmenu_outline</item>
         <item>mainmenu_search</item>
         <item>mainmenu_bookmark</item>
@@ -43,6 +43,7 @@
         <item>actions_zoomToColumn</item>
 
         <item>mainmenu_booksettings</item>
+        <item>mainmenu_picturesettings</item>
         <item>mainmenu_settings</item>
         <item>actions_toggleTouchManagerView</item>
         <item>actions_keyBindings</item>
@@ -69,7 +70,7 @@
         <item>@string/menu_about</item>
         <item>@string/menu_close</item>
         <item>@string/menu_exit</item>
-        
+
         <item>@string/menu_outline</item>
         <item>@string/menu_searchtext</item>
         <item>@string/menu_add_bookmark</item>
@@ -98,6 +99,7 @@
         <item>@string/actions_zoomToColumn</item>
 
         <item>@string/menu_booksettings</item>
+        <item>@string/menu_picturesettings</item>
         <item>@string/menu_settings</item>
         <item>@string/menu_tap_configuration</item>
         <item>@string/menu_key_bindings</item>

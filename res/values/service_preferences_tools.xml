@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string translatable="false" name="pref_tools_text_id">tools-text</string>
+    <string translatable="false" name="pref_tools_text_defvalue">false</string>
+
+    <string translatable="false" name="pref_tools_highlight_id">tools-highlight</string>
+    <string translatable="false" name="pref_tools_highlight_defvalue">false</string>
+
+    <string translatable="false" name="pref_tools_drawing_id">tools-drawing</string>
+    <string translatable="false" name="pref_tools_drawing_defvalue">false</string>
+
+    <string translatable="false" name="pref_tools_notes_id">tools-notes</string>
+    <string translatable="false" name="pref_tools_notes_defvalue">false</string>
+
+    <string translatable="false" name="pref_dictionarytype_id">dictionarytype</string>
+    <string translatable="false" name="pref_dictionarytype_defvalue">Fora</string>
+    <string translatable="false" name="pref_dictionarytype_fora">Fora</string>
+    <string translatable="false" name="pref_dictionarytype_color">ColorDict</string>
+    <string translatable="false" name="pref_dictionarytype_golden">GoldenDict</string>
+
+    <string-array name="pref_dictionarytype_entries" translatable="false">
+        <item>@string/list_dictionarytype_fora</item>
+        <item>@string/list_dictionarytype_color</item>
+        <item>@string/list_dictionarytype_golden</item>
+        </string-array>
+
+    <string-array name="pref_dictionarytype_values" translatable="false">
+        <item>@string/pref_dictionarytype_fora</item>
+        <item>@string/pref_dictionarytype_color</item>
+        <item>@string/pref_dictionarytype_golden</item>
+        </string-array>
+
+</resources>

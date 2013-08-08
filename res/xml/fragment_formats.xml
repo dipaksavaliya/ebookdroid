@@ -4,56 +4,56 @@
     android:summary="@string/pref_brbrfiletypesscreen_summary"
     android:title="@string/pref_brbrfiletypesscreen_title" >
 
-    <org.emdev.ui.preference.JsonCheckBoxPreference
+    <org.emdev.ui.preference.JsonSwitchPreferenceEx
         android:defaultValue="true"
         android:key="@string/pref_brfiletypes"
         android:summary="@string/pref_ft_djvu_summary"
         android:title="@string/pref_ft_djvu_title"
         ebookdroid:jsonProperty="@string/pref_ft_djvu" />
 
-    <org.emdev.ui.preference.JsonCheckBoxPreference
+    <org.emdev.ui.preference.JsonSwitchPreferenceEx
         android:defaultValue="true"
         android:key="@string/pref_brfiletypes"
         android:summary="@string/pref_ft_pdf_summary"
         android:title="@string/pref_ft_pdf_title"
         ebookdroid:jsonProperty="@string/pref_ft_pdf" />
 
-    <org.emdev.ui.preference.JsonCheckBoxPreference
+    <org.emdev.ui.preference.JsonSwitchPreferenceEx
         android:defaultValue="true"
         android:key="@string/pref_brfiletypes"
         android:summary="@string/pref_ft_xps_summary"
         android:title="@string/pref_ft_xps_title"
         ebookdroid:jsonProperty="@string/pref_ft_xps" />
 
-    <org.emdev.ui.preference.JsonCheckBoxPreference
+    <org.emdev.ui.preference.JsonSwitchPreferenceEx
         android:defaultValue="true"
         android:key="@string/pref_brfiletypes"
         android:summary="@string/pref_ft_cbx_summary"
         android:title="@string/pref_ft_cbx_title"
         ebookdroid:jsonProperty="@string/pref_ft_cbx" />
 
-    <org.emdev.ui.preference.JsonCheckBoxPreference
+    <org.emdev.ui.preference.JsonSwitchPreferenceEx
         android:defaultValue="true"
         android:key="@string/pref_brfiletypes"
         android:summary="@string/pref_ft_fb2_summary"
         android:title="@string/pref_ft_fb2_title"
         ebookdroid:jsonProperty="@string/pref_ft_fb2" />
 
-    <org.emdev.ui.preference.JsonCheckBoxPreference
+    <org.emdev.ui.preference.JsonSwitchPreferenceEx
         android:defaultValue="false"
         android:key="@string/pref_brfiletypes"
         android:summary="@string/pref_ft_epub_summary"
         android:title="@string/pref_ft_epub_title"
         ebookdroid:jsonProperty="@string/pref_ft_epub" />
 
-    <org.emdev.ui.preference.JsonCheckBoxPreference
+    <org.emdev.ui.preference.JsonSwitchPreferenceEx
         android:defaultValue="false"
         android:key="@string/pref_brfiletypes"
         android:summary="@string/pref_ft_rtf_summary"
         android:title="@string/pref_ft_rtf_title"
         ebookdroid:jsonProperty="@string/pref_ft_rtf" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
         android:defaultValue="@string/pref_handle_http_defvalue"
         android:key="@string/pref_handle_http_id"
         android:summary="@string/pref_handle_http_summary"

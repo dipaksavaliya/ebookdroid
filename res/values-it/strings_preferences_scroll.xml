@@ -13,5 +13,7 @@
     <string name="pref_touchdelay_summary">"Ritardo (in millisecondi) nell'elaborazione del tocco"</string>
     <string name="pref_animate_scrolling_title">"Animazione transizione pagina"</string>
     <string name="pref_animate_scrolling_summary">"Anima l'operazione di transizione pagina nelle modalità che lo consentono"</string>
+<!--<string name="pref_quickzoomfactor_title">"Quick zoom"</string>-->
+<!--<string name="pref_quickzoomfactor_summary">"Quick zoom scale factor (in percent)"</string>-->
 
 </resources>

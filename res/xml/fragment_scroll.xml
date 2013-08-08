@@ -4,11 +4,11 @@
     android:summary="@string/pref_scroll_category_summary"
     android:title="@string/pref_scroll_category" >
 
-    <CheckBoxPreference
-        android:defaultValue="@string/pref_tapsenabled_defvalue"
-        android:key="@string/pref_tapsenabled_id"
-        android:summary="@string/pref_tapsenabled_summary"
-        android:title="@string/pref_tapsenabled_title" />
+    <org.emdev.ui.preference.SwitchPreferenceEx
+            android:defaultValue="@string/pref_tapsenabled_defvalue"
+            android:key="@string/pref_tapsenabled_id"
+            android:summary="@string/pref_tapsenabled_summary"
+            android:title="@string/pref_tapsenabled_title" />
 
     <org.emdev.ui.preference.SeekBarPreference
             android:defaultValue="@string/pref_scrollheight_defvalue"
@@ -26,10 +26,18 @@
             android:summary="@string/pref_wheelscroll_summary"
             android:title="@string/pref_wheelscroll_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_animate_scrolling_defvalue"
             android:key="@string/pref_animate_scrolling_id"
             android:summary="@string/pref_animate_scrolling_summary"
             android:title="@string/pref_animate_scrolling_title" />
+
+    <org.emdev.ui.preference.SeekBarPreference
+            android:defaultValue="@string/pref_quickzoomfactor_defvalue"
+            android:key="@string/pref_quickzoomfactor_id"
+            ebookdroid:minValue="@string/pref_quickzoomfactor_minvalue"
+            ebookdroid:maxValue="@string/pref_quickzoomfactor_maxvalue"
+            android:summary="@string/pref_quickzoomfactor_summary"
+            android:title="@string/pref_quickzoomfactor_title" />
 
 </PreferenceScreen>

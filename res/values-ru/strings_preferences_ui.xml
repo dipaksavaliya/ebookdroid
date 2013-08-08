@@ -27,6 +27,8 @@
     <string name="list_navigation_mode_top_hidden">"Прятать служебную вкладку при открытой книге"</string>
     <string name="pref_loadrecent_title">"Открывать последнее"</string>
     <string name="pref_loadrecent_summary">"На старте автоматически открывать последнюю книгу"</string>
+    <string name="pref_confirmexit_title">"Потверждать выход"</string>
+    <string name="pref_confirmexit_summary">"Запрашивать потверждение при выходе из приложения"</string>
     <string name="pref_confirmclose_title">"Потверждать закрытие книги"</string>
     <string name="pref_confirmclose_summary">"Запрашивать потверждение закрытия книги по при нажатии кнопки Обратно"</string>
     <string name="pref_brightness_title">"Яркость"</string>
@@ -55,7 +57,5 @@
     <string name="list_toastposition_righbottom">"Правый нижний угол"</string>
     <string name="pref_showanimicon_title">"Показывать тип анимации"</string>
     <string name="pref_showanimicon_summary">"Показывать тип анимации если анимация или перетаскивание возможны"</string>
-    <string name="pref_dictionarytype_title">"Словарь"</string>
-    <string name="pref_dictionarytype_summary">"Стороннее приложение для перевода"</string>
 
 </resources>
