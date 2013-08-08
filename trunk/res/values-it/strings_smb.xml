@@ -17,7 +17,7 @@
     <string name="smb_deleteserver_title">"Elimina i server"</string>
     <string name="smb_deleteserver_msg">"Vuoi davvero eliminare tutti i server selezionati?"</string>
     <string name="smb_deleteserver_ok">"Elimina"</string>
-<!--<string name="smb_add_new_server">"Add new server"</string>-->
+    <string name="smb_add_new_server">"Aggiungi un nuovo server"</string>
     <string name="smb_edit">"Modifica"</string>
     <string name="smb_delete">"Cancella"</string>
 

@@ -37,12 +37,17 @@
 
     <string name="pref_ft_cbx" translatable="false">cbx</string>
 
-    <string-array name="pref_ft_cbx_ext" translatable="false">
+    <string-array name="pref_ft_cbz_ext" translatable="false">
         <item>cbz</item>
+    </string-array>
+    <string-array name="pref_ft_cbz_mime" translatable="false">
+        <item>application/x-cbz</item>
+    </string-array>
+
+    <string-array name="pref_ft_cbr_ext" translatable="false">
         <item>cbr</item>
     </string-array>
-    <string-array name="pref_ft_cbx_mime" translatable="false">
-        <item>application/x-cbz</item>
+    <string-array name="pref_ft_cbr_mime" translatable="false">
         <item>application/x-cbr</item>
     </string-array>
 

@@ -29,13 +29,19 @@
             android:summary="@string/pref_navigation_mode_summary"
             android:title="@string/pref_navigation_mode_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_loadrecent_defvalue"
             android:key="@string/pref_loadrecent_id"
             android:summary="@string/pref_loadrecent_summary"
             android:title="@string/pref_loadrecent_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
+            android:defaultValue="@string/pref_confirmexit_defvalue"
+            android:key="@string/pref_confirmexit_id"
+            android:summary="@string/pref_confirmexit_summary"
+            android:title="@string/pref_confirmexit_title" />
+
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_confirmclose_defvalue"
             android:key="@string/pref_confirmclose_id"
             android:summary="@string/pref_confirmclose_summary"
@@ -49,39 +55,38 @@
             android:summary="@string/pref_brightness_summary"
             android:title="@string/pref_brightness_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_brightnessnightmodeonly_defvalue"
             android:key="@string/pref_brightnessnightmodeonly_id"
             android:summary="@string/pref_brightnessnightmodeonly_summary"
             android:title="@string/pref_brightnessnightmodeonly_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_keepscreenon_defvalue"
             android:key="@string/pref_keepscreenon_id"
             android:summary="@string/pref_keepscreenon_summary"
             android:title="@string/pref_keepscreenon_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_hide_sbar_defvalue"
             android:key="@string/pref_hide_sbar_id"
             android:summary="@string/pref_hide_sbar_summary"
             android:title="@string/pref_hide_sbar_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_hide_sysui_defvalue"
             android:key="@string/pref_hide_sysui_id"
             android:summary="@string/pref_hide_sysui_summary"
             android:title="@string/pref_hide_sysui_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_title_defvalue"
             android:key="@string/pref_title_id"
             android:summary="@string/pref_title_summary"
             android:title="@string/pref_title_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_pageintitle_defvalue"
-            android:dependency="@string/pref_title_id"
             android:key="@string/pref_pageintitle_id"
             android:summary="@string/pref_pageintitle_summary"
             android:title="@string/pref_pageintitle_title" />
@@ -102,18 +107,10 @@
             android:summary="@string/pref_zoomtoastposition_summary"
             android:title="@string/pref_zoomtoastposition_title" />
 
-    <CheckBoxPreference
+    <org.emdev.ui.preference.SwitchPreferenceEx
             android:defaultValue="@string/pref_showanimicon_defvalue"
             android:key="@string/pref_showanimicon_id"
             android:summary="@string/pref_showanimicon_summary"
             android:title="@string/pref_showanimicon_title" />
-
-    <ListPreference
-            android:defaultValue="@string/pref_dictionarytype_defvalue"
-            android:entries="@array/pref_dictionarytype_entries"
-            android:entryValues="@array/pref_dictionarytype_values"
-            android:key="@string/pref_dictionarytype_id"
-            android:summary="@string/pref_dictionarytype_summary"
-            android:title="@string/pref_dictionarytype_title" />
 
 </PreferenceScreen>

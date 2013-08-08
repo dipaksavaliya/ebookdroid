@@ -1,0 +1,39 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ebookdroid="http://ebookdroid.org"
+    android:summary="@string/pref_tools_summary"
+    android:title="@string/pref_tools_title" >
+
+    <org.emdev.ui.preference.SwitchPreferenceEx
+        android:defaultValue="@string/pref_tools_text_defvalue"
+        android:key="@string/pref_tools_text_id"
+        android:summary="@string/pref_tools_text_summary"
+        android:title="@string/pref_tools_text_title" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_dictionarytype_defvalue"
+        android:dependency="@string/pref_tools_text_id"
+        android:entries="@array/pref_dictionarytype_entries"
+        android:entryValues="@array/pref_dictionarytype_values"
+        android:key="@string/pref_dictionarytype_id"
+        android:summary="@string/pref_dictionarytype_summary"
+        android:title="@string/pref_dictionarytype_title" />
+
+    <org.emdev.ui.preference.SwitchPreferenceEx
+        android:defaultValue="@string/pref_tools_highlight_defvalue"
+        android:key="@string/pref_tools_highlight_id"
+        android:summary="@string/pref_tools_highlight_summary"
+        android:title="@string/pref_tools_highlight_title" />
+
+    <org.emdev.ui.preference.SwitchPreferenceEx
+        android:defaultValue="@string/pref_tools_drawing_defvalue"
+        android:key="@string/pref_tools_drawing_id"
+        android:summary="@string/pref_tools_drawing_summary"
+        android:title="@string/pref_tools_drawing_title" />
+
+    <org.emdev.ui.preference.SwitchPreferenceEx
+        android:defaultValue="@string/pref_tools_notes_defvalue"
+        android:key="@string/pref_tools_notes_id"
+        android:summary="@string/pref_tools_notes_summary"
+        android:title="@string/pref_tools_notes_title" />
+
+</PreferenceScreen>

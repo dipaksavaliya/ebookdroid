@@ -5,6 +5,10 @@
             android:title="@string/pref_brbrfiletypesscreen_title"
             android:summary="@string/pref_brbrfiletypesscreen_summary" />
 
+    <header android:fragment="org.ebookdroid.ui.settings.fragments.ToolsFragment"
+            android:title="@string/pref_tools_title"
+            android:summary="@string/pref_tools_summary" />
+
     <header android:fragment="org.ebookdroid.ui.settings.fragments.UIFragment"
             android:title="@string/pref_ui_category"
             android:summary="@string/pref_ui_category_summary" />

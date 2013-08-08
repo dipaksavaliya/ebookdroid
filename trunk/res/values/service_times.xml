@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <item name="app_icon_refresh_phase_duration" type="integer">100</item>
+
+</resources>

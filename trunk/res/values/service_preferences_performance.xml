@@ -6,6 +6,27 @@
     <string translatable="false" name="pref_pagesinmemory_minvalue">0</string>
     <string translatable="false" name="pref_pagesinmemory_maxvalue">16</string>
 
+    <string translatable="false" name="pref_force_simd_id">force_simd</string>
+    <string translatable="false" name="pref_force_simd_defvalue">false</string>
+
+    <string translatable="false" name="pref_decodeprocess_nicelevel_id">decodeprocess_nicelevel</string>
+    <string translatable="false" name="pref_decodeprocess_nicelevel_defvalue">Lower</string>
+    <string translatable="false" name="pref_decodeprocess_nicelevel_default">Default</string>
+    <string translatable="false" name="pref_decodeprocess_nicelevel_lower">Lower</string>
+    <string translatable="false" name="pref_decodeprocess_nicelevel_lowest">Lowest</string>
+
+    <string-array name="pref_decodeprocess_nicelevel_entries" translatable="false">
+        <item>@string/list_decodeprocess_nicelevel_default</item>
+        <item>@string/list_decodeprocess_nicelevel_lower</item>
+        <item>@string/list_decodeprocess_nicelevel_lowest</item>
+    </string-array>
+
+    <string-array name="pref_decodeprocess_nicelevel_values" translatable="false">
+        <item>@string/pref_decodeprocess_nicelevel_default</item>
+        <item>@string/pref_decodeprocess_nicelevel_lower</item>
+        <item>@string/pref_decodeprocess_nicelevel_lowest</item>
+    </string-array>
+
     <string translatable="false" name="pref_decodethread_priority_id">decodethread_priority</string>
     <string translatable="false" name="pref_drawthread_priority_id">drawthread_priority</string>
 
