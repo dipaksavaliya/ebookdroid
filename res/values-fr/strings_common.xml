@@ -17,9 +17,6 @@
 <!--<string name="confirmsave_no_btn">"Close"</string>-->
 <!--<string name="error_dlg_title">"Application error"</string>-->
 <!--<string name="error_native_failed">"Fatal error: application is inconsistent."</string>-->
-<!--<string name="msg_bad_intent">"Bad intent or scheme:\n%s"</string>-->
-<!--<string name="msg_no_intent_data">"No intent data:\n%s"</string>-->
-<!--<string name="msg_unknown_intent_data_type">"Unknown intent data type:\n%s"</string>-->
 <!--<string name="msg_loading_book">"Loading book: %1$s…"</string>-->
 <!--<string name="msg_wrong_password">"Wrong password…"</string>-->
     <string name="msg_password_required">"Entrer le mot de passe…"</string>
@@ -41,6 +38,11 @@
 <!--<string name="bookmark_current">"Current position"</string>-->
     <string name="bookmark_end">"Fin"</string>
     <string name="bookmark_invalid_page">"Numéro de incorrect. Pages disponibles : %1$d-%2$d"</string>
+<!--<string name="notes_title">"Notes"</string>-->
+<!--<string name="clear_notes_title">"Clear notes"</string>-->
+<!--<string name="clear_notes_text">"This action will remove all notes from the selected book. Continue?"</string>-->
+<!--<string name="del_note_title">"Remove note"</string>-->
+<!--<string name="del_note_text">"Remove this note?"</string>-->
     <string name="bookmarks_title">"Signets"</string>
     <string name="clear_bookmarks_title">"Effacer les signets"</string>
     <string name="clear_bookmarks_text">"Vous souhaitez réellement effacer tous les signets ?"</string>
@@ -64,6 +66,7 @@
 <!--<string name="about_thanks_title">"Acknowledgments"</string>-->
 <!--<string name="about_donations">"Donations"</string>-->
 <!--<string name="browser_add">"Add new"</string>-->
+<!--<string name="browser_paste">"Paste selected"</string>-->
 <!--<string name="browser_createfolder">"Create folder"</string>-->
 <!--<string name="browser_createfolder_msg">"Enter folder name:"</string>-->
 <!--<string name="browser_refresh">"Refresh"</string>-->
@@ -103,8 +106,6 @@
 <!--<string name="move_book_to_dlg_title">"Move book to…"</string>-->
 <!--<string name="notification_file_add">"File added to library"</string>-->
 <!--<string name="notification_file_delete">"File removed from library"</string>-->
-<!--<string name="font_reminder_title">"Warning"</string>-->
-<!--<string name="font_reminder">"Starting with version 1.5, PDF and FB2 fonts are no longer embedded in the application. Standard Android fonts are used instead. If you wish to restore legacy fonts or install custom fonts, please use font package installers from Google Play Market: &lt;ul&gt;&lt;li&gt;&lt;a href=&quot;market://details?id=org.ebookdroid.fontpack.legacy&quot;&gt;Legacy fonts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;"</string>-->
 <!--<string name="msg_fonts_installing_pack">"Installing embedded fonts: %1$s…"</string>-->
 <!--<string name="cache_moving_text">"Moving cached files…"</string>-->
 <!--<string name="cache_moving_progress">"Moving cached files %1$d/%2$d"</string>-->

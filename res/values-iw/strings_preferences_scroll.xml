@@ -13,5 +13,7 @@
     <string name="pref_touchdelay_summary">"עיכוב בעיבוד נגיעות (באלפיות שנייה)"</string>
     <string name="pref_animate_scrolling_title">"הנפשת הגלילה"</string>
     <string name="pref_animate_scrolling_summary">"הנפשת הגלילה במצב מגילה"</string>
+<!--<string name="pref_quickzoomfactor_title">"Quick zoom"</string>-->
+<!--<string name="pref_quickzoomfactor_summary">"Quick zoom scale factor (in percent)"</string>-->
 
 </resources>

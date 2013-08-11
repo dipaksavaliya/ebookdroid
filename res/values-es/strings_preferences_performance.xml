@@ -5,8 +5,15 @@
     <string name="pref_performance_category_summary">"Mejorar el rendimiento ajustando determinados parámetros"</string>
     <string name="pref_pagesinmemory_title">"Páginas en memoria"</string>
     <string name="pref_pagesinmemory_summary">"Número de páginas a almacenar en memoria"</string>
+<!--<string name="pref_force_simd_title">"Use SIMD optimizations"</string>-->
+<!--<string name="pref_force_simd_summary">"Use SIMD instructions (NEON for ARMv7 or SSE for x86)"</string>-->
     <string name="pref_lowlevel_category">"Preferencias de bajo nivel"</string>
     <string name="pref_lowlevel_category_summary">"Preferencias de bajo nivel para la aplicación (se aplican tras recargar el documento)"</string>
+<!--<string name="pref_decodeprocess_nicelevel_title">"Decode process nice level"</string>-->
+<!--<string name="pref_decodeprocess_nicelevel_summary">"Defines nice level for separated decoding processes"</string>-->
+<!--<string name="list_decodeprocess_nicelevel_default">"Default"</string>-->
+<!--<string name="list_decodeprocess_nicelevel_lower">"Higher priority"</string>-->
+<!--<string name="list_decodeprocess_nicelevel_lowest">"Highest priority"</string>-->
     <string name="pref_decodethread_priority_title">"Prioridad del hilo de decodificación"</string>
     <string name="pref_decodethread_priority_summary">"Define la prioridad del hilo encargado de la decodificación"</string>
 <!--<string name="pref_decodethread_timeout_title">"Decode thread timeout"</string>-->

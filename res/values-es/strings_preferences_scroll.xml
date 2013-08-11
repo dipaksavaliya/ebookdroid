@@ -13,5 +13,7 @@
     <string name="pref_touchdelay_summary">"Demora al procesar toque (en milisegundos)"</string>
     <string name="pref_animate_scrolling_title">"Animar desplazamiento"</string>
     <string name="pref_animate_scrolling_summary">"Animar desplazamiento durante los modos de desplazamiento"</string>
+<!--<string name="pref_quickzoomfactor_title">"Quick zoom"</string>-->
+<!--<string name="pref_quickzoomfactor_summary">"Quick zoom scale factor (in percent)"</string>-->
 
 </resources>

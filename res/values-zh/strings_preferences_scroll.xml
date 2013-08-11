@@ -13,5 +13,7 @@
     <string name="pref_touchdelay_summary">"触摸处理延时（毫秒）"</string>
     <string name="pref_animate_scrolling_title">"动画滚动"</string>
     <string name="pref_animate_scrolling_summary">"动画滚动滚动模式"</string>
+<!--<string name="pref_quickzoomfactor_title">"Quick zoom"</string>-->
+<!--<string name="pref_quickzoomfactor_summary">"Quick zoom scale factor (in percent)"</string>-->
 
 </resources>
