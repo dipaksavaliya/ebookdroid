@@ -66,6 +66,7 @@
     <string name="about_thanks_title">"תודות"</string>
 <!--<string name="about_donations">"Donations"</string>-->
 <!--<string name="browser_add">"Add new"</string>-->
+<!--<string name="browser_paste">"Paste selected"</string>-->
 <!--<string name="browser_createfolder">"Create folder"</string>-->
 <!--<string name="browser_createfolder_msg">"Enter folder name:"</string>-->
 <!--<string name="browser_refresh">"Refresh"</string>-->
@@ -105,8 +106,6 @@
     <string name="move_book_to_dlg_title">"העבר את הספר …"</string>
     <string name="notification_file_add">"הקובץ יתווסף להספריה"</string>
     <string name="notification_file_delete">"קובץ נמחק מהספרייה"</string>
-    <string name="font_reminder_title">"תשומת לב"</string>
-    <string name="font_reminder">"החל בגרסה 1.5 של התכנית הוסרו גופנים המוטבעים, המשמשים להצגת ספרים בפורמט PDF וfb2. עכשיו, במקומם משתמשים בגופנים הסטנדרטיים של אנדרואיד. אם אתה רוצה לחזיר אותם או להתקין גופנים חדשים, להוריד את הגופנים משוק של Google Play: &lt;ul&gt; &lt;li&gt; &lt;a href=market://details?id=org.ebookdroid.fontpack.legacy&gt; גופן ישן &lt;/ a&gt; &lt;/ Li&gt; &lt;/ ul&gt;"</string>
 <!--<string name="msg_fonts_installing_pack">"Installing embedded fonts: %1$s…"</string>-->
     <string name="cache_moving_text">"העברת קבצים למטמון …"</string>
     <string name="cache_moving_progress">"העברת קובץ %1$d %2$d"</string>

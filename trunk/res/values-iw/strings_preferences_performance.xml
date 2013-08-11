@@ -5,8 +5,15 @@
     <string name="pref_performance_category_summary">"ההגדרות ביצועים"</string>
     <string name="pref_pagesinmemory_title">"דפים בזיכרון"</string>
     <string name="pref_pagesinmemory_summary">"מספר העמודים המאוחסנים בזיכרון"</string>
+<!--<string name="pref_force_simd_title">"Use SIMD optimizations"</string>-->
+<!--<string name="pref_force_simd_summary">"Use SIMD instructions (NEON for ARMv7 or SSE for x86)"</string>-->
     <string name="pref_lowlevel_category">"אפליקצית Tweaks (חובה לפתוח מחדש את המסמך)"</string>
     <string name="pref_lowlevel_category_summary">"הגדרות מתקדמות (חובה לפתוח מחדש את המסמך)"</string>
+<!--<string name="pref_decodeprocess_nicelevel_title">"Decode process nice level"</string>-->
+<!--<string name="pref_decodeprocess_nicelevel_summary">"Defines nice level for separated decoding processes"</string>-->
+<!--<string name="list_decodeprocess_nicelevel_default">"Default"</string>-->
+<!--<string name="list_decodeprocess_nicelevel_lower">"Higher priority"</string>-->
+<!--<string name="list_decodeprocess_nicelevel_lowest">"Highest priority"</string>-->
     <string name="pref_decodethread_priority_title">"עדיפות זרם פענוח"</string>
     <string name="pref_decodethread_priority_summary">"עדיפות זרם פענוח"</string>
 <!--<string name="pref_decodethread_timeout_title">"Decode thread timeout"</string>-->

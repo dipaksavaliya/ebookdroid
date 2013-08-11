@@ -16,6 +16,7 @@
     <string name="list_lang_uk">"Ukraniano (Український)"</string>
     <string name="list_lang_zh">"Chino (中文简体)"</string>
 <!--<string name="list_lang_iw">"Hebrew (עברית)"</string>-->
+<!--<string name="list_lang_tt">"Tatar (Татар)"</string>-->
 <!--<string name="pref_navigation_type_title">"Navigation"</string>-->
 <!--<string name="pref_navigation_type_summary">"Navigation between documents and service views&quot;"</string>-->
 <!--<string name="pref_navigation_mode_title">"Navigation for service views"</string>-->
@@ -27,6 +28,8 @@
 <!--<string name="list_navigation_mode_top_hidden">"Hide top service view if book opened"</string>-->
     <string name="pref_loadrecent_title">"Abrir reciente"</string>
     <string name="pref_loadrecent_summary">"Al arrancar, abrir automáticamente el último libro"</string>
+<!--<string name="pref_confirmexit_title">"Confirm application exit"</string>-->
+<!--<string name="pref_confirmexit_summary">"Ask application exit confirmation on Back pressed"</string>-->
     <string name="pref_confirmclose_title">"Confirmar cerrar"</string>
     <string name="pref_confirmclose_summary">"Confirmar el cierre al presionar Volver"</string>
     <string name="pref_brightness_title">"Brillo"</string>
@@ -55,7 +58,5 @@
     <string name="list_toastposition_righbottom">"Esquina inferior derecha"</string>
     <string name="pref_showanimicon_title">"Mostrar icono de animación"</string>
     <string name="pref_showanimicon_summary">"Mostrar animación o icono de desplazamiento si están activados"</string>
-<!--<string name="pref_dictionarytype_title">"Dictionary"</string>-->
-<!--<string name="pref_dictionarytype_summary">"Third party application to lookup words translation"</string>-->
 
 </resources>

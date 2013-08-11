@@ -16,20 +16,22 @@
 <!--<string name="list_lang_uk">"Ukrainian (Український)"</string>-->
 <!--<string name="list_lang_zh">"Chinese (中文简体)"</string>-->
 <!--<string name="list_lang_iw">"Hebrew (עברית)"</string>-->
+<!--<string name="list_lang_tt">"Tatar (Татар)"</string>-->
 <!--<string name="pref_navigation_type_title">"Navigation"</string>-->
 <!--<string name="pref_navigation_type_summary">"Navigation between documents and service views&quot;"</string>-->
 <!--<string name="pref_navigation_mode_title">"Navigation for service views"</string>-->
 <!--<string name="pref_navigation_mode_summary">"How to navigate between service views&quot;"</string>-->
 <!--<string name="list_navigation_type_list">"Drop down list in action bar"</string>-->
-<!--<string name="list_navigation_type_tabs">"Tabs in action bar"</string>-->
-<!--<string name="list_navigation_type_ctabs">"Custom tabs in action bar"</string>-->
+<!--<string name="list_navigation_type_ctabs">"Tabs in action bar"</string>-->
 <!--<string name="list_navigation_mode_all">"Always show all service views"</string>-->
 <!--<string name="list_navigation_mode_top_always">"Alway show top service view"</string>-->
 <!--<string name="list_navigation_mode_top_hidden">"Hide top service view if book opened"</string>-->
     <string name="pref_loadrecent_title">"Відкривати останнє"</string>
     <string name="pref_loadrecent_summary">"На старті автоматично відкривати останню книгу"</string>
-<!--<string name="pref_confirmclose_title">"Confirm closing"</string>-->
-<!--<string name="pref_confirmclose_summary">"Ask close confirmation on Back pressed"</string>-->
+<!--<string name="pref_confirmexit_title">"Confirm application exit"</string>-->
+<!--<string name="pref_confirmexit_summary">"Ask application exit confirmation on Back pressed"</string>-->
+<!--<string name="pref_confirmclose_title">"Confirm book closing"</string>-->
+<!--<string name="pref_confirmclose_summary">"Ask book close confirmation on Back pressed"</string>-->
     <string name="pref_brightness_title">"Яскравість"</string>
     <string name="pref_brightness_summary">"Налаштування загальної яскравості картинки (0–100)"</string>
     <string name="pref_brightnessnightmodeonly_title">"Яскравість вночі"</string>
@@ -56,7 +58,5 @@
 <!--<string name="list_toastposition_righbottom">"Right bottom corner"</string>-->
     <string name="pref_showanimicon_title">"Показувати тип анімації"</string>
     <string name="pref_showanimicon_summary">"Показувати тип анімації, якщо анімація або перетягування можливі"</string>
-<!--<string name="pref_dictionarytype_title">"Dictionary"</string>-->
-<!--<string name="pref_dictionarytype_summary">"Third party application to lookup words translation"</string>-->
 
 </resources>
