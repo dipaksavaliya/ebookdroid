@@ -7,6 +7,84 @@
  * Only Android 4+ devices supported.
  * Legacy fonts are added back in package and selected by default.
 
+= EBookDroid v2.0.6 changelog =
+
+== Common changes ==
+ * Assembled APKs and source code for PDF and DJVU standalone decoders are available on Google Drive: http://goo.gl/SKKb8c
+ * Tatar localization added.
+ * Width of navigation tabs in action bar is restricted
+
+===Book viewer features===
+ * Manual crop view is re-styled and works in all view modes.
+
+== Bug fixes ==
+ * Attempt to fix black screen on return from settings
+ * Attempt to fix action bar padding
+ * Exit confirmation fixed.
+ * Menu button processing fixed
+ * Various crashes fixed
+
+
+= EBookDroid v2.0.4 changelog =
+
+== Bug fixes ==
+ * Indetermined progress indicator removed from title bar
+ * Menu button processing fixed
+ * Various crashes fixed
+
+
+= EBookDroid v2.0.3 changelog =
+
+== Common changes ==
+ * Progress indicator is shown instead of application icon now.
+ * Overflow sub-menu is opened on Menu button press.
+
+==Decoding features==
+ * SSE optimizations in JPEG decoding are available now.
+
+== Preference changes ==
+ * "Quick zoom scale factor" preference is added.
+
+== Bug fixes ==
+ * Various fixes
+
+= EBookDroid v2.0.2 changelog =
+
+== Common changes ==
+ * NDK v9 and GCC 4.8 are used to compile native code
+ * The JPEG-turbo library is updated and configured to switch on/off SIMD optimizations in runtime.
+
+== Preference changes ==
+ * "Decode process nice level" preference added.
+ * "Use SIMD optimizations" preference added.
+
+===Decoding features===
+ * Forced line splitting added for EPUB, FB2 and RTF.
+ * New icon added to show bookmarks/notes in the night mode.
+
+== Bug fixes ==
+ * Various fixes
+
+
+= EBookDroid v2.0.1 changelog =
+
+== Common changes ==
+ * Removed reference to standard Android Holo theme
+ * JPEG library replaced by JPEG-turbo
+ * Menu re-styling for phones and small tablets.
+
+== Preference changes ==
+ * "Confirm exit" preference added.
+
+== Bug fixes ==
+ * Fixed XPS opening.
+ * Fixed AES encoded PDF opening.
+ * Fixed some errors reported on Google Play
+ * Fixed processing of interlaced GIFs
+ * Fixed processing of EPUB entities
+ * Various fixes
+
+
 = EBookDroid v2.0.0 changelog =
 
 ==New features==
