@@ -7,6 +7,18 @@
  * Only Android 4+ devices supported.
  * Legacy fonts are added back in package and selected by default.
 
+= EBookDroid v2.0.7 changelog =
+
+== Decoding features ==
+ * EPUB parsing speed improved.
+
+== Book viewer features ==
+ * Bookmarks, notes and notebooks re-styled
+
+== Preference changes ==
+ * "All Settings/Supported Tools/SPen starts drawing" preference is added.
+
+
 = EBookDroid v2.0.6 changelog =
 
 == Common changes ==
