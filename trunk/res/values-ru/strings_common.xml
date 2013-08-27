@@ -104,7 +104,7 @@
     <string name="folder_books_count">"Книг: %1$d"</string>
     <string name="copy_book_to_dlg_title">"Копировать книгу в…"</string>
     <string name="move_book_to_dlg_title">"Переместить книгу в…"</string>
-    <string name="notification_file_add">"Файл добавлен в бибилиотеку"</string>
+    <string name="notification_file_add">"Файл добавлен в библиотеку"</string>
     <string name="notification_file_delete">"Файл удален из библиотеки"</string>
     <string name="msg_fonts_installing_pack">"Инсталляция встроенных шрифтов: %1$s…"</string>
     <string name="cache_moving_text">"Перенос кэшированных файлов…"</string>

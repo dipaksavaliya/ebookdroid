@@ -20,4 +20,7 @@
     <dimen name="thumbnail_size">134dip</dimen>
     <dimen name="thumbnail_decor_size">0.35dip</dimen>
 
+    <dimen name="pref_text_size">20sp</dimen>
+
+    <item type="integer" name="pref_tab_text_size">11</item>
 </resources>
