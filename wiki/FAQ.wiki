@@ -10,7 +10,7 @@ The most prominent feature of EBookDroid is its customizability: you can tune th
 Most (but not all!) of the setting are accessible via the later swiping menus. 
 The menu on the left has mostly system and file-system options; the menu on the right has mostly viewing and appearance options. To access the menus just swipe horizontally near the blue glowing areas (and yes, you can disable the blue glow, if you wish so!).
 
-== Q: Do I need to download some plug-in to view my PDF documents? ==
+== Q: Do I need to download some plug-in to view my PDF or DJVU documents? ==
 == A: ==
 No, all plug-ins are _already integrated_ into EBookDroid. All you have to do is to acknowledge installation and the fact that you want to use the plug-in to read your documents. The reason for this is simply that starting with version 2.0 some of the code is now used as separate modules in form of a plug-in.
 
@@ -22,7 +22,7 @@ You have to enable file type associations in General settings..., File Associati
 == A: ==
 You leave your books and documents exactly as they are- there is no need to import or copy them in special folders. Just specify the path were you keep them stored (for example on your external SD card) and they will be available in the graphical user interface (the bookshelf).
 Each folder and subfolder is graphically translated into a separate bookshelf that you can browse by swiping down (if there are more books than can be displayed in a single screen). 
-You can browse between bookshelf (that is folders) by swiping left and right.
+You can browse between bookshelves (that is folders) by swiping left and right.
 By default, the "Recent" bookshelf is shown when EBookDroid is first opened.
 
 If you prefer browsing directory trees, you can do so by accessing the Folder View under the EBookDroid icon button (it's on the top left corner: the backward E and B that look like two books - or a droid with a green dome...).
