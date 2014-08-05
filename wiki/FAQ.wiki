@@ -1,5 +1,6 @@
 == Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
-== A: == EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
+== A: == 
+EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
 
 == Q: Now, what is EBookDroid and what can I do with it? ==
 == A: ==
