@@ -1,38 +1,89 @@
-== Q: How do I obtain the program's log file? ==
+== Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
+== A: == EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
+
+== Q: Now, what is EBookDroid and what can I do with it? ==
 == A: ==
-=== 1. On the PC, using Android SDK ===
-Connect your device to a PC running Android SDK and issue the command _"adb logcat"_.
-=== 2. On the device ===
-There are many apps on the Market that allow you to see and save the log file directly on the device.
-For example:
- * https://market.android.com/details?id=com.nolanlawson.logcat
- * https://market.android.com/details?id=org.jtb.alogcat
+Well, first and foremost you can read books or, in more generally, documents of many sorts: PDF, DJVU, EPUB, FB2, CBR, CBZ, even RTF and XPS.
+The most prominent feature of EBookDroid is its customizability: you can tune the interface and the reading modes to suit your reading habits. And most importantly, you can set layout and viewing preferences on a per book basis.
+
+Most (but not all!) of the setting are accessible via the later swiping menus. 
+The menu on the left has mostly system and file-system options; the menu on the right has mostly viewing and appearance options. To access the menus just swipe horizontally near the blue glowing areas (and yes, you can disable the blue glow, if you wish so!).
+
+== Q: Do I need to download some plug-in to view my PDF documents? ==
+== A: ==
+No, all plug-ins are _already integrated_ into EBookDroid. All you have to do is to acknowledge installation and the fact that you want to use the plug-in to read your documents. The reason for this is simply that starting with version 2.0 some of the code is now used as separate modules in form of a plug-in.
+
+== Q: I do not see any of my EPUB and RTF files. Why? ==
+== A: ==
+You have to enable file type associations in General settings..., File Association.... Just tap in the missing checkboxes, restart EBookDroid and you will see your EPUB and RTF files.
+
+== Q: How do I access my books and documents? ==
+== A: ==
+You leave your books and documents exactly as they are- there is no need to import or copy them in special folders. Just specify the path were you keep them stored (for example on your external SD card) and they will be available in the graphical user interface (the bookshelf).
+Each folder and subfolder is graphically translated into a separate bookshelf that you can browse by swiping down (if there are more books than can be displayed in a single screen). 
+You can browse between bookshelf (that is folders) by swiping left and right.
+By default, the "Recent" bookshelf is shown when EBookDroid is first opened.
+
+If you prefer browsing directory trees, you can do so by accessing the Folder View under the EBookDroid icon button (it's on the top left corner: the backward E and B that look like two books - or a droid with a green dome...).
+
+In either view, whenever you reach a book you want to read, you can open it by - guess what - tapping on it.
+It will later show up in the Recent bookshelf.
+
+== Q: What can I do from within the Bookshelves? ==
+== A: ==
+In the "Recent" bookshelf you can remove the book presence (not the file, just its presence in this particular shelf), its cached data or its specific settings.
+
+In all other shelves you can executes file operations (to rename, delete or copy the corresponding files - needless to say, you'd better be careful with "delete").
 
 == Q: How can I  have EBookDroid automatically open a certain type of file using an external file manager? ==
 == A: ==
 EBookDroid uses MIME types to handle different file types. Unfortunately, Android's and many other file managers might not support all MIME types. When this happens, you will not be able to open said files directly from the file manager. Some file managers allow you to add new MIME types and associate them with the corresponding file extensions. Refer to your file manager manual to get further instructions on how to do that. All MIME types supported by EBookDroid are listed [MimeTypes here].
 
-== Q: I don't see any of my EPUB and RTF files. Why? ==
+== Q: Why can I turn pages only in vertical? ==
 == A: ==
-You have to enable file type associations in General settings..., File Association.... Just tap in the missing checkboxes, restart EBookDroid and you will see your EPUB and RTF files.
+By default EBookDroid has two tapping areas at the top and bottom of the screen that allow you to turn pages up and down. This is the most natural way to navigate a document in small devices like mobile phones and smartphones. 
+You can add your own tapping areas by means of the "Configure Taps" menu. You can have both vertical and horizontal tapping areas.
 
-== Q: Do I need to download some plug-in to view my PDF documents? ==
+== Q: Can I customize the interface? ==
 == A: ==
-No, all plug-ins are already integrated into EBookDroid. All you have to do is to acknowledge installation and the fact that you want to use the plug-in to read your documents. The reason for this is simply that starting with version 2.0 some of the code is now used as separate modules in form of a plug-in.
+You can customize how EBookDroid reacts to gestures and key pressing.
+By default EBookDroid comes with a few commands coded in: 
 
-== Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
-== A: ==
-EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
+ * Close
+ * Page forward
+ * Page backward
+ * Settings
+	
+You can either redefine the haptic interface from scratch, or simply add new commands.
+The Settings... Configure Touch menu shows a grid of touch sensitive zones representing the whole screen. 
+You can select an area by dragging the selection on the screen - the area will change color (to a different hue, it's not important which color is used) to reflect the selection - and then you can add up to three different commands for the selected zone
 
-== Q: What? No reflow??? ==
+ * one for Tap
+ * one for Long Tap
+ * one for Double Tap
+
+(You do not need to associate a command to all three gestures, only to those you need)
+Colors are semi-transparent because zones can overlap.
+
+For example, to add a left to right page browsing (as opposed to the up-down by default), just select the leftmost column and then choose the "Page back" command from the "Tap" list. After that, you can select the rightmost column and associate the "Page forward" command to the tap List.
+
+If you want to add a "Double Tap to Column" behavior to EBookDroid, just select the whole screen area and then associate the "Zoom to column" command to the "Double Tap" gesture.
+Next time you'll double tap on a column of text, EBookDroid will automatically zoom in to the column width. Double tap again and you are back to your original magnification level.
+
+== Q: What else can I customize of the interface? ==
 == A: ==
-Yes, no reflow.
-For several technical reasons, EBookDroid is a 'page-oriented' document viewer. Many of its unique features require the document's content to be cast in a set of immutable pages. Not only that, but EBookDroid developers believe a document should be rendered as faithfully as possible to the way the original creator designed it.
-All that said, EBookDroid provide several features to make the best of the scarce screen size of portable devices.
+You can hide the title and or the status bar (to gain a full page view of your document).
+
+You can hide the blue lateral glow of the lateral menus (to make sure nothing stands between the nazgu--- the reader and its book)
+
+You can choose if and where to show small indicators for page number and zoom level.
+
+More to come...
+
 
 == Q: How can I maximize viewable area in Ebookdroid? ==
 == A: ==
-EbookDroid offers several features to make the most out of the - usually scarce - screen real estate of tablets and smartphones. Apart from the ordinary zoom level (manually selectable either by pinching in and out or by means of a slider at the bottom of the screen), the following methods can be used to magnify relevant parts of a document:
+EBookDroid offers several features to make the most out of the - usually scarce - screen real estate of tablets and smart phones. Apart from the ordinary zoom level (manually selectable either by pinching in and out or by means of a slider at the bottom of the screen), the following methods can be used to magnify relevant parts of a document:
 
  * Split pages
  * Automatic crop margins
@@ -95,14 +146,20 @@ simply takes you back to the area selection screen. You can exit the Manual Crop
 === Zoom to column ===
 Zoom to Column is a feature that allows you to fit the width of a selected column to the screen. This is useful for reading multiple column documents, like newspapers, magazines, scientific papers, some textbooks and whitepapers. There is no menu to directly access this feature, whose action can be associated to a particular gesture (a tap, a long tap or a double tap, whatever suits you) in the "*Tap Configuration*" menu.  Repeating the gesture on the magnified column will take you back at the previous level of magnification (be it full page, a custom level or one imposed via automatic or manual crop settings).
 
-== Q: When I try to select the area for Manual Crop nothing happens. Why? ==
+== Q: When I try to select the area for Manual Crop nothing happens. Why? (superseded) ==
 == A: ==
 Although the viewable area selection affects all viewing modes, setting the area for Manual Crop requires your document to be displayed in Single Page mode. Please turn on Single Page mode before trying to set Manual Crop's viewable area, otherwise you will not be able to see the resizable rectangular selection superposed to the current (single) page.
 
-== Q: Why can I turn pages only in vertical? ==
+== Q: Can I change brightness, color and appearance of the document? ==
 == A: ==
-By default EBookDroid has two tapping areas at the top and bottom of the screen that allow you to turn pages up and down. This is the most natural way to navigate a document in small devices like mobile phones and smartphones. 
-You can add your own tapping areas by means of the "Configure Taps" menu. You can have both vertical and horizontal tapping areas.
+You can change the brightness at a global level, setting a value as a percent of the default device brightness. If white pages are too bright to read, you can set the value at 80 or 70, it will look better in dim light. 
+
+You can even change the page background color - at the moment this is a global setting.
+
+You can also invert colors, in Night mode. It will help you go easy on your eyes when you are reading at night, with the lights off.
+A special setting will let you choose between gray-scale images (it adds to a nice blackboard effect for math books) or colored images.
+
+And you can change the contrast, brightness and saturation of the displayed page. This is very helpful with old xeroxes that might need some tweaking for enhance their readability.
 
 == Q: Where are the Edit Tools? ==
 == A: ==
@@ -134,10 +191,39 @@ You could use notebooks to summarize lengthy textbooks while you read. Take note
 
 You are a journalist and you have to review a book. While you are reading it, you can add your considerations on every page you find something worth noting. At the end of the book, you export your diary as booktitle_notes.epub and move it to your computer. Here you can open it and transfer it into your word processor to create a review with all your annotations ordered by page.
 
+== Q: What else can I do with EBookDroid? ==
+== A: ==
+You can read books with facing pages in landscape mode.
+
+You can read from right to left.
+
+You can browse the table of contents (outline) of the book, if the book has one.
+
+You can add bookmarks, notes and create a notebook with extended annotations that can be exported as an external epub file for further processing.
+
+You can highlight and draw on the page.
+
+== Q: What can I NOT do with EBookDroid (at least for the time being)? ==
+== A: ==
+You can't reflow text. Sorry, this is by design. This means that you cannot increase font size to make the text bigger without the page growing bigger than the screen.
+You can zoom to columns, if you wish.
+
+You can't embed your notes directly into the document (for example a PDF file).
+EBookDroid philosophy is not to alter any document.
+Possibly an external tool can be developed to incorporate the notes exported into the EPUB file in the original document file. But do not hold you breath while waiting for it.
+
+You can't brew coffee.
+But you can still read a book on coffee brewing.
+
+== Q: What? No reflow??? ==
+== A: ==
+Yes, no reflow.
+For several technical reasons, EBookDroid is a 'page-oriented' document viewer. Many of its unique features require the document's content to be cast in a set of immutable pages. Not only that, but EBookDroid developers believe a document should be rendered as faithfully as possible to the way the original creator designed it.
+All that said, EBookDroid provide several features to make the best of the scarce screen size of portable devices.
+
 == Q: Why does EBookDroid need to access the Internet? Do you collect data when I am not looking? ==
 == A: ==
 EBookDroid requires Internet access in order to provide OPDS functionality.
-Unlike many other e-book readers on the market, EBookDroid is open source, which means that everyone can read the source code and see what the program does and does not. You do not have to trust the developers: if you are not into software developing, you can ask a programmer you personally trust to look at the source code to see if something muddy is going on.
 
 == Q: On my device, EBookDroid is too slow for my tastes: can I speed it up a bit? ==
 == A: ==
@@ -148,3 +234,13 @@ For example: you can make EBookDroid load a certain number of pages (default is 
 
 Not all devices tolerate all these advanced settings, therefore some experimenting is needed to strike the correct balance of performance and stability. 
 For example, you can dedicate more than one thread to page rendering, but on certain devices this could have a detrimental effect on some services or other applications making the system overall slower. 
+
+== Q: How do I obtain the program's log file? ==
+== A: ==
+=== 1. On the PC, using Android SDK ===
+Connect your device to a PC running Android SDK and issue the command _"adb logcat"_.
+=== 2. On the device ===
+There are many apps on the Market that allow you to see and save the log file directly on the device.
+For example:
+ * https://market.android.com/details?id=com.nolanlawson.logcat
+ * https://market.android.com/details?id=org.jtb.alogcat
