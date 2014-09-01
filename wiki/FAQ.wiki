@@ -14,7 +14,7 @@ EBookDroid is constantly being updated and enhanced. Sometimes the features desc
 
 == Q: Do I need to download some plug-in to view my PDF or DJVU documents? ==
 == A: ==
-No, all plug-ins are _already integrated_ into EBookDroid. All you have to do is to acknowledge installation and the fact that you want to use the plug-in to read your documents. The reason for this is simply that starting with version 2.0 some of the code is now used as separate modules in form of a plug-in.
+No, all plug-ins are _already integrated_ into EBookDroid. All you have to do is to acknowledge installation and the fact that you want to use the plug-in to read your documents. The reason for this is simply that starting with version 2.0 some of the code is now used as separate modules in form of a plug-in. Again, you do not have to download anything: all the code is already present within the EBookDroid app.
 
 == Q: I do not see any of my EPUB and RTF files. Why? ==
 == A: ==
@@ -232,7 +232,7 @@ All that said, EBookDroid provide several features to make the best of the scarc
 
 == Q: Why does EBookDroid need to access the Internet? Do you collect data when I am not looking? ==
 == A: ==
-EBookDroid requires Internet access in order to provide OPDS functionality.
+EBookDroid requires Internet access in order to provide OPDS functionality. When EBookDroid was open source you could have analyzed the code to verify that. Later versions are now distributed with another license and the code is no longer available for scrutiny, so you'll have to either trust the developers or analyze all data exchanged by the app to make sure nothing shady is going on under the hood. If you still think that EBookDroid is "too good to be free", you can support the developers by buying the paid version (PDF and DJVU Reader, look it up on Google Play) that, for your peace of mind, features no Internet connection (but lacks the OPDS functionality).
 
 == Q: On my device, EBookDroid is too slow for my tastes: can I speed it up a bit? ==
 == A: ==
