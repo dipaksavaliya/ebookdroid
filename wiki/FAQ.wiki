@@ -1,14 +1,14 @@
-== Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
-== A: == 
-EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
-
-== Q: Now, what is EBookDroid and what can I do with it? ==
+== Q: First of all, what is EBookDroid and what can I do with it? ==
 == A: ==
 Well, first and foremost you can read books or, more generally, documents of many sorts: PDF, DJVU, EPUB, FB2, CBR, CBZ, even RTF and XPS.
 The most prominent feature of EBookDroid is its customizability: you can tune the interface and the reading modes to suit your reading habits. And most importantly, you can set layout and viewing preferences on a per book basis.
 
 Most (but not all!) of the setting are accessible via the later swiping menus. 
 The menu on the left has mostly system and file-system options; the menu on the right has mostly viewing and appearance options. To access the menus just swipe horizontally near the blue glowing areas (and yes, you can disable the blue glow, if you wish so!).
+
+== Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
+== A: == 
+EBookDroid is constantly being updated and enhanced. Sometimes the features described in this FAQ might not be up to date with those in the latest version of the program. A certain degree of mental flexibility is required to adapt the procedures herein described to the actual version of EBookDroid currently on your device. Most of the the times some options have changed name with something equivalent; some other times certain options might have been removed, or simply moved to another menu or another panel. Reading the ChangeLog embedded in the app and placed on the Wiki might be of some help.
 
 == Q: Do I need to download some plug-in to view my PDF or DJVU documents? ==
 == A: ==
@@ -29,6 +29,12 @@ If you prefer browsing directory trees, you can do so by accessing the Folder Vi
 
 In either view, whenever you reach a book you want to read, you can open it by - guess what - tapping on it.
 It will later show up in the Recent bookshelf.
+
+== Q: How can I tell EBookDroid where to look for my books? ==
+== A: ==
+While in bookshelf view tap the app icon (the "EB" on the top left); a list of options will appear. Choose "All Settings" to enter the settings page (yes, not everything is set via the lateral menus!).
+Scroll down to "Library and Files" and tap on it.
+Tap on "Auto Scan Directories" and type the path to the directory you want EBookDroid to look for your books (default is the internal SD card of your device)
 
 == Q: What can I do from within the Bookshelves? ==
 == A: ==
