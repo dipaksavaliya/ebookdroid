@@ -68,11 +68,12 @@ The Settings... Configure Touch menu shows a grid of touch sensitive zones repre
 You can select an area by dragging the selection on the screen - the area will change color (to a different hue, it's not important which color is used) to reflect the selection - and then you can add up to three different commands for the selected zone
 
  * one for Tap
- * one for Long Tap
  * one for Double Tap
+ * one for Two-fingers Tap
+ (the long tap on the whole page is reserved for the Edit Tools)
 
 (You do not need to associate a command to all three gestures, only to those you need)
-Colors are semi-transparent because zones can overlap.
+Colors are semi-transparent because zones are allowed to overlap.
 
 For example, to add a left to right page browsing (as opposed to the up-down by default), just select the leftmost column and then choose the "Page back" command from the "Tap" list. After that, you can select the rightmost column and associate the "Page forward" command to the tap List.
 
