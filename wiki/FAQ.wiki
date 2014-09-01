@@ -3,8 +3,10 @@
 Well, first and foremost you can read books or, more generally, documents of many sorts: PDF, DJVU, EPUB, FB2, CBR, CBZ, even RTF and XPS.
 The most prominent feature of EBookDroid is its customizability: you can tune the interface and the reading modes to suit your reading habits. And most importantly, you can set layout and viewing preferences on a per book basis.
 
-Most (but not all!) of the setting are accessible via the later swiping menus. 
-The menu on the left has mostly system and file-system options; the menu on the right has mostly viewing and appearance options. To access the menus just swipe horizontally near the blue glowing areas (and yes, you can disable the blue glow, if you wish so!).
+Most (but not all!) of the setting are accessible via the lateral menus you can access by swiping from the border toward the center of the screen. 
+The menu on the left has (mostly) system and file-system options; the menu on the right has (mostly) viewing and appearance options. To access the menus just swipe horizontally near the blue glowing areas (and yes, you can disable the blue glow, if you wish so!).
+
+The rest of the settings are available in the multi-pages menu that can be accessed from the left lateral menu (entry "All Settings...").
 
 == Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
 == A: == 
