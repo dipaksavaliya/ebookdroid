@@ -3,10 +3,40 @@
 Well, first and foremost you can read books or, more generally, documents of many sorts: PDF, DJVU, EPUB, FB2, CBR, CBZ, even RTF and XPS.
 The most prominent feature of EBookDroid is its customizability: you can tune the interface and the reading modes to suit your reading habits. And most importantly, you can set layout and viewing preferences on a per book basis.
 
-Most (but not all!) of the setting are accessible via the lateral menus you can access by swiping from the border toward the center of the screen. 
+Most (but not all!) of the settings are accessible via the side menus you can access by swiping from the left or right borders toward the center of the screen. 
 The menu on the left has (mostly) system and file-system options; the menu on the right has (mostly) viewing and appearance options. To access the menus just swipe horizontally near the blue glowing areas (and yes, you can disable the blue glow, if you wish so!).
 
-The rest of the settings are available in the multi-pages menu that can be accessed from the left lateral menu (entry "All Settings...").
+The rest of the settings are available in a multi-page menu that can be accessed from the left lateral menu (entry "All Settings...").
+
+== Q: What else can I do with EBookDroid? ==
+== A: ==
+You can read books with facing pages in landscape mode.
+
+You can read from right to left.
+
+You can browse the table of contents (outline) of the book, if the book has one.
+
+You can add bookmarks, notes and create a notebook with extended annotations that can be exported as an external epub file for further processing.
+
+You can highlight and draw on the page.
+
+== Q: What can I NOT do with EBookDroid (at least for the time being)? ==
+== A: ==
+You can't reflow text. Sorry, this is by design. This means that you cannot increase font size to make the text bigger without the page growing bigger than the screen.
+You can zoom to columns, if you wish.
+
+You can't embed your notes directly into the document (for example a PDF file).
+EBookDroid philosophy is not to alter any document.
+Possibly an external tool can be developed to incorporate the notes exported into the EPUB file in the original document file. But do not hold you breath while waiting for it.
+
+You can't brew coffee.
+But you can still read a book on coffee brewing.
+
+== Q: What? No reflow??? ==
+== A: ==
+Yes, no reflow.
+For several technical reasons, EBookDroid is a 'page-oriented' document viewer. Many of its unique features require the document's content to be cast in a set of immutable pages. Not only that, but EBookDroid developers believe a document should be rendered as faithfully as possible to the way the original creator designed it.
+All that said, EBookDroid provide several features to make the best of the scarce screen size of portable devices (read on).
 
 == Q: Why are the command sequences described in the FAQ different on my version of EBookDroid? ==
 == A: == 
@@ -22,7 +52,7 @@ You have to enable file type associations in General settings..., File Associati
 
 == Q: How do I access my books and documents? ==
 == A: ==
-You leave your books and documents exactly as they are- there is no need to import or copy them in special folders. Just specify the path were you keep them stored (for example on your external SD card) and they will be available in the graphical user interface (the bookshelf).
+You leave your books and documents exactly where they are- there is no need to import or copy them in special folders. Just specify the path were you keep them stored (for example on your external SD card) and they will be available in the graphical user interface (the bookshelf).
 Each folder and subfolder is graphically translated into a separate bookshelf that you can browse by swiping down (if there are more books than can be displayed in a single screen). 
 You can browse between bookshelves (that is folders) by swiping left and right.
 By default, the "Recent" bookshelf is shown when EBookDroid is first opened.
@@ -40,7 +70,7 @@ Tap on "Auto Scan Directories" and type the path to the directory you want EBook
 
 == Q: What can I do from within the Bookshelves? ==
 == A: ==
-In the "Recent" bookshelf you can remove the book presence (not the file, just its presence in this particular shelf), its cached data or its specific settings.
+In the "Recent" bookshelf you can remove the book link (not the file, just its presence in this particular shelf), its cached data or its specific settings.
 
 In all other shelves you can executes file operations (to rename, delete or copy the corresponding files - needless to say, you'd better be careful with "delete").
 
@@ -63,16 +93,16 @@ By default EBookDroid comes with a few commands coded in:
  * Page backward
  * Settings
 	
-You can either redefine the haptic interface from scratch, or simply add new commands.
+You can either redefine the tactile interface from scratch, or simply add new commands.
 The Settings... Configure Touch menu shows a grid of touch sensitive zones representing the whole screen. 
-You can select an area by dragging the selection on the screen - the area will change color (to a different hue, it's not important which color is used) to reflect the selection - and then you can add up to three different commands for the selected zone
+You can select an area by dragging a selection on the screen - the area will change color (to a different hue, it's not important which color is used) to reflect the selection - and then you can add up to three different commands for the selected zone
 
  * one for Tap
  * one for Double Tap
  * one for Two-fingers Tap
  (the long tap on the whole page is reserved for the Edit Tools)
 
-(You do not need to associate a command to all three gestures, only to those you need)
+(You do not have to associate a command for each one of these three gestures, pick the ones you want and just leave those you are not interested in blank)
 Colors are semi-transparent because zones are allowed to overlap.
 
 For example, to add a left to right page browsing (as opposed to the up-down by default), just select the leftmost column and then choose the "Page back" command from the "Tap" list. After that, you can select the rightmost column and associate the "Page forward" command to the tap List.
@@ -185,9 +215,11 @@ Long tap on the page, choose "Notes" from the tools bar, then "Notebook".
 You can now write down your thoughts and associate the text to the page you are reading. A notebook entry can have a title and a content; the content can have some basic formatting (bold, italics, underline).
 These notes will be saved internally by EBookDroid and will be accessible for reading and editing by using the Notebook feature on that same page.
 You can add a notebook page for every page of your book.
+The whole notebook will be accessible via the Go to... menu, by tapping on the notebook icon.
+
 
 === To export the Notebook: ===
-Notebook pages are stored internally by EBookDroid for maximum efficiency. If you want to access all notes at once, you have to export them using the Export function (available on the Text toolbar). EBookDroid will generate an epub file containing all your diary pages neatly ordered by page number.The epub file will be placed in the same folder as the original file with the name booktitle_notes.epub (where booktitle is the actual name of the file of your document). You can then use it at your leisure, for example by moving it on your computer, renaming it as a zip file and extract the notes on selected pages.
+Notebook pages are stored internally by EBookDroid for maximum efficiency. If you want to access all notes at once from another application, you have to export them using the Export function (available on the Text toolbar). EBookDroid will generate an epub file containing all your notebook pages neatly ordered by page number.The epub file will be placed in the same folder as the original file with the name booktitle_notes.epub (where booktitle is the actual name of the file of your document). You can then use it at your leisure, for example by moving it on your computer, renaming it as a zip file and extract the notes on selected pages.
 If you add more entries to your notebook, you must remember to export it again in order for them to show up in the epub container.
 
 == Q: Why should I need a Notebook feature? ==
@@ -200,36 +232,6 @@ You are a student and have to write an essay. It would be easier to do it if you
 You could use notebooks to summarize lengthy textbooks while you read. Take notes about the most interesting parts on every page you feel inclined to add something. When you finish reading the book, you will have a nice version of it in your own words, chapter after chapter, page after page.
 
 You are a journalist and you have to review a book. While you are reading it, you can add your considerations on every page you find something worth noting. At the end of the book, you export your diary as booktitle_notes.epub and move it to your computer. Here you can open it and transfer it into your word processor to create a review with all your annotations ordered by page.
-
-== Q: What else can I do with EBookDroid? ==
-== A: ==
-You can read books with facing pages in landscape mode.
-
-You can read from right to left.
-
-You can browse the table of contents (outline) of the book, if the book has one.
-
-You can add bookmarks, notes and create a notebook with extended annotations that can be exported as an external epub file for further processing.
-
-You can highlight and draw on the page.
-
-== Q: What can I NOT do with EBookDroid (at least for the time being)? ==
-== A: ==
-You can't reflow text. Sorry, this is by design. This means that you cannot increase font size to make the text bigger without the page growing bigger than the screen.
-You can zoom to columns, if you wish.
-
-You can't embed your notes directly into the document (for example a PDF file).
-EBookDroid philosophy is not to alter any document.
-Possibly an external tool can be developed to incorporate the notes exported into the EPUB file in the original document file. But do not hold you breath while waiting for it.
-
-You can't brew coffee.
-But you can still read a book on coffee brewing.
-
-== Q: What? No reflow??? ==
-== A: ==
-Yes, no reflow.
-For several technical reasons, EBookDroid is a 'page-oriented' document viewer. Many of its unique features require the document's content to be cast in a set of immutable pages. Not only that, but EBookDroid developers believe a document should be rendered as faithfully as possible to the way the original creator designed it.
-All that said, EBookDroid provide several features to make the best of the scarce screen size of portable devices.
 
 == Q: Why does EBookDroid need to access the Internet? Do you collect data when I am not looking? ==
 == A: ==
