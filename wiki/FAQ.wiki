@@ -134,6 +134,8 @@ You can hide the blue lateral glow of the lateral menus (to make sure nothing st
 
 You can choose if and where to show small indicators for page number and zoom level.
 
+You can hide the spiderwebs and winter decorations.
+
 More to come...
 
 
