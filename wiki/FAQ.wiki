@@ -7,6 +7,7 @@ Most (but not all!) of the settings are accessible via the side menus you can ac
 The menu on the left has (mostly) system and file-system options; the menu on the right has (mostly) viewing and appearance options. To access the menus just swipe horizontally near the blue glowing areas (and yes, you can disable the blue glow, if you wish so!).
 
 The rest of the settings are available in a multi-page menu that can be accessed from the left lateral menu (entry "All Settings...").
+In there you can also find the option to remove the spiderwebs and other decorations, if they are too cheesy for you.
 
 == Q: What else can I do with EBookDroid? ==
 == A: ==
