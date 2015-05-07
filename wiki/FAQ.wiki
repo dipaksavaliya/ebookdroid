@@ -1,7 +1,7 @@
 == Q: First of all, what is EBookDroid and what can I do with it? ==
 == A: ==
-Well, first and foremost you can read books or, more generally, documents of many sorts: PDF, DJVU, EPUB, FB2, CBR, CBZ, even RTF and XPS.
-The most prominent feature of EBookDroid is its customizability: you can tune the interface and the reading modes to suit your reading habits. And most importantly, you can set layout and viewing preferences on a per book basis.
+Well, first and foremost you can read books or, more generally, documents of many sorts: PDF, DJVU, EPUB, MOBI, FB2, CBR, CBZ, and even RTF and XPS.
+The most prominent feature of EBookDroid is its customizability: you can tune both interface and reading modes to suit your reading habits. And most importantly, you can set layout and viewing preferences on a per book basis.
 
 Most (but not all!) of the settings are accessible via the side menus you can access by swiping from the left or right borders toward the center of the screen. 
 The menu on the left has (mostly) system and file-system options; the menu on the right has (mostly) viewing and appearance options. To access the menus just swipe horizontally near the blue glowing areas (and yes, you can disable the blue glow, if you wish so!).
@@ -12,13 +12,21 @@ The rest of the settings are available in a multi-page menu that can be accessed
 == A: ==
 You can read books with facing pages in landscape mode.
 
+You can split landscape double pages into two portrait pages.
+
 You can read from right to left.
 
-You can browse the table of contents (outline) of the book, if the book has one.
+You can fix skewd pages, automatically.
 
-You can add bookmarks, notes and create a notebook with extended annotations that can be exported as an external epub file for further processing.
+You can remove empty or useless borders via cropping (either Automatic or Manual).
+
+You can browse the table of contents (outline) of the book, if the book has one. And you can create a custom ToC with bookmarks if the book has not one.
+
+You can add bookmarks and in-text notes. You can also create a notebook with page-indexed extended annotations that can be exported as an external epub file for further processing.
 
 You can highlight and draw on the page.
+
+You can set the brightness and background color of the pages. You can go easy on your eyes with Night Mode and Dark Room Mode.
 
 == Q: What can I NOT do with EBookDroid (at least for the time being)? ==
 == A: ==
@@ -46,13 +54,17 @@ EBookDroid is constantly being updated and enhanced. Sometimes the features desc
 == A: ==
 No, all plug-ins are _already integrated_ into EBookDroid. All you have to do is to acknowledge installation and the fact that you want to use the plug-in to read your documents. The reason for this is simply that starting with version 2.0 some of the code is now used as separate modules in form of a plug-in. Again, you do not have to download anything: all the code is already present within the EBookDroid app.
 
-== Q: I do not see any of my EPUB and RTF files. Why? ==
+== Q: I do not see any of my EPUB, RTF, MOBI or XXX files. Why? ==
 == A: ==
-You have to enable file type associations in General settings..., File Association.... Just tap in the missing checkboxes, restart EBookDroid and you will see your EPUB and RTF files.
+You have to enable file type associations in General settings..., File Association.... Just tap in the missing checkboxes, restart EBookDroid and you will see your EPUB and RTF files. Or any other supported format that you wish to enable.
+
+== Q: My comic books are just jpg images in a folder. How can I read them in EBookDroid? ==
+== A: ==
+CBR and CBZ file are just rar- and zip-compressed folders of images. You can turn your folder of pictures into such a file by simly compressing them (with a RAR o ZIP compressing utility) and then changing the file suffix from ".rar" or ".zip" to ".cbr" or ".cbz". It's that easy. Then you can have EBookDroid read them.
 
 == Q: How do I access my books and documents? ==
 == A: ==
-You leave your books and documents exactly where they are- there is no need to import or copy them in special folders. Just specify the path were you keep them stored (for example on your external SD card) and they will be available in the graphical user interface (the bookshelf).
+You leave your books and documents exactly where they are - there is no need to import or copy them in special folders. Just specify the path were you keep them stored (for example on your external SD card) and they will be available in the graphical user interface (the bookshelf).
 Each folder and subfolder is graphically translated into a separate bookshelf that you can browse by swiping down (if there are more books than can be displayed in a single screen). 
 You can browse between bookshelves (that is folders) by swiping left and right.
 By default, the "Recent" bookshelf is shown when EBookDroid is first opened.
@@ -205,6 +217,27 @@ And you can change the contrast, brightness and saturation of the displayed page
 == A: ==
 The new Edit Tools introduced with EBookDroid 2.0 are experimental features under development. For this reason they are disabled by default. In order to use them, you need to enable each one of them in the menu Edit Tools under General Settings...
 Once one or more Edit Tools have been enable, a long tap on the page will make the Edit toolbar appear at the top of the screen. Choose a tool and then an action to perform with that tool. When you are done, tap on the check sign on the letf of the toolbar to apply your action.
+
+== Q: Why are some Edit Tools and functions disabled by default? ==
+== A: ==
+Several features are still in development and are marked as experimental. They will work flawlessly on many tablets and smartphone, but they might cause problems with certain hardware/software combinations. To avoid crippling EBookDroid for these unfortunate users, the app is shipped with these features disabled so that a user can immediately know if enabling it will cause some kind of malfunctioning.
+
+== Q: What??? You highlight separated words in a sentence? ==
+== A: ==
+You can enable "Smart highlilghting" to have a continuous highlight line. This is still an experimental feature and for this reason it is disabled by default.
+
+== Q: What kind of annotations can I add to my ebooks? ==
+== A: ==
+You can add bookmarks. They are shown as small slips of paper.
+You can add in-text notes. They are shown as asterisks.
+You can add extensive notes that will be collected in a notebook associated with the book. When a page of the book has a notebook page associated to it, a small page icon is shown in the top right corner of the page (if not cropped).
+You can highlight text.
+You can draw simple geometric figures (like rectangular and circular boxes).
+You can add free-hand drawing by using your fingers or an S-Pen (on Samsung devices).
+
+== Q: What happens to these annotations? ==
+== A: ==
+All annotations are saved internally by EBbookDroid, but can be exported in a user-selected folder for backup purposes. The annotations are NOT embedded in the document, as EBookDroid philosophy is to leave the documents alone.
 
 == Q: What is the Notebook function and how do I use it? ==
 == A: ==
