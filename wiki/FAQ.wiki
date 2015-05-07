@@ -16,7 +16,7 @@ You can split landscape double pages into two portrait pages.
 
 You can read from right to left.
 
-You can fix skewd pages, automatically.
+You can fix skewed pages, automatically.
 
 You can remove empty or useless borders via cropping (either Automatic or Manual).
 
@@ -43,6 +43,7 @@ But you can still read a book on coffee brewing.
 == Q: What? No reflow??? ==
 == A: ==
 Yes, no reflow.
+
 For several technical reasons, EBookDroid is a 'page-oriented' document viewer. Many of its unique features require the document's content to be cast in a set of immutable pages. Not only that, but EBookDroid developers believe a document should be rendered as faithfully as possible to the way the original creator designed it.
 All that said, EBookDroid provide several features to make the best of the scarce screen size of portable devices (read on).
 
@@ -56,11 +57,13 @@ No, all plug-ins are _already integrated_ into EBookDroid. All you have to do is
 
 == Q: I do not see any of my EPUB, RTF, MOBI or XXX files. Why? ==
 == A: ==
-You have to enable file type associations in General settings..., File Association.... Just tap in the missing checkboxes, restart EBookDroid and you will see your EPUB and RTF files. Or any other supported format that you wish to enable.
+You have to enable file type associations in General settings..., File Association.... Just tap in the missing checkboxes, restart EBookDroid and you will see your EPUB and RTF files. Or any other new supported format that you wish to enable.
 
 == Q: My comic books are just jpg images in a folder. How can I read them in EBookDroid? ==
 == A: ==
-CBR and CBZ file are just rar- and zip-compressed folders of images. You can turn your folder of pictures into such a file by simly compressing them (with a RAR o ZIP compressing utility) and then changing the file suffix from ".rar" or ".zip" to ".cbr" or ".cbz". It's that easy. Then you can have EBookDroid read them.
+CBR and CBZ file are just rar- and zip-compressed folders of images. You can turn your folder of pictures into such a file by simply compressing them (with a RAR o ZIP compressing utility) and then changing the file suffix from ".rar" or ".zip" to ".cbr" or ".cbz". It's that easy. Then you can have EBookDroid read them.
+
+Linux users already know how to do that. Under windows, popular compressing utilities are 7zip (free and open source), WinZip and WinRar (not so free and not open source).
 
 == Q: How do I access my books and documents? ==
 == A: ==
@@ -148,7 +151,7 @@ These methods are not necessarily mutually exclusive as it is for example possib
 Some documents show two pages side by side in a single landscape view. EBookDroid can show half landscape page at the time in portrait mode, effectively splitting a single large landscape page into two subsequent portrait pages. This functionality is easily accessed by checking "*Split pages*" in the More... View... menu (the actual sequence of commands could vary from version to version). It can also be set as a default behavior for all books, although you'll rarely need to do so.
 
 === Crop margins (automatic) ===
-Most documents (books, whitepapers, tutorials)share a page layout characterized by wide empty margins around the page's content. While this is usually desirable in a printed document, it represents a waste of screen real estate on handheld devices such as smartphones and tablets. By checking the option "*Crop margins*" in the View... menu, you can have EBookDroid automatically strip those margins away for you. 
+Most documents (books, whitepapers, tutorials) share a page layout characterized by wide empty margins around the page's content. While this is usually desirable in a printed document, it represents a waste of screen real estate on handheld devices such as smartphones and tablets. By checking the option "*Crop margins*" in the View... menu, you can have EBookDroid automatically strip those margins away for you. 
 
 This option can be set as a default for all books (by checking it in the General Settings menu) or on a per book basis (by accessing it from the View... menu or the Book Settings menu).
 
@@ -216,28 +219,33 @@ And you can change the contrast, brightness and saturation of the displayed page
 == Q: Where are the Edit Tools? ==
 == A: ==
 The new Edit Tools introduced with EBookDroid 2.0 are experimental features under development. For this reason they are disabled by default. In order to use them, you need to enable each one of them in the menu Edit Tools under General Settings...
-Once one or more Edit Tools have been enable, a long tap on the page will make the Edit toolbar appear at the top of the screen. Choose a tool and then an action to perform with that tool. When you are done, tap on the check sign on the letf of the toolbar to apply your action.
+Once one or more Edit Tools have been enable, a long tap on the page will make the Edit toolbar appear at the top of the screen. Choose a tool and then an action to perform with that tool. When you are done, tap on the check sign on the left of the toolbar to apply your action.
 
 == Q: Why are some Edit Tools and functions disabled by default? ==
 == A: ==
-Several features are still in development and are marked as experimental. They will work flawlessly on many tablets and smartphone, but they might cause problems with certain hardware/software combinations. To avoid crippling EBookDroid for these unfortunate users, the app is shipped with these features disabled so that a user can immediately know if enabling it will cause some kind of malfunctioning.
+Several features are still in development and are marked as experimental. They will work flawlessly on many tablets and smartphone, but they might cause problems to users with certain hardware/software combinations. To avoid crippling EBookDroid for these unfortunate users, the app is shipped with these features disabled so that a user can immediately know when enabling it will result in some kind of malfunctioning.
 
-== Q: What??? You highlight separated words in a sentence? ==
+== Q: What??? EBookDroid highlights word by word? ==
 == A: ==
-You can enable "Smart highlilghting" to have a continuous highlight line. This is still an experimental feature and for this reason it is disabled by default.
+You can enable "Smart highlilghting" to have a continuous highlighting without spaces between words. This is still an experimental feature and for this reason it is disabled by default.
 
 == Q: What kind of annotations can I add to my ebooks? ==
 == A: ==
 You can add bookmarks. They are shown as small slips of paper.
+
 You can add in-text notes. They are shown as asterisks.
+
 You can add extensive notes that will be collected in a notebook associated with the book. When a page of the book has a notebook page associated to it, a small page icon is shown in the top right corner of the page (if not cropped).
+
 You can highlight text.
+
 You can draw simple geometric figures (like rectangular and circular boxes).
+
 You can add free-hand drawing by using your fingers or an S-Pen (on Samsung devices).
 
 == Q: What happens to these annotations? ==
 == A: ==
-All annotations are saved internally by EBbookDroid, but can be exported in a user-selected folder for backup purposes. The annotations are NOT embedded in the document, as EBookDroid philosophy is to leave the documents alone.
+All annotations are saved internally by EBbookDroid, but can be exported in a user-selected folder for backup purposes. The annotations are NOT embedded in the document, as EBookDroid's philosophy is to leave the documents as they are.
 
 == Q: What is the Notebook function and how do I use it? ==
 == A: ==
