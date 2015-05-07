@@ -230,7 +230,7 @@ You can enable "Smart highlighting" to have a continuous highlighting without sp
 
 == Q: What kind of annotations can I add to my ebooks? ==
 == A: ==
-You can add bookmarks. They are shown as small slips of paper.
+You can add bookmarks. They are shown as small ribbon-like icons.
 
 You can add in-text notes. They are shown as asterisks.
 
@@ -240,11 +240,11 @@ You can highlight text.
 
 You can draw simple geometric figures (like rectangular and circular boxes).
 
-You can add free-hand drawing by using your fingers or an S-Pen (on Samsung devices).
+You can add free-hand drawings by using your fingers or an S-Pen (on certain Samsung devices).
 
 == Q: What happens to these annotations? ==
 == A: ==
-All annotations for a given book are saved internally by EBbookDroid in a dedicated database, but can be exported in a user-selected folder for backup purposes. The annotations are NOT embedded in the document, as EBookDroid's philosophy is to leave the documents as they are.
+All annotations for a given book are saved internally by EBbookDroid in a dedicated database for fast retrieval, but can be exported in a user-selected folder for backup purposes. The annotations are NOT embedded in the document, as EBookDroid's philosophy is to leave the documents as they are. You can save the annotations for a given book and then restore them if you need to do so.
 
 == Q: What is the Notebook function and how do I use it? ==
 == A: ==
