@@ -21,11 +21,17 @@ You can fix skewed pages, automatically.
 
 You can remove empty or useless borders via cropping (either Automatic or Manual).
 
+You can zoom in and out of columns of text (requires configuration).
+
 You can browse the table of contents (outline) of the book, if the book has one. And you can create a custom ToC with bookmarks if the book does not have one.
 
 You can add bookmarks and in-text notes. You can also create a notebook with extended page-indexed annotations that can be used as a 'reading diary' or be exported as an external EPUB file for further processing.
 
 You can highlight and draw on the page.
+
+You can search the document, copy and paste text or look-up a dictionary or web-search engine for a given word.
+
+You can flip between multiple open books.
 
 You can set the brightness and background color of the pages. You can go easy on your eyes with Night Mode and Dark Room Mode.
 
@@ -186,7 +192,6 @@ EBookDroid's flexible Manual Crop feature allow you to select two distinct viewa
 
 Once you have set the desired viewable area with Manual Crop, you can scroll, change page, zoom in and out and be sure to be able to return to the same view by pinching out. The area selected represents now the new page size for your document (to be specific: for one, all, all even or odd pages according to your choice).
 
-
 You can remove manual crop settings via the same menu you use to set them: View... , "Manual crop", double click on the selected area and then choose one of the options:
 
  * Remove crop settings from current page(s)
@@ -201,7 +206,11 @@ The first option will remove any (manual) crop settings associated with the curr
 simply takes you back to the area selection screen. You can exit the Manual Crop submenu by using the back button on your device.
 
 === Zoom to column ===
-Zoom to Column is a feature that allows you to fit the width of a selected column to the screen. This is useful for reading multiple column documents, like newspapers, magazines, scientific papers, some textbooks and whitepapers. There is no menu to directly access this feature, whose action can be associated to a particular gesture (a tap, a long tap or a double tap, whatever suits you) in the "*Tap Configuration*" menu.  Repeating the gesture on the magnified column will take you back at the previous level of magnification (be it full page, a custom level or one imposed via automatic or manual crop settings).
+Zoom to Column is a feature that allows you to fit the width of a selected column to the screen. This is useful for reading multiple column documents, like newspapers, magazines, scientific papers, some textbooks and whitepapers. There is no menu to directly access this feature, whose action can be associated to a particular gesture (a tap, a long tap or a double tap, whatever suits you) in the "*Tap Configuration*" menu.
+
+For example, to add a "Double Tap to Column" behavior to EBookDroid, go into the Configure Tap menu, and select the whole screen area by dragging one corner of the screen to the opposite corner. Then associate the "Zoom to column" command to the "Double Tap" gesture. 
+
+Once you have done this, whenever you double tap on a column of text, EBookDroid will automatically zoom in to the column's width. Repeating the gesture on the magnified column will take you back at the previous level of magnification (be it full page, a custom level or one imposed via automatic or manual crop settings).
 
 == Q: When I try to select the area for Manual Crop nothing happens. Why? (superseded) ==
 == A: ==
