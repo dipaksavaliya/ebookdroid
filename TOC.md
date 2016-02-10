@@ -1,0 +1,6 @@
+  * [FeatureRequests](http://code.google.com/p/ebookdroid/wiki/FeatureRequests)
+  * [ChangeLog](http://code.google.com/p/ebookdroid/wiki/ChangeLog)
+  * [Mime Types](http://code.google.com/p/ebookdroid/wiki/MimeTypes)
+  * [Preferences](http://code.google.com/p/ebookdroid/wiki/preferences)
+  * [Development](http://code.google.com/p/ebookdroid/wiki/Development)
+  * [FAQ](http://code.google.com/p/ebookdroid/wiki/FAQ)
